@@ -1,0 +1,2731 @@
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import svgPaths from "../imports/svg-tzdfx9foxi";
+import doneTickPaths from "../imports/svg-c9judk5sbu";
+import scheduleSetPaths from "../imports/svg-ky2itz2q0i";
+import scheduleUnsetPaths from "../imports/svg-4l9vgb24m5";
+import repeatIconPaths from "../imports/svg-cep8nozhxy";
+import doneCirclePaths from "../imports/svg-zbpmwo25rv";
+import NewReminderOverlay from "../imports/NewReminderOverlay";
+import DevToolsOverlay from "./components/DevToolsOverlay";
+import RepeatsOverlay from "./components/RepeatsOverlay";
+import ReminderInfoOverlay from "./components/ReminderInfoOverlay";
+import SettingsOverlay from "./components/SettingsOverlay";
+import TutorialOverlay from "./components/TutorialOverlay";
+import type { RepeatRule } from "./types/reminder";
+import type { NlcMode } from "./utils/nlc-interaction";
+import { renderReminderText, getDisplayTitle } from "./utils/render-text";
+import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel } from "./reminder-utils";
+import type { Reminder, ReminderCategory, ReminderSchedule, RepeatConfig, ViewMode, FiltersMenuVariant } from "./reminder-utils";
+import { formatTime12h } from "./utils/normalise-text";
+import { formatSelectedDate } from "../imports/NewReminderOverlay";
+import { scheduleEquality } from "./utils/schedule";
+import laterBtnPaths from "../imports/svg-0tntgsesap";
+import LaterBtn from "../imports/LaterBtn-146-39";
+import ListsHeader from "../imports/Header";
+import AddListItem from "../imports/Frame807";
+import ListItem from "../imports/ListItem";
+import InfoOverlay from "../imports/InfoOverlay";
+
+// Category colours matching existing static component tick circles
+const CATEGORY_COLOURS: Record<string, string> = {
+  today: "#00AFEE",
+  "this-week": "#DF4DFC",
+  later: "#FAA429",
+  sometime: "#939393",
+  other: "#FAA429",
+};
+
+const LIST_CATEGORY_PILL_COLOURS: Record<string, string> = {
+  complete: "#0D45A0",
+  almost: "#9468D5",
+  started: "#00AFEE",
+  todo: "#939393",
+  "grouped-todo": "#939393",
+};
+
+// Overdue colour for overdue reminders
+const OVERDUE_COLOUR = "#FF0000";
+
+// Reminderly dark blue constant for done styling
+const DONE_BLUE = "#1C2C42";
+
+// Deleted grey constant for deleted styling
+const DELETED_GREY = "#939393";
+
+// Completion delay before setting completedAt (ms)
+const COMPLETION_DELAY = 350; // ms 
+
+// Delay after completedAt is set before rescheduling a repeating reminder (ms)
+const RESCHEDULE_DELAY = 1000;
+
+// Delay before showing empty-state message (ms)
+const EMPTY_STATE_DELAY = 350;
+
+// Delay before inserting a newly created reminder into the list (ms)
+// Allows the overlay slide-down to finish before the row fades in.
+const NEW_REMINDER_INSERT_DELAY = 500;
+
+// Duration of the temporary "just inserted" text/icon highlight (ms)
+const INSERT_HIGHLIGHT_MS = 1000;
+
+// Playful default list names - one is picked at random for each new list
+const DEFAULT_LIST_NAMES = [
+  "Stuff to do...",
+  "Don't forget...",
+  "Getting it done...",
+  "On my radar...",
+  "Things & stuff...",
+  "Brain dump...",
+  "Sort this out...",
+  "The game plan...",
+  "Bits & bobs...",
+  "On the list...",
+  "Need to handle...",
+  "The rundown...",
+  "Top of mind...",
+  "Note to self...",
+  "The essentials...",
+];
+
+/** Pick a random default name, avoiding titles already used by existing lists */
+function pickDefaultListName(existingTitles: string[]): string {
+  const used = new Set(existingTitles);
+  const available = DEFAULT_LIST_NAMES.filter((n) => !used.has(n));
+  const pool = available.length > 0 ? available : DEFAULT_LIST_NAMES;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Pure helper: compute next occurrence for a repeating reminder.
+// Always computes relative to the scheduled datetime being completed, never relative to "now".
+function getNextOccurrence(baseDateTime: Date, repeatRule: RepeatRule): Date {
+  const { frequency, interval, byDay } = repeatRule;
+
+  // Weekly with byDay: find the next matching weekday
+  if (frequency === 'weekly' && byDay && byDay.length > 0) {
+    // Convert byDay abbreviations to JS weekday indices (0=Sun, 1=Mon, ..., 6=Sat)
+    const abbrevToIndex: Record<string, number> = {
+      su: 0, mo: 1, tu: 2, we: 3, th: 4, fr: 5, sa: 6,
+    };
+    const allowedDays = new Set(byDay.map((d) => abbrevToIndex[d]).filter((n) => n !== undefined));
+
+    // Walk forward day by day from baseDateTime + 1 day, up to 365 days
+    for (let offset = 1; offset <= 365; offset++) {
+      const candidate = new Date(baseDateTime);
+      candidate.setDate(candidate.getDate() + offset);
+      const candidateDay = candidate.getDay();
+
+      if (!allowedDays.has(candidateDay)) continue;
+
+      // Check interval: how many full weeks between base week and candidate week
+      const weekDistance = Math.floor(offset / 7);
+      if (weekDistance % interval === 0) {
+        return candidate;
+      }
+    }
+    // Fallback: should not reach here for valid inputs; advance 7 * interval days
+    const fallback = new Date(baseDateTime);
+    fallback.setDate(fallback.getDate() + 7 * interval);
+    return fallback;
+  }
+
+  switch (frequency) {
+    case 'hourly': {
+      const next = new Date(baseDateTime);
+      next.setHours(next.getHours() + interval);
+      return next;
+    }
+    case 'daily': {
+      const next = new Date(baseDateTime);
+      next.setDate(next.getDate() + interval);
+      return next;
+    }
+    case 'weekly': {
+      // Plain weekly (no byDay)
+      const next = new Date(baseDateTime);
+      next.setDate(next.getDate() + 7 * interval);
+      return next;
+    }
+    case 'monthly': {
+      const originalDay = baseDateTime.getDate();
+      const targetMonth = baseDateTime.getMonth() + interval;
+      const next = new Date(baseDateTime.getFullYear(), targetMonth, originalDay,
+        baseDateTime.getHours(), baseDateTime.getMinutes(), 0, 0);
+      // Clamp if month overflowed (e.g. 31st → next month rolled to following month)
+      if (next.getDate() !== originalDay) {
+        // Last day of intended month: day 0 of the next month
+        const clamped = new Date(baseDateTime.getFullYear(), targetMonth + 1, 0,
+          baseDateTime.getHours(), baseDateTime.getMinutes(), 0, 0);
+        return clamped;
+      }
+      return next;
+    }
+    case 'yearly': {
+      const originalMonth = baseDateTime.getMonth();
+      const originalDay = baseDateTime.getDate();
+      const targetYear = baseDateTime.getFullYear() + interval;
+      const next = new Date(targetYear, originalMonth, originalDay,
+        baseDateTime.getHours(), baseDateTime.getMinutes(), 0, 0);
+      // Clamp for Feb 29 on non-leap years
+      if (next.getMonth() !== originalMonth || next.getDate() !== originalDay) {
+        const clamped = new Date(targetYear, originalMonth + 1, 0,
+          baseDateTime.getHours(), baseDateTime.getMinutes(), 0, 0);
+        return clamped;
+      }
+      return next;
+    }
+    default:
+      // Unknown frequency — fallback: advance 1 day
+      const fallback = new Date(baseDateTime);
+      fallback.setDate(fallback.getDate() + 1);
+      return fallback;
+  }
+}
+
+// Format a Date to yyyy-mm-dd string
+function formatDateToSchedule(d: Date): string {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+// Format a Date to HH:mm string
+function formatTimeToSchedule(d: Date): string {
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+// Small component: delays rendering of empty-state text by EMPTY_STATE_DELAY ms
+function DelayedEmptyState({ message }: { message: string }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setVisible(true), EMPTY_STATE_DELAY);
+    return () => clearTimeout(timer);
+  }, []);
+  if (!visible) return <div className="flex items-center justify-center flex-1 w-full" />;
+  return (
+    <div className="flex items-center justify-center flex-1 w-full">
+      <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
+        {message}
+      </p>
+    </div>
+  );
+}
+
+export default function App() {
+  const [reminders, setReminders] = useState<Reminder[]>(() => loadReminders());
+  const [activeFilter, setActiveFilter] = useState<ReminderCategory | "all">("all");
+  const [activeListFilter, setActiveListFilter] = useState<"all" | "complete" | "almost" | "started" | "todo" | "grouped-todo">("all");
+  const [viewMode, setViewMode] = useState<ViewMode | 'lists-done'>("list");
+
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [isListsOverlayOpen, setIsListsOverlayOpen] = useState(false);
+  const [listItems, setListItems] = useState<{ id: string; text: string; completed: boolean }[]>([]);
+  const [listTitle, setListTitle] = useState("");
+  const [createdLists, setCreatedLists] = useState<{ id: string; title: string; items: { text: string; completed: boolean }[]; sortMode?: 'alphabetical' | 'insertion'; smartReminders?: boolean }[]>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-created-lists');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          // Migrate old string[] items to { text, completed } format
+          return parsed.map((list: any) => ({
+            ...list,
+            items: Array.isArray(list.items) ? list.items.map((item: any) =>
+              typeof item === 'string' ? { text: item, completed: false } : item
+            ) : []
+          }));
+        }
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
+
+  // UI-only: list settings overlay (cog button in overlay header)
+  const [isListSettingsOpen, setIsListSettingsOpen] = useState(false);
+  const [listSortMode, setListSortMode] = useState<'alphabetical' | 'insertion'>('insertion');
+  const [listSmartReminders, setListSmartReminders] = useState(true);
+  const handleSmartRemindersChange = (val: boolean) => {
+    setListSmartReminders(val);
+    if (editingListId) {
+      setCreatedLists(prev => prev.map(l => l.id === editingListId ? { ...l, smartReminders: val } : l));
+    }
+  };
+
+  // UI-only: list overlay mode tracking (create vs edit, kept separate from reminders)
+  const [listOverlayMode, setListOverlayMode] = useState<'create' | 'edit'>('create');
+  const [editingListId, setEditingListId] = useState<string | null>(null);
+
+  // UI-only: list-specific insertion state (mirrors reminder insertion state, kept separate)
+  const [listReinsertedId, setListReinsertedId] = useState<string | null>(null);
+  const [listInsertHighlightId, setListInsertHighlightId] = useState<string | null>(null);
+  const newListInsertTimerRef = useRef<number | null>(null);
+  const listInsertHighlightTimerRef = useRef<number | null>(null);
+
+  // UI-only: list-item-specific insertion state (mirrors list insertion state, for items within the overlay)
+  const [listItemReinsertedId, setListItemReinsertedId] = useState<string | null>(null);
+  const [listItemHighlightId, setListItemHighlightId] = useState<string | null>(null);
+  const listItemHighlightTimerRef = useRef<number | null>(null);
+
+  const [isDevToolsOpen, setIsDevToolsOpen] = useState(false);
+  const [isDevToolsUnlocked, setIsDevToolsUnlocked] = useState(false);
+  const [isDevToolsPasswordRequired, setIsDevToolsPasswordRequired] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-dev-tools-password-required');
+      if (stored === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+  const [isRepeatsOverlayOpen, setIsRepeatsOverlayOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 0);
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef<number | null>(null);
+  const [repeatConfig, setRepeatConfig] = useState<RepeatConfig>(null);
+
+  // Transient visual-only set: ids currently in the 350ms "pending done" window.
+  // Affects rendering only — never list membership or done/deleted derivation.
+  const [pendingDoneIds, setPendingDoneIds] = useState<Set<string>>(new Set());
+
+  // Transient visual-only set: ids currently in the 350ms "pending uncomplete" window.
+  const [pendingUncompleteIds, setPendingUncompleteIds] = useState<Set<string>>(new Set());
+
+  // Completion timer map: one timer per reminder id, cleared on unmount.
+  const completionTimersRef = useRef<Map<string, number>>(new Map());
+
+  // Uncomplete timer map: one timer per reminder id, cleared on unmount.
+  const uncompleteTimersRef = useRef<Map<string, number>>(new Map());
+
+  // Stores the original completedAt for pending-uncomplete items so the done/deleted sort stays stable.
+  const pendingUncompleteCompletedAtRef = useRef<Map<string, number>>(new Map());
+
+  // Transient visual-only set: ids currently in the 350ms "pending delete" window.
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(new Set());
+
+  // Delete timer map: one timer per reminder id, cleared on unmount.
+  const pendingDeleteTimersRef = useRef<Map<string, number>>(new Map());
+
+  // Transient visual-only set: ids currently in the 350ms "pending undelete" window.
+  const [pendingUndeleteIds, setPendingUndeleteIds] = useState<Set<string>>(new Set());
+
+  // Undelete timer map: one timer per reminder id, cleared on unmount.
+  const undeleteTimersRef = useRef<Map<string, number>>(new Map());
+
+  // Stores the original deletedAt for pending-undelete items so the done/deleted sort stays stable.
+  const pendingUndeleteSortKeyRef = useRef<Map<string, number>>(new Map());
+
+  // Reschedule timer map: one timer per repeating reminder id, for the 500ms delay after completedAt is set.
+  const rescheduleTimersRef = useRef<Map<string, number>>(new Map());
+
+  // Pending repeat completion ids: tracks repeat reminders in the full in-flight completion cycle.
+  // Used to allow second-click cancellation and prevent duplicate spawn.
+  const pendingRepeatCompletionIdsRef = useRef<Set<string>>(new Set());
+
+  // Dev-only: NLC parsing mode for A/B testing (click vs auto)
+  const [nlcMode, setNlcMode] = useState<NlcMode>('auto');
+
+  // Dev-only: NLC feature flag — controls whether NLC parsing and UI are active
+  const [nlcEnabled, setNlcEnabled] = useState(true);
+
+  // Dev-only: onboarding tutorial feature flag — controls whether tutorial overlay is available
+  const [isOnboardingTutorialEnabled, setIsOnboardingTutorialEnabled] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-ff-onboarding-tutorial');
+      if (stored === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+
+  // Dev-only: paywall feature flag — controls visibility of premium features
+  const [isListsEnabled, setIsListsEnabled] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('dev.listsEnabled');
+      if (stored === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+
+  // Lists mode: active main tab (reminders or lists)
+  const [activeMainTab, setActiveMainTab] = useState<'reminders' | 'lists'>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-active-main-tab');
+      if (stored === 'reminders' || stored === 'lists') return stored;
+      return 'reminders';
+    } catch {
+      return 'reminders';
+    }
+  });
+
+  // Dev-only: show tutorial on first launch toggle
+  const [showTutorialOnFirstLaunch, setShowTutorialOnFirstLaunch] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-ff-tutorial-first-launch');
+      if (stored === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+
+  // Dev-only: show tutorial on every app start toggle
+  const [showTutorialOnEveryStart, setShowTutorialOnEveryStart] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-ff-tutorial-every-start');
+      if (stored === 'true') return true;
+      return false;
+    } catch {
+      return false;
+    }
+  });
+
+  // Dev-only: filters menu variant for A/B testing (standard vs grouped)
+  const [filtersMenuVariant, setFiltersMenuVariant] = useState<FiltersMenuVariant>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-filters-menu-variant');
+      if (stored === 'standard' || stored === 'grouped') return stored;
+      return 'grouped';
+    } catch {
+      return 'grouped';
+    }
+  });
+
+  // Dev-only: hide overdue reminders from all views
+  const [hideOverdue, setHideOverdue] = useState(false);
+
+  // Setting: show date and time subtitles (persisted, default true)
+  const [showDateAndTimeSubtitles, setShowDateAndTimeSubtitles] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly.showDateAndTimeSubtitles');
+      if (stored === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+
+  // Conditional empty-placeholder delay: only active when the user removes the last visible item
+  // in the current active list (complete or delete). Navigation-to-empty is always immediate.
+  const emptyPlaceholderDelayRef = useRef<{ untilMs: number; filterKey: string } | null>(null);
+  const [, setEmptyRerenderTick] = useState(0);
+
+  const handleFiltersMenuVariantChange = (variant: FiltersMenuVariant) => {
+    setFiltersMenuVariant(variant);
+    setActiveFilter("all");
+    setActiveListFilter("all");
+  };
+
+  // Reminder info overlay: the reminder currently shown (null = closed)
+  const [infoReminder, setInfoReminder] = useState<Reminder | null>(null);
+
+  // Timer ref for overlay mark-as-done 200ms delay
+  const overlayDoneTimerRef = useRef<number | null>(null);
+
+  // Timer ref for overlay edit 200ms delay
+  const overlayEditTimerRef = useRef<number | null>(null);
+
+  // State: which reminder is being edited (null = create mode)
+  const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
+
+  // UI-only: id of reminder that just reinserted via repeat reschedule (drives fade-in)
+  const [reinsertedId, setReinsertedId] = useState<string | null>(null);
+
+  // UI-only: id of reminder currently showing the temporary insert highlight
+  const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
+
+  // Timer ref for delayed new-reminder insertion (last-one-wins; single timer)
+  const newReminderInsertTimerRef = useRef<number | null>(null);
+
+  // Timer ref for clearing the insert highlight (last-one-wins; single timer)
+  const insertHighlightTimerRef = useRef<number | null>(null);
+
+  // Done/deleted view sub-filter: 'all' | 'done' | 'deleted'
+  const [doneDeletedFilter, setDoneDeletedFilter] = useState<'all' | 'done' | 'deleted'>('all');
+
+  // Clear list button 3-step state: 0=default, 1=confirm, 2=cleared
+  const [clearListStep, setClearListStep] = useState<0 | 1 | 2>(0);
+
+  // Timer ref for clear list 500ms reset after "Cleared!" state
+  const clearListTimerRef = useRef<number | null>(null);
+
+  // Ref for clear all button (used for outside-click detection)
+  const clearAllButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // Cleanup overlay done timer on unmount
+  useEffect(() => {
+    return () => {
+      if (overlayDoneTimerRef.current !== null) {
+        clearTimeout(overlayDoneTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Cleanup overlay edit timer on unmount
+  useEffect(() => {
+    return () => {
+      if (overlayEditTimerRef.current !== null) {
+        clearTimeout(overlayEditTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Cleanup all completion timers on unmount
+  useEffect(() => {
+    const timers = completionTimersRef.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+  }, []);
+
+  // Cleanup all uncomplete timers on unmount
+  useEffect(() => {
+    const timers = uncompleteTimersRef.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+  }, []);
+
+  // Cleanup all reschedule timers on unmount
+  useEffect(() => {
+    const timers = rescheduleTimersRef.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+  }, []);
+
+  // Cleanup new-reminder insert timer on unmount
+  useEffect(() => {
+    return () => {
+      if (newReminderInsertTimerRef.current !== null) {
+        clearTimeout(newReminderInsertTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Cleanup insert highlight timer on unmount
+  useEffect(() => {
+    return () => {
+      if (insertHighlightTimerRef.current !== null) {
+        clearTimeout(insertHighlightTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Cleanup new-list insert timer on unmount
+  useEffect(() => {
+    return () => {
+      if (newListInsertTimerRef.current !== null) {
+        clearTimeout(newListInsertTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Cleanup list insert highlight timer on unmount
+  useEffect(() => {
+    return () => {
+      if (listInsertHighlightTimerRef.current !== null) {
+        clearTimeout(listInsertHighlightTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Cleanup list-item insert highlight timer on unmount
+  useEffect(() => {
+    return () => {
+      if (listItemHighlightTimerRef.current !== null) {
+        clearTimeout(listItemHighlightTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Cleanup clear list timer on unmount
+  useEffect(() => {
+    return () => {
+      if (clearListTimerRef.current !== null) {
+        clearTimeout(clearListTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Persist reminders to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(reminders));
+    } catch {
+      // Fail silently - storage may be full or unavailable
+    }
+  }, [reminders]);
+
+  // Persist showDateAndTimeSubtitles to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('reminderly.showDateAndTimeSubtitles', String(showDateAndTimeSubtitles));
+    } catch {
+      // Fail silently
+    }
+  }, [showDateAndTimeSubtitles]);
+
+  // Persist onboarding tutorial feature flag to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('reminderly-ff-onboarding-tutorial', String(isOnboardingTutorialEnabled));
+    } catch {
+      // Fail silently
+    }
+  }, [isOnboardingTutorialEnabled]);
+
+  // Persist paywall feature flag to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('dev.listsEnabled', String(isListsEnabled));
+    } catch {
+      // Fail silently
+    }
+  }, [isListsEnabled]);
+
+  // Persist tutorial first-launch toggle to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('reminderly-ff-tutorial-first-launch', String(showTutorialOnFirstLaunch));
+    } catch {
+      // Fail silently
+    }
+  }, [showTutorialOnFirstLaunch]);
+
+  // Persist tutorial every-start toggle to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('reminderly-ff-tutorial-every-start', String(showTutorialOnEveryStart));
+    } catch {
+      // Fail silently
+    }
+  }, [showTutorialOnEveryStart]);
+
+  // Persist dev tools password required toggle to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('reminderly-dev-tools-password-required', String(isDevToolsPasswordRequired));
+    } catch {
+      // Fail silently
+    }
+  }, [isDevToolsPasswordRequired]);
+
+  // Persist filters menu variant to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('reminderly-filters-menu-variant', filtersMenuVariant);
+    } catch {
+      // Fail silently
+    }
+  }, [filtersMenuVariant]);
+
+  // Persist created lists to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('reminderly-created-lists', JSON.stringify(createdLists));
+    } catch {
+      // Fail silently
+    }
+  }, [createdLists]);
+
+  // Persist active main tab to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('reminderly-active-main-tab', activeMainTab);
+    } catch {
+      // Fail silently
+    }
+  }, [activeMainTab]);
+
+  // Auto-launch tutorial on mount based on toggle states
+  useEffect(() => {
+    if (!isOnboardingTutorialEnabled) return;
+    if (showTutorialOnEveryStart) {
+      setIsTutorialOpen(true);
+      return;
+    }
+    if (showTutorialOnFirstLaunch) {
+      try {
+        const alreadyShown = localStorage.getItem('reminderly-tutorial-first-launch-shown');
+        if (alreadyShown !== 'true') {
+          localStorage.setItem('reminderly-tutorial-first-launch-shown', 'true');
+          setIsTutorialOpen(true);
+        }
+      } catch {
+        // Fail silently
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-reset: when leaving grouped filters with subtitles off, reset to on
+  useEffect(() => {
+    if (filtersMenuVariant !== 'grouped' && !showDateAndTimeSubtitles) {
+      setShowDateAndTimeSubtitles(true);
+    }
+  }, [filtersMenuVariant, showDateAndTimeSubtitles]);
+
+  // Derived: whether subtitles should be shown
+  const showSubtitles = !(filtersMenuVariant === 'grouped' && !showDateAndTimeSubtitles);
+
+  // Derived: effective filter variant for rendering (lists mode forces standard)
+  const effectiveFiltersVariant = isListsEnabled ? 'standard' : filtersMenuVariant;
+
+  // Helper: cancel and delete entries for a given id from all timer maps.
+  const cancelAllTimersForId = (id: string) => {
+    const maps = [completionTimersRef, uncompleteTimersRef, pendingDeleteTimersRef, undeleteTimersRef, rescheduleTimersRef];
+    for (const map of maps) {
+      const t = map.current.get(id);
+      if (t !== undefined) {
+        clearTimeout(t);
+        map.current.delete(id);
+      }
+    }
+  };
+
+  // Helper: remove a given id from all pending visual sets and pending ref maps.
+  const clearPendingStateForId = (id: string) => {
+    setPendingDoneIds((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    setPendingUncompleteIds((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    setPendingDeleteIds((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    setPendingUndeleteIds((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    pendingUncompleteCompletedAtRef.current.delete(id);
+    pendingUndeleteSortKeyRef.current.delete(id);
+  };
+
+  const addReminder = useCallback((reminder: Reminder) => {
+    // Cancel any pending insert timer (last-one-wins)
+    if (newReminderInsertTimerRef.current !== null) {
+      clearTimeout(newReminderInsertTimerRef.current);
+    }
+    newReminderInsertTimerRef.current = window.setTimeout(() => {
+      newReminderInsertTimerRef.current = null;
+      setReminders((prev) => [...prev, reminder]);
+      setReinsertedId(reminder.id);
+      setInsertHighlightId(reminder.id);
+      if (insertHighlightTimerRef.current !== null) {
+        clearTimeout(insertHighlightTimerRef.current);
+      }
+      insertHighlightTimerRef.current = window.setTimeout(() => {
+        insertHighlightTimerRef.current = null;
+        setInsertHighlightId(null);
+      }, INSERT_HIGHLIGHT_MS);
+    }, NEW_REMINDER_INSERT_DELAY);
+  }, []);
+
+  const addReminders = useCallback((newReminders: Reminder[]) => {
+    // Cancel any pending insert timer (last-one-wins)
+    if (newReminderInsertTimerRef.current !== null) {
+      clearTimeout(newReminderInsertTimerRef.current);
+    }
+    newReminderInsertTimerRef.current = window.setTimeout(() => {
+      newReminderInsertTimerRef.current = null;
+      setReminders((prev) => {
+        const existingTexts = new Set(prev.map((r) => r.originalText));
+        const unique = newReminders.filter((r) => !existingTexts.has(r.originalText));
+        if (unique.length > 0) {
+          setReinsertedId(unique[unique.length - 1].id);
+          setInsertHighlightId(unique[unique.length - 1].id);
+          if (insertHighlightTimerRef.current !== null) {
+            clearTimeout(insertHighlightTimerRef.current);
+          }
+          insertHighlightTimerRef.current = window.setTimeout(() => {
+            insertHighlightTimerRef.current = null;
+            setInsertHighlightId(null);
+          }, INSERT_HIGHLIGHT_MS);
+        }
+        return [...prev, ...unique];
+      });
+    }, NEW_REMINDER_INSERT_DELAY);
+  }, []);
+
+  // Update an existing reminder in place (id unchanged)
+  const updateReminder = useCallback((updated: Reminder) => {
+    setReminders((prev) =>
+      prev.map((r) => (r.id === updated.id ? updated : r))
+    );
+  }, []);
+
+  // Convert RepeatRule → RepeatConfig for edit mode initialisation
+  const repeatRuleToConfig = (rule: RepeatRule | null | undefined): RepeatConfig => {
+    if (!rule) return null;
+    const ABBREV_TO_DAY: Record<string, string> = {
+      mo: 'Monday', tu: 'Tuesday', we: 'Wednesday', th: 'Thursday',
+      fr: 'Friday', sa: 'Saturday', su: 'Sunday',
+    };
+    if (rule.frequency === 'weekly' && rule.byDay && rule.byDay.length > 0) {
+      return {
+        frequency: 'custom-days',
+        interval: rule.byDay.length,
+        selectedDays: rule.byDay.map(d => ABBREV_TO_DAY[d] ?? d),
+      };
+    }
+    return {
+      frequency: rule.frequency,
+      interval: rule.interval,
+    };
+  };
+
+  const handleOverlayClose = useCallback(() => {
+    setIsOverlayOpen(false);
+    setRepeatConfig(null);
+    setEditingReminder(null);
+  }, []);
+
+  // Track viewport height for overlay positioning
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportHeight(window.innerHeight);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Calculate overlay top position based on viewport height
+  const getOverlayTopPosition = () => {
+    const THRESHOLD = 570;
+    const DEFAULT_TOP = 121.653; // 16px below logo: 20px + 50px + 35.653px + 16px
+    const ABOVE_LOGO_TOP = 54; // 16px above logo: 20px + 50px - 16px
+    
+    if (viewportHeight <= THRESHOLD) {
+      return ABOVE_LOGO_TOP;
+    }
+    return DEFAULT_TOP;
+  };
+
+  // Tutorial overlay: always 16px above logo, no resize recalculation
+  const HEADER_PADDING = 20;
+  const LOGO_PADDING_TOP = 50;
+  const TUTORIAL_OVERLAY_TOP = HEADER_PADDING + LOGO_PADDING_TOP - 16;
+
+  const handleTutorialOpen = () => {
+    setIsTutorialOpen(true);
+    setTimeout(() => setIsSettingsOpen(false), 250);
+  };
+
+  const handleLogoClick = () => {
+    clickCountRef.current += 1;
+
+    if (clickCountRef.current === 3) {
+      setIsDevToolsOpen(true);
+      clickCountRef.current = 0;
+      if (clickTimerRef.current !== null) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+    } else {
+      if (clickTimerRef.current !== null) {
+        clearTimeout(clickTimerRef.current);
+      }
+      clickTimerRef.current = window.setTimeout(() => {
+        clickCountRef.current = 0;
+        clickTimerRef.current = null;
+      }, 500);
+    }
+  };
+
+  // Logo tick click: toggle between done-deleted view and "all" list view
+  const handleTickClick = () => {
+    if (isListsEnabled && activeMainTab === 'lists') {
+      setViewMode((prev) => (prev === 'lists-done' ? 'list' : 'lists-done'));
+    } else {
+      setViewMode((prev) => (prev === "list" ? "done-deleted" : "list"));
+    }
+    setActiveFilter("all");
+    setDoneDeletedFilter('all');
+    setClearListStep(0);
+    if (clearListTimerRef.current !== null) {
+      clearTimeout(clearListTimerRef.current);
+      clearListTimerRef.current = null;
+    }
+  };
+
+  const getCategoryLabel = (category: ReminderCategory) => {
+    const labels: Record<ReminderCategory, string> = {
+      today: "Today",
+      "this-week": "This week",
+      later: "Later",
+      sometime: "Sometime",
+      other: "Later",
+    };
+    return labels[category];
+  };
+
+  // Cancel a pending repeat completion: clears all in-flight timers and reverts state.
+  const cancelPendingRepeatCompletion = useCallback((reminderId: string) => {
+    // Clear completion timer if still pending
+    const completionTimer = completionTimersRef.current.get(reminderId);
+    if (completionTimer != null) {
+      clearTimeout(completionTimer);
+      completionTimersRef.current.delete(reminderId);
+    }
+    // Clear reschedule timer if in-flight
+    const rescheduleTimer = rescheduleTimersRef.current.get(reminderId);
+    if (rescheduleTimer != null) {
+      clearTimeout(rescheduleTimer);
+      rescheduleTimersRef.current.delete(reminderId);
+    }
+    // Remove from pending repeat set
+    pendingRepeatCompletionIdsRef.current.delete(reminderId);
+    // Revert pending UI state
+    setPendingDoneIds((prev) => {
+      const next = new Set(prev);
+      next.delete(reminderId);
+      return next;
+    });
+    // Revert completedAt if already committed by the 350ms timer
+    setReminders((prev) =>
+      prev.map((r) => {
+        if (r.id !== reminderId) return r;
+        if (r.completedAt == null) return r;
+        return { ...r, completedAt: null };
+      })
+    );
+  }, []);
+
+  // Mark a reminder as done: immediate visual commit, then 350ms delayed data commit.
+  // For repeating reminders, a second 500ms timer reschedules the next occurrence.
+  const handleCompleteClick = useCallback((reminderId: string, opts?: { armEmptyDelay?: boolean; filterKey?: string; isRepeat?: boolean }) => {
+    // Repeat reminder cancel: second click during in-flight window cancels pending completion
+    if (pendingRepeatCompletionIdsRef.current.has(reminderId)) {
+      cancelPendingRepeatCompletion(reminderId);
+      return;
+    }
+
+    // Guard: no-op if already pending or already completed (non-repeat path)
+    if (completionTimersRef.current.has(reminderId)) return;
+
+    // Track repeat reminders across the full in-flight lifecycle
+    if (opts?.isRepeat) {
+      pendingRepeatCompletionIdsRef.current.add(reminderId);
+    }
+
+    // Arm empty-placeholder delay when this is the last visible item in the current active list
+    if (opts?.armEmptyDelay && opts.filterKey != null) {
+      emptyPlaceholderDelayRef.current = { untilMs: Date.now() + EMPTY_STATE_DELAY + 350, filterKey: opts.filterKey };
+      setTimeout(() => setEmptyRerenderTick((c) => c + 1), EMPTY_STATE_DELAY + 350);
+    }
+
+    // Immediate visual commit
+    setPendingDoneIds((prev) => {
+      const next = new Set(prev);
+      next.add(reminderId);
+      return next;
+    });
+
+    // Delayed data commit
+    const timer = window.setTimeout(() => {
+      completionTimersRef.current.delete(reminderId);
+
+      // Set completedAt and schedule reschedule timer for repeating reminders.
+      // Both read and timer-scheduling happen inside the updater to avoid stale closures.
+      setReminders((prev) =>
+        prev.map((r) => {
+          if (r.id !== reminderId) return r;
+
+          // Schedule the 500ms reschedule timer for repeating reminders
+          if (r.repeatRule != null && r.schedule.kind === 'scheduled' && r.schedule.date != null) {
+            const capturedSchedule = r.schedule;
+            const capturedRepeatRule = r.repeatRule;
+            const capturedOriginalText = r.originalText;
+            const capturedDisplayText = r.displayText;
+
+            const rescheduleTimer = window.setTimeout(() => {
+              rescheduleTimersRef.current.delete(reminderId);
+
+              // Guard: if pending was cancelled by a second click, skip spawn entirely
+              if (!pendingRepeatCompletionIdsRef.current.has(reminderId)) {
+                pendingRepeatCompletionIdsRef.current.delete(reminderId);
+                return;
+              }
+
+              // Build baseDateTime from the completed occurrence's scheduled date/time
+              const [y, m, d] = capturedSchedule.date.split('-').map(Number);
+              let baseDateTime: Date;
+              if (capturedSchedule.time) {
+                const [hh, mm] = capturedSchedule.time.split(':').map(Number);
+                baseDateTime = new Date(y, m - 1, d, hh, mm, 0, 0);
+              } else {
+                baseDateTime = new Date(y, m - 1, d, 0, 0, 0, 0);
+              }
+
+              const nextOccurrence = getNextOccurrence(baseDateTime, capturedRepeatRule);
+
+              // Validate next occurrence
+              if (!(nextOccurrence instanceof Date) || isNaN(nextOccurrence.getTime())) {
+                return;
+              }
+
+              const nextDate = formatDateToSchedule(nextOccurrence);
+              // Preserve time if original had time; update from nextOccurrence for hourly
+              const nextTime = capturedSchedule.time
+                ? formatTimeToSchedule(nextOccurrence)
+                : null;
+
+              const nextScheduleObj: ReminderSchedule = nextTime != null
+                ? { kind: 'scheduled' as const, date: nextDate, time: nextTime }
+                : { kind: 'scheduled' as const, date: nextDate };
+
+              // Insert next occurrence as a brand new reminder, leaving the completed one untouched.
+              // Guard: check deletedAt at execution time — if deleted, skip reschedule entirely.
+              const newReminder: Reminder = {
+                id: crypto.randomUUID(),
+                originalText: capturedOriginalText,
+                displayText: capturedDisplayText,
+                createdAt: Date.now(),
+                schedule: nextScheduleObj,
+                repeatRule: { ...capturedRepeatRule },
+                completedAt: null,
+              };
+              setReminders((prev2) => {
+                const source = prev2.find((r2) => r2.id === reminderId);
+                if (source?.deletedAt != null) return prev2;
+                return [...prev2, newReminder];
+              });
+              setReinsertedId(newReminder.id);
+              setInsertHighlightId(newReminder.id);
+              if (insertHighlightTimerRef.current !== null) {
+                clearTimeout(insertHighlightTimerRef.current);
+              }
+              insertHighlightTimerRef.current = window.setTimeout(() => {
+                insertHighlightTimerRef.current = null;
+                setInsertHighlightId(null);
+              }, INSERT_HIGHLIGHT_MS);
+              // Clear pending repeat completion after successful spawn
+              pendingRepeatCompletionIdsRef.current.delete(reminderId);
+            }, RESCHEDULE_DELAY);
+
+            rescheduleTimersRef.current.set(reminderId, rescheduleTimer);
+          }
+
+          return { ...r, completedAt: Date.now() };
+        })
+      );
+
+      // Clear from pending visual set
+      setPendingDoneIds((prev) => {
+        const next = new Set(prev);
+        next.delete(reminderId);
+        return next;
+      });
+    }, COMPLETION_DELAY);
+
+    completionTimersRef.current.set(reminderId, timer);
+  }, [cancelPendingRepeatCompletion]);
+
+  // Uncheck a done reminder: instant reinsertion (matches repeat reinsertion path).
+  // Done view feedback preserved separately via pendingUncompleteIds + COMPLETION_DELAY.
+  const handleUncompleteClick = useCallback((reminderId: string) => {
+    // Guard: no-op if already pending
+    if (uncompleteTimersRef.current.has(reminderId)) return;
+
+    const currentReminders = reminders;
+    const target = currentReminders.find((r) => r.id === reminderId);
+
+    // Undelete path: mirrors un-done cadence exactly
+    if (target?.deletedAt != null) {
+      // Guard: no-op if already pending undelete
+      if (undeleteTimersRef.current.has(reminderId)) return;
+
+      // Cancel any pending delete timer (defensive)
+      const pendingDelTimer = pendingDeleteTimersRef.current.get(reminderId);
+      if (pendingDelTimer !== undefined) {
+        clearTimeout(pendingDelTimer);
+        pendingDeleteTimersRef.current.delete(reminderId);
+      }
+      setPendingDeleteIds((prev) => {
+        if (!prev.has(reminderId)) return prev;
+        const next = new Set(prev);
+        next.delete(reminderId);
+        return next;
+      });
+
+      // Capture prior deletedAt for stable sort during pending window
+      pendingUndeleteSortKeyRef.current.set(reminderId, target.deletedAt);
+
+      // Immediately clear deletedAt (causes instant reinsertion to active list if completedAt is null)
+      setReminders((prev) =>
+        prev.map((r) => r.id === reminderId ? { ...r, deletedAt: null } : r)
+      );
+
+      // Trigger fade-in + highlight only if returning to active list (completedAt is null)
+      if (target.completedAt == null) {
+        setReinsertedId(reminderId);
+        setInsertHighlightId(reminderId);
+        if (insertHighlightTimerRef.current !== null) {
+          clearTimeout(insertHighlightTimerRef.current);
+        }
+        insertHighlightTimerRef.current = window.setTimeout(() => {
+          insertHighlightTimerRef.current = null;
+          setInsertHighlightId(null);
+        }, INSERT_HIGHLIGHT_MS);
+      }
+
+      // Done view feedback: show undelete visual for COMPLETION_DELAY, then remove
+      setPendingUndeleteIds((prev) => {
+        const next = new Set(prev);
+        next.add(reminderId);
+        return next;
+      });
+
+      const timer = window.setTimeout(() => {
+        undeleteTimersRef.current.delete(reminderId);
+        pendingUndeleteSortKeyRef.current.delete(reminderId);
+        setPendingUndeleteIds((prev) => {
+          const next = new Set(prev);
+          next.delete(reminderId);
+          return next;
+        });
+      }, COMPLETION_DELAY);
+
+      undeleteTimersRef.current.set(reminderId, timer);
+      return;
+    }
+
+    // Existing uncomplete path: clear completedAt and handle repeat duplicate removal
+
+    // 1. For repeating reminders: cancel any pending reschedule timer to prevent
+    //    a stale callback from inserting a duplicate after undo.
+    //    Then compute the expected next schedule for duplicate detection.
+    let expectedNextSchedule: ReminderSchedule | null = null;
+    let capturedOriginalText: string | null = null;
+    let capturedDisplayText: string | null = null;
+    let capturedRepeatRule: RepeatRule | null = null;
+
+    if (target?.repeatRule != null) {
+      // Cancel pending reschedule timer if present
+      const pendingTimer = rescheduleTimersRef.current.get(reminderId);
+      if (pendingTimer !== undefined) {
+        clearTimeout(pendingTimer);
+        rescheduleTimersRef.current.delete(reminderId);
+      }
+
+      // Compute expected next schedule for duplicate matching
+      if (target.schedule.kind === 'scheduled' && target.schedule.date != null) {
+        const [y, m, d] = target.schedule.date.split('-').map(Number);
+        let baseDateTime: Date;
+        if (target.schedule.time) {
+          const [hh, mm] = target.schedule.time.split(':').map(Number);
+          baseDateTime = new Date(y, m - 1, d, hh, mm, 0, 0);
+        } else {
+          baseDateTime = new Date(y, m - 1, d, 0, 0, 0, 0);
+        }
+
+        const nextOccurrence = getNextOccurrence(baseDateTime, target.repeatRule);
+
+        if (nextOccurrence instanceof Date && !isNaN(nextOccurrence.getTime())) {
+          const nextDate = formatDateToSchedule(nextOccurrence);
+          const nextTime = target.schedule.time
+            ? formatTimeToSchedule(nextOccurrence)
+            : undefined;
+
+          expectedNextSchedule = nextTime != null
+            ? { kind: 'scheduled' as const, date: nextDate, time: nextTime }
+            : { kind: 'scheduled' as const, date: nextDate };
+
+          capturedOriginalText = target.originalText;
+          capturedDisplayText = target.displayText;
+          capturedRepeatRule = target.repeatRule;
+        }
+      }
+    }
+
+    // 2. Store original completedAt for stable sort, then clear it for instant reinsertion.
+    //    For repeating reminders with a computed next schedule, also remove the duplicate
+    //    active instance if exactly one confident match exists.
+    setReminders((prev) => {
+      const targetInPrev = prev.find((r) => r.id === reminderId);
+      if (targetInPrev?.completedAt != null) {
+        pendingUncompleteCompletedAtRef.current.set(reminderId, targetInPrev.completedAt);
+      }
+
+      // Find duplicate active instance to remove (repeating reminders only)
+      let duplicateIdToRemove: string | null = null;
+      if (expectedNextSchedule != null && capturedRepeatRule != null) {
+        const matches = prev.filter((r) => {
+          if (r.id === reminderId) return false;
+          if (r.completedAt != null) return false;
+          if (r.originalText !== capturedOriginalText) return false;
+          if (r.displayText !== capturedDisplayText) return false;
+          if (!scheduleEquality.areRepeatsEqual(r.repeatRule ?? null, capturedRepeatRule)) return false;
+          // Inline schedule equality
+          if (r.schedule.kind !== expectedNextSchedule!.kind) return false;
+          if (r.schedule.kind === 'scheduled' && expectedNextSchedule!.kind === 'scheduled') {
+            if (r.schedule.date !== expectedNextSchedule!.date) return false;
+            if ((r.schedule.time ?? undefined) !== (expectedNextSchedule!.time ?? undefined)) return false;
+          }
+          return true;
+        });
+        if (matches.length === 1) {
+          duplicateIdToRemove = matches[0].id;
+        }
+      }
+
+      return prev
+        .filter((r) => r.id !== duplicateIdToRemove)
+        .map((r) =>
+          r.id === reminderId && r.completedAt != null
+            ? { ...r, completedAt: null }
+            : r
+        );
+    });
+
+    // 3. Trigger fade-in + highlight (same flags as repeat reinsertion)
+    setReinsertedId(reminderId);
+    setInsertHighlightId(reminderId);
+    if (insertHighlightTimerRef.current !== null) {
+      clearTimeout(insertHighlightTimerRef.current);
+    }
+    insertHighlightTimerRef.current = window.setTimeout(() => {
+      insertHighlightTimerRef.current = null;
+      setInsertHighlightId(null);
+    }, INSERT_HIGHLIGHT_MS);
+
+    // 3. Done view feedback: show uncomplete visual for COMPLETION_DELAY, then remove
+    setPendingUncompleteIds((prev) => {
+      const next = new Set(prev);
+      next.add(reminderId);
+      return next;
+    });
+
+    const timer = window.setTimeout(() => {
+      uncompleteTimersRef.current.delete(reminderId);
+      pendingUncompleteCompletedAtRef.current.delete(reminderId);
+      setPendingUncompleteIds((prev) => {
+        const next = new Set(prev);
+        next.delete(reminderId);
+        return next;
+      });
+    }, COMPLETION_DELAY);
+
+    uncompleteTimersRef.current.set(reminderId, timer);
+  }, [reminders]);
+
+  // Delete a reminder: same cadence as done (350ms pending visual, then data commit).
+  const handleDeleteClick = useCallback((reminderId: string, opts?: { armEmptyDelay?: boolean; filterKey?: string }) => {
+    // Guard: no-op if already pending delete
+    if (pendingDeleteTimersRef.current.has(reminderId)) return;
+
+    // Arm empty-placeholder delay when this is the last visible item in the current active list
+    if (opts?.armEmptyDelay && opts.filterKey != null) {
+      emptyPlaceholderDelayRef.current = { untilMs: Date.now() + EMPTY_STATE_DELAY + 350, filterKey: opts.filterKey };
+      setTimeout(() => setEmptyRerenderTick((c) => c + 1), EMPTY_STATE_DELAY + 350);
+    }
+
+    // Cancel all pending timers and clear all pending state for this id
+    cancelAllTimersForId(reminderId);
+    clearPendingStateForId(reminderId);
+
+    // Immediate visual commit: add to pendingDeleteIds
+    setPendingDeleteIds((prev) => {
+      const next = new Set(prev);
+      next.add(reminderId);
+      return next;
+    });
+
+    // Close info overlay
+    setInfoReminder(null);
+
+    // Delayed data commit (same COMPLETION_DELAY as done)
+    const timer = window.setTimeout(() => {
+      pendingDeleteTimersRef.current.delete(reminderId);
+
+      // Set deletedAt
+      setReminders((prev) =>
+        prev.map((r) => r.id === reminderId ? { ...r, deletedAt: Date.now() } : r)
+      );
+
+      // Clear from pending visual set
+      setPendingDeleteIds((prev) => {
+        const next = new Set(prev);
+        next.delete(reminderId);
+        return next;
+      });
+    }, COMPLETION_DELAY);
+
+    pendingDeleteTimersRef.current.set(reminderId, timer);
+  }, []);
+
+  // Clear list: 3-step confirmation handler
+  const handleClearListClick = useCallback(() => {
+    if (clearListStep === 2) return; // ignore clicks during "Cleared!" state
+
+    if (clearListStep === 0) {
+      setClearListStep(1);
+      return;
+    }
+
+    // clearListStep === 1: execute clear
+    setClearListStep(2);
+    setDoneDeletedFilter('all');
+
+    // Build set of ids to remove: everything visible in done/deleted list
+    setReminders((prev) => {
+      const idsToRemove = new Set<string>();
+      for (const r of prev) {
+        if (r.completedAt != null || r.deletedAt != null) {
+          idsToRemove.add(r.id);
+        }
+      }
+      // Also include pending restore items (visible in done/deleted view but data already cleared)
+      for (const id of pendingUncompleteIds) idsToRemove.add(id);
+      for (const id of pendingUndeleteIds) idsToRemove.add(id);
+
+      // Cleanup timers and pending sets for removed ids
+      for (const id of idsToRemove) {
+        const ct = completionTimersRef.current.get(id);
+        if (ct !== undefined) { clearTimeout(ct); completionTimersRef.current.delete(id); }
+        const ut = uncompleteTimersRef.current.get(id);
+        if (ut !== undefined) { clearTimeout(ut); uncompleteTimersRef.current.delete(id); }
+        const rt = rescheduleTimersRef.current.get(id);
+        if (rt !== undefined) { clearTimeout(rt); rescheduleTimersRef.current.delete(id); }
+        const dt = pendingDeleteTimersRef.current.get(id);
+        if (dt !== undefined) { clearTimeout(dt); pendingDeleteTimersRef.current.delete(id); }
+        const udt = undeleteTimersRef.current.get(id);
+        if (udt !== undefined) { clearTimeout(udt); undeleteTimersRef.current.delete(id); }
+        pendingUncompleteCompletedAtRef.current.delete(id);
+        pendingUndeleteSortKeyRef.current.delete(id);
+      }
+
+      // Clean pending id sets
+      setPendingDoneIds((s) => {
+        let changed = false;
+        const next = new Set(s);
+        for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
+        return changed ? next : s;
+      });
+      setPendingUncompleteIds((s) => {
+        let changed = false;
+        const next = new Set(s);
+        for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
+        return changed ? next : s;
+      });
+      setPendingDeleteIds((s) => {
+        let changed = false;
+        const next = new Set(s);
+        for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
+        return changed ? next : s;
+      });
+      setPendingUndeleteIds((s) => {
+        let changed = false;
+        const next = new Set(s);
+        for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
+        return changed ? next : s;
+      });
+
+      return prev.filter((r) => !idsToRemove.has(r.id));
+    });
+
+    // 500ms reset back to default
+    if (clearListTimerRef.current !== null) {
+      clearTimeout(clearListTimerRef.current);
+    }
+    clearListTimerRef.current = window.setTimeout(() => {
+      clearListTimerRef.current = null;
+      setClearListStep(0);
+    }, 500);
+  }, [clearListStep, pendingUncompleteIds, pendingUndeleteIds]);
+
+  const now = new Date();
+
+  return (
+    <div className="content-stretch flex flex-col items-center h-screen w-full overflow-hidden" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }} onPointerDownCapture={(e) => {
+        if ((clearListStep === 1 || clearListStep === 2) && clearAllButtonRef.current && !clearAllButtonRef.current.contains(e.target as Node)) {
+          setClearListStep(0);
+          if (clearListTimerRef.current !== null) {
+            clearTimeout(clearListTimerRef.current);
+            clearListTimerRef.current = null;
+          }
+        }
+      }}>
+      {/* Header */}
+      <div className="app-header relative shrink-0 w-full p-[20px]">
+        <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full max-w-[768px] mx-auto" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }}>
+          <div className="content-stretch flex items-center justify-center pb-[20px] pt-[50px] relative shrink-0 w-full">
+            <div className="h-[35.653px] relative shrink-0 w-[209.653px]">
+              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
+                <g>
+                  {/* Text portion */}
+                  <g>
+                    <path d={svgPaths.p2e09d80} fill="white" />
+                    <path d={svgPaths.p3b133a00} fill="white" />
+                    <path d={svgPaths.p11840600} fill="white" />
+                    <path d={svgPaths.p170f9700} fill="white" />
+                    <path d={svgPaths.pf876500} fill="white" />
+                    <path d={svgPaths.pc9c4a00} fill="white" />
+                    <path d={svgPaths.p6114100} fill="white" />
+                    <path d={svgPaths.pb9f8400} fill="white" />
+                    <path d={svgPaths.pe461c40} fill="white" />
+                    <path d={svgPaths.p38e87300} fill="white" />
+                    <path d={svgPaths.p26dc1e00} fill="white" />
+                    <path d={svgPaths.p82ca600} fill="white" />
+                  </g>
+                  
+                  {/* Circular tick icon */}
+                  {viewMode !== "done-deleted" && viewMode !== 'lists-done' && (
+                    <path d={svgPaths.p3babd700} fill="white" />
+                  )}
+                </g>
+              </svg>
+
+              {/* Done-deleted mode: overlay the dark tick icon at same size */}
+              {viewMode === "done-deleted" && (
+                <svg
+                  className="absolute left-0 top-0"
+                  style={{ width: '35.653px', height: '35.653px' }}
+                  fill="none"
+                  preserveAspectRatio="none"
+                  viewBox="0 0 35.6533 35.6533"
+                >
+                  <g clipPath="url(#clip0_done_tick)">
+                    <path d={doneTickPaths.p2b6e2900} fill="#FFFFFF" />
+                    <g>
+                      <path d={doneTickPaths.p2e09d80} fill={isListsEnabled ? '#4784f8' : DONE_BLUE} />
+                      <path d={doneTickPaths.p3b133a00} fill={isListsEnabled ? '#4784f8' : DONE_BLUE} />
+                    </g>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_done_tick">
+                      <rect fill="white" height="35.6533" width="35.6533" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              )}
+
+              {/* Lists-done mode: overlay tick icon with white fill and Reminderly dark blue tick */}
+              {viewMode === 'lists-done' && (
+                <svg
+                  className="absolute left-0 top-0"
+                  style={{ width: '35.653px', height: '35.653px' }}
+                  fill="none"
+                  preserveAspectRatio="none"
+                  viewBox="0 0 35.6533 35.6533"
+                >
+                  <g clipPath="url(#clip0_lists_done_tick)">
+                    <path d={doneTickPaths.p2b6e2900} fill="#FFFFFF" />
+                    <g>
+                      <path d={doneTickPaths.p2e09d80} fill={DONE_BLUE} />
+                      <path d={doneTickPaths.p3b133a00} fill={DONE_BLUE} />
+                    </g>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_lists_done_tick">
+                      <rect fill="white" height="35.6533" width="35.6533" />
+                    </clipPath>
+                  </defs>
+                </svg>
+              )}
+              
+              {/* Clickable area over tick circle (left segment) */}
+              <button
+                className="absolute top-0 bottom-0 cursor-pointer"
+                style={{ left: 0, width: '22%', padding: 0, background: 'none', border: 'none' }}
+                onClick={handleTickClick}
+                aria-label={viewMode === "done-deleted" ? "Return to reminders" : "Show done and deleted"}
+              />
+              {/* Invisible clickable area over text portion only */}
+              <button
+                className="absolute top-0 bottom-0 left-1/4 right-0 p-0 m-0 bg-transparent border-0 text-left cursor-pointer"
+                onClick={handleLogoClick}
+                aria-label="Developer tools (triple tap)"
+              />
+            </div>
+          </div>
+
+          {/* Filter buttons — hidden when Lists mode is active (rendered inside container instead) */}
+          {!isListsEnabled && (
+          <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
+            {viewMode === "done-deleted" ? (<div
+              className="flex items-center justify-between w-full"
+            >
+              {/* Done/deleted view filters */}
+              <div className="flex items-center gap-[12px]">
+                <button
+                  onClick={() => setViewMode("list")}
+                  className="relative shrink-0 self-center hidden min-[390px]:flex cursor-pointer"
+                  style={{ width: 50, height: 40 }}
+                  aria-label="Back to reminders"
+                >
+                  <svg className="block" style={{ width: 50, height: 40 }} fill="none" viewBox="0 0 50 40">
+                    <rect fill="white" fillOpacity="0.15" height="39" rx="19.5" width="49" x="0.5" y="0.5" />
+                    <rect height="39" rx="19.5" stroke="white" width="49" x="0.5" y="0.5" />
+                  </svg>
+                  <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ width: 8, height: 13 }} fill="none" viewBox="20.88 13.38 7.76 13.24">
+                    <path d={laterBtnPaths.p17336800} fill="white" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => {
+                    setDoneDeletedFilter(doneDeletedFilter === 'done' ? 'all' : 'done');
+                  }}
+                  className={`${
+                    doneDeletedFilter === 'done'
+                      ? "bg-white"
+                      : "bg-[rgba(255,255,255,0.15)] text-white"
+                  } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
+                  style={doneDeletedFilter === 'done' ? { boxShadow: `inset 0 0 0 2px ${DONE_BLUE}`, color: DONE_BLUE } : { boxShadow: 'inset 0 0 0 1px #FFFFFF' }}
+                >
+                  <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                    Done
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    setDoneDeletedFilter(doneDeletedFilter === 'deleted' ? 'all' : 'deleted');
+                  }}
+                  className={`${
+                    doneDeletedFilter === 'deleted'
+                      ? "bg-white"
+                      : "bg-[rgba(255,255,255,0.15)] text-white"
+                  } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
+                  style={doneDeletedFilter === 'deleted' ? { boxShadow: `inset 0 0 0 2px ${DELETED_GREY}`, color: DELETED_GREY } : { boxShadow: 'inset 0 0 0 1px #FFFFFF' }}
+                >
+                  <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                    Deleted
+                  </div>
+                </button>
+              </div>
+              {/* Clear all button */}
+              <button
+                ref={clearAllButtonRef}
+                onClick={handleClearListClick}
+                className={`${
+                  clearListStep === 0
+                    ? "bg-[rgba(255,255,255,0.15)] text-white"
+                    : "bg-white text-[#1C2C42]"
+                } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid border-white transition-colors cursor-pointer`}
+              >
+                <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                  {clearListStep === 0 ? "Clear all" : clearListStep === 1 ? "Clear all?" : "Cleared!"}
+                </div>
+              </button>
+            </div>) : filtersMenuVariant === "grouped" ? (
+              <>
+                <div className="flex items-center gap-[12px]">
+                  {(["today", "this-week", "other"] as ReminderCategory[]).map((filter) => {
+                    const pillColor = CATEGORY_COLOURS[filter] || "#4784f8";
+                    const isActive = activeFilter === filter;
+                    return (
+                    <button
+                      key={filter}
+                      onClick={() => {
+                        setActiveFilter(activeFilter === filter ? "all" : filter);
+                      }}
+                      className={`${
+                        isActive
+                          ? "bg-white"
+                          : "bg-[rgba(255,255,255,0.15)] text-white"
+                      } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
+                        filter === "other" ? "hidden min-[390px]:flex" : ""
+                      }`}
+                      style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #FFFFFF` }}
+                    >
+                      <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                        {getCategoryLabel(filter)}
+                      </div>
+                    </button>
+                    );
+                  })}
+                </div>
+                <div className="shrink-0 h-[40px] cursor-pointer" onClick={() => setIsSettingsOpen(true)}>
+                  <LaterBtn />
+                </div>
+              </>
+            ) : (
+              (["today", "this-week", "later", "sometime"] as ReminderCategory[]).map((filter) => {
+                const pillColor = CATEGORY_COLOURS[filter] || "#4784f8";
+                const isActive = activeFilter === filter;
+                return (
+                <button
+                  key={filter}
+                  onClick={() => {
+                    setActiveFilter(activeFilter === filter ? "all" : filter);
+                  }}
+                  className={`${
+                    isActive
+                      ? "bg-white"
+                      : "bg-[rgba(255,255,255,0.15)] text-white"
+                  } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
+                    filter === "sometime" ? "hidden min-[390px]:flex" : ""
+                  }`}
+                  style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #FFFFFF` }}
+                >
+                  <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                    {getCategoryLabel(filter)}
+                  </div>
+                </button>
+                );
+              })
+            )}
+          </div>
+          )}
+        </div>
+      </div>
+
+      {/* Reminders/Lists tab bar — Lists mode only */}
+      {isListsEnabled && (
+        <div className="content-stretch flex gap-[10px] items-end justify-center px-[20px] relative w-full">
+          <div
+            className={`${activeMainTab === 'reminders' ? 'bg-white' : 'bg-[rgba(255,255,255,0.25)]'} flex-[1_0_0] min-h-px min-w-px relative rounded-tl-[12px] rounded-tr-[12px] cursor-pointer h-[52px]`}
+            data-name="today-btn"
+            onClick={() => {
+              if (viewMode === 'lists-done') {
+                setViewMode('list');
+              }
+              setActiveMainTab('reminders');
+            }}
+          >
+            {activeMainTab === 'reminders' && (
+              <div aria-hidden="true" className="absolute border-[1.5px] border-solid border-white inset-[-0.75px] pointer-events-none rounded-tl-[12.75px] rounded-tr-[12.75px]" />
+            )}
+            <div className="flex flex-row items-center justify-center size-full">
+              <div className="content-stretch flex items-center justify-center px-[30px] relative size-full">
+                <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] whitespace-nowrap ${activeMainTab === 'reminders' ? 'text-[#4784f8]' : 'text-white'}`}>
+                  <p className="leading-[normal]">{isListsEnabled && viewMode === 'done-deleted' ? 'Done reminders' : 'Reminders'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            className={`${activeMainTab === 'lists' ? 'bg-white' : 'bg-[rgba(255,255,255,0.25)]'} flex-[1_0_0] min-h-px min-w-px relative rounded-tl-[12px] rounded-tr-[12px] cursor-pointer h-[52px]`}
+            data-name="today-btn"
+            onClick={() => {
+              if (viewMode === 'done-deleted') {
+                setViewMode('list');
+              }
+              setActiveMainTab('lists');
+            }}
+          >
+            {activeMainTab === 'lists' && (
+              <div aria-hidden="true" className="absolute border-[1.5px] border-solid border-white inset-[-0.75px] pointer-events-none rounded-tl-[12.75px] rounded-tr-[12.75px]" />
+            )}
+            <div className="flex flex-row items-center justify-center size-full">
+              <div className="content-stretch flex items-center justify-center px-[30px] relative size-full">
+                <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] whitespace-nowrap ${activeMainTab === 'lists' ? 'text-[#1C2C42]' : 'text-white'}`}>
+                  <p className="leading-[normal]">{viewMode === 'lists-done' ? 'Done lists' : 'Lists'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reminder list container */}
+      <div className={`bg-white content-stretch flex flex-col gap-[32px] items-center px-[20px] ${isListsEnabled ? 'pt-[24px]' : 'pt-[30px]'} relative ${isListsEnabled ? 'rounded-tl-[15px] rounded-tr-[15px]' : 'rounded-tl-[20px] rounded-tr-[20px]'} w-full flex-1 min-h-[350px]`}>
+        {isListsEnabled && activeMainTab === 'lists' ? (
+          <>
+          {viewMode === 'lists-done' && (
+            <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
+              <div className="flex items-center gap-[12px]">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className="relative shrink-0 self-center hidden min-[390px]:flex cursor-pointer"
+                  style={{ width: 50, height: 40 }}
+                  aria-label="Back to lists"
+                >
+                  <svg className="block" style={{ width: 50, height: 40 }} fill="none" viewBox="0 0 50 40">
+                    <rect fill="transparent" height="39" rx="19.5" width="49" x="0.5" y="0.5" />
+                    <rect height="39" rx="19.5" stroke={DONE_BLUE} width="49" x="0.5" y="0.5" />
+                  </svg>
+                  <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ width: 8, height: 13 }} fill="none" viewBox="20.88 13.38 7.76 13.24">
+                    <path d={laterBtnPaths.p17336800} fill={DONE_BLUE} />
+                  </svg>
+                </button>
+                <button
+                  className="text-[#1C2C42] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 border border-solid border-[#1C2C42] transition-colors cursor-pointer"
+                >
+                  <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                    Done
+                  </div>
+                </button>
+                <button
+                  className="text-[#1C2C42] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 border border-solid border-[#1C2C42] transition-colors cursor-pointer"
+                >
+                  <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                    Deleted
+                  </div>
+                </button>
+              </div>
+              {/* Clear all button */}
+              <button
+                ref={clearAllButtonRef}
+                onClick={handleClearListClick}
+                className={`${
+                  clearListStep === 0
+                    ? "text-[#1C2C42]"
+                    : "bg-[#1C2C42] text-white"
+                } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid border-[#1C2C42] transition-colors cursor-pointer`}
+              >
+                <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                  {clearListStep === 0 ? "Clear all" : clearListStep === 1 ? "Clear all?" : "Cleared!"}
+                </div>
+              </button>
+            </div>
+          )}
+          {viewMode === 'lists-done' ? (
+            <div className="flex flex-col items-center justify-center flex-1 w-full">
+              <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">No done or deleted lists yet…</p>
+            </div>
+          ) : (
+            <>
+            {/* List filter pills */}
+            {(
+              <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
+                {effectiveFiltersVariant === "grouped" ? (
+                  <>
+                    <div className="flex items-center gap-[12px]">
+                      {(["complete", "almost", "grouped-todo"] as const).map((filter) => {
+                        const pillColor = LIST_CATEGORY_PILL_COLOURS[filter] || "#1C2C42";
+                        const isActive = activeListFilter === filter;
+                        return (
+                        <button
+                          key={filter}
+                          onClick={() => {
+                            setActiveListFilter(activeListFilter === filter ? "all" : filter);
+                          }}
+                          className={`${
+                            isActive
+                              ? "bg-white"
+                              : "text-[#1C2C42]"
+                          } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
+                            filter === "grouped-todo" ? "hidden min-[390px]:flex" : ""
+                          }`}
+                          style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #1C2C42` }}
+                        >
+                          <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                            {filter === "complete" ? "Complete" : filter === "almost" ? "Almost" : "Todo"}
+                          </div>
+                        </button>
+                        );
+                      })}
+                    </div>
+                    <div className="shrink-0 h-[40px] cursor-pointer" onClick={() => setIsSettingsOpen(true)}>
+                      <LaterBtn />
+                    </div>
+                  </>
+                ) : (
+                  (["complete", "almost", "started", "todo"] as const).map((filter) => {
+                    const pillColor = LIST_CATEGORY_PILL_COLOURS[filter] || "#1C2C42";
+                    const isActive = activeListFilter === filter;
+                    return (
+                    <button
+                      key={filter}
+                      onClick={() => {
+                        setActiveListFilter(activeListFilter === filter ? "all" : filter);
+                      }}
+                      className={`${
+                        isActive
+                          ? "bg-white"
+                          : "text-[#1C2C42]"
+                      } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
+                        filter === "started" ? "max-[389px]:hidden" : ""
+                      }`}
+                      style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #1C2C42` }}
+                    >
+                      <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                        {filter === "complete" ? "Complete" : filter === "almost" ? "Almost" : filter === "started" ? "Started" : "Todo"}
+                      </div>
+                    </button>
+                    );
+                  })
+                )}
+              </div>
+            )}
+            {/* Scrollable lists container */}
+            <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full max-w-[768px] rounded-[10px]" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+              <div className="flex flex-col gap-[22px] w-full" style={{ position: 'relative', zIndex: 1 }}>
+                {/* Dynamic list cards */}
+                <AnimatePresence key={`lists-${activeListFilter}`}>
+                {(() => {
+                  const listCategoryOrder: Record<string, number> = { complete: 0, almost: 1, started: 2, todo: 3 };
+                  const categoriseList = (list: typeof createdLists[number]) => {
+                    const total = list.items.length;
+                    const checked = list.items.filter(i => i.completed).length;
+                    if (checked === total) return "complete";
+                    if (checked / total >= 0.5) return "almost";
+                    if (checked > 0) return "started";
+                    return "todo";
+                  };
+                  const filteredLists = activeListFilter === "all"
+                    ? createdLists
+                    : activeListFilter === "grouped-todo"
+                      ? createdLists.filter(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
+                      : createdLists.filter(l => categoriseList(l) === activeListFilter);
+                  const sortedLists = [...filteredLists].sort((a, b) => {
+                    const catA = listCategoryOrder[categoriseList(a)] ?? 3;
+                    const catB = listCategoryOrder[categoriseList(b)] ?? 3;
+                    if (catA !== catB) return catA - catB;
+                    return createdLists.indexOf(a) - createdLists.indexOf(b);
+                  });
+                  const listCategoryColor: Record<string, string> = {
+                    complete: "#0D45A0",
+                    almost: "#9468D5",
+                    started: "#00AFEE",
+                    todo: "#939393",
+                  };
+                  return sortedLists.map((list) => {
+                  const isReinserted = listReinsertedId === list.id;
+                  const isHighlighted = listInsertHighlightId === list.id;
+                  const catColor = listCategoryColor[categoriseList(list)] || "#BABABA";
+                  return (
+                    <motion.div
+                      key={list.id}
+                      layout
+                      initial={isReinserted ? { opacity: 0 } : false}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={isReinserted
+                        ? { opacity: { duration: 0.2 } }
+                        : { layout: { duration: 0.25 } }
+                      }
+                      onAnimationComplete={() => {
+                        if (isReinserted) {
+                          setListReinsertedId(null);
+                        }
+                      }}
+                    >
+                      <div className="content-stretch flex items-start justify-between px-px relative w-full">
+                        <div className="flex-[1_0_0] min-h-px min-w-px relative">
+                          <div className="flex flex-row items-start size-full">
+                            <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full">
+                              <div className="relative shrink-0 size-[25px]" style={{ marginTop: '3px' }}>
+                                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                  <path d="M12.5 0C19.4036 0 25 5.59644 25 12.5C25 19.4036 19.4036 25 12.5 25C5.59644 25 0 19.4036 0 12.5C0 5.59644 5.59644 0 12.5 0ZM12.5 2C6.70101 2 2 6.70101 2 12.5C2 18.299 6.70101 23 12.5 23C18.299 23 23 18.299 23 12.5C23 6.70101 18.299 2 12.5 2Z" fill={catColor} />
+                                </svg>
+                              </div>
+                              <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
+                                <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer" style={{ fontSize: '17px', color: isHighlighted ? catColor : '#1c2c42' }} onClick={() => { setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.title}</p>
+                                <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }} onClick={() => { setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.items.filter(i => i.completed).length} of {list.items.length} items completed</p>
+                              </div>
+                              {(list.smartReminders ?? true) && (
+                                <div className="relative shrink-0" style={{ width: '21px', height: '23px', marginTop: '3px' }}>
+                                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 23">
+                                    <g>
+                                      <path clipRule="evenodd" d="M8.23145 8.76074C8.78101 8.49029 9.42663 8.49023 9.97617 8.76074C10.2153 8.87848 10.4255 9.06614 10.6293 9.26532L20.2878 18.8597C20.4883 19.0622 20.6773 19.271 20.7958 19.5085C21.0681 20.0544 21.068 20.6957 20.7958 21.2416C20.6378 21.5583 20.3552 21.8245 20.0859 22.092C19.8167 22.3594 19.5486 22.6402 19.2298 22.7971C18.6803 23.0676 18.0347 23.0677 17.4851 22.7971C17.246 22.6794 17.0358 22.4917 16.832 22.2926L7.17346 12.6982C6.97295 12.4957 6.78403 12.2869 6.6655 12.0494C6.39318 11.5035 6.39325 10.8622 6.6655 10.3163C6.82349 9.99959 7.10613 9.73337 7.37538 9.4659C7.64464 9.19844 7.91264 8.91767 8.23145 8.76074ZM11.4022 14.6298L17.7722 20.9574C17.9362 21.1203 18.036 21.2185 18.1151 21.2886C18.1703 21.3376 18.1957 21.3545 18.2024 21.3586C18.3 21.4067 18.4149 21.4067 18.5126 21.3586C18.5187 21.3549 18.5447 21.3385 18.6009 21.2886C18.68 21.2185 18.7799 21.1203 18.9438 20.9574C19.1077 20.7946 19.2066 20.6954 19.2772 20.6169C19.3274 20.561 19.3439 20.5351 19.3476 20.5291C19.396 20.4321 19.396 20.318 19.3476 20.2209C19.3435 20.2143 19.3265 20.1891 19.2772 20.1342C19.2066 20.0557 19.1077 19.9565 18.9438 19.7937L12.5738 13.466L11.4022 14.6298ZM9.25893 10.1993C9.16126 10.1512 9.04635 10.1512 8.94869 10.1993C8.94263 10.2029 8.91662 10.2194 8.86035 10.2693C8.7813 10.3394 8.68141 10.4376 8.5175 10.6004C8.35359 10.7633 8.25472 10.8625 8.18412 10.941C8.13387 10.9969 8.11735 11.0227 8.11366 11.0288C8.06526 11.1258 8.06526 11.2399 8.11366 11.3369C8.11777 11.3436 8.13483 11.3688 8.18412 11.4236C8.2547 11.5022 8.35354 11.6013 8.5175 11.7642L10.2601 13.4953L11.4317 12.3315L9.68906 10.6004C9.5251 10.4376 9.42527 10.3394 9.34622 10.2693C9.29101 10.2203 9.2656 10.2034 9.25893 10.1993Z" fill="#BABABA" fillRule="evenodd" />
+                                      <path clipRule="evenodd" d="M4.03842 2.13952C4.3762 2.13952 4.6782 2.34834 4.79563 2.66291L5.03436 3.30225C5.37219 4.20917 5.46981 4.4243 5.6233 4.57677C5.77678 4.72924 5.99336 4.82621 6.90634 5.16179L7.54996 5.39894C7.86663 5.51559 8.07685 5.81558 8.07685 6.15111C8.07685 6.48665 7.86663 6.78664 7.54996 6.90329L6.90634 7.14043C5.99336 7.47602 5.77678 7.57299 5.6233 7.72545C5.46981 7.87792 5.37219 8.09306 5.03436 8.99997L4.79563 9.63932C4.6782 9.95388 4.3762 10.1627 4.03842 10.1627C3.70065 10.1627 3.39865 9.95388 3.28122 9.63932L3.04249 8.99997C2.70466 8.09306 2.60704 7.87792 2.45355 7.72545C2.30007 7.57299 2.08349 7.47602 1.17051 7.14043L0.526888 6.90329C0.210221 6.78664 0 6.48665 0 6.15111C0 5.81558 0.210221 5.51559 0.526888 5.39894L1.17051 5.16179C2.08349 4.82621 2.30007 4.72924 2.45355 4.57677C2.60704 4.4243 2.70466 4.20917 3.04249 3.30225L3.28122 2.66291L3.3338 2.55008C3.47493 2.29944 3.74291 2.13952 4.03842 2.13952ZM4.03842 5.10538C3.91539 5.33113 3.77441 5.53375 3.59567 5.7113C3.41694 5.88885 3.21295 6.02889 2.9857 6.15111C3.21295 6.27333 3.41693 6.41338 3.59567 6.59093C3.77419 6.76826 3.91549 6.97038 4.03842 7.1958C4.16136 6.97038 4.30266 6.76826 4.48118 6.59093C4.6597 6.41359 4.86317 6.27323 5.0901 6.15111C4.86317 6.02899 4.6597 5.88864 4.48118 5.7113C4.30244 5.53375 4.16146 5.33113 4.03842 5.10538Z" fill="#BABABA" fillRule="evenodd" />
+                                      <path clipRule="evenodd" d="M15.8845 0C16.2222 0 16.5242 0.208824 16.6417 0.523388L16.9593 1.37585C17.4012 2.56212 17.5519 2.91626 17.808 3.17062C18.064 3.42499 18.4205 3.57472 19.6148 4.01368L20.4729 4.32918C20.7896 4.44583 20.9998 4.74582 20.9998 5.08135C20.9998 5.41689 20.7896 5.71688 20.4729 5.83353L19.6148 6.14902C18.4205 6.58798 18.064 6.73772 17.808 6.99208C17.5519 7.24645 17.4012 7.60058 16.9593 8.78686L16.6417 9.63932C16.5242 9.95388 16.2222 10.1627 15.8845 10.1627C15.5467 10.1627 15.2447 9.95388 15.1273 9.63932L14.8097 8.78686C14.3678 7.60058 14.217 7.24645 13.961 6.99208C13.7049 6.73772 13.3484 6.58798 12.1542 6.14902L11.296 5.83353C10.9794 5.71688 10.7691 5.41689 10.7691 5.08135C10.7691 4.74582 10.9794 4.44583 11.296 4.32918L12.1542 4.01368C13.3484 3.57472 13.7049 3.42499 13.961 3.17062C14.217 2.91626 14.3678 2.56212 14.8097 1.37585L15.1273 0.523388L15.1798 0.410562C15.321 0.159927 15.589 0 15.8845 0ZM15.8845 3.06406C15.67 3.56181 15.4406 3.96986 15.1031 4.30515C14.7655 4.64044 14.3548 4.86827 13.8537 5.08135C14.3548 5.29443 14.7655 5.52226 15.1031 5.85756C15.4404 6.19265 15.6701 6.60025 15.8845 7.0976C16.0989 6.60025 16.3285 6.19265 16.6659 5.85756C17.0032 5.52246 17.4135 5.29433 17.9142 5.08135C17.4135 4.86838 17.0032 4.64025 16.6659 4.30515C16.3283 3.96986 16.099 3.56181 15.8845 3.06406Z" fill="#BABABA" fillRule="evenodd" />
+                                    </g>
+                                  </svg>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                });
+                })()}
+                </AnimatePresence>
+              </div>
+              {(() => {
+                const categoriseList = (list: typeof createdLists[number]) => {
+                  const total = list.items.length;
+                  const checked = list.items.filter(i => i.completed).length;
+                  if (checked === total) return "complete";
+                  if (checked / total >= 0.5) return "almost";
+                  if (checked > 0) return "started";
+                  return "todo";
+                };
+                const hasVisible = activeListFilter === "all"
+                  ? createdLists.length > 0
+                  : activeListFilter === "grouped-todo"
+                    ? createdLists.some(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
+                    : createdLists.some(l => categoriseList(l) === activeListFilter);
+                if (!hasVisible) {
+                  const emptyMessages: Record<string, string> = {
+                    all: "No lists here yet.. get busy!",
+                    complete: "No fully checked off lists yet",
+                    almost: "Nothing close to completion yet",
+                    started: "All your lists are well underway",
+                    todo: "All your lists have been started!",
+                    "grouped-todo": "All your lists have been started!",
+                  };
+                  return (
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 0 }}>
+                      <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
+                        {emptyMessages[activeListFilter]}
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+            {/* Add new list button */}
+            <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[32px] shrink-0">
+              <button
+                className="bg-[#1C2C42] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
+                style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
+                onClick={() => { setListTitle(pickDefaultListName(createdLists.map(l => l.title))); setListItems([]); setListOverlayMode('create'); setEditingListId(null); setListSortMode('insertion'); setListSmartReminders(true); setIsListsOverlayOpen(true); }}
+              >
+                <div className="relative shrink-0 size-[15px]">
+                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
+                    <path d={svgPaths.p1e67ad80} fill="white" />
+                  </svg>
+                </div>
+                <div className="font-['Lato',sans-serif] font-bold text-[20px] text-white whitespace-nowrap">
+                  Add new list
+                </div>
+              </button>
+            </div>
+            </>
+          )}
+          </>
+        ) : (
+        <>
+        {/* Filter buttons — Lists mode: rendered here inside the container */}
+        {isListsEnabled && (
+        <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
+          {viewMode === "done-deleted" ? (<div
+            className="flex items-center justify-between w-full"
+          >
+            {/* Done/deleted view filters */}
+            <div className="flex items-center gap-[12px]">
+              <button
+                onClick={() => setViewMode("list")}
+                className="relative shrink-0 self-center hidden min-[390px]:flex cursor-pointer"
+                style={{ width: 50, height: 40 }}
+                aria-label="Back to reminders"
+              >
+                <svg className="block" style={{ width: 50, height: 40 }} fill="none" viewBox="0 0 50 40">
+                  <rect fill="transparent" height="39" rx="19.5" width="49" x="0.5" y="0.5" />
+                  <rect height="39" rx="19.5" stroke="#4784f8" width="49" x="0.5" y="0.5" />
+                </svg>
+                <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ width: 8, height: 13 }} fill="none" viewBox="20.88 13.38 7.76 13.24">
+                  <path d={laterBtnPaths.p17336800} fill="#4784f8" />
+                </svg>
+              </button>
+              <button
+                onClick={() => {
+                  setDoneDeletedFilter(doneDeletedFilter === 'done' ? 'all' : 'done');
+                }}
+                className={`${
+                  doneDeletedFilter === 'done'
+                    ? "bg-white"
+                    : "text-[#4784f8]"
+                } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
+                style={doneDeletedFilter === 'done' ? { boxShadow: `inset 0 0 0 2px ${DONE_BLUE}`, color: DONE_BLUE } : { boxShadow: 'inset 0 0 0 1px #4784f8', color: '#4784f8' }}
+              >
+                <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                  Done
+                </div>
+              </button>
+              <button
+                onClick={() => {
+                  setDoneDeletedFilter(doneDeletedFilter === 'deleted' ? 'all' : 'deleted');
+                }}
+                className={`${
+                  doneDeletedFilter === 'deleted'
+                    ? "bg-white"
+                    : "text-[#4784f8]"
+                } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
+                style={doneDeletedFilter === 'deleted' ? { boxShadow: `inset 0 0 0 2px ${DELETED_GREY}`, color: DELETED_GREY } : { boxShadow: 'inset 0 0 0 1px #4784f8', color: '#4784f8' }}
+              >
+                <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                  Deleted
+                </div>
+              </button>
+            </div>
+            {/* Clear all button */}
+            <button
+              ref={clearAllButtonRef}
+              onClick={handleClearListClick}
+              className={`${
+                clearListStep === 0
+                  ? "text-[#4784f8]"
+                  : "bg-[#4784f8] text-white"
+              } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid border-[#4784f8] transition-colors cursor-pointer`}
+            >
+              <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                {clearListStep === 0 ? "Clear all" : clearListStep === 1 ? "Clear all?" : "Cleared!"}
+              </div>
+            </button>
+          </div>) : effectiveFiltersVariant === "grouped" ? (
+            <>
+              <div className="flex items-center gap-[12px]">
+                {(["today", "this-week", "other"] as ReminderCategory[]).map((filter) => {
+                  const pillColor = CATEGORY_COLOURS[filter] || "#4784f8";
+                  const isActive = activeFilter === filter;
+                  return (
+                  <button
+                    key={filter}
+                    onClick={() => {
+                      setActiveFilter(activeFilter === filter ? "all" : filter);
+                    }}
+                    className={`${
+                      isActive
+                        ? "bg-white"
+                        : "text-[#4784f8]"
+                    } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
+                      filter === "other" ? "hidden min-[390px]:flex" : ""
+                    }`}
+                    style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #4784f8` }}
+                  >
+                    <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                      {getCategoryLabel(filter)}
+                    </div>
+                  </button>
+                  );
+                })}
+              </div>
+              <div className="shrink-0 h-[40px] cursor-pointer" onClick={() => setIsSettingsOpen(true)}>
+                <LaterBtn />
+              </div>
+            </>
+          ) : (
+            (["today", "this-week", "later", "sometime"] as ReminderCategory[]).map((filter) => {
+              const pillColor = CATEGORY_COLOURS[filter] || "#4784f8";
+              const isActive = activeFilter === filter;
+              return (
+              <button
+                key={filter}
+                onClick={() => {
+                  setActiveFilter(activeFilter === filter ? "all" : filter);
+                }}
+                className={`${
+                  isActive
+                    ? "bg-white"
+                    : "text-[#4784f8]"
+                } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
+                  filter === "sometime" ? "hidden min-[390px]:flex" : ""
+                }`}
+                style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #4784f8` }}
+              >
+                <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
+                  {getCategoryLabel(filter)}
+                </div>
+              </button>
+              );
+            })
+          )}
+        </div>
+        )}
+        {/* Scrollable area */}
+        <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full max-w-[768px] rounded-[10px]" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+          {(() => {
+            const displayReminders = hideOverdue ? reminders.filter(r => !isOverdue(r, now)) : reminders;
+            // Done / deleted view — derived from completedAt or deletedAt on reminders
+            if (viewMode === "done-deleted") {
+              const completedItems = displayReminders
+                .filter((r) => r.completedAt != null || r.deletedAt != null || pendingUncompleteIds.has(r.id) || pendingUndeleteIds.has(r.id))
+                .filter((r) => {
+                  if (doneDeletedFilter === 'all') return true;
+                  if (doneDeletedFilter === 'done') return (r.completedAt != null && r.deletedAt == null) || pendingUncompleteIds.has(r.id);
+                  // 'deleted'
+                  return r.deletedAt != null || pendingUndeleteIds.has(r.id);
+                })
+                .sort((a, b) => {
+                  const tsA = pendingUndeleteSortKeyRef.current.get(a.id) ?? a.deletedAt ?? a.completedAt ?? pendingUncompleteCompletedAtRef.current.get(a.id) ?? 0;
+                  const tsB = pendingUndeleteSortKeyRef.current.get(b.id) ?? b.deletedAt ?? b.completedAt ?? pendingUncompleteCompletedAtRef.current.get(b.id) ?? 0;
+                  return tsB - tsA;
+                });
+
+              if (completedItems.length === 0) {
+                return (
+                  <div className="flex flex-col items-center justify-center flex-1 w-full gap-[4px]">
+                    <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
+                      {doneDeletedFilter === 'all' ? 'No done or deleted reminders yet...' : doneDeletedFilter === 'deleted' ? 'No deleted reminders yet...' : 'No done reminders yet...'}
+                    </p>
+                    {doneDeletedFilter === 'done' && (
+                      <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
+                        get busy!
+                      </p>
+                    )}
+                  </div>
+                );
+              }
+              return (
+                <div className="flex flex-col gap-[22px] w-full">
+                  <AnimatePresence key={`${viewMode}-${activeFilter}-${doneDeletedFilter}`}>
+                  {completedItems.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      layout
+                      exit={{ opacity: 0 }}
+                      transition={{ layout: { duration: 0.25 } }}
+                    >
+                      <div className={`content-stretch flex ${showSubtitles ? 'items-start' : 'items-center'} justify-between px-px relative w-full`}>
+                        <div className="flex-[1_0_0] min-h-px min-w-px relative">
+                          <div className={`flex flex-row ${showSubtitles ? 'items-start' : 'items-center'} size-full`}>
+                            <div className={`content-stretch flex gap-[16px] ${showSubtitles ? 'items-start' : 'items-center'} pr-[16px] relative w-full`}>
+                              {/* Done/deleted tick circle — clickable to uncomplete/undelete */}
+                              <button
+                                className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                                style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, ...(showSubtitles ? { marginTop: '3px' } : {}) }}
+                                onClick={() => handleUncompleteClick(item.id)}
+                                aria-label={item.deletedAt != null ? "Undelete" : "Mark as not done"}
+                              >
+                                {(pendingUncompleteIds.has(item.id) || pendingUndeleteIds.has(item.id)) ? (() => {
+                                  const cat = categoriseReminder(item, now);
+                                  const overdue = isOverdue(item, now);
+                                  const circleCol = overdue ? OVERDUE_COLOUR : CATEGORY_COLOURS[cat] ?? "#939393";
+                                  return (
+                                    <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                      <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={circleCol} strokeWidth="2" />
+                                    </svg>
+                                  );
+                                })() : (() => {
+                                  const checkboxFill = item.deletedAt != null ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE);
+                                  return (
+                                    <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                      <rect fill={checkboxFill} height="23" rx="11.5" width="23" x="1" y="1" />
+                                      <rect height="23" rx="11.5" stroke={checkboxFill} strokeWidth="2" width="23" x="1" y="1" />
+                                      <path d={doneCirclePaths.p1bc11a00} fill="white" />
+                                    </svg>
+                                  );
+                                })()}
+                              </button>
+                              {(() => {
+                                const isPendingRestore = pendingUncompleteIds.has(item.id) || pendingUndeleteIds.has(item.id);
+                                const isDeleted = item.deletedAt != null;
+                                const overdue = isOverdue(item, now);
+                                const textCol = isPendingRestore ? (overdue ? OVERDUE_COLOUR : (isListsEnabled ? '#3F3F3F' : "#1c2c42")) : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : "#1C2C42"));
+                                const subtitleCol = isPendingRestore ? '#BABABA' : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE));
+                                return (
+                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ color: textCol, gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}>
+                                    <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px' }}>{getDisplayTitle(item)}</p>
+                                    {showSubtitles && <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: subtitleCol }}>{(() => {
+                                      if (item.repeatRule) {
+                                        const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
+                                        if (label) return label;
+                                      }
+                                      if (item.schedule.kind === 'scheduled' && item.schedule.date) {
+                                        const [sy, sm, sd] = item.schedule.date.split('-').map(Number);
+                                        const dateLabel = formatSelectedDate(new Date(sy, sm - 1, sd), now);
+                                        if (item.schedule.time) {
+                                          return `${dateLabel} at ${formatTime12h(item.schedule.time)}`;
+                                        }
+                                        return dateLabel;
+                                      }
+                                      return 'No date / time set';
+                                    })()}</p>}
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        </div>
+                        {(() => {
+                          const isPendingRestore2 = pendingUncompleteIds.has(item.id) || pendingUndeleteIds.has(item.id);
+                          const isDeleted = item.deletedAt != null;
+                          const cat = categoriseReminder(item, now);
+                          const overdue = isOverdue(item, now);
+                          const iconCol = isPendingRestore2 ? (overdue ? OVERDUE_COLOUR : "#BABABA") : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : "#1C2C42"));
+                          return item.repeatRule ? (
+                            <div className="relative shrink-0 size-[25px]" data-name="icon-repeats">
+                              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25.0003 25.0708">
+                                <g>
+                                  <path d={repeatIconPaths.p19a7b000} fill={iconCol} />
+                                  <path d={repeatIconPaths.p9f3c880} fill={iconCol} />
+                                  <path d={repeatIconPaths.pf2d2300} fill={iconCol} />
+                                </g>
+                              </svg>
+                            </div>
+                          ) : item.schedule.kind === "scheduled" ? (
+                            <div className="relative shrink-0 size-[25px]" data-name="icon-schedule-set">
+                              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                <g>
+                                  <mask fill="white" id={`mask-done-${item.id}`}>
+                                    <path d={scheduleSetPaths.p37c4f500} />
+                                  </mask>
+                                  <path d={scheduleSetPaths.pde59c80} fill={iconCol} mask={`url(#mask-done-${item.id})`} />
+                                </g>
+                              </svg>
+                            </div>
+                          ) : (
+                            <div className="relative shrink-0 size-[25px]" data-name="icon-schedule-unset">
+                              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                <g>
+                                  <path d={scheduleUnsetPaths.pe7a3000} fill={iconCol} />
+                                  <path d={scheduleUnsetPaths.p1e7ee400} fill={iconCol} />
+                                  <path d={scheduleUnsetPaths.p37e67100} fill={iconCol} />
+                                  <path d={scheduleUnsetPaths.pfd088c0} fill={iconCol} />
+                                  <path d={scheduleUnsetPaths.p35b867f0} fill={iconCol} />
+                                  <path d={scheduleUnsetPaths.p16a18300} fill={iconCol} />
+                                  <path d={scheduleUnsetPaths.pcd64f00} fill={iconCol} />
+                                </g>
+                              </svg>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </motion.div>
+                  ))}
+                  </AnimatePresence>
+                </div>
+              );
+            }
+
+            // Standard reminder list view — active reminders only (not completed, not deleted),
+            // plus items in pendingDeleteIds so they remain visible during the 350ms delete window.
+            const activeReminders = displayReminders.filter((r) =>
+              (r.completedAt == null && r.deletedAt == null) || pendingDeleteIds.has(r.id)
+            );
+            const filtered = activeReminders.filter((r) => {
+              if (activeFilter === "all") return true;
+              // Overdue reminders appear in every filter view
+              if (isOverdue(r, now)) return true;
+              const cat = categoriseReminder(r, now);
+              if (activeFilter === "other") return cat === "later" || cat === "sometime";
+              return cat === activeFilter;
+            });
+            const isLastVisibleInThisList = filtered.length === 1;
+            const sortedFiltered = filtered.length > 0 ? sortReminders(filtered, now) : [];
+            return (
+              <>
+              <div className="flex flex-col gap-[22px] w-full" style={{ position: 'relative', zIndex: 1 }}>
+                <AnimatePresence key={`${viewMode}-${activeFilter}`}>
+                {sortedFiltered.map((reminder) => {
+                  const isPendingDone = pendingDoneIds.has(reminder.id);
+                  const isPendingDelete = pendingDeleteIds.has(reminder.id);
+                  const isPendingAway = isPendingDone || isPendingDelete;
+                  const pendingColour = isPendingDelete ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE);
+                  const category = categoriseReminder(reminder, now);
+                  const overdue = isOverdue(reminder, now);
+                  const circleColour = overdue ? OVERDUE_COLOUR : CATEGORY_COLOURS[category] ?? "#939393";
+                  const isHighlighted = insertHighlightId === reminder.id;
+                  const textColour = isPendingAway ? "#BABABA" : (isHighlighted ? circleColour : (overdue ? OVERDUE_COLOUR : "#1c2c42"));
+                  const iconColour = isPendingAway ? pendingColour : (isHighlighted ? circleColour : (overdue ? OVERDUE_COLOUR : "#BABABA"));
+                  const isReinserted = reinsertedId === reminder.id;
+                  return (
+                    <motion.div
+                      key={reminder.id}
+                      layout
+                      initial={isReinserted ? { opacity: 0 } : false}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={isReinserted
+                        ? { opacity: { duration: 0.2 } }
+                        : { layout: { duration: 0.25 } }
+                      }
+                      onAnimationComplete={() => {
+                        if (isReinserted) {
+                          setReinsertedId(null);
+                        }
+                      }}
+                    >
+                      <div className={`content-stretch flex ${showSubtitles ? 'items-start' : 'items-center'} justify-between px-px relative w-full`}>
+                        <div className="flex-[1_0_0] min-h-px min-w-px relative">
+                          <div className={`flex flex-row ${showSubtitles ? 'items-start' : 'items-center'} size-full`}>
+                            <div className={`content-stretch flex gap-[16px] ${showSubtitles ? 'items-start' : 'items-center'} pr-[16px] relative w-full`}>
+                              {/* Circle: clickable completion target */}
+                              <button
+                                className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                                style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, ...(showSubtitles ? { marginTop: '3px' } : {}) }}
+                                onClick={() => handleCompleteClick(reminder.id, { armEmptyDelay: isLastVisibleInThisList, filterKey: activeFilter, isRepeat: reminder.repeatRule != null })}
+                                aria-label="Mark as done"
+                              >
+                                {isPendingAway ? (
+                                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                    <rect fill={pendingColour} height="23" rx="11.5" width="23" x="1" y="1" />
+                                    <rect height="23" rx="11.5" stroke={pendingColour} strokeWidth="2" width="23" x="1" y="1" />
+                                    <path d={doneCirclePaths.p1bc11a00} fill="white" />
+                                  </svg>
+                                ) : (
+                                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                    <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={circleColour} strokeWidth="2" />
+                                  </svg>
+                                )}
+                              </button>
+                              <div className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative`} style={{ transition: 'color 300ms', gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}>
+                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingAway ? pendingColour : textColour }}>{getDisplayTitle(reminder)}</p>
+                                {showSubtitles && <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAway ? pendingColour : '#BABABA' }}>{(() => {
+                                  if (reminder.repeatRule) {
+                                    const label = formatRepeatLabel(reminder.repeatRule, reminder.schedule.kind === 'scheduled' ? reminder.schedule.time : undefined, reminder.schedule.kind === 'scheduled' ? reminder.schedule.date : undefined);
+                                    if (label) return label;
+                                  }
+                                  if (reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
+                                    const [sy, sm, sd] = reminder.schedule.date.split('-').map(Number);
+                                    const dateLabel = formatSelectedDate(new Date(sy, sm - 1, sd), now);
+                                    if (reminder.schedule.time) {
+                                      return `${dateLabel} at ${formatTime12h(reminder.schedule.time)}`;
+                                    }
+                                    return dateLabel;
+                                  }
+                                  return 'No date / time set';
+                                })()}</p>}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {reminder.repeatRule ? (
+                          <button
+                            className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                            style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, color: iconColour, transition: 'color 300ms' }}
+                            onClick={() => setInfoReminder(reminder)}
+                            aria-label="Reminder info"
+                            data-name="icon-repeats"
+                          >
+                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25.0003 25.0708">
+                              <g>
+                                <path d={repeatIconPaths.p19a7b000} fill="currentColor" />
+                                <path d={repeatIconPaths.p9f3c880} fill="currentColor" />
+                                <path d={repeatIconPaths.pf2d2300} fill="currentColor" />
+                              </g>
+                            </svg>
+                          </button>
+                        ) : reminder.schedule.kind === "scheduled" ? (
+                          <button
+                            className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                            style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, color: iconColour, transition: 'color 300ms' }}
+                            onClick={() => setInfoReminder(reminder)}
+                            aria-label="Reminder info"
+                            data-name="icon-schedule-set"
+                          >
+                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                              <g>
+                                <mask fill="white" id={`mask-${reminder.id}`}>
+                                  <path d={scheduleSetPaths.p37c4f500} />
+                                </mask>
+                                <path d={scheduleSetPaths.pde59c80} fill="currentColor" mask={`url(#mask-${reminder.id})`} />
+                              </g>
+                            </svg>
+                          </button>
+                        ) : (
+                          <button
+                            className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                            style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, color: iconColour, transition: 'color 300ms' }}
+                            onClick={() => setInfoReminder(reminder)}
+                            aria-label="Reminder info"
+                            data-name="icon-schedule-unset"
+                          >
+                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                              <g>
+                                <path d={scheduleUnsetPaths.pe7a3000} fill="currentColor" />
+                                <path d={scheduleUnsetPaths.p1e7ee400} fill="currentColor" />
+                                <path d={scheduleUnsetPaths.p37e67100} fill="currentColor" />
+                                <path d={scheduleUnsetPaths.pfd088c0} fill="currentColor" />
+                                <path d={scheduleUnsetPaths.p35b867f0} fill="currentColor" />
+                                <path d={scheduleUnsetPaths.p16a18300} fill="currentColor" />
+                                <path d={scheduleUnsetPaths.pcd64f00} fill="currentColor" />
+                              </g>
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                </AnimatePresence>
+              </div>
+              {filtered.length === 0 && (() => {
+                const emptyMessages: Record<ReminderCategory | "all", string> = {
+                  all: "No reminders... take it easy!",
+                  today: "No reminders today... take it easy!",
+                  "this-week": "No reminders this week... take it easy!",
+                  later: "No reminders... take it easy!",
+                  sometime: "No reminders... take it easy!",
+                  other: "No reminders... take it easy!",
+                };
+                const delay = emptyPlaceholderDelayRef.current;
+                if (delay !== null && delay.filterKey === activeFilter && Date.now() < delay.untilMs) {
+                  return <div style={{ position: 'absolute', inset: 0, zIndex: 0 }} />;
+                }
+                emptyPlaceholderDelayRef.current = null;
+                return (
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 0 }}>
+                    <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
+                      {emptyMessages[activeFilter]}
+                    </p>
+                  </div>
+                );
+              })()}
+              {infoReminder && (
+                <ReminderInfoOverlay
+                  reminder={infoReminder}
+                  onClose={() => setInfoReminder(null)}
+                  onMarkAsDone={() => {
+                    const reminderId = infoReminder.id;
+                    setInfoReminder(null);
+                    overlayDoneTimerRef.current = window.setTimeout(() => {
+                      overlayDoneTimerRef.current = null;
+                      handleCompleteClick(reminderId, { armEmptyDelay: isLastVisibleInThisList, filterKey: activeFilter, isRepeat: infoReminder?.repeatRule != null });
+                    }, 200);
+                  }}
+                  onEdit={() => {
+                    const reminderToEdit = infoReminder;
+                    setInfoReminder(null);
+                    if (overlayEditTimerRef.current !== null) {
+                      clearTimeout(overlayEditTimerRef.current);
+                    }
+                    overlayEditTimerRef.current = window.setTimeout(() => {
+                      overlayEditTimerRef.current = null;
+                      setRepeatConfig(repeatRuleToConfig(reminderToEdit.repeatRule));
+                      setEditingReminder(reminderToEdit);
+                      setIsOverlayOpen(true);
+                    }, 200);
+                  }}
+                  onDelete={() => {
+                    handleDeleteClick(infoReminder.id, { armEmptyDelay: isLastVisibleInThisList, filterKey: activeFilter });
+                  }}
+                />
+              )}
+              </>
+            );
+          })()}
+        </div>
+
+        {/* New reminder button - fixed at bottom */}
+        {viewMode !== "done-deleted" && (
+        <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[32px] shrink-0">
+          <button
+            className="bg-[#4784f8] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
+            style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
+            onClick={() => setIsOverlayOpen(true)}
+          >
+            <div className="relative shrink-0 size-[15px]">
+              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
+                <path d={svgPaths.p1e67ad80} fill="white" />
+              </svg>
+            </div>
+            <div className="font-['Lato',sans-serif] font-bold text-[20px] text-white whitespace-nowrap">
+              New reminder
+            </div>
+          </button>
+        </div>
+        )}
+        </>
+        )}
+      </div>
+
+      {/* New Reminder Overlay */}
+      <AnimatePresence>
+        {isOverlayOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => {
+                setIsOverlayOpen(false);
+                setRepeatConfig(null);
+                setEditingReminder(null);
+              }}
+              className="fixed inset-0 bg-black/0 z-40"
+            />
+            
+            {/* Overlay sliding from bottom */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0, top: getOverlayTopPosition() }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="fixed left-0 right-0 z-50 mx-auto w-full"
+              style={{ bottom: 0 }}
+            >
+              <NewReminderOverlay
+                onRepeatsOverlayOpen={() => setIsRepeatsOverlayOpen(true)}
+                repeatConfig={repeatConfig}
+                onRepeatConfigChange={setRepeatConfig}
+                isRepeatsOverlayOpen={isRepeatsOverlayOpen}
+                addReminder={addReminder}
+                onClose={handleOverlayClose}
+                nlcMode={nlcMode}
+                nlcEnabled={nlcEnabled}
+                editReminder={editingReminder}
+                updateReminder={updateReminder}
+              />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Lists Overlay */}
+      <AnimatePresence>
+        {isListsEnabled && activeMainTab === 'lists' && isListsOverlayOpen && (() => {
+          const handleListSaveAndClose = () => {
+            setIsListSettingsOpen(false);
+            if (!(listTitle.trim().length > 0 && listItems.length > 0)) {
+              setIsListsOverlayOpen(false);
+              return;
+            }
+            const title = listTitle.trim();
+            const items = [...listItems];
+            setIsListsOverlayOpen(false);
+            if (newListInsertTimerRef.current !== null) {
+              clearTimeout(newListInsertTimerRef.current);
+            }
+            if (listOverlayMode === 'edit' && editingListId !== null) {
+              const targetId = editingListId;
+              setListInsertHighlightId(targetId);
+              if (listInsertHighlightTimerRef.current !== null) {
+                clearTimeout(listInsertHighlightTimerRef.current);
+              }
+              newListInsertTimerRef.current = window.setTimeout(() => {
+                newListInsertTimerRef.current = null;
+                setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders } : l));
+                listInsertHighlightTimerRef.current = window.setTimeout(() => {
+                  listInsertHighlightTimerRef.current = null;
+                  setListInsertHighlightId(null);
+                }, INSERT_HIGHLIGHT_MS);
+              }, NEW_REMINDER_INSERT_DELAY);
+            } else {
+              const newId = crypto.randomUUID();
+              setListInsertHighlightId(newId);
+              if (listInsertHighlightTimerRef.current !== null) {
+                clearTimeout(listInsertHighlightTimerRef.current);
+              }
+              newListInsertTimerRef.current = window.setTimeout(() => {
+                newListInsertTimerRef.current = null;
+                setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, smartReminders: listSmartReminders }]);
+                setListReinsertedId(newId);
+                listInsertHighlightTimerRef.current = window.setTimeout(() => {
+                  listInsertHighlightTimerRef.current = null;
+                  setListInsertHighlightId(null);
+                }, INSERT_HIGHLIGHT_MS);
+              }, NEW_REMINDER_INSERT_DELAY);
+            }
+          };
+          return (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={handleListSaveAndClose}
+              className="fixed inset-0 bg-black/0 z-40"
+            />
+            
+            {/* Overlay sliding from bottom */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0, top: getOverlayTopPosition() }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="fixed left-0 right-0 z-50 mx-auto w-full"
+              style={{ bottom: 0 }}
+            >
+              <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[20px] rounded-tr-[20px] size-full">
+                <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col">
+                  <div className="content-stretch flex flex-col gap-[30px] items-start pt-[26px] px-[20px] relative w-full shrink-0">
+                    <ListsHeader key={isListsOverlayOpen ? 'open' : 'closed'} value={listTitle} onChange={setListTitle} active={listTitle.trim().length > 0 && listItems.length > 0} isEditMode={listOverlayMode === 'edit' || listTitle.length > 0} onSubmit={handleListSaveAndClose} onGearClick={() => setIsListSettingsOpen(true)} />
+                    <AddListItem onAdd={(text: string) => {
+                      const newId = crypto.randomUUID();
+                      setListItems(prev => [{ id: newId, text, completed: false }, ...prev]);
+                      setListItemReinsertedId(newId);
+                      setListItemHighlightId(newId);
+                      if (listItemHighlightTimerRef.current !== null) {
+                        clearTimeout(listItemHighlightTimerRef.current);
+                      }
+                      listItemHighlightTimerRef.current = window.setTimeout(() => {
+                        listItemHighlightTimerRef.current = null;
+                        setListItemHighlightId(null);
+                      }, INSERT_HIGHLIGHT_MS);
+                    }} isEmpty={listItems.length === 0} />
+                  </div>
+                  <div className="flex flex-col gap-[22px] items-start px-[20px] pb-[26px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[22px]">
+                    <AnimatePresence initial={false}>
+                    {(listSortMode === 'alphabetical' ? [...listItems].sort((a, b) => a.text.localeCompare(b.text)) : listItems).map((item) => {
+                      const isItemReinserted = listItemReinsertedId === item.id;
+                      const isItemHighlighted = listItemHighlightId === item.id;
+                      return (
+                        <motion.div
+                          key={item.id}
+                          layout
+                          initial={isItemReinserted ? { opacity: 0 } : false}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={isItemReinserted
+                            ? { opacity: { duration: 0.2 } }
+                            : { layout: { duration: 0.25 } }
+                          }
+                          onAnimationComplete={() => {
+                            if (isItemReinserted) {
+                              setListItemReinsertedId(null);
+                            }
+                          }}
+                          className="w-full"
+                        >
+                          <ListItem name={item.text} completed={item.completed} isHighlighted={isItemHighlighted} onToggle={() => setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], completed: !next[idx].completed }; } return next; })} editable={listOverlayMode === 'edit'} onChange={(val: string) => setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], text: val }; } return next; })} />
+                        </motion.div>
+                      );
+                    })}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+            {/* List Settings Overlay */}
+            {isListSettingsOpen && (
+              <>
+                <div
+                  className="fixed inset-0 bg-black/50 z-[60]"
+                  onClick={() => setIsListSettingsOpen(false)}
+                />
+                <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none px-[20px]">
+                  <div className="pointer-events-auto w-full max-w-[400px]">
+                    <InfoOverlay sortMode={listSortMode} onSortChange={setListSortMode} listTitle={listTitle} onUncheckAll={() => { setListItems(prev => prev.map(i => ({ ...i, completed: false }))); setIsListSettingsOpen(false); }} allUnchecked={listItems.every(i => !i.completed)} smartReminders={listSmartReminders} onSmartRemindersChange={handleSmartRemindersChange} />
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+          );
+        })()}
+      </AnimatePresence>
+
+      {/* Dev Tools Overlay */}
+      <AnimatePresence>
+        {isDevToolsOpen && (
+          <>
+            {/* Click-outside to close */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setIsDevToolsOpen(false)}
+              className="fixed inset-0 z-40"
+            />
+            
+            {/* Overlay sliding from bottom */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0, top: getOverlayTopPosition() }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="fixed left-0 right-0 z-50 mx-auto w-full"
+              style={{ bottom: 0 }}
+            >
+              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} onClearLists={() => setCreatedLists([])} onGenerateLists={(lists) => setCreatedLists(lists)} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Repeats Overlay */}
+      <AnimatePresence>
+        {isRepeatsOverlayOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setIsRepeatsOverlayOpen(false)}
+              className="fixed inset-0 bg-black/0 z-40"
+            />
+            
+            {/* Overlay sliding from bottom */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0, top: getOverlayTopPosition() }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="fixed left-0 right-0 z-50 mx-auto w-full"
+              style={{ bottom: 0 }}
+            >
+              <RepeatsOverlay
+                onClose={(config) => {
+                  if (config !== undefined) setRepeatConfig(config);
+                  setIsRepeatsOverlayOpen(false);
+                }}
+                initialConfig={repeatConfig}
+              />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Settings Overlay */}
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setIsSettingsOpen(false)}
+              className="fixed inset-0 bg-black/0 z-40"
+            />
+
+            {/* Overlay sliding from bottom */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0, top: getOverlayTopPosition() }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="fixed left-0 right-0 z-50 mx-auto w-full"
+              style={{ bottom: 0 }}
+            >
+              <SettingsOverlay onClose={() => setIsSettingsOpen(false)} showDateAndTimeSubtitles={showDateAndTimeSubtitles} onShowDateAndTimeSubtitlesChange={setShowDateAndTimeSubtitles} onTutorialOpen={handleTutorialOpen} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Tutorial Overlay */}
+      <AnimatePresence>
+        {isTutorialOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setIsTutorialOpen(false)}
+              className="fixed inset-0 bg-black/0 z-40"
+            />
+
+            {/* Overlay sliding from bottom */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0, top: TUTORIAL_OVERLAY_TOP }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="fixed left-0 right-0 z-50 mx-auto w-full"
+              style={{ bottom: 0 }}
+            >
+              <TutorialOverlay onClose={() => setIsTutorialOpen(false)} isEnabled={isOnboardingTutorialEnabled} filtersMenuVariant={filtersMenuVariant} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+    </div>
+  );
+}

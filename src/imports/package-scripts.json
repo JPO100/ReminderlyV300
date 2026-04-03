@@ -1,0 +1,80 @@
+Ticket 1: Add runnable test scripts (no other changes)
+
+Outcome
+
+Engineers can run the existing vitest suite locally via package scripts.
+
+Why
+
+Tests exist but there is no script to run them, increasing regression risk.
+
+Evidence
+
+package.json has scripts for dev/build/preview only (package.json lines 5-9).
+
+vitest is already installed (package.json dependency list includes vitest, line 49).
+
+Existing tests: src/app/tests/delete.test.ts (for example lines 1-116+).
+
+Scope
+In scope
+
+Update package.json only by adding two scripts:
+
+test: vitest run
+
+test:watch: vitest
+
+Out of scope (non-negotiable)
+
+No other package.json changes.
+
+No changes to app code.
+
+No changes to existing tests.
+
+No new tests.
+
+No coverage configuration.
+
+No CI workflows or quality gates.
+
+No dependency changes.
+
+Implementation
+
+Edit package.json scripts block to include:
+
+"test": "vitest run"
+
+"test:watch": "vitest"
+
+Acceptance criteria
+
+npm run test runs vitest in run mode and exits with a non-zero code on failure.
+
+npm run test:watch starts vitest in watch mode.
+
+Existing tests execute under these scripts without requiring any additional configuration changes.
+
+Verification steps
+
+npm run test
+
+npm run test:watch
+
+Effort
+
+S
+
+Risk of change
+
+Low
+
+Claude risk check
+
+No open questions remain.
+
+No “nice to have” follow-ons are permitted in this ticket.
+
+The only acceptable diff is package.json adding the two scripts.
