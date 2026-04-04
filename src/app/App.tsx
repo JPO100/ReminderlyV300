@@ -1,12 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { LocalNotifications } from "@capacitor/local-notifications";
 import svgPaths from "../imports/svg-tzdfx9foxi";
 import doneTickPaths from "../imports/svg-c9judk5sbu";
-import scheduleSetPaths from "../imports/svg-ky2itz2q0i";
-import scheduleUnsetPaths from "../imports/svg-4l9vgb24m5";
-import repeatIconPaths from "../imports/svg-cep8nozhxy";
-import doneCirclePaths from "../imports/svg-zbpmwo25rv";
 import NewReminderOverlay from "../imports/NewReminderOverlay";
 import DevToolsOverlay from "./components/DevToolsOverlay";
 import RepeatsOverlay from "./components/RepeatsOverlay";
@@ -21,12 +16,15 @@ import type { Reminder, ReminderCategory, ReminderSchedule, RepeatConfig, ViewMo
 import { formatTime12h } from "./utils/normalise-text";
 import { formatSelectedDate } from "../imports/NewReminderOverlay";
 import { scheduleEquality } from "./utils/schedule";
+import { PENDING_NOTIFICATION_REMINDER_ID_KEY, syncReminderNotifications } from "./notifications";
+import { useNotificationTapHandler } from "./useNotificationTapHandler";
 import laterBtnPaths from "../imports/svg-0tntgsesap";
 import LaterBtn from "../imports/LaterBtn-146-39";
 import ListsHeader from "../imports/Header";
-import AddListItem from "../imports/Frame807";
-import ListItem from "../imports/ListItem";
 import InfoOverlay from "../imports/InfoOverlay";
+import AddListItemInput from "./components/lists/AddListItemInput";
+import EditableListItem from "./components/lists/EditableListItem";
+import { CompletedCircleIcon, RepeatReminderIcon, ScheduledReminderIcon, UnscheduledReminderIcon } from "./components/icons/ReminderStateIcons";
 
 // Category colours matching existing static component tick circles
 const CATEGORY_COLOURS: Record<string, string> = {
@@ -44,9 +42,6 @@ const LIST_CATEGORY_PILL_COLOURS: Record<string, string> = {
   todo: "#939393",
   "grouped-todo": "#939393",
 };
-
-const PENDING_NOTIFICATION_REMINDER_ID_KEY = "reminderly.pendingNotificationReminderId";
-const NOTIFICATION_TAP_EVENT = "reminderly:notification-tap";
 
 // Overdue colour for overdue reminders
 const OVERDUE_COLOUR = "#FF0000";
@@ -91,6 +86,11 @@ const DEFAULT_LIST_NAMES = [
   "Note to self...",
   "The essentials...",
 ];
+
+function persistStringIfChanged(key: string, value: string) {
+  if (localStorage.getItem(key) === value) return;
+  localStorage.setItem(key, value);
+}
 
 /** Pick a random default name, avoiding titles already used by existing lists */
 function pickDefaultListName(existingTitles: string[]): string {
@@ -393,6 +393,14 @@ export default function App() {
     }
   });
 
+  const [useOneMinuteTimeIncrements, setUseOneMinuteTimeIncrements] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('reminderly-dev-one-minute-time-increments') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
   // Dev-only: filters menu variant for A/B testing (standard vs grouped)
   const [filtersMenuVariant, setFiltersMenuVariant] = useState<FiltersMenuVariant>(() => {
     try {
@@ -567,70 +575,20 @@ export default function App() {
   // Persist reminders to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(reminders));
+      persistStringIfChanged(STORAGE_KEY, JSON.stringify(reminders));
     } catch {
       // Fail silently - storage may be full or unavailable
     }
   }, [reminders]);
 
   useEffect(() => {
-    const syncNotifications = async () => {
-      const permission = await LocalNotifications.requestPermissions();
-      if (permission.display !== "granted") return;
-
-      const pending = await LocalNotifications.getPending();
-      if (pending.notifications.length > 0) {
-        await LocalNotifications.cancel({
-          notifications: pending.notifications.map((notification) => ({
-            id: notification.id,
-          })),
-        });
-      }
-
-      const notifications = reminders
-        .filter((reminder) => {
-          if (reminder.completedAt != null) return false;
-          if (reminder.deletedAt != null) return false;
-          if (reminder.schedule.kind !== "scheduled") return false;
-          if (!reminder.schedule.time) return false;
-
-          const [year, month, day] = reminder.schedule.date.split("-").map(Number);
-          const [hour, minute] = reminder.schedule.time.split(":").map(Number);
-          const at = new Date(year, month - 1, day, hour, minute, 0, 0);
-
-          return at.getTime() > Date.now();
-        })
-        .map((reminder) => {
-          const [year, month, day] = reminder.schedule.date.split("-").map(Number);
-          const [hour, minute] = reminder.schedule.time!.split(":").map(Number);
-          const at = new Date(year, month - 1, day, hour, minute, 0, 0);
-
-          const notificationId = Array.from(reminder.id).reduce(
-            (acc, char) => ((acc * 31) + char.charCodeAt(0)) % 2147483647,
-            1
-          );
-
-          return {
-            id: notificationId,
-            title: "Reminderly",
-            body: reminder.displayText,
-            schedule: { at },
-            extra: { reminderId: reminder.id },
-          };
-        });
-
-      if (notifications.length > 0) {
-        await LocalNotifications.schedule({ notifications });
-      }
-    };
-
-    void syncNotifications();
+    void syncReminderNotifications(reminders);
   }, [reminders]);
 
   // Persist showDateAndTimeSubtitles to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('reminderly.showDateAndTimeSubtitles', String(showDateAndTimeSubtitles));
+      persistStringIfChanged('reminderly.showDateAndTimeSubtitles', String(showDateAndTimeSubtitles));
     } catch {
       // Fail silently
     }
@@ -639,7 +597,7 @@ export default function App() {
   // Persist onboarding tutorial feature flag to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('reminderly-ff-onboarding-tutorial', String(isOnboardingTutorialEnabled));
+      persistStringIfChanged('reminderly-ff-onboarding-tutorial', String(isOnboardingTutorialEnabled));
     } catch {
       // Fail silently
     }
@@ -648,7 +606,7 @@ export default function App() {
   // Persist paywall feature flag to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('dev.listsEnabled', String(isListsEnabled));
+      persistStringIfChanged('dev.listsEnabled', String(isListsEnabled));
     } catch {
       // Fail silently
     }
@@ -657,7 +615,7 @@ export default function App() {
   // Persist tutorial first-launch toggle to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('reminderly-ff-tutorial-first-launch', String(showTutorialOnFirstLaunch));
+      persistStringIfChanged('reminderly-ff-tutorial-first-launch', String(showTutorialOnFirstLaunch));
     } catch {
       // Fail silently
     }
@@ -666,16 +624,24 @@ export default function App() {
   // Persist tutorial every-start toggle to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('reminderly-ff-tutorial-every-start', String(showTutorialOnEveryStart));
+      persistStringIfChanged('reminderly-ff-tutorial-every-start', String(showTutorialOnEveryStart));
     } catch {
       // Fail silently
     }
   }, [showTutorialOnEveryStart]);
 
+  useEffect(() => {
+    try {
+      persistStringIfChanged('reminderly-dev-one-minute-time-increments', String(useOneMinuteTimeIncrements));
+    } catch {
+      // Fail silently
+    }
+  }, [useOneMinuteTimeIncrements]);
+
   // Persist dev tools password required toggle to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('reminderly-dev-tools-password-required', String(isDevToolsPasswordRequired));
+      persistStringIfChanged('reminderly-dev-tools-password-required', String(isDevToolsPasswordRequired));
     } catch {
       // Fail silently
     }
@@ -684,7 +650,7 @@ export default function App() {
   // Persist filters menu variant to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('reminderly-filters-menu-variant', filtersMenuVariant);
+      persistStringIfChanged('reminderly-filters-menu-variant', filtersMenuVariant);
     } catch {
       // Fail silently
     }
@@ -693,7 +659,7 @@ export default function App() {
   // Persist created lists to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('reminderly-created-lists', JSON.stringify(createdLists));
+      persistStringIfChanged('reminderly-created-lists', JSON.stringify(createdLists));
     } catch {
       // Fail silently
     }
@@ -702,50 +668,23 @@ export default function App() {
   // Persist active main tab to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('reminderly-active-main-tab', activeMainTab);
+      persistStringIfChanged('reminderly-active-main-tab', activeMainTab);
     } catch {
       // Fail silently
     }
   }, [activeMainTab]);
 
-  useEffect(() => {
-    let openTimer: number | null = null;
-
-    const openTappedReminder = () => {
-      const reminderId = localStorage.getItem(PENDING_NOTIFICATION_REMINDER_ID_KEY);
-      if (!reminderId) return;
-
-      const tappedReminder = reminders.find((reminder) => reminder.id === reminderId);
-      if (!tappedReminder) return;
-
-      setIsTutorialOpen(false);
-      setIsOverlayOpen(false);
-      setIsListsOverlayOpen(false);
-      setIsRepeatsOverlayOpen(false);
-      setIsSettingsOpen(false);
-      setViewMode("list");
-      setActiveFilter("all");
-
-      if (openTimer !== null) {
-        clearTimeout(openTimer);
-      }
-      openTimer = window.setTimeout(() => {
-        setInfoReminder(tappedReminder);
-      }, 300);
-
-      localStorage.removeItem(PENDING_NOTIFICATION_REMINDER_ID_KEY);
-    };
-
-    openTappedReminder();
-    window.addEventListener(NOTIFICATION_TAP_EVENT, openTappedReminder);
-
-    return () => {
-      window.removeEventListener(NOTIFICATION_TAP_EVENT, openTappedReminder);
-      if (openTimer !== null) {
-        clearTimeout(openTimer);
-      }
-    };
-  }, [reminders]);
+  useNotificationTapHandler({
+    reminders,
+    setIsTutorialOpen,
+    setIsOverlayOpen,
+    setIsListsOverlayOpen,
+    setIsRepeatsOverlayOpen,
+    setIsSettingsOpen,
+    setViewMode,
+    setActiveFilter,
+    setInfoReminder,
+  });
 
   // Auto-launch tutorial on mount based on toggle states
   useEffect(() => {
@@ -2201,13 +2140,7 @@ export default function App() {
                                   );
                                 })() : (() => {
                                   const checkboxFill = item.deletedAt != null ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE);
-                                  return (
-                                    <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                                      <rect fill={checkboxFill} height="23" rx="11.5" width="23" x="1" y="1" />
-                                      <rect height="23" rx="11.5" stroke={checkboxFill} strokeWidth="2" width="23" x="1" y="1" />
-                                      <path d={doneCirclePaths.p1bc11a00} fill="white" />
-                                    </svg>
-                                  );
+                                  return <CompletedCircleIcon className="absolute block size-full" color={checkboxFill} />;
                                 })()}
                               </button>
                               {(() => {
@@ -2248,38 +2181,15 @@ export default function App() {
                           const iconCol = isPendingRestore2 ? (overdue ? OVERDUE_COLOUR : "#BABABA") : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : "#1C2C42"));
                           return item.repeatRule ? (
                             <div className="relative shrink-0 size-[25px]" data-name="icon-repeats">
-                              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25.0003 25.0708">
-                                <g>
-                                  <path d={repeatIconPaths.p19a7b000} fill={iconCol} />
-                                  <path d={repeatIconPaths.p9f3c880} fill={iconCol} />
-                                  <path d={repeatIconPaths.pf2d2300} fill={iconCol} />
-                                </g>
-                              </svg>
+                              <RepeatReminderIcon className="absolute block size-full" color={iconCol} />
                             </div>
                           ) : item.schedule.kind === "scheduled" ? (
                             <div className="relative shrink-0 size-[25px]" data-name="icon-schedule-set">
-                              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                                <g>
-                                  <mask fill="white" id={`mask-done-${item.id}`}>
-                                    <path d={scheduleSetPaths.p37c4f500} />
-                                  </mask>
-                                  <path d={scheduleSetPaths.pde59c80} fill={iconCol} mask={`url(#mask-done-${item.id})`} />
-                                </g>
-                              </svg>
+                              <ScheduledReminderIcon className="absolute block size-full" color={iconCol} maskId={`mask-done-${item.id}`} />
                             </div>
                           ) : (
                             <div className="relative shrink-0 size-[25px]" data-name="icon-schedule-unset">
-                              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                                <g>
-                                  <path d={scheduleUnsetPaths.pe7a3000} fill={iconCol} />
-                                  <path d={scheduleUnsetPaths.p1e7ee400} fill={iconCol} />
-                                  <path d={scheduleUnsetPaths.p37e67100} fill={iconCol} />
-                                  <path d={scheduleUnsetPaths.pfd088c0} fill={iconCol} />
-                                  <path d={scheduleUnsetPaths.p35b867f0} fill={iconCol} />
-                                  <path d={scheduleUnsetPaths.p16a18300} fill={iconCol} />
-                                  <path d={scheduleUnsetPaths.pcd64f00} fill={iconCol} />
-                                </g>
-                              </svg>
+                              <UnscheduledReminderIcon className="absolute block size-full" color={iconCol} />
                             </div>
                           );
                         })()}
@@ -2351,11 +2261,7 @@ export default function App() {
                                 aria-label="Mark as done"
                               >
                                 {isPendingAway ? (
-                                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                                    <rect fill={pendingColour} height="23" rx="11.5" width="23" x="1" y="1" />
-                                    <rect height="23" rx="11.5" stroke={pendingColour} strokeWidth="2" width="23" x="1" y="1" />
-                                    <path d={doneCirclePaths.p1bc11a00} fill="white" />
-                                  </svg>
+                                  <CompletedCircleIcon className="absolute block size-full" color={pendingColour} />
                                 ) : (
                                   <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
                                     <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={circleColour} strokeWidth="2" />
@@ -2395,13 +2301,7 @@ export default function App() {
                             aria-label="Reminder info"
                             data-name="icon-repeats"
                           >
-                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25.0003 25.0708">
-                              <g>
-                                <path d={repeatIconPaths.p19a7b000} fill="currentColor" />
-                                <path d={repeatIconPaths.p9f3c880} fill="currentColor" />
-                                <path d={repeatIconPaths.pf2d2300} fill="currentColor" />
-                              </g>
-                            </svg>
+                            <RepeatReminderIcon className="absolute block size-full" color="currentColor" />
                           </button>
                         ) : reminder.schedule.kind === "scheduled" ? (
                           <button
@@ -2411,14 +2311,7 @@ export default function App() {
                             aria-label="Reminder info"
                             data-name="icon-schedule-set"
                           >
-                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                              <g>
-                                <mask fill="white" id={`mask-${reminder.id}`}>
-                                  <path d={scheduleSetPaths.p37c4f500} />
-                                </mask>
-                                <path d={scheduleSetPaths.pde59c80} fill="currentColor" mask={`url(#mask-${reminder.id})`} />
-                              </g>
-                            </svg>
+                            <ScheduledReminderIcon className="absolute block size-full" color="currentColor" maskId={`mask-${reminder.id}`} />
                           </button>
                         ) : (
                           <button
@@ -2428,17 +2321,7 @@ export default function App() {
                             aria-label="Reminder info"
                             data-name="icon-schedule-unset"
                           >
-                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                              <g>
-                                <path d={scheduleUnsetPaths.pe7a3000} fill="currentColor" />
-                                <path d={scheduleUnsetPaths.p1e7ee400} fill="currentColor" />
-                                <path d={scheduleUnsetPaths.p37e67100} fill="currentColor" />
-                                <path d={scheduleUnsetPaths.pfd088c0} fill="currentColor" />
-                                <path d={scheduleUnsetPaths.p35b867f0} fill="currentColor" />
-                                <path d={scheduleUnsetPaths.p16a18300} fill="currentColor" />
-                                <path d={scheduleUnsetPaths.pcd64f00} fill="currentColor" />
-                              </g>
-                            </svg>
+                            <UnscheduledReminderIcon className="absolute block size-full" color="currentColor" />
                           </button>
                         )}
                       </div>
@@ -2565,6 +2448,7 @@ export default function App() {
                 nlcEnabled={nlcEnabled}
                 editReminder={editingReminder}
                 updateReminder={updateReminder}
+                useOneMinuteIncrements={useOneMinuteTimeIncrements}
               />
             </motion.div>
           </>
@@ -2642,7 +2526,7 @@ export default function App() {
                 <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col">
                   <div className="content-stretch flex flex-col gap-[30px] items-start pt-[26px] px-[20px] relative w-full shrink-0">
                     <ListsHeader key={isListsOverlayOpen ? 'open' : 'closed'} value={listTitle} onChange={setListTitle} active={listTitle.trim().length > 0 && listItems.length > 0} isEditMode={listOverlayMode === 'edit' || listTitle.length > 0} onSubmit={handleListSaveAndClose} onGearClick={() => setIsListSettingsOpen(true)} />
-                    <AddListItem onAdd={(text: string) => {
+                    <AddListItemInput onAdd={(text: string) => {
                       const newId = crypto.randomUUID();
                       setListItems(prev => [{ id: newId, text, completed: false }, ...prev]);
                       setListItemReinsertedId(newId);
@@ -2679,7 +2563,7 @@ export default function App() {
                           }}
                           className="w-full"
                         >
-                          <ListItem name={item.text} completed={item.completed} isHighlighted={isItemHighlighted} onToggle={() => setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], completed: !next[idx].completed }; } return next; })} editable={listOverlayMode === 'edit'} onChange={(val: string) => setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], text: val }; } return next; })} />
+                          <EditableListItem name={item.text} completed={item.completed} isHighlighted={isItemHighlighted} onToggle={() => setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], completed: !next[idx].completed }; } return next; })} editable={listOverlayMode === 'edit'} onChange={(val: string) => setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], text: val }; } return next; })} />
                         </motion.div>
                       );
                     })}
@@ -2730,7 +2614,7 @@ export default function App() {
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
-              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} onClearLists={() => setCreatedLists([])} onGenerateLists={(lists) => setCreatedLists(lists)} />
+              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} onClearLists={() => setCreatedLists([])} onGenerateLists={(lists) => setCreatedLists(lists)} />
             </motion.div>
           </>
         )}

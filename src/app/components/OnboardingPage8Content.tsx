@@ -6,6 +6,7 @@ import ImportedReminderListDone from "@/imports/ReminderList-1198-346";
 import SettingsBtnSml from "@/imports/SettingsBtnSml";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 
 function Group1() {
   return (
@@ -29,7 +30,7 @@ function Frame3() {
       <div className="[@media(max-height:570px)]:hidden">
         <Group1 />
       </div>
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[22px] text-center">
+      <div className={TUTORIAL_TITLE_CLASSNAME}>
         <p className="css-ew64yg leading-[normal]">See what you've done</p>
       </div>
     </div>
@@ -40,7 +41,7 @@ function Frame8() {
   return (
     <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] items-center relative shrink-0">
       <Frame3 />
-      <div className="flex flex-col font-['Lato:Medium',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#939393] text-[17px] text-center w-full max-w-[322px]">
+      <div className={TUTORIAL_BODY_CLASSNAME}>
         <p className="css-4hzbpn leading-[30px]">Tap the Reminderly logo 'tick' to<br />see what you've already done</p>
       </div>
     </div>

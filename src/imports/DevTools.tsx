@@ -128,6 +128,7 @@ export default function DevTools({
   onNavigateFiltersMenu,
   onNavigateOnboardingTutorial,
   onNavigateDevToolsPassword,
+  onNavigateReminderSettings,
   onNavigatePaywall,
   nlcEnabled,
   onNlcEnabledChange,
@@ -144,6 +145,7 @@ export default function DevTools({
   onNavigateFiltersMenu: () => void;
   onNavigateOnboardingTutorial: () => void;
   onNavigateDevToolsPassword: () => void;
+  onNavigateReminderSettings: () => void;
   onNavigatePaywall: () => void;
   nlcEnabled: boolean;
   onNlcEnabledChange: (enabled: boolean) => void;
@@ -172,6 +174,7 @@ export default function DevTools({
               <NavRow label="Dummy lists" onClick={onNavigateDummyLists} plain />
               <NavRow label="Filters menu" onClick={onNavigateFiltersMenu} plain />
               <NavRow label="Dev tools password" onClick={onNavigateDevToolsPassword} plain />
+              <NavRow label="Reminder settings" onClick={onNavigateReminderSettings} plain />
               <div />
             </div>
           </div>

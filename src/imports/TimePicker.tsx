@@ -3,10 +3,10 @@ import { useRef, useState, useEffect, useCallback } from "react";
 interface TimePickerProps {
   selectedTime: { hour: number; minute: number } | null;
   onTimeSelect: (time: { hour: number; minute: number }) => void;
+  useOneMinuteIncrements?: boolean;
 }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
 const ITEM_HEIGHT = 38;
 const VISIBLE_ITEMS = 7;
@@ -230,12 +230,13 @@ function WheelColumn({ values, selectedValue, onChange, formatValue }: WheelColu
   );
 }
 
-export default function TimePicker({ selectedTime, onTimeSelect }: TimePickerProps) {
+export default function TimePicker({ selectedTime, onTimeSelect, useOneMinuteIncrements = false }: TimePickerProps) {
   const hour = selectedTime?.hour ?? 12;
   const minute = selectedTime?.minute ?? 0;
+  const minutes = useOneMinuteIncrements ? Array.from({ length: 60 }, (_, i) => i) : [0, 15, 30, 45];
 
   // Snap minute to nearest valid value
-  const nearestMinute = MINUTES.reduce((prev, curr) =>
+  const nearestMinute = minutes.reduce((prev, curr) =>
     Math.abs(curr - minute) < Math.abs(prev - minute) ? curr : prev
   );
 
@@ -254,7 +255,7 @@ export default function TimePicker({ selectedTime, onTimeSelect }: TimePickerPro
         onChange={(h) => onTimeSelect({ hour: h, minute: nearestMinute })}
       />
       <WheelColumn
-        values={MINUTES}
+        values={minutes}
         selectedValue={nearestMinute}
         onChange={(m) => onTimeSelect({ hour, minute: m })}
       />

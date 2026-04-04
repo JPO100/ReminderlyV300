@@ -1,5 +1,6 @@
 {
   "appId": "com.reminderly.app",
   "appName": "Reminderly",
-  "webDir": "dist"
+  "webDir": "dist",
+  "loggingBehavior": "none"
 }

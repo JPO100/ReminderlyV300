@@ -450,7 +450,8 @@ function SetTime({
   selectedTime,
   onTimeSelect,
   isDrawerOpen,
-  onLabelClick 
+  onLabelClick,
+  useOneMinuteIncrements = false,
 }: { 
   isTimeOn: boolean; 
   onTimeToggle: () => void; 
@@ -458,6 +459,7 @@ function SetTime({
   onTimeSelect: (time: { hour: number; minute: number }) => void;
   isDrawerOpen: boolean;
   onLabelClick: () => void;
+  useOneMinuteIncrements?: boolean;
 }) {
   return (
     <div className="content-stretch flex flex-col items-start relative shrink-0 w-full" data-name="set-time">
@@ -474,7 +476,7 @@ function SetTime({
             className="w-full overflow-hidden"
           >
             <div className="pt-[20px]">
-              <TimePicker selectedTime={selectedTime} onTimeSelect={onTimeSelect} />
+              <TimePicker selectedTime={selectedTime} onTimeSelect={onTimeSelect} useOneMinuteIncrements={useOneMinuteIncrements} />
             </div>
             <div
               aria-hidden="true"
@@ -519,7 +521,8 @@ function ReminderOptions({
   openDrawer,
   onDateLabelClick,
   onTimeLabelClick,
-  onRepeatsLabelClick
+  onRepeatsLabelClick,
+  useOneMinuteIncrements = false,
 }: { 
   isDateOn: boolean; 
   onDateToggle: () => void; 
@@ -536,6 +539,7 @@ function ReminderOptions({
   onDateLabelClick: () => void;
   onTimeLabelClick: () => void;
   onRepeatsLabelClick: () => void;
+  useOneMinuteIncrements?: boolean;
 }) {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full flex-1 min-h-0 overflow-y-auto" data-name="reminder-options">
@@ -547,13 +551,13 @@ function ReminderOptions({
         isDrawerOpen={openDrawer === 'date'}
         onLabelClick={onDateLabelClick}
       />
-      <SetTime isTimeOn={isTimeOn} onTimeToggle={onTimeToggle} selectedTime={selectedTime} onTimeSelect={onTimeSelect} isDrawerOpen={openDrawer === 'time'} onLabelClick={onTimeLabelClick} />
+      <SetTime isTimeOn={isTimeOn} onTimeToggle={onTimeToggle} selectedTime={selectedTime} onTimeSelect={onTimeSelect} isDrawerOpen={openDrawer === 'time'} onLabelClick={onTimeLabelClick} useOneMinuteIncrements={useOneMinuteIncrements} />
       <SetRepeats isRepeatsOn={isRepeatsOn} onRepeatsToggle={onRepeatsToggle} repeatConfig={repeatConfig} onLabelClick={onRepeatsLabelClick} disabled={!isDateOn && !isTimeOn} />
     </div>
   );
 }
 
-function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void }) {
+function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder, useOneMinuteIncrements = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; useOneMinuteIncrements?: boolean }) {
   const isEditMode = !!editReminder;
 
   const [isDateOn, setIsDateOn] = useState(() => {
@@ -1239,21 +1243,22 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
           onTimeSelect={handleTimeSelect}
           isRepeatsOn={isRepeatsOn}
           onRepeatsToggle={handleRepeatsToggle}
-          repeatConfig={repeatConfig}
-          openDrawer={openDrawer}
-          onDateLabelClick={handleDateLabelClick}
-          onTimeLabelClick={handleTimeLabelClick}
-          onRepeatsLabelClick={handleRepeatsLabelClick}
-        />
+        repeatConfig={repeatConfig}
+        openDrawer={openDrawer}
+        onDateLabelClick={handleDateLabelClick}
+        onTimeLabelClick={handleTimeLabelClick}
+        onRepeatsLabelClick={handleRepeatsLabelClick}
+        useOneMinuteIncrements={useOneMinuteIncrements}
+      />
       </div>
     </div>
   );
 }
 
-export default function NewReminderOverlay({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void }) {
+export default function NewReminderOverlay({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder, useOneMinuteIncrements = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; useOneMinuteIncrements?: boolean }) {
   return (
     <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[20px] rounded-tr-[20px] size-full" data-name="new-reminder-overlay">
-      <NewReminderElements onRepeatsOverlayOpen={onRepeatsOverlayOpen} repeatConfig={repeatConfig} onRepeatConfigChange={onRepeatConfigChange} isRepeatsOverlayOpen={isRepeatsOverlayOpen} addReminder={addReminder} onClose={onClose} nlcMode={nlcMode} nlcEnabled={nlcEnabled} editReminder={editReminder} updateReminder={updateReminder} />
+      <NewReminderElements onRepeatsOverlayOpen={onRepeatsOverlayOpen} repeatConfig={repeatConfig} onRepeatConfigChange={onRepeatConfigChange} isRepeatsOverlayOpen={isRepeatsOverlayOpen} addReminder={addReminder} onClose={onClose} nlcMode={nlcMode} nlcEnabled={nlcEnabled} editReminder={editReminder} updateReminder={updateReminder} useOneMinuteIncrements={useOneMinuteIncrements} />
     </div>
   );
 }
