@@ -866,6 +866,8 @@ export default function App() {
     return DEFAULT_TOP;
   };
 
+  const REMINDER_OVERLAY_TOP = 121.653;
+
   // Tutorial overlay: always 16px above logo, no resize recalculation
   const HEADER_PADDING = 20;
   const LOGO_PADDING_TOP = 50;
@@ -1515,7 +1517,7 @@ export default function App() {
               <div className="flex items-center gap-[12px]">
                 <button
                   onClick={() => setViewMode("list")}
-                  className="relative shrink-0 self-center hidden min-[390px]:flex cursor-pointer"
+                  className="hidden relative shrink-0 self-center cursor-pointer"
                   style={{ width: 50, height: 40 }}
                   aria-label="Back to reminders"
                 >
@@ -1692,7 +1694,7 @@ export default function App() {
               <div className="flex items-center gap-[12px]">
                 <button
                   onClick={() => setViewMode('list')}
-                  className="relative shrink-0 self-center hidden min-[390px]:flex cursor-pointer"
+                  className="hidden relative shrink-0 self-center cursor-pointer"
                   style={{ width: 50, height: 40 }}
                   aria-label="Back to lists"
                 >
@@ -1860,7 +1862,7 @@ export default function App() {
                       <div className="content-stretch flex items-start justify-between px-px relative w-full">
                         <div className="flex-[1_0_0] min-h-px min-w-px relative">
                           <div className="flex flex-row items-start size-full">
-                            <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full">
+                            <div className="content-stretch flex gap-[16px] items-start justify-between relative w-full">
                               <div className="relative shrink-0 size-[25px]" style={{ marginTop: '3px' }}>
                                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
                                   <path d="M12.5 0C19.4036 0 25 5.59644 25 12.5C25 19.4036 19.4036 25 12.5 25C5.59644 25 0 19.4036 0 12.5C0 5.59644 5.59644 0 12.5 0ZM12.5 2C6.70101 2 2 6.70101 2 12.5C2 18.299 6.70101 23 12.5 23C18.299 23 23 18.299 23 12.5C23 6.70101 18.299 2 12.5 2Z" fill={catColor} />
@@ -1957,7 +1959,7 @@ export default function App() {
             <div className="flex items-center gap-[12px]">
               <button
                 onClick={() => setViewMode("list")}
-                className="relative shrink-0 self-center hidden min-[390px]:flex cursor-pointer"
+                className="hidden relative shrink-0 self-center cursor-pointer"
                 style={{ width: 50, height: 40 }}
                 aria-label="Back to reminders"
               >
@@ -2431,7 +2433,7 @@ export default function App() {
             {/* Overlay sliding from bottom */}
             <motion.div
               initial={{ y: "100%" }}
-              animate={{ y: 0, top: getOverlayTopPosition() }}
+              animate={{ y: 0, top: REMINDER_OVERLAY_TOP }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
               className="fixed left-0 right-0 z-50 mx-auto w-full"

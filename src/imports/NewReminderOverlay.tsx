@@ -593,7 +593,6 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     if (editReminder) return editReminder.originalText;
     return '';
   });
-  const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 0);
   const prevRepeatsOverlayOpenRef = useRef(isRepeatsOverlayOpen);
   const repeatsDrawerTimerRef = useRef<number | null>(null);
   const repeatsOverlayTimerRef = useRef<number | null>(null);
@@ -803,6 +802,14 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     }
   };
 
+  const handleTextareaPointerDown = (e: React.PointerEvent<HTMLTextAreaElement>) => {
+    if (!textareaRef.current) return;
+    if (document.activeElement === textareaRef.current) return;
+
+    e.preventDefault();
+    textareaRef.current.focus({ preventScroll: true });
+  };
+
   // NLC: apply structured state for a token — shared by click and auto-apply.
   // Updates appliedTokens, toggles on relevant toggle(s), sets values.
   // Does NOT open drawers or assume any UI event context.
@@ -965,16 +972,6 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       return () => clearTimeout(timer);
     }
   }, [isRepeatsOverlayOpen, repeatConfig]);
-
-  // Track viewport height for textarea height adjustment
-  useEffect(() => {
-    const handleResize = () => {
-      setViewportHeight(window.innerHeight);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const handleDateToggle = () => {
     if (isDateOn) {
@@ -1155,13 +1152,10 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     onClose();
   };
 
-  // Calculate textarea height based on viewport height
+  // Keep the text field height stable when the keyboard is manually reopened.
   const getTextareaHeight = () => {
-    const THRESHOLD = 630; // Start reduction 60px before overlay position breakpoint
     const DEFAULT_HEIGHT = 80;
-    const REDUCED_HEIGHT = 50; // Reduced height for constrained viewports
-    
-    return viewportHeight <= THRESHOLD ? REDUCED_HEIGHT : DEFAULT_HEIGHT;
+    return DEFAULT_HEIGHT;
   };
 
   const isSubmitActive = reminderText.trim().length > 0;
@@ -1223,10 +1217,15 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
             className="w-full h-full p-[12px] font-['Lato',sans-serif] text-[17px] resize-none border-none outline-none bg-transparent relative z-10 placeholder:font-medium placeholder:text-[#bababa]"
             style={{ color: nlcEnabled ? 'transparent' : '#1c2c42', caretColor: '#1c2c42', lineHeight: 'normal' }}
             placeholder="Don't forget..."
+            autoCapitalize="sentences"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
             data-name="text-field"
             value={reminderText}
             onChange={(e) => setReminderText(e.target.value)}
             onScroll={handleTextareaScroll}
+            onPointerDown={handleTextareaPointerDown}
             onClick={handleTextareaClick}
           />
         </motion.div>
