@@ -22,9 +22,10 @@ import laterBtnPaths from "../imports/svg-0tntgsesap";
 import LaterBtn from "../imports/LaterBtn-146-39";
 import ListsHeader from "../imports/Header";
 import InfoOverlay from "../imports/InfoOverlay";
+import ListInfoOverlay from "../imports/list-info-overlay";
 import AddListItemInput from "./components/lists/AddListItemInput";
 import EditableListItem from "./components/lists/EditableListItem";
-import { CompletedCircleIcon, RepeatReminderIcon, ScheduledReminderIcon, UnscheduledReminderIcon } from "./components/icons/ReminderStateIcons";
+import { CompletedCircleIcon } from "./components/icons/ReminderStateIcons";
 
 // Category colours matching existing static component tick circles
 const CATEGORY_COLOURS: Record<string, string> = {
@@ -77,6 +78,28 @@ type CreatedList = {
   smartReminders?: boolean;
   completedAt?: number | null;
 };
+
+function RowMenuButton({ onClick }: { onClick?: () => void }) {
+  return (
+    <button
+      className="relative shrink-0 self-stretch w-[20px] cursor-pointer flex items-center justify-center"
+      style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0 }}
+      aria-label="Item menu"
+      type="button"
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onClick?.();
+      }}
+    >
+      <div className="flex flex-row items-center justify-center gap-[3px]">
+        <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
+        <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
+        <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
+      </div>
+    </button>
+  );
+}
 
 // Playful default list names - one is picked at random for each new list
 const DEFAULT_LIST_NAMES = [
@@ -262,6 +285,7 @@ export default function App() {
 
   // UI-only: list settings overlay (cog button in overlay header)
   const [isListSettingsOpen, setIsListSettingsOpen] = useState(false);
+  const [listInfoOverlayListId, setListInfoOverlayListId] = useState<string | null>(null);
   const [listSortMode, setListSortMode] = useState<'alphabetical' | 'insertion'>('insertion');
   const [listSmartReminders, setListSmartReminders] = useState(true);
   const handleSmartRemindersChange = (val: boolean) => {
@@ -303,6 +327,9 @@ export default function App() {
   })();
   const currentListAccentColor = LIST_CATEGORY_PILL_COLOURS[currentListCategory] || "#939393";
   const listItemHighlightTimerRef = useRef<number | null>(null);
+  const listInfoOverlayList = listInfoOverlayListId == null
+    ? null
+    : createdLists.find((list) => list.id === listInfoOverlayListId) ?? null;
   const displayListItems = (() => {
     if (listSortMode !== 'alphabetical') return listItems;
     if (!alphabeticalPinnedListItemId) {
@@ -1929,15 +1956,7 @@ export default function App() {
                                       <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', color: isPendingRestore ? '#BABABA' : '#1c2c42' }}>{list.title}</p>
                                       <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>{doneCount} of {list.items.length} items completed</p>
                                     </div>
-                                    {(list.smartReminders ?? true) && (
-                                      <div className="relative shrink-0" style={{ width: '21px', height: '23px', marginTop: '3px' }}>
-                                        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 23">
-                                          <g>
-                                            <path clipRule="evenodd" d="M8.23145 8.76074C8.78101 8.49029 9.42663 8.49023 9.97617 8.76074C10.2153 8.87848 10.4255 9.06614 10.6293 9.26532L20.2878 18.8597C20.4883 19.0622 20.6773 19.271 20.7958 19.5085C21.0681 20.0544 21.068 20.6957 20.7958 21.2416C20.6378 21.5583 20.3552 21.8245 20.0859 22.092C19.8167 22.3594 19.5486 22.6402 19.2298 22.7971C18.6803 23.0676 18.0347 23.0677 17.4851 22.7971C17.246 22.6794 17.0358 22.4917 16.832 22.2926L7.17346 12.6982C6.97295 12.4957 6.78403 12.2869 6.6655 12.0494C6.39318 11.5035 6.39325 10.8622 6.6655 10.3163C6.82349 9.99959 7.10613 9.73337 7.37538 9.4659C7.64464 9.19844 7.91264 8.91767 8.23145 8.76074Z" fill="#BABABA" fillRule="evenodd" />
-                                          </g>
-                                        </svg>
-                                      </div>
-                                    )}
+                                    <RowMenuButton onClick={() => setListInfoOverlayListId(list.id)} />
                                   </div>
                                 </div>
                               </div>
@@ -2089,20 +2108,10 @@ export default function App() {
                                 )}
                               </button>
                               <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
-                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDoneList ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingDoneList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.title}</p>
-                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDoneList ? ' line-through' : ''}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }} onClick={() => { setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.items.filter(i => i.completed).length} of {list.items.length} items completed</p>
+                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDoneList ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingDoneList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.title}</p>
+                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDoneList ? ' line-through' : ''}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.items.filter(i => i.completed).length} of {list.items.length} items completed</p>
                               </div>
-                              {(list.smartReminders ?? true) && (
-                                <div className="relative shrink-0" style={{ width: '21px', height: '23px', marginTop: '3px' }}>
-                                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 23">
-                                    <g>
-                                      <path clipRule="evenodd" d="M8.23145 8.76074C8.78101 8.49029 9.42663 8.49023 9.97617 8.76074C10.2153 8.87848 10.4255 9.06614 10.6293 9.26532L20.2878 18.8597C20.4883 19.0622 20.6773 19.271 20.7958 19.5085C21.0681 20.0544 21.068 20.6957 20.7958 21.2416C20.6378 21.5583 20.3552 21.8245 20.0859 22.092C19.8167 22.3594 19.5486 22.6402 19.2298 22.7971C18.6803 23.0676 18.0347 23.0677 17.4851 22.7971C17.246 22.6794 17.0358 22.4917 16.832 22.2926L7.17346 12.6982C6.97295 12.4957 6.78403 12.2869 6.6655 12.0494C6.39318 11.5035 6.39325 10.8622 6.6655 10.3163C6.82349 9.99959 7.10613 9.73337 7.37538 9.4659C7.64464 9.19844 7.91264 8.91767 8.23145 8.76074ZM11.4022 14.6298L17.7722 20.9574C17.9362 21.1203 18.036 21.2185 18.1151 21.2886C18.1703 21.3376 18.1957 21.3545 18.2024 21.3586C18.3 21.4067 18.4149 21.4067 18.5126 21.3586C18.5187 21.3549 18.5447 21.3385 18.6009 21.2886C18.68 21.2185 18.7799 21.1203 18.9438 20.9574C19.1077 20.7946 19.2066 20.6954 19.2772 20.6169C19.3274 20.561 19.3439 20.5351 19.3476 20.5291C19.396 20.4321 19.396 20.318 19.3476 20.2209C19.3435 20.2143 19.3265 20.1891 19.2772 20.1342C19.2066 20.0557 19.1077 19.9565 18.9438 19.7937L12.5738 13.466L11.4022 14.6298ZM9.25893 10.1993C9.16126 10.1512 9.04635 10.1512 8.94869 10.1993C8.94263 10.2029 8.91662 10.2194 8.86035 10.2693C8.7813 10.3394 8.68141 10.4376 8.5175 10.6004C8.35359 10.7633 8.25472 10.8625 8.18412 10.941C8.13387 10.9969 8.11735 11.0227 8.11366 11.0288C8.06526 11.1258 8.06526 11.2399 8.11366 11.3369C8.11777 11.3436 8.13483 11.3688 8.18412 11.4236C8.2547 11.5022 8.35354 11.6013 8.5175 11.7642L10.2601 13.4953L11.4317 12.3315L9.68906 10.6004C9.5251 10.4376 9.42527 10.3394 9.34622 10.2693C9.29101 10.2203 9.2656 10.2034 9.25893 10.1993Z" fill="#BABABA" fillRule="evenodd" />
-                                      <path clipRule="evenodd" d="M4.03842 2.13952C4.3762 2.13952 4.6782 2.34834 4.79563 2.66291L5.03436 3.30225C5.37219 4.20917 5.46981 4.4243 5.6233 4.57677C5.77678 4.72924 5.99336 4.82621 6.90634 5.16179L7.54996 5.39894C7.86663 5.51559 8.07685 5.81558 8.07685 6.15111C8.07685 6.48665 7.86663 6.78664 7.54996 6.90329L6.90634 7.14043C5.99336 7.47602 5.77678 7.57299 5.6233 7.72545C5.46981 7.87792 5.37219 8.09306 5.03436 8.99997L4.79563 9.63932C4.6782 9.95388 4.3762 10.1627 4.03842 10.1627C3.70065 10.1627 3.39865 9.95388 3.28122 9.63932L3.04249 8.99997C2.70466 8.09306 2.60704 7.87792 2.45355 7.72545C2.30007 7.57299 2.08349 7.47602 1.17051 7.14043L0.526888 6.90329C0.210221 6.78664 0 6.48665 0 6.15111C0 5.81558 0.210221 5.51559 0.526888 5.39894L1.17051 5.16179C2.08349 4.82621 2.30007 4.72924 2.45355 4.57677C2.60704 4.4243 2.70466 4.20917 3.04249 3.30225L3.28122 2.66291L3.3338 2.55008C3.47493 2.29944 3.74291 2.13952 4.03842 2.13952ZM4.03842 5.10538C3.91539 5.33113 3.77441 5.53375 3.59567 5.7113C3.41694 5.88885 3.21295 6.02889 2.9857 6.15111C3.21295 6.27333 3.41693 6.41338 3.59567 6.59093C3.77419 6.76826 3.91549 6.97038 4.03842 7.1958C4.16136 6.97038 4.30266 6.76826 4.48118 6.59093C4.6597 6.41359 4.86317 6.27323 5.0901 6.15111C4.86317 6.02899 4.6597 5.88864 4.48118 5.7113C4.30244 5.53375 4.16146 5.33113 4.03842 5.10538Z" fill="#BABABA" fillRule="evenodd" />
-                                      <path clipRule="evenodd" d="M15.8845 0C16.2222 0 16.5242 0.208824 16.6417 0.523388L16.9593 1.37585C17.4012 2.56212 17.5519 2.91626 17.808 3.17062C18.064 3.42499 18.4205 3.57472 19.6148 4.01368L20.4729 4.32918C20.7896 4.44583 20.9998 4.74582 20.9998 5.08135C20.9998 5.41689 20.7896 5.71688 20.4729 5.83353L19.6148 6.14902C18.4205 6.58798 18.064 6.73772 17.808 6.99208C17.5519 7.24645 17.4012 7.60058 16.9593 8.78686L16.6417 9.63932C16.5242 9.95388 16.2222 10.1627 15.8845 10.1627C15.5467 10.1627 15.2447 9.95388 15.1273 9.63932L14.8097 8.78686C14.3678 7.60058 14.217 7.24645 13.961 6.99208C13.7049 6.73772 13.3484 6.58798 12.1542 6.14902L11.296 5.83353C10.9794 5.71688 10.7691 5.41689 10.7691 5.08135C10.7691 4.74582 10.9794 4.44583 11.296 4.32918L12.1542 4.01368C13.3484 3.57472 13.7049 3.42499 13.961 3.17062C14.217 2.91626 14.3678 2.56212 14.8097 1.37585L15.1273 0.523388L15.1798 0.410562C15.321 0.159927 15.589 0 15.8845 0ZM15.8845 3.06406C15.67 3.56181 15.4406 3.96986 15.1031 4.30515C14.7655 4.64044 14.3548 4.86827 13.8537 5.08135C14.3548 5.29443 14.7655 5.52226 15.1031 5.85756C15.4404 6.19265 15.6701 6.60025 15.8845 7.0976C16.0989 6.60025 16.3285 6.19265 16.6659 5.85756C17.0032 5.52246 17.4135 5.29433 17.9142 5.08135C17.4135 4.86838 17.0032 4.64025 16.6659 4.30515C16.3283 3.96986 16.099 3.56181 15.8845 3.06406Z" fill="#BABABA" fillRule="evenodd" />
-                                    </g>
-                                  </svg>
-                                </div>
-                              )}
+                              <RowMenuButton onClick={() => setListInfoOverlayListId(list.id)} />
                             </div>
                           </div>
                         </div>
@@ -2396,26 +2405,7 @@ export default function App() {
                             </div>
                           </div>
                         </div>
-                        {(() => {
-                          const isPendingRestore2 = pendingUncompleteIds.has(item.id) || pendingUndeleteIds.has(item.id);
-                          const isDeleted = item.deletedAt != null;
-                          const cat = categoriseReminder(item, now);
-                          const overdue = isOverdue(item, now);
-                          const iconCol = isPendingRestore2 ? (overdue ? OVERDUE_COLOUR : "#BABABA") : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : "#1C2C42"));
-                          return item.repeatRule ? (
-                            <div className="relative shrink-0 size-[25px]" data-name="icon-repeats">
-                              <RepeatReminderIcon className="absolute block size-full" color={iconCol} />
-                            </div>
-                          ) : item.schedule.kind === "scheduled" ? (
-                            <div className="relative shrink-0 size-[25px]" data-name="icon-schedule-set">
-                              <ScheduledReminderIcon className="absolute block size-full" color={iconCol} maskId={`mask-done-${item.id}`} />
-                            </div>
-                          ) : (
-                            <div className="relative shrink-0 size-[25px]" data-name="icon-schedule-unset">
-                              <UnscheduledReminderIcon className="absolute block size-full" color={iconCol} />
-                            </div>
-                          );
-                        })()}
+                        <RowMenuButton onClick={() => setInfoReminder(item)} />
                       </div>
                     </motion.div>
                   ))}
@@ -2453,7 +2443,6 @@ export default function App() {
                   const circleColour = overdue ? OVERDUE_COLOUR : CATEGORY_COLOURS[category] ?? "#939393";
                   const isHighlighted = insertHighlightId === reminder.id;
                   const textColour = isPendingAway ? "#BABABA" : (isHighlighted ? circleColour : (overdue ? OVERDUE_COLOUR : "#1c2c42"));
-                  const iconColour = isPendingAway ? pendingColour : (isHighlighted ? circleColour : (overdue ? OVERDUE_COLOUR : "#BABABA"));
                   const isReinserted = reinsertedId === reminder.id;
                   return (
                     <motion.div
@@ -2494,7 +2483,11 @@ export default function App() {
                               <div
                                 className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative cursor-pointer`}
                                 style={{ transition: 'color 300ms', gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}
-                                onClick={() => setInfoReminder(reminder)}
+                                onClick={() => {
+                                  setRepeatConfig(repeatRuleToConfig(reminder.repeatRule));
+                                  setEditingReminder(reminder);
+                                  setIsOverlayOpen(true);
+                                }}
                               >
                                 <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingAway ? pendingColour : textColour }}>{getDisplayTitle(reminder)}</p>
                                 {showSubtitles && <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAway ? pendingColour : '#BABABA' }}>{(() => {
@@ -2516,37 +2509,7 @@ export default function App() {
                             </div>
                           </div>
                         </div>
-                        {reminder.repeatRule ? (
-                          <button
-                            className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
-                            style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, color: iconColour, transition: 'color 300ms' }}
-                            onClick={() => setInfoReminder(reminder)}
-                            aria-label="Reminder info"
-                            data-name="icon-repeats"
-                          >
-                            <RepeatReminderIcon className="absolute block size-full" color="currentColor" />
-                          </button>
-                        ) : reminder.schedule.kind === "scheduled" ? (
-                          <button
-                            className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
-                            style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, color: iconColour, transition: 'color 300ms' }}
-                            onClick={() => setInfoReminder(reminder)}
-                            aria-label="Reminder info"
-                            data-name="icon-schedule-set"
-                          >
-                            <ScheduledReminderIcon className="absolute block size-full" color="currentColor" maskId={`mask-${reminder.id}`} />
-                          </button>
-                        ) : (
-                          <button
-                            className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
-                            style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, color: iconColour, transition: 'color 300ms' }}
-                            onClick={() => setInfoReminder(reminder)}
-                            aria-label="Reminder info"
-                            data-name="icon-schedule-unset"
-                          >
-                            <UnscheduledReminderIcon className="absolute block size-full" color="currentColor" />
-                          </button>
-                        )}
+                        <RowMenuButton onClick={() => setInfoReminder(reminder)} />
                       </div>
                     </motion.div>
                   );
@@ -2695,17 +2658,14 @@ export default function App() {
             }
             if (listOverlayMode === 'edit' && editingListId !== null) {
               const targetId = editingListId;
-              setListInsertHighlightId(targetId);
               if (listInsertHighlightTimerRef.current !== null) {
                 clearTimeout(listInsertHighlightTimerRef.current);
+                listInsertHighlightTimerRef.current = null;
               }
+              setListInsertHighlightId((currentId) => currentId === targetId ? null : currentId);
               newListInsertTimerRef.current = window.setTimeout(() => {
                 newListInsertTimerRef.current = null;
                 setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, completedAt: l.completedAt ?? null } : l));
-                listInsertHighlightTimerRef.current = window.setTimeout(() => {
-                  listInsertHighlightTimerRef.current = null;
-                  setListInsertHighlightId(null);
-                }, INSERT_HIGHLIGHT_MS);
               }, NEW_REMINDER_INSERT_DELAY);
             } else {
               const newId = crypto.randomUUID();
@@ -2857,6 +2817,28 @@ export default function App() {
           );
         })()}
       </AnimatePresence>
+
+      {listInfoOverlayList && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-[60]"
+            onClick={() => setListInfoOverlayListId(null)}
+          />
+          <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none px-[20px]">
+            <div className="pointer-events-auto w-full max-w-[400px]">
+              <ListInfoOverlay
+                listTitle={listInfoOverlayList.title}
+                smartReminders={listInfoOverlayList.smartReminders ?? true}
+                onSmartRemindersChange={(val) => {
+                  setCreatedLists((prev) => prev.map((list) => (
+                    list.id === listInfoOverlayList.id ? { ...list, smartReminders: val } : list
+                  )));
+                }}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Dev Tools Overlay */}
       <AnimatePresence>

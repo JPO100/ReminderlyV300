@@ -164,7 +164,7 @@ export default function ReminderInfoOverlay({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Reminder text in single quotes */}
-          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] text-center">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
             <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>'{reminder.displayText}'</p>
           </div>
 
@@ -183,26 +183,13 @@ export default function ReminderInfoOverlay({
           {/* Buttons */}
           <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
             <button
-              className="bg-[#1c2c42] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
+              className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
               onClick={onMarkAsDone}
             >
               <div className="flex flex-row items-center justify-center size-full">
                 <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
                   <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-left text-white whitespace-nowrap">
                     <p className="leading-[normal]">Mark as done</p>
-                  </div>
-                </div>
-              </div>
-            </button>
-
-            <button
-              className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
-              onClick={onEdit}
-            >
-              <div className="flex flex-row items-center justify-center size-full">
-                <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-                    <p className="leading-[normal]">Edit</p>
                   </div>
                 </div>
               </div>

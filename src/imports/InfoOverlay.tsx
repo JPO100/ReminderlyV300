@@ -106,23 +106,9 @@ function Frame3({ sortMode, onSortChange, smartReminders, onSmartRemindersChange
   );
 }
 
-function MarkAsDoneBtn() {
-  return (
-    <div className="bg-[#1c2c42] h-[50px] relative rounded-[100px] shrink-0 w-full" data-name="mark-as-done-btn">
-      <div className="flex flex-row items-center justify-center size-full">
-        <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-            <p className="leading-[normal]">Mark list as done</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function UncheckAllBtn({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   return (
-    <div className={`${disabled ? 'bg-[#d9d9d9]' : 'bg-[#4784f8] cursor-pointer'} h-[50px] relative rounded-[100px] shrink-0 w-full`} data-name="uncheck-all-btn" onClick={disabled ? undefined : onClick}>
+    <div className={`${disabled ? 'bg-[#d9d9d9]' : 'bg-[#1c2c42] cursor-pointer'} h-[50px] relative rounded-[100px] shrink-0 w-full`} data-name="uncheck-all-btn" onClick={disabled ? undefined : onClick}>
       <div className="flex flex-row items-center justify-center size-full">
         <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -134,35 +120,19 @@ function UncheckAllBtn({ onClick, disabled }: { onClick: () => void; disabled: b
   );
 }
 
-function DeleteBtn() {
-  return (
-    <div className="bg-[#939393] h-[50px] relative rounded-[100px] shrink-0 w-full" data-name="delete-btn">
-      <div className="flex flex-row items-center justify-center size-full">
-        <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-            <p className="leading-[normal]">Delete list</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Buttons({ onUncheckAll, allUnchecked }: { onUncheckAll: () => void; allUnchecked: boolean }) {
   return (
     <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full" data-name="buttons">
-      <MarkAsDoneBtn />
       <UncheckAllBtn onClick={onUncheckAll} disabled={allUnchecked} />
-      <DeleteBtn />
     </div>
   );
 }
 
 export default function InfoOverlay({ sortMode, onSortChange, listTitle, onUncheckAll, allUnchecked, smartReminders, onSmartRemindersChange }: { sortMode: 'alphabetical' | 'insertion'; onSortChange: (mode: 'alphabetical' | 'insertion') => void; listTitle: string; onUncheckAll: () => void; allUnchecked: boolean; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void }) {
   return (
-    <div className="bg-white content-stretch flex flex-col gap-[40px] items-center justify-center px-[30px] py-[40px] relative rounded-[32px] w-full" data-name="info-overlay">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[20px] text-ellipsis w-full whitespace-nowrap">
-        <p className="leading-[normal] overflow-hidden">{listTitle}</p>
+    <div className="bg-white content-stretch flex flex-col gap-[40px] items-center justify-center px-[30px] py-[40px] relative rounded-[32px] mx-auto" style={{ width: 322 }} data-name="info-overlay">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
+        <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>{listTitle}</p>
       </div>
       <Frame3 sortMode={sortMode} onSortChange={onSortChange} smartReminders={smartReminders} onSmartRemindersChange={onSmartRemindersChange} />
       <Buttons onUncheckAll={onUncheckAll} allUnchecked={allUnchecked} />

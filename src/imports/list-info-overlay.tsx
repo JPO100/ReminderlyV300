@@ -1,0 +1,95 @@
+import svgPaths from "./svg-oxn8g14l6y";
+
+function SmartRemindersLabel({ active }: { active: boolean }) {
+  return (
+    <div className={`content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[5px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative ${active ? '' : 'text-[#d9d9d9]'}`}>
+      <div className={`flex flex-col justify-center overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#1c2c42]' : ''}`}>
+        <p className="leading-[23px] overflow-hidden text-ellipsis">Smart reminders</p>
+      </div>
+      <div className={`flex flex-col justify-center relative shrink-0 text-[13.5px] w-full ${active ? 'text-[#bababa]' : ''}`}>
+        <p className="leading-[normal]">Auto-generate smart time-based reminders</p>
+      </div>
+    </div>
+  );
+}
+
+function ToggleButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+  return (
+    <button className={`${active ? 'bg-[#1c2c42] justify-end' : 'bg-[#d9d9d9]'} content-stretch cursor-pointer flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px]`} onClick={onClick}>
+      <div className="relative shrink-0 size-[22.5px]">
+        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+          <circle cx="11.25" cy="11.25" fill="var(--fill-0, white)" r="11.25" />
+        </svg>
+      </div>
+    </button>
+  );
+}
+
+function Frame3({ smartReminders, onSmartRemindersChange }: { smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void }) {
+  return (
+    <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
+      <div className="content-stretch flex gap-[16px] items-start justify-center relative shrink-0 w-full cursor-pointer" onClick={() => onSmartRemindersChange(!smartReminders)}>
+        <div className="h-[21.5px] relative shrink-0 w-[19.5px]" data-name="Union">
+          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19.5002 21.5002">
+            <g id="Union">
+              <path clipRule="evenodd" d={svgPaths.p23b20a00} fill={smartReminders ? '#1C2C42' : '#D9D9D9'} fillRule="evenodd" />
+              <path clipRule="evenodd" d={svgPaths.p15d6fbb2} fill={smartReminders ? '#1C2C42' : '#D9D9D9'} fillRule="evenodd" />
+              <path clipRule="evenodd" d={svgPaths.p1797f00} fill={smartReminders ? '#1C2C42' : '#D9D9D9'} fillRule="evenodd" />
+            </g>
+          </svg>
+        </div>
+        <SmartRemindersLabel active={smartReminders} />
+        <ToggleButton active={smartReminders} onClick={() => onSmartRemindersChange(!smartReminders)} />
+      </div>
+    </div>
+  );
+}
+
+function MarkAsDoneBtn() {
+  return (
+    <div className="bg-[#1c2c42] h-[50px] relative rounded-[100px] shrink-0 w-full" data-name="mark-as-done-btn">
+      <div className="flex flex-row items-center justify-center size-full">
+        <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+            <p className="leading-[normal]">Mark as done</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeleteBtn() {
+  return (
+    <div className="bg-[#939393] h-[50px] relative rounded-[100px] shrink-0 w-full" data-name="delete-btn">
+      <div className="flex flex-row items-center justify-center size-full">
+        <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+            <p className="leading-[normal]">Delete</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Buttons() {
+  return (
+    <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full" data-name="buttons">
+      <MarkAsDoneBtn />
+      <DeleteBtn />
+    </div>
+  );
+}
+
+export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void }) {
+  return (
+    <div className="bg-white content-stretch flex flex-col gap-[40px] items-center justify-center px-[30px] py-[40px] relative rounded-[32px] mx-auto" style={{ width: 322 }} data-name="list-info-overlay">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
+        <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>{listTitle}</p>
+      </div>
+      <Frame3 smartReminders={smartReminders} onSmartRemindersChange={onSmartRemindersChange} />
+      <Buttons />
+    </div>
+  );
+}
