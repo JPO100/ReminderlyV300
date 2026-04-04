@@ -45,9 +45,9 @@ function Frame3({ smartReminders, onSmartRemindersChange }: { smartReminders: bo
   );
 }
 
-function MarkAsDoneBtn() {
+function MarkAsDoneBtn({ onClick }: { onClick: () => void }) {
   return (
-    <div className="bg-[#1c2c42] h-[50px] relative rounded-[100px] shrink-0 w-full" data-name="mark-as-done-btn">
+    <button className="bg-[#1c2c42] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="mark-as-done-btn" onClick={onClick}>
       <div className="flex flex-row items-center justify-center size-full">
         <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -55,7 +55,7 @@ function MarkAsDoneBtn() {
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -73,23 +73,23 @@ function DeleteBtn() {
   );
 }
 
-function Buttons() {
+function Buttons({ onMarkAsDone }: { onMarkAsDone: () => void }) {
   return (
     <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full" data-name="buttons">
-      <MarkAsDoneBtn />
+      <MarkAsDoneBtn onClick={onMarkAsDone} />
       <DeleteBtn />
     </div>
   );
 }
 
-export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void }) {
+export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange, onMarkAsDone }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; onMarkAsDone: () => void }) {
   return (
     <div className="bg-white content-stretch flex flex-col gap-[40px] items-center justify-center px-[30px] py-[40px] relative rounded-[32px] mx-auto" style={{ width: 322 }} data-name="list-info-overlay">
       <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
         <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>{listTitle}</p>
       </div>
       <Frame3 smartReminders={smartReminders} onSmartRemindersChange={onSmartRemindersChange} />
-      <Buttons />
+      <Buttons onMarkAsDone={onMarkAsDone} />
     </div>
   );
 }

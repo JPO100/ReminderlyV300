@@ -68,6 +68,11 @@ export default function EditableListItem({
     }, [isDeleteRevealed]);
 
     const commitDraft = () => {
+        const normalizedValue = draftValue.trim();
+        if (normalizedValue.length === 0) {
+            setDraftValue(lastCommittedValueRef.current);
+            return;
+        }
         if (draftValue === lastCommittedValueRef.current) return;
         lastCommittedValueRef.current = draftValue;
         onCommit?.(draftValue);

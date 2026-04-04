@@ -1,7 +1,7 @@
 import svgPaths from "./svg-z3vqooufv8";
 import gearPaths from "./svg-2owmcw62lt";
 import backChevronPaths from "./svg-7vys4qis03";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function AddTickBtn({ active, onClick }: { active: boolean; onClick?: () => void }) {
   return (
@@ -41,9 +41,27 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [hasTypedSinceFocus, setHasTypedSinceFocus] = useState(false);
+  const [draftValue, setDraftValue] = useState(value);
+  const lastCommittedValueRef = useRef(value);
 
   const showGrey = isEditMode && isFocused && !hasTypedSinceFocus;
   const textColor = showGrey ? '#B7B7B7' : '#1c2c42';
+
+  useEffect(() => {
+    setDraftValue(value);
+    lastCommittedValueRef.current = value;
+  }, [value]);
+
+  const commitDraft = () => {
+    const normalizedValue = draftValue.trim();
+    if (normalizedValue.length === 0) {
+      setDraftValue(lastCommittedValueRef.current);
+      return;
+    }
+    if (draftValue === lastCommittedValueRef.current) return;
+    lastCommittedValueRef.current = draftValue;
+    onChange(draftValue);
+  };
 
   return (
     <div className="flex items-center justify-between relative w-full gap-[12px]" data-name="header">
@@ -51,13 +69,19 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
       <input
         ref={inputRef}
         type="text"
-        value={value}
-        onFocus={(e) => { setIsFocused(true); setHasTypedSinceFocus(false); if (isEditMode) e.target.select(); }}
-        onBlur={() => { setIsFocused(false); setHasTypedSinceFocus(false); }}
-        onChange={(e) => { if (!hasTypedSinceFocus) setHasTypedSinceFocus(true); onChange(e.target.value); }}
-        placeholder="Tap here to name your list..."
+        value={draftValue}
+        onFocus={() => { setIsFocused(true); setHasTypedSinceFocus(false); }}
+        onBlur={() => { commitDraft(); setIsFocused(false); setHasTypedSinceFocus(false); }}
+        onChange={(e) => { if (!hasTypedSinceFocus) setHasTypedSinceFocus(true); setDraftValue(e.target.value); onChange(e.target.value); }}
+        onKeyDown={(event) => {
+          if (event.key !== "Enter") return;
+          event.preventDefault();
+          commitDraft();
+          event.currentTarget.blur();
+        }}
+        placeholder=""
         className="font-['Lato:Bold',sans-serif] not-italic text-[20px] whitespace-nowrap bg-transparent border-none outline-none flex-1 min-w-0 placeholder-[#bababa] caret-[#1c2c42]"
-        style={{ color: textColor }}
+        style={{ color: textColor, transition: "color 300ms" }}
       />
       <GearBtn onClick={onGearClick} />
     </div>

@@ -2759,7 +2759,7 @@ export default function App() {
                           }}
                           className="w-full"
                         >
-                          <EditableListItem name={item.text} completed={item.completed} isHighlighted={isItemHighlighted} accentColor={currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={() => { setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], completed: !next[idx].completed }; } return next; }); }} onDelete={() => { setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={listOverlayMode === 'edit'} onCommit={(val: string) => {
+                          <EditableListItem name={item.text} completed={item.completed} isHighlighted={isItemHighlighted} accentColor={currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={() => { setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], completed: !next[idx].completed }; } return next; }); }} onDelete={() => { setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={true} onCommit={(val: string) => {
                             const currentIndex = displayListItems.findIndex((displayItem) => displayItem.id === item.id);
                             setRevealedDeleteListItemId(null);
                             setListItems(prev => {
@@ -2796,6 +2796,23 @@ export default function App() {
                     })}
                     </AnimatePresence>
                   </div>
+                  {listOverlayMode === 'create' && (
+                    <button
+                      type="button"
+                      aria-label="Smart list"
+                      className="absolute bottom-[36px] right-[30px] z-10"
+                      style={{ width: 50, height: 50, padding: 0, background: 'none', border: 'none', lineHeight: 0 }}
+                    >
+                      <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="50" height="50" rx="25" fill="#1C2C42"/>
+                        <path d="M25.3473 13.5952C25.7999 13.5975 26.1649 13.9666 26.1628 14.4192C26.1606 14.8719 25.7915 15.2369 25.3388 15.2347C24.8274 15.2322 25.2839 15.2326 24.7035 15.2326C22.2328 15.2326 20.4621 15.2341 19.1156 15.4151C17.7928 15.593 17.003 15.9308 16.4204 16.5134C15.8378 17.0961 15.4999 17.8858 15.3221 19.2086C15.141 20.5551 15.1395 22.3259 15.1395 24.7965C15.1395 27.2671 15.141 29.0379 15.3221 30.3844C15.4999 31.7072 15.8378 32.4969 16.4204 33.0796C17.003 33.6622 17.7928 34.0001 19.1156 34.1779C20.4621 34.359 22.2328 34.3605 24.7035 34.3605C27.1741 34.3605 28.9448 34.359 30.2914 34.1779C31.6142 34.0001 32.4039 33.6622 32.9866 33.0796C33.5691 32.4969 33.9071 31.7072 34.0849 30.3844C34.2659 29.0379 34.2674 27.2671 34.2674 24.7965C34.2674 24.2161 34.2678 24.6726 34.2653 24.1612C34.2631 23.7085 34.6281 23.3394 35.0808 23.3372C35.5334 23.3351 35.9025 23.7001 35.9048 24.1527C35.9074 24.6689 35.907 24.2169 35.907 24.7965C35.907 27.2205 35.9086 29.1211 35.7095 30.6021C35.5072 32.1069 35.0837 33.3007 34.1458 34.2388C33.2077 35.1768 32.0138 35.6002 30.5091 35.8025C29.028 36.0016 27.1275 36 24.7035 36C22.2795 36 20.3789 36.0016 18.8979 35.8025C17.3932 35.6002 16.1993 35.1768 15.2612 34.2388C14.3232 33.3007 13.8998 32.1069 13.6975 30.6021C13.4984 29.121 13.5 27.2205 13.5 24.7965C13.5 22.3725 13.4984 20.472 13.6975 18.9909C13.8998 17.4862 14.3232 16.2923 15.2612 15.3542C16.1993 14.4162 17.3932 13.9928 18.8979 13.7905C20.3789 13.5914 22.2795 13.593 24.7035 13.593C25.2831 13.593 24.8311 13.5926 25.3473 13.5952Z" fill="white"/>
+                        <path d="M30.0256 29.175C30.4781 29.1752 30.8453 29.5422 30.8453 29.9948C30.8453 30.4474 30.4782 30.8144 30.0256 30.8145H19.3814C18.9287 30.8145 18.5616 30.4475 18.5616 29.9948C18.5617 29.5421 18.9288 29.1751 19.3814 29.175H30.0256Z" fill="white"/>
+                        <path d="M30.0256 24.4347C30.4782 24.4348 30.8453 24.8018 30.8453 25.2544C30.8451 25.7069 30.478 26.074 30.0256 26.0742H19.3814C18.9289 26.0741 18.5619 25.7069 18.5616 25.2544C18.5616 24.8017 18.9287 24.4347 19.3814 24.4347H30.0256Z" fill="white"/>
+                        <path fillRule="evenodd" clipRule="evenodd" d="M33.6808 11.2773C34.0237 11.2773 34.3302 11.4907 34.4494 11.8121L34.7311 12.5742C35.1268 13.6436 35.2534 13.9344 35.4613 14.1423C35.6691 14.3501 35.96 14.4767 37.0293 14.8724L37.7914 15.1542C38.1128 15.2733 38.3262 15.5799 38.3262 15.9227C38.3262 16.2655 38.1128 16.572 37.7914 16.6912L37.0293 16.973C35.96 17.3687 35.6691 17.4953 35.4613 17.7031C35.2534 17.9109 35.1268 18.2018 34.7311 19.2711L34.4494 20.0333C34.3302 20.3547 34.0237 20.568 33.6808 20.568C33.338 20.568 33.0315 20.3547 32.9123 20.0333L32.6305 19.2711C32.2348 18.2018 32.1082 17.9109 31.9004 17.7031C31.6925 17.4953 31.4017 17.3687 30.3324 16.973L29.5702 16.6912C29.2488 16.572 29.0355 16.2655 29.0355 15.9227C29.0355 15.5799 29.2488 15.2733 29.5702 15.1542L30.3324 14.8724C31.4017 14.4767 31.6925 14.3501 31.9004 14.1423C32.1082 13.9344 32.2348 13.6436 32.6305 12.5742L32.9123 11.8121L32.9657 11.6968C33.1089 11.4407 33.3809 11.2773 33.6808 11.2773ZM33.6808 14.3718C33.5115 14.7315 33.3209 15.0402 33.0596 15.3015C32.7983 15.5627 32.4896 15.7534 32.1299 15.9227C32.4896 16.092 32.7983 16.2827 33.0596 16.5439C33.3206 16.805 33.5116 17.1132 33.6808 17.4726C33.85 17.1132 34.041 16.805 34.3021 16.5439C34.5631 16.2829 34.8714 16.0919 35.2307 15.9227C34.8714 15.7535 34.5631 15.5625 34.3021 15.3015C34.0408 15.0402 33.8501 14.7315 33.6808 14.3718Z" fill="white"/>
+                        <path d="M26.4302 19.9089C26.883 19.9089 27.25 20.2759 27.25 20.7286C27.25 21.1814 26.883 21.5484 26.4302 21.5484H19.3814C18.9287 21.5484 18.5616 21.1814 18.5616 20.7286C18.5616 20.2759 18.9287 19.9089 19.3814 19.9089H26.4302Z" fill="white"/>
+                      </svg>
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -2833,6 +2850,13 @@ export default function App() {
                   setCreatedLists((prev) => prev.map((list) => (
                     list.id === listInfoOverlayList.id ? { ...list, smartReminders: val } : list
                   )));
+                }}
+                onMarkAsDone={() => {
+                  const listId = listInfoOverlayList.id;
+                  setListInfoOverlayListId(null);
+                  window.setTimeout(() => {
+                    handleListCompleteClick(listId);
+                  }, 200);
                 }}
               />
             </div>

@@ -655,6 +655,7 @@ function LoginScreen({ onUnlock, passwordRequired }: { onUnlock: () => void; pas
   const [showPassword, setShowPassword] = useState(false);
   const [revealVisible, setRevealVisible] = useState(false);
   const [revealFading, setRevealFading] = useState(false);
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -708,6 +709,12 @@ function LoginScreen({ onUnlock, passwordRequired }: { onUnlock: () => void; pas
     }
   };
 
+  const handlePasswordPointerDown = (event: React.PointerEvent<HTMLInputElement>) => {
+    if (document.activeElement === passwordInputRef.current) return;
+    event.preventDefault();
+    passwordInputRef.current?.focus({ preventScroll: true });
+  };
+
   return (
     <div className="flex-[1_0_0] min-h-px min-w-px relative w-full">
       <div className="flex flex-col items-center size-full">
@@ -737,10 +744,12 @@ function LoginScreen({ onUnlock, passwordRequired }: { onUnlock: () => void; pas
               <div aria-hidden="true" className="absolute border border-[#BABABA] group-focus-within:border-[#939393] border-solid inset-0 pointer-events-none rounded-[100px]" />
               <div className="flex items-center justify-center px-[30px] relative size-full">
                 <input
+                  ref={passwordInputRef}
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setShowError(false); }}
                   onKeyDown={handleKeyDown}
+                  onPointerDown={handlePasswordPointerDown}
                   placeholder="Password..."
                   className="flex-1 bg-transparent outline-none font-['Lato:Bold',sans-serif] not-italic text-[20px] text-[#1c2c42] placeholder:text-[#C9C9C9] focus:placeholder:text-transparent placeholder-lato-semibold text-center leading-[60px] h-full"
                 />
