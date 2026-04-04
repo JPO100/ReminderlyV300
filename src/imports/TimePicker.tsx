@@ -6,7 +6,7 @@ interface TimePickerProps {
 }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const MINUTES = [0, 15, 30, 45];
+const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 
 const ITEM_HEIGHT = 38;
 const VISIBLE_ITEMS = 7;

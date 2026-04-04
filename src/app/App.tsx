@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import svgPaths from "../imports/svg-tzdfx9foxi";
 import doneTickPaths from "../imports/svg-c9judk5sbu";
 import scheduleSetPaths from "../imports/svg-ky2itz2q0i";
@@ -43,6 +44,9 @@ const LIST_CATEGORY_PILL_COLOURS: Record<string, string> = {
   todo: "#939393",
   "grouped-todo": "#939393",
 };
+
+const PENDING_NOTIFICATION_REMINDER_ID_KEY = "reminderly.pendingNotificationReminderId";
+const NOTIFICATION_TAP_EVENT = "reminderly:notification-tap";
 
 // Overdue colour for overdue reminders
 const OVERDUE_COLOUR = "#FF0000";
@@ -569,6 +573,60 @@ export default function App() {
     }
   }, [reminders]);
 
+  useEffect(() => {
+    const syncNotifications = async () => {
+      const permission = await LocalNotifications.requestPermissions();
+      if (permission.display !== "granted") return;
+
+      const pending = await LocalNotifications.getPending();
+      if (pending.notifications.length > 0) {
+        await LocalNotifications.cancel({
+          notifications: pending.notifications.map((notification) => ({
+            id: notification.id,
+          })),
+        });
+      }
+
+      const notifications = reminders
+        .filter((reminder) => {
+          if (reminder.completedAt != null) return false;
+          if (reminder.deletedAt != null) return false;
+          if (reminder.schedule.kind !== "scheduled") return false;
+          if (!reminder.schedule.time) return false;
+
+          const [year, month, day] = reminder.schedule.date.split("-").map(Number);
+          const [hour, minute] = reminder.schedule.time.split(":").map(Number);
+          const at = new Date(year, month - 1, day, hour, minute, 0, 0);
+
+          return at.getTime() > Date.now();
+        })
+        .map((reminder) => {
+          const [year, month, day] = reminder.schedule.date.split("-").map(Number);
+          const [hour, minute] = reminder.schedule.time!.split(":").map(Number);
+          const at = new Date(year, month - 1, day, hour, minute, 0, 0);
+
+          const notificationId = Array.from(reminder.id).reduce(
+            (acc, char) => ((acc * 31) + char.charCodeAt(0)) % 2147483647,
+            1
+          );
+
+          return {
+            id: notificationId,
+            title: "Reminderly",
+            body: reminder.displayText,
+            schedule: { at },
+            extra: { reminderId: reminder.id },
+          };
+        });
+
+      if (notifications.length > 0) {
+        await LocalNotifications.schedule({ notifications });
+      }
+    };
+
+    void syncNotifications();
+  }, [reminders]);
+
   // Persist showDateAndTimeSubtitles to localStorage
   useEffect(() => {
     try {
@@ -650,8 +708,49 @@ export default function App() {
     }
   }, [activeMainTab]);
 
+  useEffect(() => {
+    let openTimer: number | null = null;
+
+    const openTappedReminder = () => {
+      const reminderId = localStorage.getItem(PENDING_NOTIFICATION_REMINDER_ID_KEY);
+      if (!reminderId) return;
+
+      const tappedReminder = reminders.find((reminder) => reminder.id === reminderId);
+      if (!tappedReminder) return;
+
+      setIsTutorialOpen(false);
+      setIsOverlayOpen(false);
+      setIsListsOverlayOpen(false);
+      setIsRepeatsOverlayOpen(false);
+      setIsSettingsOpen(false);
+      setViewMode("list");
+      setActiveFilter("all");
+
+      if (openTimer !== null) {
+        clearTimeout(openTimer);
+      }
+      openTimer = window.setTimeout(() => {
+        setInfoReminder(tappedReminder);
+      }, 300);
+
+      localStorage.removeItem(PENDING_NOTIFICATION_REMINDER_ID_KEY);
+    };
+
+    openTappedReminder();
+    window.addEventListener(NOTIFICATION_TAP_EVENT, openTappedReminder);
+
+    return () => {
+      window.removeEventListener(NOTIFICATION_TAP_EVENT, openTappedReminder);
+      if (openTimer !== null) {
+        clearTimeout(openTimer);
+      }
+    };
+  }, [reminders]);
+
   // Auto-launch tutorial on mount based on toggle states
   useEffect(() => {
+    const pendingTappedReminderId = localStorage.getItem(PENDING_NOTIFICATION_REMINDER_ID_KEY);
+    if (pendingTappedReminderId) return;
     if (!isOnboardingTutorialEnabled) return;
     if (showTutorialOnEveryStart) {
       setIsTutorialOpen(true);
@@ -2263,7 +2362,11 @@ export default function App() {
                                   </svg>
                                 )}
                               </button>
-                              <div className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative`} style={{ transition: 'color 300ms', gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}>
+                              <div
+                                className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative cursor-pointer`}
+                                style={{ transition: 'color 300ms', gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}
+                                onClick={() => setInfoReminder(reminder)}
+                              >
                                 <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingAway ? pendingColour : textColour }}>{getDisplayTitle(reminder)}</p>
                                 {showSubtitles && <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAway ? pendingColour : '#BABABA' }}>{(() => {
                                   if (reminder.repeatRule) {

@@ -196,7 +196,7 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
   };
   
   return (
-    <div className="backdrop-blur-[10px] content-stretch flex flex-col items-center pb-[20px] relative w-full" data-name="date-picker">
+    <div className="content-stretch flex flex-col items-center pb-[20px] relative w-full" data-name="date-picker">
       <div aria-hidden="true" className="absolute border-[#EDEDED] border-solid border-t inset-0 pointer-events-none" />
       
       {/* Top - Month and Year */}
@@ -207,9 +207,25 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
               {formatMonthYear(viewYear, viewMonth)}
             </p>
           </div>
-          <div className="content-stretch flex font-['SF_Compact:Semibold',sans-serif] font-[656.2] items-center justify-between leading-[normal] relative shrink-0 text-[#0088fe] text-[21px] text-nowrap w-[58px]" data-name="arrow-btns">
-            <p onClick={handlePrevMonth} className="relative shrink-0 cursor-pointer">􀆉</p>
-            <p onClick={handleNextMonth} className="relative shrink-0 cursor-pointer">􀆊</p>
+          <div
+            className="content-stretch flex items-center justify-between leading-[normal] relative shrink-0 text-[#0088fe] text-nowrap w-[76px]"
+            data-name="arrow-btns"
+            style={{ transform: "translateY(-5px)" }}
+          >
+            <p
+              onClick={handlePrevMonth}
+              className="relative shrink-0 cursor-pointer select-none"
+              style={{ width: "32px", height: "32px", fontSize: "30px", fontWeight: 700, lineHeight: "32px", textAlign: "center" }}
+            >
+              ‹
+            </p>
+            <p
+              onClick={handleNextMonth}
+              className="relative shrink-0 cursor-pointer select-none"
+              style={{ width: "32px", height: "32px", fontSize: "30px", fontWeight: 700, lineHeight: "32px", textAlign: "center" }}
+            >
+              ›
+            </p>
           </div>
         </div>
       </div>
@@ -913,6 +929,17 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       case 'repeats': setIsRepeatsOn(isOn); break;
     }
   };
+
+  // Clear pending repeats toggle timers
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      textareaRef.current?.focus({ preventScroll: true });
+    }, 150);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   // Clear pending repeats toggle timers
   useEffect(() => {
