@@ -68,6 +68,16 @@ const NEW_REMINDER_INSERT_DELAY = 500;
 // Duration of the temporary "just inserted" text/icon highlight (ms)
 const INSERT_HIGHLIGHT_MS = 1000;
 
+type ListItem = { id: string; text: string; completed: boolean };
+type CreatedList = {
+  id: string;
+  title: string;
+  items: ListItem[];
+  sortMode?: 'alphabetical' | 'insertion';
+  smartReminders?: boolean;
+  completedAt?: number | null;
+};
+
 // Playful default list names - one is picked at random for each new list
 const DEFAULT_LIST_NAMES = [
   "Stuff to do...",
@@ -226,9 +236,9 @@ export default function App() {
 
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [isListsOverlayOpen, setIsListsOverlayOpen] = useState(false);
-  const [listItems, setListItems] = useState<{ id: string; text: string; completed: boolean }[]>([]);
+  const [listItems, setListItems] = useState<ListItem[]>([]);
   const [listTitle, setListTitle] = useState("");
-  const [createdLists, setCreatedLists] = useState<{ id: string; title: string; items: { text: string; completed: boolean }[]; sortMode?: 'alphabetical' | 'insertion'; smartReminders?: boolean }[]>(() => {
+  const [createdLists, setCreatedLists] = useState<CreatedList[]>(() => {
     try {
       const stored = localStorage.getItem('reminderly-created-lists');
       if (stored) {
@@ -238,8 +248,9 @@ export default function App() {
           return parsed.map((list: any) => ({
             ...list,
             items: Array.isArray(list.items) ? list.items.map((item: any) =>
-              typeof item === 'string' ? { text: item, completed: false } : item
-            ) : []
+              typeof item === 'string' ? { id: crypto.randomUUID(), text: item, completed: false } : { id: item.id || crypto.randomUUID(), text: item.text, completed: item.completed }
+            ) : [],
+            completedAt: list.completedAt ?? null,
           }));
         }
       }
@@ -273,7 +284,64 @@ export default function App() {
   // UI-only: list-item-specific insertion state (mirrors list insertion state, for items within the overlay)
   const [listItemReinsertedId, setListItemReinsertedId] = useState<string | null>(null);
   const [listItemHighlightId, setListItemHighlightId] = useState<string | null>(null);
+  const [revealedDeleteListItemId, setRevealedDeleteListItemId] = useState<string | null>(null);
+  const [pendingDoneListIds, setPendingDoneListIds] = useState<Set<string>>(new Set());
+  const [pendingUndoneListIds, setPendingUndoneListIds] = useState<Set<string>>(new Set());
+  const pendingUndoneListCompletedAtRef = useRef<Map<string, number>>(new Map());
+  const completeListTimersRef = useRef<Map<string, number>>(new Map());
+  const undoListTimersRef = useRef<Map<string, number>>(new Map());
+  const [alphabeticalPinnedListItemId, setAlphabeticalPinnedListItemId] = useState<string | null>(null);
+  const [alphabeticalPinnedListItemIndex, setAlphabeticalPinnedListItemIndex] = useState<number>(0);
+  const alphabeticalListItemTimerRef = useRef<number | null>(null);
+  const currentListCategory = (() => {
+    const total = listItems.length;
+    const checked = listItems.filter((item) => item.completed).length;
+    if (total > 0 && checked === total) return "complete";
+    if (total > 0 && checked / total >= 0.5) return "almost";
+    if (checked > 0) return "started";
+    return "todo";
+  })();
+  const currentListAccentColor = LIST_CATEGORY_PILL_COLOURS[currentListCategory] || "#939393";
   const listItemHighlightTimerRef = useRef<number | null>(null);
+  const displayListItems = (() => {
+    if (listSortMode !== 'alphabetical') return listItems;
+    if (!alphabeticalPinnedListItemId) {
+      return [...listItems].sort((a, b) => a.text.localeCompare(b.text));
+    }
+
+    const pinnedItem = listItems.find((item) => item.id === alphabeticalPinnedListItemId);
+    const remainingItems = listItems
+      .filter((item) => item.id !== alphabeticalPinnedListItemId)
+      .sort((a, b) => a.text.localeCompare(b.text));
+    if (!pinnedItem) return remainingItems;
+
+    const insertIndex = Math.max(0, Math.min(alphabeticalPinnedListItemIndex, remainingItems.length));
+    return [
+      ...remainingItems.slice(0, insertIndex),
+      pinnedItem,
+      ...remainingItems.slice(insertIndex),
+    ];
+  })();
+
+  useEffect(() => {
+    if (listSortMode === 'alphabetical') return;
+    if (alphabeticalListItemTimerRef.current !== null) {
+      clearTimeout(alphabeticalListItemTimerRef.current);
+      alphabeticalListItemTimerRef.current = null;
+    }
+    if (alphabeticalPinnedListItemId !== null) {
+      setAlphabeticalPinnedListItemId(null);
+      setAlphabeticalPinnedListItemIndex(0);
+    }
+  }, [listSortMode, alphabeticalPinnedListItemId]);
+
+  useEffect(() => {
+    return () => {
+      if (alphabeticalListItemTimerRef.current !== null) {
+        clearTimeout(alphabeticalListItemTimerRef.current);
+      }
+    };
+  }, []);
 
   const [isDevToolsOpen, setIsDevToolsOpen] = useState(false);
   const [isDevToolsUnlocked, setIsDevToolsUnlocked] = useState(false);
@@ -925,6 +993,74 @@ export default function App() {
     };
     return labels[category];
   };
+
+  const handleListCompleteClick = useCallback((listId: string) => {
+    if (completeListTimersRef.current.has(listId)) return;
+
+    setPendingDoneListIds((prev) => {
+      const next = new Set(prev);
+      next.add(listId);
+      return next;
+    });
+
+    const timer = window.setTimeout(() => {
+      completeListTimersRef.current.delete(listId);
+      setCreatedLists((prev) =>
+        prev.map((list) =>
+          list.id === listId ? { ...list, completedAt: Date.now() } : list
+        )
+      );
+      setPendingDoneListIds((prev) => {
+        const next = new Set(prev);
+        next.delete(listId);
+        return next;
+      });
+    }, COMPLETION_DELAY);
+
+    completeListTimersRef.current.set(listId, timer);
+  }, []);
+
+  const handleListUndoClick = useCallback((listId: string) => {
+    if (undoListTimersRef.current.has(listId)) return;
+
+    const target = createdLists.find((list) => list.id === listId);
+    if (!target || target.completedAt == null) return;
+
+    pendingUndoneListCompletedAtRef.current.set(listId, target.completedAt);
+    setCreatedLists((prev) =>
+      prev.map((list) =>
+        list.id === listId ? { ...list, completedAt: null } : list
+      )
+    );
+
+    setListReinsertedId(listId);
+    setListInsertHighlightId(listId);
+    if (listInsertHighlightTimerRef.current !== null) {
+      clearTimeout(listInsertHighlightTimerRef.current);
+    }
+    listInsertHighlightTimerRef.current = window.setTimeout(() => {
+      listInsertHighlightTimerRef.current = null;
+      setListInsertHighlightId(null);
+    }, INSERT_HIGHLIGHT_MS);
+
+    setPendingUndoneListIds((prev) => {
+      const next = new Set(prev);
+      next.add(listId);
+      return next;
+    });
+
+    const timer = window.setTimeout(() => {
+      undoListTimersRef.current.delete(listId);
+      pendingUndoneListCompletedAtRef.current.delete(listId);
+      setPendingUndoneListIds((prev) => {
+        const next = new Set(prev);
+        next.delete(listId);
+        return next;
+      });
+    }, COMPLETION_DELAY);
+
+    undoListTimersRef.current.set(listId, timer);
+  }, [createdLists]);
 
   // Cancel a pending repeat completion: clears all in-flight timers and reverts state.
   const cancelPendingRepeatCompletion = useCallback((reminderId: string) => {
@@ -1738,9 +1874,82 @@ export default function App() {
             </div>
           )}
           {viewMode === 'lists-done' ? (
-            <div className="flex flex-col items-center justify-center flex-1 w-full">
-              <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">No done or deleted lists yet…</p>
-            </div>
+            (() => {
+              const doneLists = createdLists
+                .filter((list) => list.completedAt != null || pendingUndoneListIds.has(list.id))
+                .sort((a, b) => {
+                  const tsA = pendingUndoneListCompletedAtRef.current.get(a.id) ?? a.completedAt ?? 0;
+                  const tsB = pendingUndoneListCompletedAtRef.current.get(b.id) ?? b.completedAt ?? 0;
+                  return tsB - tsA;
+                });
+
+              if (doneLists.length === 0) {
+                return (
+                  <div className="flex flex-col items-center justify-center flex-1 w-full">
+                    <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">No done or deleted lists yet…</p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full max-w-[768px] rounded-[10px]" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                  <div className="flex flex-col gap-[22px] w-full" style={{ position: 'relative', zIndex: 1 }}>
+                    <AnimatePresence key="lists-done-items">
+                      {doneLists.map((list) => {
+                        const isPendingRestore = pendingUndoneListIds.has(list.id);
+                        const doneCount = list.items.filter(i => i.completed).length;
+                        return (
+                          <motion.div
+                            key={list.id}
+                            layout
+                            initial={false}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ layout: { duration: 0.25 } }}
+                          >
+                            <div className="content-stretch flex items-start justify-between px-px relative w-full">
+                              <div className="flex-[1_0_0] min-h-px min-w-px relative">
+                                <div className="flex flex-row items-start size-full">
+                                  <div className="content-stretch flex gap-[16px] items-start justify-between relative w-full">
+                                    <button
+                                      className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                                      style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
+                                      onClick={() => handleListUndoClick(list.id)}
+                                      aria-label="Mark list as not done"
+                                    >
+                                      {isPendingRestore ? (
+                                        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                          <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke="#BABABA" strokeWidth="2" />
+                                        </svg>
+                                      ) : (
+                                        <CompletedCircleIcon className="absolute block size-full" color={DONE_BLUE} />
+                                      )}
+                                    </button>
+                                    <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
+                                      <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', color: isPendingRestore ? '#BABABA' : '#1c2c42' }}>{list.title}</p>
+                                      <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>{doneCount} of {list.items.length} items completed</p>
+                                    </div>
+                                    {(list.smartReminders ?? true) && (
+                                      <div className="relative shrink-0" style={{ width: '21px', height: '23px', marginTop: '3px' }}>
+                                        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21 23">
+                                          <g>
+                                            <path clipRule="evenodd" d="M8.23145 8.76074C8.78101 8.49029 9.42663 8.49023 9.97617 8.76074C10.2153 8.87848 10.4255 9.06614 10.6293 9.26532L20.2878 18.8597C20.4883 19.0622 20.6773 19.271 20.7958 19.5085C21.0681 20.0544 21.068 20.6957 20.7958 21.2416C20.6378 21.5583 20.3552 21.8245 20.0859 22.092C19.8167 22.3594 19.5486 22.6402 19.2298 22.7971C18.6803 23.0676 18.0347 23.0677 17.4851 22.7971C17.246 22.6794 17.0358 22.4917 16.832 22.2926L7.17346 12.6982C6.97295 12.4957 6.78403 12.2869 6.6655 12.0494C6.39318 11.5035 6.39325 10.8622 6.6655 10.3163C6.82349 9.99959 7.10613 9.73337 7.37538 9.4659C7.64464 9.19844 7.91264 8.91767 8.23145 8.76074Z" fill="#BABABA" fillRule="evenodd" />
+                                          </g>
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              );
+            })()
           ) : (
             <>
             {/* List filter pills */}
@@ -1821,11 +2030,12 @@ export default function App() {
                     if (checked > 0) return "started";
                     return "todo";
                   };
+                  const activeLists = createdLists.filter((list) => list.completedAt == null || pendingDoneListIds.has(list.id));
                   const filteredLists = activeListFilter === "all"
-                    ? createdLists
+                    ? activeLists
                     : activeListFilter === "grouped-todo"
-                      ? createdLists.filter(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
-                      : createdLists.filter(l => categoriseList(l) === activeListFilter);
+                      ? activeLists.filter(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
+                      : activeLists.filter(l => categoriseList(l) === activeListFilter);
                   const sortedLists = [...filteredLists].sort((a, b) => {
                     const catA = listCategoryOrder[categoriseList(a)] ?? 3;
                     const catB = listCategoryOrder[categoriseList(b)] ?? 3;
@@ -1841,6 +2051,7 @@ export default function App() {
                   return sortedLists.map((list) => {
                   const isReinserted = listReinsertedId === list.id;
                   const isHighlighted = listInsertHighlightId === list.id;
+                  const isPendingDoneList = pendingDoneListIds.has(list.id);
                   const catColor = listCategoryColor[categoriseList(list)] || "#BABABA";
                   return (
                     <motion.div
@@ -1863,14 +2074,23 @@ export default function App() {
                         <div className="flex-[1_0_0] min-h-px min-w-px relative">
                           <div className="flex flex-row items-start size-full">
                             <div className="content-stretch flex gap-[16px] items-start justify-between relative w-full">
-                              <div className="relative shrink-0 size-[25px]" style={{ marginTop: '3px' }}>
-                                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                                  <path d="M12.5 0C19.4036 0 25 5.59644 25 12.5C25 19.4036 19.4036 25 12.5 25C5.59644 25 0 19.4036 0 12.5C0 5.59644 5.59644 0 12.5 0ZM12.5 2C6.70101 2 2 6.70101 2 12.5C2 18.299 6.70101 23 12.5 23C18.299 23 23 18.299 23 12.5C23 6.70101 18.299 2 12.5 2Z" fill={catColor} />
-                                </svg>
-                              </div>
+                              <button
+                                className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                                style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
+                                onClick={() => handleListCompleteClick(list.id)}
+                                aria-label="Mark list as done"
+                              >
+                                {isPendingDoneList ? (
+                                  <CompletedCircleIcon className="absolute block size-full" color={DONE_BLUE} />
+                                ) : (
+                                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                    <path d="M12.5 0C19.4036 0 25 5.59644 25 12.5C25 19.4036 19.4036 25 12.5 25C5.59644 25 0 19.4036 0 12.5C0 5.59644 5.59644 0 12.5 0ZM12.5 2C6.70101 2 2 6.70101 2 12.5C2 18.299 6.70101 23 12.5 23C18.299 23 23 18.299 23 12.5C23 6.70101 18.299 2 12.5 2Z" fill={catColor} />
+                                  </svg>
+                                )}
+                              </button>
                               <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
-                                <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer" style={{ fontSize: '17px', color: isHighlighted ? catColor : '#1c2c42' }} onClick={() => { setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.title}</p>
-                                <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }} onClick={() => { setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.items.filter(i => i.completed).length} of {list.items.length} items completed</p>
+                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDoneList ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingDoneList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.title}</p>
+                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDoneList ? ' line-through' : ''}`} style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }} onClick={() => { setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.items.filter(i => i.completed).length} of {list.items.length} items completed</p>
                               </div>
                               {(list.smartReminders ?? true) && (
                                 <div className="relative shrink-0" style={{ width: '21px', height: '23px', marginTop: '3px' }}>
@@ -1902,11 +2122,12 @@ export default function App() {
                   if (checked > 0) return "started";
                   return "todo";
                 };
+                const visibleActiveLists = createdLists.filter((list) => list.completedAt == null || pendingDoneListIds.has(list.id));
                 const hasVisible = activeListFilter === "all"
-                  ? createdLists.length > 0
+                  ? visibleActiveLists.length > 0
                   : activeListFilter === "grouped-todo"
-                    ? createdLists.some(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
-                    : createdLists.some(l => categoriseList(l) === activeListFilter);
+                    ? visibleActiveLists.some(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
+                    : visibleActiveLists.some(l => categoriseList(l) === activeListFilter);
                 if (!hasVisible) {
                   const emptyMessages: Record<string, string> = {
                     all: "No lists here yet.. get busy!",
@@ -2480,7 +2701,7 @@ export default function App() {
               }
               newListInsertTimerRef.current = window.setTimeout(() => {
                 newListInsertTimerRef.current = null;
-                setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders } : l));
+                setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, completedAt: l.completedAt ?? null } : l));
                 listInsertHighlightTimerRef.current = window.setTimeout(() => {
                   listInsertHighlightTimerRef.current = null;
                   setListInsertHighlightId(null);
@@ -2494,7 +2715,7 @@ export default function App() {
               }
               newListInsertTimerRef.current = window.setTimeout(() => {
                 newListInsertTimerRef.current = null;
-                setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, smartReminders: listSmartReminders }]);
+                setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, completedAt: null }]);
                 setListReinsertedId(newId);
                 listInsertHighlightTimerRef.current = window.setTimeout(() => {
                   listInsertHighlightTimerRef.current = null;
@@ -2530,7 +2751,20 @@ export default function App() {
                     <ListsHeader key={isListsOverlayOpen ? 'open' : 'closed'} value={listTitle} onChange={setListTitle} active={listTitle.trim().length > 0 && listItems.length > 0} isEditMode={listOverlayMode === 'edit' || listTitle.length > 0} onSubmit={handleListSaveAndClose} onGearClick={() => setIsListSettingsOpen(true)} />
                     <AddListItemInput onAdd={(text: string) => {
                       const newId = crypto.randomUUID();
+                      setRevealedDeleteListItemId(null);
                       setListItems(prev => [{ id: newId, text, completed: false }, ...prev]);
+                      if (listSortMode === 'alphabetical') {
+                        setAlphabeticalPinnedListItemId(newId);
+                        setAlphabeticalPinnedListItemIndex(0);
+                        if (alphabeticalListItemTimerRef.current !== null) {
+                          clearTimeout(alphabeticalListItemTimerRef.current);
+                        }
+                        alphabeticalListItemTimerRef.current = window.setTimeout(() => {
+                          alphabeticalListItemTimerRef.current = null;
+                          setAlphabeticalPinnedListItemId(currentId => currentId === newId ? null : currentId);
+                          setAlphabeticalPinnedListItemIndex(0);
+                        }, 1500);
+                      }
                       setListItemReinsertedId(newId);
                       setListItemHighlightId(newId);
                       if (listItemHighlightTimerRef.current !== null) {
@@ -2540,23 +2774,23 @@ export default function App() {
                         listItemHighlightTimerRef.current = null;
                         setListItemHighlightId(null);
                       }, INSERT_HIGHLIGHT_MS);
-                    }} isEmpty={listItems.length === 0} />
+                    }} isEmpty={listItems.length === 0} accentColor={currentListAccentColor} />
                   </div>
                   <div className="flex flex-col gap-[22px] items-start px-[20px] pb-[26px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[22px]">
                     <AnimatePresence initial={false}>
-                    {(listSortMode === 'alphabetical' ? [...listItems].sort((a, b) => a.text.localeCompare(b.text)) : listItems).map((item) => {
+                    {displayListItems.map((item) => {
                       const isItemReinserted = listItemReinsertedId === item.id;
                       const isItemHighlighted = listItemHighlightId === item.id;
                       return (
                         <motion.div
                           key={item.id}
-                          layout
+                          layout="position"
                           initial={isItemReinserted ? { opacity: 0 } : false}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
                           transition={isItemReinserted
-                            ? { opacity: { duration: 0.2 } }
-                            : { layout: { duration: 0.25 } }
+                            ? { opacity: { duration: 0.2 }, layout: { type: 'spring', stiffness: 220, damping: 26, mass: 0.9 } }
+                            : { layout: { type: 'spring', stiffness: 220, damping: 26, mass: 0.9 } }
                           }
                           onAnimationComplete={() => {
                             if (isItemReinserted) {
@@ -2565,7 +2799,38 @@ export default function App() {
                           }}
                           className="w-full"
                         >
-                          <EditableListItem name={item.text} completed={item.completed} isHighlighted={isItemHighlighted} onToggle={() => setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], completed: !next[idx].completed }; } return next; })} editable={listOverlayMode === 'edit'} onChange={(val: string) => setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], text: val }; } return next; })} />
+                          <EditableListItem name={item.text} completed={item.completed} isHighlighted={isItemHighlighted} accentColor={currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={() => { setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], completed: !next[idx].completed }; } return next; }); }} onDelete={() => { setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={listOverlayMode === 'edit'} onCommit={(val: string) => {
+                            const currentIndex = displayListItems.findIndex((displayItem) => displayItem.id === item.id);
+                            setRevealedDeleteListItemId(null);
+                            setListItems(prev => {
+                              const next = [...prev];
+                              const idx = next.findIndex(i => i.id === item.id);
+                              if (idx !== -1) {
+                                next[idx] = { ...next[idx], text: val };
+                              }
+                              return next;
+                            });
+                            if (listSortMode === 'alphabetical' && currentIndex !== -1) {
+                              setAlphabeticalPinnedListItemId(item.id);
+                              setAlphabeticalPinnedListItemIndex(currentIndex);
+                              if (alphabeticalListItemTimerRef.current !== null) {
+                                clearTimeout(alphabeticalListItemTimerRef.current);
+                              }
+                              alphabeticalListItemTimerRef.current = window.setTimeout(() => {
+                                alphabeticalListItemTimerRef.current = null;
+                                setAlphabeticalPinnedListItemId(currentId => currentId === item.id ? null : currentId);
+                                setAlphabeticalPinnedListItemIndex(0);
+                              }, 1500);
+                              setListItemHighlightId(item.id);
+                              if (listItemHighlightTimerRef.current !== null) {
+                                clearTimeout(listItemHighlightTimerRef.current);
+                              }
+                              listItemHighlightTimerRef.current = window.setTimeout(() => {
+                                listItemHighlightTimerRef.current = null;
+                                setListItemHighlightId(null);
+                              }, INSERT_HIGHLIGHT_MS);
+                            }
+                          }} />
                         </motion.div>
                       );
                     })}

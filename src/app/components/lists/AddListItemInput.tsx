@@ -20,9 +20,10 @@ function AddTickButton({ active }: { active: boolean }) {
 type AddListItemInputProps = {
     onAdd?: (text: string) => void;
     isEmpty?: boolean;
+    accentColor?: string;
 };
 
-export default function AddListItemInput({ onAdd, isEmpty }: AddListItemInputProps) {
+export default function AddListItemInput({ onAdd, isEmpty, accentColor = "#BABABA" }: AddListItemInputProps) {
     const [itemText, setItemText] = useState("");
 
     const handleAdd = () => {
@@ -37,7 +38,7 @@ export default function AddListItemInput({ onAdd, isEmpty }: AddListItemInputPro
             <div className="content-stretch relative flex h-[33px] w-full shrink-0 items-center gap-[16px]">
                 <div className="relative size-[25px] shrink-0" data-name="Tick box">
                     <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                        <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke="#BABABA" strokeWidth="2" />
+                        <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={accentColor} strokeWidth="2" />
                     </svg>
                 </div>
                 <div className="content-stretch relative flex min-h-px min-w-px flex-[1_0_0] flex-col items-start justify-center">
