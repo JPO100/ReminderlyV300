@@ -402,7 +402,7 @@ export default function App() {
   const [listInfoOverlayListId, setListInfoOverlayListId] = useState<string | null>(null);
   const [doneInfoTarget, setDoneInfoTarget] = useState<{ kind: 'reminder' | 'list'; id: string } | null>(null);
   const [listSortMode, setListSortMode] = useState<'alphabetical' | 'insertion'>('insertion');
-  const [listSmartReminders, setListSmartReminders] = useState(true);
+  const [listSmartReminders, setListSmartReminders] = useState(false);
   const [listSmartReminderDueDate, setListSmartReminderDueDate] = useState<string | null>(null);
   const handleSmartRemindersChange = (val: boolean) => {
     setListSmartReminders(val);
@@ -2680,7 +2680,7 @@ export default function App() {
                                   <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAwayList ? '#BABABA' : '#BABABA' }}>
                                     {visibleCompletedCount} of {list.items.length} items
                                     {isSmartRemindersEnabled && (list.smartReminders ?? true) ? (
-                                      <span style={{ color: isDueDateHighlighted ? catColor : '#BABABA' }}>
+                                      <span style={{ color: isDueDateHighlighted ? DONE_BLUE : '#BABABA' }}>
                                         {`. Complete by ${formatListDueDate(list.smartReminderDueDate)}`}
                                       </span>
                                     ) : null}
@@ -2739,7 +2739,7 @@ export default function App() {
               <button
                 className="bg-[#1C2C42] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
                 style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
-                onClick={() => { setListTitle(pickDefaultListName(createdLists.map(l => l.title))); setListItems([]); setListOverlayMode('create'); setEditingListId(null); setListSortMode('insertion'); setListSmartReminders(true); setListSmartReminderDueDate(null); setIsListsOverlayOpen(true); }}
+                onClick={() => { setListTitle(pickDefaultListName(createdLists.map(l => l.title))); setListItems([]); setListOverlayMode('create'); setEditingListId(null); setListSortMode('insertion'); setListSmartReminders(false); setListSmartReminderDueDate(null); setIsListsOverlayOpen(true); }}
               >
                 <div className="relative shrink-0 size-[15px]">
                   <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
@@ -3319,7 +3319,7 @@ export default function App() {
                       onSubmit={handleListSaveAndClose}
                       onGearClick={() => setIsListSettingsOpen(true)}
                       subtitleText={`${listItems.filter((item) => item.completed).length} of ${listItems.length} items. Complete by ${formatListDueDate(listSmartReminderDueDate)}`}
-                      subtitleHighlightColor={editingListId && listDueDateHighlightId === editingListId ? currentListAccentColor : null}
+                      subtitleHighlightColor={editingListId && listDueDateHighlightId === editingListId ? DONE_BLUE : null}
                       showSmartRemindersSubtitle={isSmartRemindersEnabled && listSmartReminders}
                       reserveSmartRemindersSubtitleSpace={isSmartRemindersEnabled}
                     />

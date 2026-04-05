@@ -67,6 +67,7 @@ function Frame3({ sortMode, onSortChange, smartReminders, onSmartRemindersChange
   const isAlpha = sortMode === 'alphabetical';
   const isInsertion = sortMode === 'insertion';
   const smartRemindersActive = showSmartReminders && smartReminders;
+  const showSortRows = !smartRemindersActive || (displaySmartReminderDate != null && !isDatePickerOpen);
 
   const handleSmartRemindersRowClick = () => {
     if (!showSmartReminders || !smartRemindersActive) return;
@@ -108,7 +109,7 @@ function Frame3({ sortMode, onSortChange, smartReminders, onSmartRemindersChange
       )}
         </div>
       )}
-      {!smartRemindersActive && (
+      {showSortRows && (
         <div className="content-stretch flex flex-col gap-[24px] items-start pt-[24px] w-full">
           <div className="content-stretch flex gap-[16px] items-start justify-center relative shrink-0 w-full cursor-pointer" onClick={() => onSortChange(isInsertion ? 'alphabetical' : 'insertion')}>
             <div className="h-[20.824px] relative shrink-0 w-[20.83px]" data-name="Union">
