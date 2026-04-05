@@ -79,9 +79,36 @@ type CreatedList = {
   items: ListItem[];
   sortMode?: 'alphabetical' | 'insertion';
   smartReminders?: boolean;
+  smartReminderDueDate?: string | null;
   status?: 'active' | 'done' | 'deleted';
   statusChangedAt?: number | null;
 };
+
+function dateToStorageString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function storageStringToDate(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return null;
+  const [, year, month, day] = match;
+  return new Date(Number(year), Number(month) - 1, Number(day));
+}
+
+function formatListDueDate(value: string | null | undefined): string {
+  const date = storageStringToDate(value);
+  if (!date) return 'Jan 1 2026';
+  const month = date.toLocaleString('en-US', { month: 'short' });
+  const currentYear = new Date().getFullYear();
+  if (date.getFullYear() === currentYear) {
+    return `${month} ${date.getDate()}`;
+  }
+  return `${month} ${date.getDate()} '${String(date.getFullYear()).slice(-2)}`;
+}
 
 function RowMenuButton({ onClick }: { onClick?: () => void }) {
   return (
@@ -330,6 +357,7 @@ export default function App() {
   const [doneInfoTarget, setDoneInfoTarget] = useState<{ kind: 'reminder' | 'list'; id: string } | null>(null);
   const [listSortMode, setListSortMode] = useState<'alphabetical' | 'insertion'>('insertion');
   const [listSmartReminders, setListSmartReminders] = useState(true);
+  const [listSmartReminderDueDate, setListSmartReminderDueDate] = useState<string | null>(null);
   const handleSmartRemindersChange = (val: boolean) => {
     setListSmartReminders(val);
     if (editingListId) {
@@ -344,8 +372,32 @@ export default function App() {
   // UI-only: list-specific insertion state (mirrors reminder insertion state, kept separate)
   const [listReinsertedId, setListReinsertedId] = useState<string | null>(null);
   const [listInsertHighlightId, setListInsertHighlightId] = useState<string | null>(null);
+  const [listDueDateHighlightId, setListDueDateHighlightId] = useState<string | null>(null);
   const newListInsertTimerRef = useRef<number | null>(null);
   const listInsertHighlightTimerRef = useRef<number | null>(null);
+  const listDueDateHighlightTimerRef = useRef<number | null>(null);
+
+  const triggerListInsertStyleHighlight = (listId: string) => {
+    setListInsertHighlightId(listId);
+    if (listInsertHighlightTimerRef.current !== null) {
+      clearTimeout(listInsertHighlightTimerRef.current);
+    }
+    listInsertHighlightTimerRef.current = window.setTimeout(() => {
+      listInsertHighlightTimerRef.current = null;
+      setListInsertHighlightId((currentId) => (currentId === listId ? null : currentId));
+    }, INSERT_HIGHLIGHT_MS);
+  };
+
+  const triggerListDueDateHighlight = (listId: string) => {
+    setListDueDateHighlightId(listId);
+    if (listDueDateHighlightTimerRef.current !== null) {
+      clearTimeout(listDueDateHighlightTimerRef.current);
+    }
+    listDueDateHighlightTimerRef.current = window.setTimeout(() => {
+      listDueDateHighlightTimerRef.current = null;
+      setListDueDateHighlightId((currentId) => (currentId === listId ? null : currentId));
+    }, INSERT_HIGHLIGHT_MS);
+  };
 
   // UI-only: list-item-specific insertion state (mirrors list insertion state, for items within the overlay)
   const [listItemReinsertedId, setListItemReinsertedId] = useState<string | null>(null);
@@ -548,6 +600,15 @@ export default function App() {
       return false;
     }
   });
+
+  const [smartRemindersFeatureEnabled, setSmartRemindersFeatureEnabled] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('reminderly-ff-smart-reminders') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const isSmartRemindersEnabled = isListsEnabled && smartRemindersFeatureEnabled;
 
   // Dev-only: filters menu variant for A/B testing (standard vs grouped)
   const [filtersMenuVariant, setFiltersMenuVariant] = useState<FiltersMenuVariant>(() => {
@@ -785,6 +846,20 @@ export default function App() {
       // Fail silently
     }
   }, [useOneMinuteTimeIncrements]);
+
+  useEffect(() => {
+    try {
+      persistStringIfChanged('reminderly-ff-smart-reminders', String(smartRemindersFeatureEnabled));
+    } catch {
+      // Fail silently
+    }
+  }, [smartRemindersFeatureEnabled]);
+
+  useEffect(() => {
+    if (!isListsEnabled) {
+      setSmartRemindersFeatureEnabled(false);
+    }
+  }, [isListsEnabled]);
 
   // Persist dev tools password required toggle to localStorage
   useEffect(() => {
@@ -2233,7 +2308,7 @@ export default function App() {
                                     <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', color: isPendingRestore ? '#BABABA' : listStatusColor }}>{list.title}</p>
                                     <div className={`flex items-center gap-[8px] overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
                                       <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingRestore ? '#BABABA' : listStatusColor }}>{doneCount} of {list.items.length} items completed</p>
-                                      {(list.smartReminders ?? true) && <SmartRemindersIndicator />}
+                                      {isSmartRemindersEnabled && (list.smartReminders ?? true) && <SmartRemindersIndicator />}
                                     </div>
                                   </div>
                                   <RowMenuButton onClick={() => setDoneInfoTarget({ kind: 'list', id: list.id })} />
@@ -2349,6 +2424,7 @@ export default function App() {
                   return sortedLists.map((list) => {
                   const isReinserted = listReinsertedId === list.id;
                   const isHighlighted = listInsertHighlightId === list.id;
+                  const isDueDateHighlighted = listDueDateHighlightId === list.id;
                   const isPendingDoneList = pendingDoneListIds.has(list.id);
                   const isPendingDeletedList = pendingDeletedListIds.has(list.id);
                   const isPendingAwayList = isPendingDoneList || isPendingDeletedList;
@@ -2391,10 +2467,17 @@ export default function App() {
                                 )}
                               </button>
                               <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
-                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingAwayList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.title}</p>
-                                <div className={`flex items-center gap-[8px] overflow-hidden cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>
-                                  <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAwayList ? '#BABABA' : '#BABABA' }}>{visibleCompletedCount} of {list.items.length} items completed</p>
-                                  {(list.smartReminders ?? true) && <SmartRemindersIndicator />}
+                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingAwayList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setListSmartReminderDueDate(list.smartReminderDueDate ?? null); setIsListsOverlayOpen(true); }}>{list.title}</p>
+                                <div className={`flex items-center gap-[8px] overflow-hidden cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setListSmartReminderDueDate(list.smartReminderDueDate ?? null); setIsListsOverlayOpen(true); }}>
+                                  <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAwayList ? '#BABABA' : '#BABABA' }}>
+                                    {visibleCompletedCount} of {list.items.length} items
+                                    {isSmartRemindersEnabled && (list.smartReminders ?? true) ? (
+                                      <span style={{ color: isDueDateHighlighted ? catColor : '#BABABA' }}>
+                                        {`. Complete by ${formatListDueDate(list.smartReminderDueDate)}`}
+                                      </span>
+                                    ) : null}
+                                  </p>
+                                  {isSmartRemindersEnabled && (list.smartReminders ?? true) && <SmartRemindersIndicator />}
                                 </div>
                               </div>
                               <RowMenuButton onClick={() => setListInfoOverlayListId(list.id)} />
@@ -2448,7 +2531,7 @@ export default function App() {
               <button
                 className="bg-[#1C2C42] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
                 style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
-                onClick={() => { setListTitle(pickDefaultListName(createdLists.map(l => l.title))); setListItems([]); setListOverlayMode('create'); setEditingListId(null); setListSortMode('insertion'); setListSmartReminders(true); setIsListsOverlayOpen(true); }}
+                onClick={() => { setListTitle(pickDefaultListName(createdLists.map(l => l.title))); setListItems([]); setListOverlayMode('create'); setEditingListId(null); setListSortMode('insertion'); setListSmartReminders(true); setListSmartReminderDueDate(null); setIsListsOverlayOpen(true); }}
               >
                 <div className="relative shrink-0 size-[15px]">
                   <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 15 15">
@@ -2971,7 +3054,7 @@ export default function App() {
               setListInsertHighlightId((currentId) => currentId === targetId ? null : currentId);
               newListInsertTimerRef.current = window.setTimeout(() => {
                 newListInsertTimerRef.current = null;
-                setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, status: l.status ?? 'active', statusChangedAt: l.statusChangedAt ?? null } : l));
+                setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, smartReminderDueDate: listSmartReminderDueDate, status: l.status ?? 'active', statusChangedAt: l.statusChangedAt ?? null } : l));
               }, NEW_REMINDER_INSERT_DELAY);
             } else {
               const newId = crypto.randomUUID();
@@ -2981,7 +3064,7 @@ export default function App() {
               }
               newListInsertTimerRef.current = window.setTimeout(() => {
                 newListInsertTimerRef.current = null;
-                setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, status: 'active', statusChangedAt: null }]);
+                setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, smartReminderDueDate: listSmartReminderDueDate, status: 'active', statusChangedAt: null }]);
                 setListReinsertedId(newId);
                 listInsertHighlightTimerRef.current = window.setTimeout(() => {
                   listInsertHighlightTimerRef.current = null;
@@ -3014,7 +3097,19 @@ export default function App() {
               <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[20px] rounded-tr-[20px] size-full">
                 <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col">
                   <div className="content-stretch flex flex-col gap-[30px] items-start pt-[26px] px-[20px] relative w-full shrink-0">
-                    <ListsHeader key={isListsOverlayOpen ? 'open' : 'closed'} value={listTitle} onChange={setListTitle} active={listTitle.trim().length > 0 && listItems.length > 0} isEditMode={listOverlayMode === 'edit' || listTitle.length > 0} onSubmit={handleListSaveAndClose} onGearClick={() => setIsListSettingsOpen(true)} />
+                    <ListsHeader
+                      key={isListsOverlayOpen ? 'open' : 'closed'}
+                      value={listTitle}
+                      onChange={setListTitle}
+                      active={listTitle.trim().length > 0 && listItems.length > 0}
+                      isEditMode={listOverlayMode === 'edit' || listTitle.length > 0}
+                      onSubmit={handleListSaveAndClose}
+                      onGearClick={() => setIsListSettingsOpen(true)}
+                      subtitleText={`${listItems.filter((item) => item.completed).length} of ${listItems.length} items. Complete by ${formatListDueDate(listSmartReminderDueDate)}`}
+                      subtitleHighlightColor={editingListId && listDueDateHighlightId === editingListId ? currentListAccentColor : null}
+                      showSmartRemindersSubtitle={isSmartRemindersEnabled && listSmartReminders}
+                      reserveSmartRemindersSubtitleSpace={isSmartRemindersEnabled}
+                    />
                     <AddListItemInput onAdd={(text: string) => {
                       const newId = crypto.randomUUID();
                       setRevealedDeleteListItemId(null);
@@ -3141,7 +3236,7 @@ export default function App() {
                 />
                 <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none px-[20px]">
                   <div className="pointer-events-auto w-full max-w-[400px]">
-                    <InfoOverlay sortMode={listSortMode} onSortChange={setListSortMode} listTitle={listTitle} onUncheckAll={() => { setListItems(prev => prev.map(i => ({ ...i, completed: false }))); setIsListSettingsOpen(false); }} allUnchecked={listItems.every(i => !i.completed)} smartReminders={listSmartReminders} onSmartRemindersChange={handleSmartRemindersChange} />
+                    <InfoOverlay sortMode={listSortMode} onSortChange={setListSortMode} listTitle={listTitle} onUncheckAll={() => { setListItems(prev => prev.map(i => ({ ...i, completed: false }))); setIsListSettingsOpen(false); }} allUnchecked={listItems.every(i => !i.completed)} smartReminders={listSmartReminders} onSmartRemindersChange={handleSmartRemindersChange} showSmartReminders={isSmartRemindersEnabled} smartReminderDueDate={storageStringToDate(listSmartReminderDueDate)} onSetSmartReminderDueDate={(date) => { setListSmartReminderDueDate(dateToStorageString(date)); if (editingListId) triggerListDueDateHighlight(editingListId); setIsListSettingsOpen(false); }} />
                   </div>
                 </div>
               </>
@@ -3166,6 +3261,16 @@ export default function App() {
                   setCreatedLists((prev) => prev.map((list) => (
                     list.id === listInfoOverlayList.id ? { ...list, smartReminders: val } : list
                   )));
+                }}
+                showSmartReminders={isSmartRemindersEnabled}
+                smartReminderDueDate={storageStringToDate(listInfoOverlayList.smartReminderDueDate)}
+                onSetSmartReminderDueDate={(date) => {
+                  const nextDate = dateToStorageString(date);
+                  setCreatedLists((prev) => prev.map((list) => (
+                    list.id === listInfoOverlayList.id ? { ...list, smartReminderDueDate: nextDate } : list
+                  )));
+                  triggerListDueDateHighlight(listInfoOverlayList.id);
+                  setListInfoOverlayListId(null);
                 }}
                 onMarkAsDone={() => {
                   const listId = listInfoOverlayList.id;
@@ -3240,7 +3345,7 @@ export default function App() {
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
-              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} onClearLists={() => setCreatedLists([])} onGenerateLists={(lists) => setCreatedLists(lists)} />
+              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} onClearLists={() => setCreatedLists([])} onGenerateLists={(lists) => setCreatedLists(lists)} />
             </motion.div>
           </>
         )}
