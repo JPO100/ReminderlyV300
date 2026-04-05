@@ -5,6 +5,7 @@ import { formatRepeatLabel, isOverdue } from "../reminder-utils";
 // ── Due line formatting ──────────────────────────────────────────────
 
 const WEEKDAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAY_DISPLAY_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTH_SHORT = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -92,7 +93,23 @@ export function formatRepeatsLine(
 ): string | null {
   const label = formatRepeatLabel(repeatRule);
   if (!label) return null;
-  return `(${label})`;
+  const match = label.match(/^(.*)\(([^)]+)\)\s*$/);
+  if (!match) return label;
+
+  const prefix = match[1].trim();
+  const days = match[2]
+    .split(",")
+    .map((day) => day.trim())
+    .filter(Boolean)
+    .sort((a, b) => WEEKDAY_DISPLAY_ORDER.indexOf(a) - WEEKDAY_DISPLAY_ORDER.indexOf(b));
+
+  if (days.length === 0) return label;
+  if (days.length === 1) return `${prefix} on :\n${days[0]}`;
+  if (days.length === 2) return `${prefix} on :\n${days[0]} and ${days[1]}`;
+
+  const lastDay = days[days.length - 1];
+  const leadingDays = days.slice(0, -1).join(", ");
+  return `${prefix} on :\n${leadingDays} and ${lastDay}`;
 }
 
 // ── Component ────────────────────────────────────────────────────────
@@ -165,7 +182,7 @@ export default function ReminderInfoOverlay({
         >
           {/* Reminder text in single quotes */}
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
-            <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>'{reminder.displayText}'</p>
+            <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{reminder.displayText}</p>
           </div>
 
           {/* Due line */}

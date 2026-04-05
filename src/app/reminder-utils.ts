@@ -211,6 +211,9 @@ export function sortReminders(list: Reminder[], now: Date): Reminder[] {
 const DAY_ABBREV_TO_SHORT: Record<string, string> = {
   mo: 'Mon', tu: 'Tue', we: 'Wed', th: 'Thu', fr: 'Fri', sa: 'Sat', su: 'Sun',
 };
+const DAY_ABBREV_ORDER: Record<string, number> = {
+  mo: 0, tu: 1, we: 2, th: 3, fr: 4, sa: 5, su: 6,
+};
 
 function formatOrdinal(day: number): string {
   if (day >= 11 && day <= 13) return `${day}th`;
@@ -245,7 +248,10 @@ export function formatRepeatLabel(repeatRule: RepeatRule | null | undefined, tim
   }
 
   if (frequency === 'weekly' && byDay && byDay.length > 0) {
-    const days = byDay.map((d) => DAY_ABBREV_TO_SHORT[d] ?? d).join(', ');
+    const days = [...byDay]
+      .sort((a, b) => (DAY_ABBREV_ORDER[a] ?? Number.MAX_SAFE_INTEGER) - (DAY_ABBREV_ORDER[b] ?? Number.MAX_SAFE_INTEGER))
+      .map((d) => DAY_ABBREV_TO_SHORT[d] ?? d)
+      .join(', ');
     const suffix = time ? ` at ${formatTime12h(time)}` : '';
     return `${base} (${days})${suffix}`;
   }

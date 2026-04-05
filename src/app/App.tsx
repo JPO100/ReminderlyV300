@@ -297,6 +297,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode | 'lists-done'>("list");
 
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [isReminderOverlayFocusReady, setIsReminderOverlayFocusReady] = useState(false);
   const [isListsOverlayOpen, setIsListsOverlayOpen] = useState(false);
   const [listItems, setListItems] = useState<ListItem[]>([]);
   const [listTitle, setListTitle] = useState("");
@@ -986,9 +987,16 @@ export default function App() {
 
   const handleOverlayClose = useCallback(() => {
     setIsOverlayOpen(false);
+    setIsReminderOverlayFocusReady(false);
     setRepeatConfig(null);
     setEditingReminder(null);
   }, []);
+
+  useEffect(() => {
+    if (isOverlayOpen) {
+      setIsReminderOverlayFocusReady(false);
+    }
+  }, [isOverlayOpen]);
 
   // Track viewport height for overlay positioning
   useEffect(() => {
@@ -1633,8 +1641,39 @@ export default function App() {
     pendingDeleteTimersRef.current.set(reminderId, timer);
   }, []);
 
+  const visibleDoneDeletedReminderCount = reminders
+    .filter((r) => r.completedAt != null || r.deletedAt != null || pendingUncompleteIds.has(r.id) || pendingUndeleteIds.has(r.id))
+    .filter((r) => {
+      if (doneDeletedFilter === 'all') return true;
+      if (doneDeletedFilter === 'done') return (r.completedAt != null && r.deletedAt == null) || pendingUncompleteIds.has(r.id);
+      return r.deletedAt != null || pendingUndeleteIds.has(r.id);
+    })
+    .length;
+
+  const visibleDoneDeletedListCount = createdLists
+    .filter((list) => (
+      list.status === 'done' ||
+      list.status === 'deleted' ||
+      pendingUndoneListIds.has(list.id) ||
+      pendingUndeletedListIds.has(list.id)
+    ))
+    .filter((list) => {
+      if (doneDeletedFilter === 'all') return true;
+      if (doneDeletedFilter === 'done') return list.status === 'done' || pendingUndoneListIds.has(list.id);
+      return list.status === 'deleted' || pendingUndeletedListIds.has(list.id);
+    })
+    .length;
+
+  const isClearAllDisabled =
+    viewMode === 'done-deleted'
+      ? visibleDoneDeletedReminderCount === 0
+      : (isListsEnabled && activeMainTab === 'lists' && viewMode === 'lists-done')
+        ? visibleDoneDeletedListCount === 0
+        : false;
+
   // Clear list: 3-step confirmation handler
   const handleClearListClick = useCallback(() => {
+    if (isClearAllDisabled) return;
     if (clearListStep === 2) return; // ignore clicks during "Cleared!" state
 
     if (clearListStep === 0) {
@@ -1775,7 +1814,7 @@ export default function App() {
       clearListTimerRef.current = null;
       setClearListStep(0);
     }, 500);
-  }, [activeMainTab, clearListStep, doneDeletedFilter, isListsEnabled, pendingUncompleteIds, pendingUndeleteIds, pendingUndoneListIds, pendingUndeletedListIds, viewMode]);
+  }, [activeMainTab, clearListStep, doneDeletedFilter, isClearAllDisabled, isListsEnabled, pendingUncompleteIds, pendingUndeleteIds, pendingUndoneListIds, pendingUndeletedListIds, viewMode]);
 
   const now = new Date();
 
@@ -1939,12 +1978,15 @@ export default function App() {
               {/* Clear all button */}
               <button
                 ref={clearAllButtonRef}
-                onClick={handleClearListClick}
+                onClick={isClearAllDisabled ? undefined : handleClearListClick}
+                disabled={isClearAllDisabled}
                 className={`${
-                  clearListStep === 0
+                  isClearAllDisabled
+                    ? "text-[#CCCCCC]"
+                    : clearListStep === 0
                     ? "bg-[rgba(255,255,255,0.15)] text-white"
                     : "bg-white text-[#1C2C42]"
-                } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid border-white transition-colors cursor-pointer`}
+                } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid transition-colors ${isClearAllDisabled ? "cursor-default border-[#CCCCCC]" : "cursor-pointer border-white"}`}
               >
                 <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                   {clearListStep === 0 ? "Clear all" : clearListStep === 1 ? "Clear all?" : "Cleared!"}
@@ -2104,12 +2146,16 @@ export default function App() {
               {/* Clear all button */}
               <button
                 ref={clearAllButtonRef}
-                onClick={handleClearListClick}
+                onClick={isClearAllDisabled ? undefined : handleClearListClick}
+                disabled={isClearAllDisabled}
                 className={`${
-                  clearListStep === 0
+                  isClearAllDisabled
+                    ? "text-[#CCCCCC]"
+                    : clearListStep === 0
                     ? "text-[#1C2C42]"
                     : "bg-[#1C2C42] text-white"
-                } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid border-[#1C2C42] transition-colors cursor-pointer`}
+                } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid transition-colors ${isClearAllDisabled ? "cursor-default border-[#CCCCCC]" : "cursor-pointer border-[#1C2C42]"}`}
+                style={isClearAllDisabled ? { color: '#CCCCCC', borderColor: '#CCCCCC' } : undefined}
               >
                 <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                   {clearListStep === 0 ? "Clear all" : clearListStep === 1 ? "Clear all?" : "Cleared!"}
@@ -2475,12 +2521,16 @@ export default function App() {
             {/* Clear all button */}
             <button
               ref={clearAllButtonRef}
-              onClick={handleClearListClick}
+              onClick={isClearAllDisabled ? undefined : handleClearListClick}
+              disabled={isClearAllDisabled}
               className={`${
-                clearListStep === 0
+                isClearAllDisabled
+                  ? "text-[#CCCCCC]"
+                  : clearListStep === 0
                   ? "text-[#4784f8]"
                   : "bg-[#4784f8] text-white"
-              } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid border-[#4784f8] transition-colors cursor-pointer`}
+              } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid transition-colors ${isClearAllDisabled ? "cursor-default border-[#CCCCCC]" : "cursor-pointer border-[#4784f8]"}`}
+              style={isClearAllDisabled ? { color: '#CCCCCC', borderColor: '#CCCCCC' } : undefined}
             >
               <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                 {clearListStep === 0 ? "Clear all" : clearListStep === 1 ? "Clear all?" : "Cleared!"}
@@ -2872,6 +2922,9 @@ export default function App() {
               animate={{ y: 0, top: REMINDER_OVERLAY_TOP }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
+              onAnimationComplete={() => {
+                if (isOverlayOpen) setIsReminderOverlayFocusReady(true);
+              }}
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
@@ -2887,6 +2940,7 @@ export default function App() {
                 editReminder={editingReminder}
                 updateReminder={updateReminder}
                 useOneMinuteIncrements={useOneMinuteTimeIncrements}
+                autoFocusReady={isReminderOverlayFocusReady}
               />
             </motion.div>
           </>

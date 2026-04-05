@@ -557,7 +557,7 @@ function ReminderOptions({
   );
 }
 
-function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder, useOneMinuteIncrements = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; useOneMinuteIncrements?: boolean }) {
+function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder, useOneMinuteIncrements = false, autoFocusReady = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; useOneMinuteIncrements?: boolean; autoFocusReady?: boolean }) {
   const isEditMode = !!editReminder;
 
   const [isDateOn, setIsDateOn] = useState(() => {
@@ -943,14 +943,9 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
 
   // Clear pending repeats toggle timers
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      textareaRef.current?.focus({ preventScroll: true });
-    }, 150);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, []);
+    if (!autoFocusReady) return;
+    textareaRef.current?.focus({ preventScroll: true });
+  }, [autoFocusReady]);
 
   // Clear pending repeats toggle timers
   useEffect(() => {
@@ -1254,10 +1249,10 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
   );
 }
 
-export default function NewReminderOverlay({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder, useOneMinuteIncrements = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; useOneMinuteIncrements?: boolean }) {
+export default function NewReminderOverlay({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder, useOneMinuteIncrements = false, autoFocusReady = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; useOneMinuteIncrements?: boolean; autoFocusReady?: boolean }) {
   return (
     <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[20px] rounded-tr-[20px] size-full" data-name="new-reminder-overlay">
-      <NewReminderElements onRepeatsOverlayOpen={onRepeatsOverlayOpen} repeatConfig={repeatConfig} onRepeatConfigChange={onRepeatConfigChange} isRepeatsOverlayOpen={isRepeatsOverlayOpen} addReminder={addReminder} onClose={onClose} nlcMode={nlcMode} nlcEnabled={nlcEnabled} editReminder={editReminder} updateReminder={updateReminder} useOneMinuteIncrements={useOneMinuteIncrements} />
+      <NewReminderElements onRepeatsOverlayOpen={onRepeatsOverlayOpen} repeatConfig={repeatConfig} onRepeatConfigChange={onRepeatConfigChange} isRepeatsOverlayOpen={isRepeatsOverlayOpen} addReminder={addReminder} onClose={onClose} nlcMode={nlcMode} nlcEnabled={nlcEnabled} editReminder={editReminder} updateReminder={updateReminder} useOneMinuteIncrements={useOneMinuteIncrements} autoFocusReady={autoFocusReady} />
     </div>
   );
 }

@@ -25,8 +25,8 @@ function GearBtn({ active, onClick }: { active: boolean; onClick?: () => void })
       onClick={active ? onClick : undefined}
     >
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 23.1994 23.75">
-        <path clipRule="evenodd" d={gearPaths.p1100a300} fill={active ? "#1C2C42" : "#E4E4E4"} fillRule="evenodd" />
-        <path clipRule="evenodd" d={gearPaths.p11234300} fill={active ? "#1C2C42" : "#E4E4E4"} fillRule="evenodd" />
+        <path clipRule="evenodd" d={gearPaths.p1100a300} fill={active ? "#1C2C42" : "#CCCCCC"} fillRule="evenodd" />
+        <path clipRule="evenodd" d={gearPaths.p11234300} fill={active ? "#1C2C42" : "#CCCCCC"} fillRule="evenodd" />
       </svg>
     </button>
   );
