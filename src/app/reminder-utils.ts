@@ -16,6 +16,8 @@ export type Reminder = {
   repeatRule?: RepeatRule | null;
   completedAt?: number | null;
   deletedAt?: number | null;
+  linkedListId?: string | null;
+  isSmartReminder?: boolean;
 };
 
 export type RepeatConfig = {
@@ -102,6 +104,12 @@ export function loadReminders(): Reminder[] {
       }
       if (r.deletedAt != null) {
         sanitised.deletedAt = r.deletedAt;
+      }
+      if (typeof r.linkedListId === "string" && r.linkedListId.trim() !== "") {
+        sanitised.linkedListId = r.linkedListId;
+      }
+      if (r.isSmartReminder === true) {
+        sanitised.isSmartReminder = true;
       }
       acc.push(sanitised);
       return acc;

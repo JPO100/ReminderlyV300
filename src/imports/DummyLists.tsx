@@ -41,6 +41,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
   const [numberOfLists, setNumberOfLists] = useState("11");
   const [maxListItems, setMaxListItems] = useState("15");
   const [includeDone, setIncludeDone] = useState(true);
+  const [includeSmartReminderLists, setIncludeSmartReminderLists] = useState(true);
   const [clearState, setClearState] = useState<'idle' | 'confirming' | 'cleared'>('idle');
   const clearBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -86,6 +87,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
       parseCount(numberOfLists),
       parseCount(maxListItems),
       includeDone,
+      includeSmartReminderLists,
     );
     onGenerateLists(lists);
     setTimeout(() => {
@@ -148,6 +150,23 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
             </div>
             <div
               className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeDone ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+            >
+              <div className="relative shrink-0 size-[22.5px]">
+                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+                  <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
+                </svg>
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => setIncludeSmartReminderLists(!includeSmartReminderLists)}
+            className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
+          >
+            <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
+              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSmartReminderLists ? '#1C2C42' : '#C9C9C9' }}>Include smart reminder lists</p>
+            </div>
+            <div
+              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSmartReminderLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
             >
               <div className="relative shrink-0 size-[22.5px]">
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">

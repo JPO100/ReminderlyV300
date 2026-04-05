@@ -17,6 +17,9 @@ export interface GeneratedList {
   items: ListItem[];
   sortMode: 'alphabetical' | 'insertion';
   smartReminders: boolean;
+  smartReminderDueDate?: string | null;
+  status?: 'active' | 'done' | 'deleted';
+  statusChangedAt?: number | null;
 }
 
 // Each entry: [listTitle, ...possible items related to that title]
@@ -153,6 +156,20 @@ function shuffleArray<T>(arr: T[]): T[] {
   return shuffled;
 }
 
+function formatDateOnly(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function randomFutureDueDate(): string {
+  const date = new Date();
+  const offsetDays = Math.floor(Math.random() * 60) + 1;
+  date.setDate(date.getDate() + offsetDays);
+  return formatDateOnly(date);
+}
+
 type ListCategory = 'complete' | 'almost' | 'started' | 'todo';
 
 function applyCompletionForCategory(items: ListItem[], category: ListCategory): ListItem[] {
@@ -184,6 +201,7 @@ export function generateDummyLists(
   numberOfLists: number,
   maxListItems: number,
   includeDoneItems: boolean,
+  includeSmartReminderLists: boolean,
 ): GeneratedList[] {
   const count = Math.max(4, Math.min(numberOfLists, LIST_TEMPLATES.length));
   const allTemplates = shuffleArray(LIST_TEMPLATES);
@@ -192,6 +210,19 @@ export function generateDummyLists(
   const categories: ListCategory[] = ['complete', 'almost', 'started', 'todo'];
   const guaranteedTemplates = allTemplates.slice(0, 4);
   const remainingTemplates = allTemplates.slice(4, count);
+  const maxSmartReminderLists = includeSmartReminderLists ? Math.min(4, count) : 0;
+  let smartReminderListsAssigned = 0;
+  const shouldUseSmartReminder = () => {
+    if (!includeSmartReminderLists) return false;
+    if (smartReminderListsAssigned >= maxSmartReminderLists) return false;
+    const remainingSlots = maxSmartReminderLists - smartReminderListsAssigned;
+    const useSmartReminder = Math.random() < 0.5 || remainingSlots > (count - (smartReminderListsAssigned + 1));
+    if (useSmartReminder) {
+      smartReminderListsAssigned += 1;
+      return true;
+    }
+    return false;
+  };
 
   const guaranteedLists: GeneratedList[] = guaranteedTemplates.map(([title, allItems], idx) => {
     const itemCount = Math.max(2, Math.floor(Math.random() * maxListItems) + 1);
@@ -200,12 +231,14 @@ export function generateDummyLists(
       selectedItems.map(text => ({ text, completed: false })),
       categories[idx],
     );
+    const smartReminders = shouldUseSmartReminder();
     return {
       id: crypto.randomUUID(),
       title,
       items,
       sortMode: 'insertion',
-      smartReminders: Math.random() < 0.5,
+      smartReminders,
+      smartReminderDueDate: smartReminders ? randomFutureDueDate() : null,
     };
   });
 
@@ -216,12 +249,14 @@ export function generateDummyLists(
       const completed = includeDoneItems && Math.random() < 0.3;
       return { text, completed };
     });
+    const smartReminders = shouldUseSmartReminder();
     return {
       id: crypto.randomUUID(),
       title,
       items,
       sortMode: 'insertion',
-      smartReminders: Math.random() < 0.5,
+      smartReminders,
+      smartReminderDueDate: smartReminders ? randomFutureDueDate() : null,
     };
   });
 
