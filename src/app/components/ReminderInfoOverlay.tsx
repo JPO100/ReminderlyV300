@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import svgPaths from "../../imports/svg-oxn8g14l6y";
 import type { Reminder } from "../reminder-utils";
 import { formatRepeatLabel, isOverdue } from "../reminder-utils";
 
@@ -157,6 +158,7 @@ export default function ReminderInfoOverlay({
   }, []);
 
   const dueLine = formatDueLine(reminder);
+  const smartReminderLine = reminder.isSmartReminder ? "Smart reminder" : null;
   const repeatsLine = formatRepeatsLine(reminder.repeatRule);
   const overdue = isOverdue(reminder, new Date());
   const dueLineColour = overdue ? "#FF0000" : "#1c2c42";
@@ -189,6 +191,23 @@ export default function ReminderInfoOverlay({
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[17px] text-center w-[min-content]" style={{ color: dueLineColour }}>
             <p className="leading-[normal] whitespace-pre-wrap">{dueLine}</p>
           </div>
+
+          {smartReminderLine && (
+            <div className="content-stretch flex items-center justify-center gap-[16px] min-w-full relative shrink-0">
+              <div className="h-[21.5px] relative shrink-0 w-[24px] flex items-center justify-center" aria-hidden="true">
+                <svg className="block h-[21.5px] w-[24px]" fill="none" preserveAspectRatio="xMidYMid meet" viewBox="0 0 19.5002 21.5002">
+                  <g>
+                    <path clipRule="evenodd" d={svgPaths.p23b20a00} fill="#1C2C42" fillRule="evenodd" />
+                    <path clipRule="evenodd" d={svgPaths.p15d6fbb2} fill="#1C2C42" fillRule="evenodd" />
+                    <path clipRule="evenodd" d={svgPaths.p1797f00} fill="#1C2C42" fillRule="evenodd" />
+                  </g>
+                </svg>
+              </div>
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">{smartReminderLine}</p>
+              </div>
+            </div>
+          )}
 
           {/* Repeats line (optional) */}
           {repeatsLine && (

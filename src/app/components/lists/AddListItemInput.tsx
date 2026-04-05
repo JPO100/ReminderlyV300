@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function AddTickButton({ active }: { active: boolean }) {
     return (
@@ -31,6 +31,7 @@ export default function AddListItemInput({
     idleCircleColor,
 }: AddListItemInputProps) {
     const [itemText, setItemText] = useState("");
+    const inputRef = useRef<HTMLInputElement | null>(null);
 
     const handleAdd = () => {
         const trimmed = itemText.trim();
@@ -49,9 +50,15 @@ export default function AddListItemInput({
                 </div>
                 <div className="content-stretch relative flex min-h-px min-w-px flex-[1_0_0] flex-col items-start justify-center">
                     <input
+                        ref={inputRef}
                         type="text"
                         value={itemText}
                         onChange={(event) => setItemText(event.target.value)}
+                        onPointerDownCapture={(event) => {
+                            if (!isEmpty) return;
+                            event.preventDefault();
+                            inputRef.current?.focus({ preventScroll: true });
+                        }}
                         onKeyDown={(event) => {
                             if (event.key === "Enter") handleAdd();
                         }}

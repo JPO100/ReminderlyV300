@@ -411,6 +411,33 @@ export default function App() {
     }
   };
 
+  const openListOverlayForListId = useCallback((listId: string) => {
+    const list = createdLists.find((entry) => entry.id === listId);
+    if (!list) return;
+    setListInfoOverlayListId(null);
+    setListTitle(list.title);
+    setListItems(list.items.map((item) => ({ id: (item as any).id || crypto.randomUUID(), ...item })));
+    setListOverlayMode('edit');
+    setEditingListId(list.id);
+    setListSortMode(list.sortMode || 'insertion');
+    setListSmartReminders(list.smartReminders ?? true);
+    setListSmartReminderDueDate(list.smartReminderDueDate ?? null);
+    setIsListsOverlayOpen(true);
+  }, [createdLists]);
+
+  const openLinkedSmartReminderList = useCallback((linkedListId: string | null | undefined) => {
+    if (!linkedListId) return;
+    setActiveMainTab('lists');
+    setViewMode('list');
+    if (smartReminderOpenListTimerRef.current !== null) {
+      clearTimeout(smartReminderOpenListTimerRef.current);
+    }
+    smartReminderOpenListTimerRef.current = window.setTimeout(() => {
+      smartReminderOpenListTimerRef.current = null;
+      openListOverlayForListId(linkedListId);
+    }, 150);
+  }, [openListOverlayForListId]);
+
   // UI-only: list overlay mode tracking (create vs edit, kept separate from reminders)
   const [listOverlayMode, setListOverlayMode] = useState<'create' | 'edit'>('create');
   const [editingListId, setEditingListId] = useState<string | null>(null);
@@ -703,6 +730,7 @@ export default function App() {
 
   // Timer ref for overlay edit 200ms delay
   const overlayEditTimerRef = useRef<number | null>(null);
+  const smartReminderOpenListTimerRef = useRef<number | null>(null);
 
   // State: which reminder is being edited (null = create mode)
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
@@ -745,6 +773,14 @@ export default function App() {
     return () => {
       if (overlayEditTimerRef.current !== null) {
         clearTimeout(overlayEditTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (smartReminderOpenListTimerRef.current !== null) {
+        clearTimeout(smartReminderOpenListTimerRef.current);
       }
     };
   }, []);
@@ -2348,6 +2384,8 @@ export default function App() {
               if (viewMode === 'lists-done') {
                 setViewMode('list');
               }
+              setActiveFilter('all');
+              setActiveListFilter('all');
               setActiveMainTab('reminders');
             }}
           >
@@ -2369,6 +2407,8 @@ export default function App() {
               if (viewMode === 'done-deleted') {
                 setViewMode('list');
               }
+              setActiveFilter('all');
+              setActiveListFilter('all');
               setActiveMainTab('lists');
             }}
           >
@@ -3072,10 +3112,13 @@ export default function App() {
                                 )}
                               </button>
                               <div
-                                className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative ${isSmartReminder ? 'cursor-default' : 'cursor-pointer'}`}
+                                className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative cursor-pointer`}
                                 style={{ transition: 'color 300ms', gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}
                                 onClick={() => {
-                                  if (isSmartReminder) return;
+                                  if (isSmartReminder) {
+                                    openLinkedSmartReminderList(reminder.linkedListId);
+                                    return;
+                                  }
                                   setRepeatConfig(repeatRuleToConfig(reminder.repeatRule));
                                   setEditingReminder(reminder);
                                   setIsOverlayOpen(true);
@@ -3318,7 +3361,9 @@ export default function App() {
                       isEditMode={listOverlayMode === 'edit' || listTitle.length > 0}
                       onSubmit={handleListSaveAndClose}
                       onGearClick={() => setIsListSettingsOpen(true)}
-                      subtitleText={`${listItems.filter((item) => item.completed).length} of ${listItems.length} items. Complete by ${formatListDueDate(listSmartReminderDueDate)}`}
+                      subtitleText={listSmartReminders
+                        ? `${listItems.filter((item) => item.completed).length} of ${listItems.length} items. Complete by ${formatListDueDate(listSmartReminderDueDate)}`
+                        : `${listItems.filter((item) => item.completed).length} of ${listItems.length} items`}
                       subtitleHighlightColor={editingListId && listDueDateHighlightId === editingListId ? DONE_BLUE : null}
                       showSmartRemindersSubtitle={isSmartRemindersEnabled && listSmartReminders}
                       reserveSmartRemindersSubtitleSpace={isSmartRemindersEnabled}

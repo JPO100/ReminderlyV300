@@ -37,7 +37,7 @@ function ToggleButton({ active, onClick }: { active: boolean; onClick: () => voi
   );
 }
 
-function Frame3({ smartReminders, onSmartRemindersChange, displaySmartReminderDate, selectedSmartReminderDate, isDatePickerOpen, onDateSelect, onSetDate, onOpenDatePicker }: { smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; displaySmartReminderDate: Date | null; selectedSmartReminderDate: Date; isDatePickerOpen: boolean; onDateSelect: (date: Date) => void; onSetDate: () => void; onOpenDatePicker: () => void }) {
+function Frame3({ smartReminders, onSmartRemindersChange, displaySmartReminderDate, selectedSmartReminderDate, isDatePickerOpen, onDateSelect, onSetDate, onCloseDatePicker, onOpenDatePicker }: { smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; displaySmartReminderDate: Date | null; selectedSmartReminderDate: Date; isDatePickerOpen: boolean; onDateSelect: (date: Date) => void; onSetDate: () => void; onCloseDatePicker: () => void; onOpenDatePicker: () => void }) {
 
   const handleSmartRemindersRowClick = () => {
     if (!smartReminders) return;
@@ -72,10 +72,23 @@ function Frame3({ smartReminders, onSmartRemindersChange, displaySmartReminderDa
       {smartReminders && isDatePickerOpen && (
         <div className="content-stretch flex flex-col gap-[30px] items-start w-full">
           <ListSmartReminderCalendar selectedDate={selectedSmartReminderDate} onDateSelect={(date) => date && onDateSelect(date)} />
-          <SetDateBtn onClick={onSetDate} />
+          <DatePickerButtons onSetDate={onSetDate} onBack={onCloseDatePicker} />
         </div>
       )}
     </div>
+  );
+}
+
+function BackToOverlayBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <button className="bg-[#939393] h-[50px] relative rounded-[100px] shrink-0 w-[65px] border-none p-0 cursor-pointer" data-name="back-to-overlay-btn" onClick={onClick}>
+      <div className="absolute inset-0">
+        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 65 50">
+          <rect width="65" height="50" rx="25" fill="#939393" />
+          <path d="M34.2971 18.8497C34.7775 18.3834 35.5566 18.3834 36.037 18.8497C36.5174 19.3161 36.5174 20.072 36.037 20.5383L31.4916 24.95L36.1397 29.4617C36.6201 29.928 36.6201 30.6839 36.1397 31.1503C35.6593 31.6166 34.8803 31.6166 34.3998 31.1503L29.075 25.9817C28.9989 25.9351 28.9265 25.8799 28.8602 25.8156C28.3799 25.3493 28.3799 24.5933 28.8602 24.127L34.2971 18.8497Z" fill="white" />
+        </svg>
+      </div>
+    </button>
   );
 }
 
@@ -90,6 +103,17 @@ function SetDateBtn({ onClick }: { onClick: () => void }) {
         </div>
       </div>
     </button>
+  );
+}
+
+function DatePickerButtons({ onSetDate, onBack }: { onSetDate: () => void; onBack: () => void }) {
+  return (
+    <div className="content-stretch flex gap-[20px] items-start relative shrink-0 w-full">
+      <BackToOverlayBtn onClick={onBack} />
+      <div className="flex-[1_0_0] min-w-px">
+        <SetDateBtn onClick={onSetDate} />
+      </div>
+    </div>
   );
 }
 
@@ -156,6 +180,11 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
     setIsDatePickerOpen(true);
   };
 
+  const handleCloseDatePicker = () => {
+    setDraftSmartReminderDate(smartReminderDueDate ?? new Date());
+    setIsDatePickerOpen(false);
+  };
+
   const handleSetDate = () => {
     onSetSmartReminderDueDate(draftSmartReminderDate);
     setIsDatePickerOpen(false);
@@ -166,8 +195,8 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
       <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
         <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>{listTitle}</p>
       </div>
-      {showSmartReminders && <Frame3 smartReminders={smartReminders} onSmartRemindersChange={handleSmartRemindersChange} displaySmartReminderDate={displaySmartReminderDate} selectedSmartReminderDate={draftSmartReminderDate} isDatePickerOpen={isDatePickerOpen} onDateSelect={setDraftSmartReminderDate} onSetDate={handleSetDate} onOpenDatePicker={handleOpenDatePicker} />}
-      <Buttons onMarkAsDone={onMarkAsDone} onDelete={onDelete} showActionButtons={!smartRemindersActive || (smartReminderDueDate != null && !isDatePickerOpen)} />
+      {showSmartReminders && <Frame3 smartReminders={smartReminders} onSmartRemindersChange={handleSmartRemindersChange} displaySmartReminderDate={displaySmartReminderDate} selectedSmartReminderDate={draftSmartReminderDate} isDatePickerOpen={isDatePickerOpen} onDateSelect={setDraftSmartReminderDate} onSetDate={handleSetDate} onCloseDatePicker={handleCloseDatePicker} onOpenDatePicker={handleOpenDatePicker} />}
+      <Buttons onMarkAsDone={onMarkAsDone} onDelete={onDelete} showActionButtons={!smartRemindersActive || !isDatePickerOpen} />
     </div>
   );
 }

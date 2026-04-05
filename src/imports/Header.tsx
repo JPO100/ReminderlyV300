@@ -103,10 +103,10 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
         </div>
         <GearBtn active={active} onClick={onGearClick} />
       </div>
-      {(showSmartRemindersSubtitle && subtitleText) || reserveSmartRemindersSubtitleSpace ? (
+      {subtitleText || reserveSmartRemindersSubtitleSpace ? (
         <div
           className="flex items-center gap-[8px] min-w-0 pl-[34px] pr-[36px]"
-          style={showSmartRemindersSubtitle && subtitleText ? undefined : { visibility: "hidden" }}
+          style={subtitleText ? undefined : { visibility: "hidden" }}
         >
           <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>
             {subtitleText?.includes('. Complete by ') ? (
@@ -121,7 +121,7 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
               subtitleText ?? "Complete this list by..."
             )}
           </p>
-          <SmartRemindersIndicator />
+          {showSmartRemindersSubtitle ? <SmartRemindersIndicator /> : null}
         </div>
       ) : null}
     </div>
