@@ -16,12 +16,17 @@ function AddTickBtn({ active, onClick }: { active: boolean; onClick?: () => void
   );
 }
 
-function GearBtn({ onClick }: { onClick?: () => void }) {
+function GearBtn({ active, onClick }: { active: boolean; onClick?: () => void }) {
   return (
-    <button className="cursor-pointer relative shrink-0 size-[24px] p-0 m-0 border-none bg-transparent flex items-center justify-center" data-name="gear-btn" onClick={onClick}>
+    <button
+      className={`relative shrink-0 size-[24px] p-0 m-0 border-none bg-transparent flex items-center justify-center ${active ? "cursor-pointer" : "cursor-default"}`}
+      data-name="gear-btn"
+      disabled={!active}
+      onClick={active ? onClick : undefined}
+    >
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 23.1994 23.75">
-        <path clipRule="evenodd" d={gearPaths.p1100a300} fill="#1C2C42" fillRule="evenodd" />
-        <path clipRule="evenodd" d={gearPaths.p11234300} fill="#1C2C42" fillRule="evenodd" />
+        <path clipRule="evenodd" d={gearPaths.p1100a300} fill={active ? "#1C2C42" : "#E4E4E4"} fillRule="evenodd" />
+        <path clipRule="evenodd" d={gearPaths.p11234300} fill={active ? "#1C2C42" : "#E4E4E4"} fillRule="evenodd" />
       </svg>
     </button>
   );
@@ -83,7 +88,7 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
         className="font-['Lato:Bold',sans-serif] not-italic text-[20px] whitespace-nowrap bg-transparent border-none outline-none flex-1 min-w-0 placeholder-[#bababa] caret-[#1c2c42]"
         style={{ color: textColor, transition: "color 300ms" }}
       />
-      <GearBtn onClick={onGearClick} />
+      <GearBtn active={active} onClick={onGearClick} />
     </div>
   );
 }

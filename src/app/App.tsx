@@ -23,6 +23,7 @@ import LaterBtn from "../imports/LaterBtn-146-39";
 import ListsHeader from "../imports/Header";
 import InfoOverlay from "../imports/InfoOverlay";
 import ListInfoOverlay from "../imports/list-info-overlay";
+import DeletedInfoOverlay from "../imports/deleted-info-overlay";
 import AddListItemInput from "./components/lists/AddListItemInput";
 import EditableListItem from "./components/lists/EditableListItem";
 import { CompletedCircleIcon } from "./components/icons/ReminderStateIcons";
@@ -49,9 +50,11 @@ const OVERDUE_COLOUR = "#FF0000";
 
 // Reminderly dark blue constant for done styling
 const DONE_BLUE = "#1C2C42";
+const DONE_LIST_COLOUR = "#404040";
 
 // Deleted grey constant for deleted styling
 const DELETED_GREY = "#939393";
+const DELETED_LIST_COLOUR = "#898989";
 
 // Completion delay before setting completedAt (ms)
 const COMPLETION_DELAY = 350; // ms 
@@ -76,7 +79,8 @@ type CreatedList = {
   items: ListItem[];
   sortMode?: 'alphabetical' | 'insertion';
   smartReminders?: boolean;
-  completedAt?: number | null;
+  status?: 'active' | 'done' | 'deleted';
+  statusChangedAt?: number | null;
 };
 
 function RowMenuButton({ onClick }: { onClick?: () => void }) {
@@ -128,6 +132,7 @@ function RepeatReminderIndicator() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="shrink-0"
+      style={{ marginTop: '2px' }}
       aria-hidden="true"
     >
       <path d="M1.44434 3.48096C1.59681 3.4883 1.73996 3.55905 1.84961 3.64502L1.94824 3.73486L3.07227 4.96729C3.30912 5.22148 3.29491 5.61985 3.04102 5.85693C2.78691 6.09383 2.38854 6.08048 2.15137 5.82666L1.62598 5.26318C0.87435 7.43043 1.46921 9.9307 3.31738 11.5122C5.32505 13.2299 8.17595 13.3202 10.2646 11.9106L10.2666 11.9087C10.2757 11.9033 10.3905 11.8364 10.5479 11.8081C10.6863 11.7833 10.8615 11.7883 11.0264 11.8931L11.0967 11.9438L11.1592 12.0044C11.2904 12.1495 11.3179 12.3217 11.3105 12.4614C11.3021 12.6199 11.2485 12.742 11.2451 12.7495C11.2416 12.7571 11.2362 12.764 11.2295 12.769C8.66386 14.6783 5.03173 14.6353 2.49902 12.4683C-0.0335254 10.3011 -0.63702 6.71916 0.852539 3.88916L0.866211 3.87256C0.869116 3.87039 0.872651 3.86918 0.875977 3.86768C0.95226 3.72692 1.03936 3.62903 1.13379 3.56689C1.23497 3.50033 1.34146 3.47608 1.44434 3.48096ZM2.92969 1.43115C5.49535 -0.478399 9.1283 -0.435229 11.6611 1.73193C14.1936 3.89913 14.7972 7.48108 13.3076 10.311C13.3022 10.3211 13.2926 10.3271 13.2822 10.3315C13.206 10.4722 13.1208 10.5712 13.0264 10.6333C12.925 10.6999 12.8179 10.7243 12.7148 10.7192C12.5115 10.7092 12.3252 10.5866 12.2119 10.4653V10.4644L11.0869 9.23291V9.23193C10.8507 8.97767 10.8654 8.58009 11.1191 8.34326C11.3731 8.10643 11.7706 8.12002 12.0078 8.37354L12.5332 8.93604C13.2845 6.76911 12.6904 4.27039 10.8428 2.68896C8.83508 0.971123 5.98426 0.879935 3.89551 2.28955L3.89258 2.2915L3.8916 2.29053C3.87902 2.29792 3.76692 2.36318 3.61328 2.39111C3.45498 2.41981 3.2479 2.41007 3.06348 2.25537C2.87832 2.09972 2.84024 1.89826 2.84863 1.73877C2.85699 1.58032 2.91071 1.45818 2.91406 1.45068C2.91753 1.44303 2.92297 1.4362 2.92969 1.43115ZM7.08008 3.94678C7.41603 3.94686 7.68848 4.2192 7.68848 4.55518V7.08545L8.90527 8.30029C9.14308 8.53749 9.14424 8.92271 8.90723 9.16064C8.67004 9.39845 8.28481 9.39862 8.04688 9.16162L6.65039 7.77002C6.53601 7.65596 6.4718 7.50082 6.47168 7.33936V4.55518C6.47168 4.21915 6.74406 3.94678 7.08008 3.94678Z" fill="#BABABA" stroke="#BABABA" strokeWidth="0.1" strokeLinecap="round" strokeLinejoin="round"/>
@@ -307,7 +312,8 @@ export default function App() {
             items: Array.isArray(list.items) ? list.items.map((item: any) =>
               typeof item === 'string' ? { id: crypto.randomUUID(), text: item, completed: false } : { id: item.id || crypto.randomUUID(), text: item.text, completed: item.completed }
             ) : [],
-            completedAt: list.completedAt ?? null,
+            status: list.status ?? (list.completedAt != null ? 'done' : 'active'),
+            statusChangedAt: list.statusChangedAt ?? list.completedAt ?? null,
           }));
         }
       }
@@ -320,6 +326,7 @@ export default function App() {
   // UI-only: list settings overlay (cog button in overlay header)
   const [isListSettingsOpen, setIsListSettingsOpen] = useState(false);
   const [listInfoOverlayListId, setListInfoOverlayListId] = useState<string | null>(null);
+  const [doneInfoTarget, setDoneInfoTarget] = useState<{ kind: 'reminder' | 'list'; id: string } | null>(null);
   const [listSortMode, setListSortMode] = useState<'alphabetical' | 'insertion'>('insertion');
   const [listSmartReminders, setListSmartReminders] = useState(true);
   const handleSmartRemindersChange = (val: boolean) => {
@@ -345,9 +352,14 @@ export default function App() {
   const [revealedDeleteListItemId, setRevealedDeleteListItemId] = useState<string | null>(null);
   const [pendingDoneListIds, setPendingDoneListIds] = useState<Set<string>>(new Set());
   const [pendingUndoneListIds, setPendingUndoneListIds] = useState<Set<string>>(new Set());
-  const pendingUndoneListCompletedAtRef = useRef<Map<string, number>>(new Map());
+  const [pendingDeletedListIds, setPendingDeletedListIds] = useState<Set<string>>(new Set());
+  const [pendingUndeletedListIds, setPendingUndeletedListIds] = useState<Set<string>>(new Set());
+  const pendingUndoneListStatusChangedAtRef = useRef<Map<string, number>>(new Map());
+  const pendingUndeletedListStatusChangedAtRef = useRef<Map<string, number>>(new Map());
   const completeListTimersRef = useRef<Map<string, number>>(new Map());
   const undoListTimersRef = useRef<Map<string, number>>(new Map());
+  const deleteListTimersRef = useRef<Map<string, number>>(new Map());
+  const undeleteListTimersRef = useRef<Map<string, number>>(new Map());
   const [alphabeticalPinnedListItemId, setAlphabeticalPinnedListItemId] = useState<string | null>(null);
   const [alphabeticalPinnedListItemIndex, setAlphabeticalPinnedListItemIndex] = useState<number>(0);
   const alphabeticalListItemTimerRef = useRef<number | null>(null);
@@ -364,6 +376,12 @@ export default function App() {
   const listInfoOverlayList = listInfoOverlayListId == null
     ? null
     : createdLists.find((list) => list.id === listInfoOverlayListId) ?? null;
+  const doneInfoReminder = doneInfoTarget?.kind === 'reminder'
+    ? reminders.find((reminder) => reminder.id === doneInfoTarget.id) ?? null
+    : null;
+  const doneInfoList = doneInfoTarget?.kind === 'list'
+    ? createdLists.find((list) => list.id === doneInfoTarget.id) ?? null
+    : null;
   const displayListItems = (() => {
     if (listSortMode !== 'alphabetical') return listItems;
     if (!alphabeticalPinnedListItemId) {
@@ -1057,6 +1075,7 @@ export default function App() {
 
   const handleListCompleteClick = useCallback((listId: string) => {
     if (completeListTimersRef.current.has(listId)) return;
+    if (deleteListTimersRef.current.has(listId)) return;
 
     setPendingDoneListIds((prev) => {
       const next = new Set(prev);
@@ -1068,7 +1087,14 @@ export default function App() {
       completeListTimersRef.current.delete(listId);
       setCreatedLists((prev) =>
         prev.map((list) =>
-          list.id === listId ? { ...list, completedAt: Date.now() } : list
+          list.id === listId
+            ? {
+                ...list,
+                items: list.items.map((item) => ({ ...item, completed: true })),
+                status: 'done',
+                statusChangedAt: Date.now(),
+              }
+            : list
         )
       );
       setPendingDoneListIds((prev) => {
@@ -1083,14 +1109,22 @@ export default function App() {
 
   const handleListUndoClick = useCallback((listId: string) => {
     if (undoListTimersRef.current.has(listId)) return;
+    if (undeleteListTimersRef.current.has(listId)) return;
 
     const target = createdLists.find((list) => list.id === listId);
-    if (!target || target.completedAt == null) return;
+    if (!target || target.status !== 'done') return;
 
-    pendingUndoneListCompletedAtRef.current.set(listId, target.completedAt);
+    pendingUndoneListStatusChangedAtRef.current.set(listId, target.statusChangedAt ?? Date.now());
     setCreatedLists((prev) =>
       prev.map((list) =>
-        list.id === listId ? { ...list, completedAt: null } : list
+        list.id === listId
+          ? {
+              ...list,
+              items: list.items.map((item) => ({ ...item, completed: false })),
+              status: 'active',
+              statusChangedAt: null,
+            }
+          : list
       )
     );
 
@@ -1112,7 +1146,7 @@ export default function App() {
 
     const timer = window.setTimeout(() => {
       undoListTimersRef.current.delete(listId);
-      pendingUndoneListCompletedAtRef.current.delete(listId);
+      pendingUndoneListStatusChangedAtRef.current.delete(listId);
       setPendingUndoneListIds((prev) => {
         const next = new Set(prev);
         next.delete(listId);
@@ -1121,6 +1155,87 @@ export default function App() {
     }, COMPLETION_DELAY);
 
     undoListTimersRef.current.set(listId, timer);
+  }, [createdLists]);
+
+  const handleListDeleteClick = useCallback((listId: string) => {
+    if (deleteListTimersRef.current.has(listId)) return;
+    if (completeListTimersRef.current.has(listId)) return;
+
+    setPendingDeletedListIds((prev) => {
+      const next = new Set(prev);
+      next.add(listId);
+      return next;
+    });
+
+    const timer = window.setTimeout(() => {
+      deleteListTimersRef.current.delete(listId);
+      setCreatedLists((prev) =>
+        prev.map((list) =>
+          list.id === listId
+            ? {
+                ...list,
+                status: 'deleted',
+                statusChangedAt: Date.now(),
+              }
+            : list
+        )
+      );
+      setPendingDeletedListIds((prev) => {
+        const next = new Set(prev);
+        next.delete(listId);
+        return next;
+      });
+    }, COMPLETION_DELAY);
+
+    deleteListTimersRef.current.set(listId, timer);
+  }, []);
+
+  const handleListUndeleteClick = useCallback((listId: string) => {
+    if (undeleteListTimersRef.current.has(listId)) return;
+
+    const target = createdLists.find((list) => list.id === listId);
+    if (!target || target.status !== 'deleted') return;
+
+    pendingUndeletedListStatusChangedAtRef.current.set(listId, target.statusChangedAt ?? Date.now());
+    setCreatedLists((prev) =>
+      prev.map((list) =>
+        list.id === listId
+          ? {
+              ...list,
+              status: 'active',
+              statusChangedAt: null,
+            }
+          : list
+      )
+    );
+
+    setListReinsertedId(listId);
+    setListInsertHighlightId(listId);
+    if (listInsertHighlightTimerRef.current !== null) {
+      clearTimeout(listInsertHighlightTimerRef.current);
+    }
+    listInsertHighlightTimerRef.current = window.setTimeout(() => {
+      listInsertHighlightTimerRef.current = null;
+      setListInsertHighlightId(null);
+    }, INSERT_HIGHLIGHT_MS);
+
+    setPendingUndeletedListIds((prev) => {
+      const next = new Set(prev);
+      next.add(listId);
+      return next;
+    });
+
+    const timer = window.setTimeout(() => {
+      undeleteListTimersRef.current.delete(listId);
+      pendingUndeletedListStatusChangedAtRef.current.delete(listId);
+      setPendingUndeletedListIds((prev) => {
+        const next = new Set(prev);
+        next.delete(listId);
+        return next;
+      });
+    }, COMPLETION_DELAY);
+
+    undeleteListTimersRef.current.set(listId, timer);
   }, [createdLists]);
 
   // Cancel a pending repeat completion: clears all in-flight timers and reverts state.
@@ -1531,6 +1646,70 @@ export default function App() {
     setClearListStep(2);
     setDoneDeletedFilter('all');
 
+    if (isListsEnabled && activeMainTab === 'lists' && viewMode === 'lists-done') {
+      setCreatedLists((prev) => {
+        const idsToRemove = new Set<string>();
+
+        for (const list of prev) {
+          if (list.status === 'done' || list.status === 'deleted') {
+            idsToRemove.add(list.id);
+          } 
+        }
+
+        for (const id of pendingUndoneListIds) idsToRemove.add(id);
+        for (const id of pendingUndeletedListIds) idsToRemove.add(id);
+
+        for (const id of idsToRemove) {
+          const ct = completeListTimersRef.current.get(id);
+          if (ct !== undefined) { clearTimeout(ct); completeListTimersRef.current.delete(id); }
+          const ut = undoListTimersRef.current.get(id);
+          if (ut !== undefined) { clearTimeout(ut); undoListTimersRef.current.delete(id); }
+          const dt = deleteListTimersRef.current.get(id);
+          if (dt !== undefined) { clearTimeout(dt); deleteListTimersRef.current.delete(id); }
+          const udt = undeleteListTimersRef.current.get(id);
+          if (udt !== undefined) { clearTimeout(udt); undeleteListTimersRef.current.delete(id); }
+          pendingUndoneListStatusChangedAtRef.current.delete(id);
+          pendingUndeletedListStatusChangedAtRef.current.delete(id);
+        }
+
+        setPendingDoneListIds((s) => {
+          let changed = false;
+          const next = new Set(s);
+          for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
+          return changed ? next : s;
+        });
+        setPendingUndoneListIds((s) => {
+          let changed = false;
+          const next = new Set(s);
+          for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
+          return changed ? next : s;
+        });
+        setPendingDeletedListIds((s) => {
+          let changed = false;
+          const next = new Set(s);
+          for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
+          return changed ? next : s;
+        });
+        setPendingUndeletedListIds((s) => {
+          let changed = false;
+          const next = new Set(s);
+          for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
+          return changed ? next : s;
+        });
+
+        return prev.filter((list) => !idsToRemove.has(list.id));
+      });
+
+      if (clearListTimerRef.current !== null) {
+        clearTimeout(clearListTimerRef.current);
+      }
+      clearListTimerRef.current = window.setTimeout(() => {
+        clearListTimerRef.current = null;
+        setClearListStep(0);
+      }, 500);
+      return;
+    }
+
     // Build set of ids to remove: everything visible in done/deleted list
     setReminders((prev) => {
       const idsToRemove = new Set<string>();
@@ -1596,7 +1775,7 @@ export default function App() {
       clearListTimerRef.current = null;
       setClearListStep(0);
     }, 500);
-  }, [clearListStep, pendingUncompleteIds, pendingUndeleteIds]);
+  }, [activeMainTab, clearListStep, doneDeletedFilter, isListsEnabled, pendingUncompleteIds, pendingUndeleteIds, pendingUndoneListIds, pendingUndeletedListIds, viewMode]);
 
   const now = new Date();
 
@@ -1904,14 +2083,18 @@ export default function App() {
                   </svg>
                 </button>
                 <button
+                  onClick={() => setDoneDeletedFilter(doneDeletedFilter === 'done' ? 'all' : 'done')}
                   className="text-[#1C2C42] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 border border-solid border-[#1C2C42] transition-colors cursor-pointer"
+                  style={doneDeletedFilter === 'done' ? { boxShadow: `inset 0 0 0 2px ${DONE_LIST_COLOUR}`, color: DONE_LIST_COLOUR, borderColor: DONE_LIST_COLOUR } : undefined}
                 >
                   <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                     Done
                   </div>
                 </button>
                 <button
+                  onClick={() => setDoneDeletedFilter(doneDeletedFilter === 'deleted' ? 'all' : 'deleted')}
                   className="text-[#1C2C42] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 border border-solid border-[#1C2C42] transition-colors cursor-pointer"
+                  style={doneDeletedFilter === 'deleted' ? { boxShadow: `inset 0 0 0 2px ${DELETED_LIST_COLOUR}`, color: DELETED_LIST_COLOUR, borderColor: DELETED_LIST_COLOUR } : undefined}
                 >
                   <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                     Deleted
@@ -1936,73 +2119,86 @@ export default function App() {
           )}
           {viewMode === 'lists-done' ? (
             (() => {
-              const doneLists = createdLists
-                .filter((list) => list.completedAt != null || pendingUndoneListIds.has(list.id))
+              const doneDeletedLists = createdLists
+                .filter((list) => list.status === 'done' || list.status === 'deleted' || pendingUndoneListIds.has(list.id) || pendingUndeletedListIds.has(list.id))
+                .filter((list) => {
+                  if (doneDeletedFilter === 'all') return true;
+                  if (doneDeletedFilter === 'done') return list.status === 'done' || pendingUndoneListIds.has(list.id);
+                  return list.status === 'deleted' || pendingUndeletedListIds.has(list.id);
+                })
                 .sort((a, b) => {
-                  const tsA = pendingUndoneListCompletedAtRef.current.get(a.id) ?? a.completedAt ?? 0;
-                  const tsB = pendingUndoneListCompletedAtRef.current.get(b.id) ?? b.completedAt ?? 0;
+                  const tsA =
+                    pendingUndeletedListStatusChangedAtRef.current.get(a.id) ??
+                    pendingUndoneListStatusChangedAtRef.current.get(a.id) ??
+                    a.statusChangedAt ??
+                    0;
+                  const tsB =
+                    pendingUndeletedListStatusChangedAtRef.current.get(b.id) ??
+                    pendingUndoneListStatusChangedAtRef.current.get(b.id) ??
+                    b.statusChangedAt ??
+                    0;
                   return tsB - tsA;
                 });
 
-              if (doneLists.length === 0) {
+              if (doneDeletedLists.length === 0) {
                 return (
                   <div className="flex flex-col items-center justify-center flex-1 w-full">
-                    <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">No done or deleted lists yet…</p>
+                    <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
+                      {doneDeletedFilter === 'deleted' ? 'No deleted lists yet…' : doneDeletedFilter === 'done' ? 'No done lists yet…' : 'No done or deleted lists yet…'}
+                    </p>
                   </div>
                 );
               }
 
               return (
-                <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full max-w-[768px] rounded-[10px]" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: 'auto' }}>
-                  <div className="flex flex-col gap-[22px] w-full" style={{ position: 'relative', zIndex: 1 }}>
-                    <AnimatePresence key="lists-done-items">
-                      {doneLists.map((list) => {
-                        const isPendingRestore = pendingUndoneListIds.has(list.id);
-                        const doneCount = list.items.filter(i => i.completed).length;
-                        return (
-                          <motion.div
-                            key={list.id}
-                            layout
-                            initial={false}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ layout: { duration: 0.25 } }}
-                          >
-                            <div className="content-stretch flex items-start justify-between px-px relative w-full">
-                              <div className="flex-[1_0_0] min-h-px min-w-px relative">
-                                <div className="flex flex-row items-start size-full">
-                                  <div className="content-stretch flex gap-[16px] items-start justify-between relative w-full">
-                                    <button
-                                      className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
-                                      style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
-                                      onClick={() => handleListUndoClick(list.id)}
-                                      aria-label="Mark list as not done"
-                                    >
-                                      {isPendingRestore ? (
-                                        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                                          <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke="#BABABA" strokeWidth="2" />
-                                        </svg>
-                                      ) : (
-                                        <CompletedCircleIcon className="absolute block size-full" color={DONE_BLUE} />
-                                      )}
-                                    </button>
-                                    <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
-                                      <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', color: isPendingRestore ? '#BABABA' : '#1c2c42' }}>{list.title}</p>
-                                      <div className={`flex items-center gap-[8px] overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
-                                        <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>{doneCount} of {list.items.length} items completed</p>
-                                        {(list.smartReminders ?? true) && <SmartRemindersIndicator />}
-                                      </div>
+                <div className="flex flex-col gap-[22px] w-full">
+                  <AnimatePresence key={`${viewMode}-${activeMainTab}-${doneDeletedFilter}`}>
+                    {doneDeletedLists.map((list) => {
+                      const isPendingRestore = pendingUndoneListIds.has(list.id) || pendingUndeletedListIds.has(list.id);
+                      const isDeletedList = list.status === 'deleted' && !pendingUndeletedListIds.has(list.id);
+                      const doneCount = list.items.filter(i => i.completed).length;
+                      const listStatusColor = isDeletedList ? DELETED_LIST_COLOUR : DONE_LIST_COLOUR;
+                      return (
+                        <motion.div
+                          key={list.id}
+                          layout
+                          exit={{ opacity: 0 }}
+                          transition={{ layout: { duration: 0.25 } }}
+                        >
+                          <div className="content-stretch flex items-start justify-between px-px relative w-full">
+                            <div className="flex-[1_0_0] min-h-px min-w-px relative">
+                              <div className="flex flex-row items-start size-full">
+                                <div className="content-stretch flex gap-[16px] items-start justify-between relative w-full">
+                                  <button
+                                    className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                                    style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
+                                    onClick={() => isDeletedList ? handleListUndeleteClick(list.id) : handleListUndoClick(list.id)}
+                                    aria-label="Mark list as not done"
+                                  >
+                                    {isPendingRestore ? (
+                                      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                        <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke="#BABABA" strokeWidth="2" />
+                                      </svg>
+                                    ) : (
+                                      <CompletedCircleIcon className="absolute block size-full" color={listStatusColor} />
+                                    )}
+                                  </button>
+                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
+                                    <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', color: isPendingRestore ? '#BABABA' : listStatusColor }}>{list.title}</p>
+                                    <div className={`flex items-center gap-[8px] overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
+                                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingRestore ? '#BABABA' : listStatusColor }}>{doneCount} of {list.items.length} items completed</p>
+                                      {(list.smartReminders ?? true) && <SmartRemindersIndicator />}
                                     </div>
-                                    <RowMenuButton onClick={() => setListInfoOverlayListId(list.id)} />
                                   </div>
+                                  <RowMenuButton onClick={() => setDoneInfoTarget({ kind: 'list', id: list.id })} />
                                 </div>
                               </div>
                             </div>
-                          </motion.div>
-                        );
-                      })}
-                    </AnimatePresence>
-                  </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
                 </div>
               );
             })()
@@ -2086,7 +2282,7 @@ export default function App() {
                     if (checked > 0) return "started";
                     return "todo";
                   };
-                  const activeLists = createdLists.filter((list) => list.completedAt == null || pendingDoneListIds.has(list.id));
+                  const activeLists = createdLists.filter((list) => (list.status !== 'done' && list.status !== 'deleted') || pendingDoneListIds.has(list.id) || pendingDeletedListIds.has(list.id));
                   const filteredLists = activeListFilter === "all"
                     ? activeLists
                     : activeListFilter === "grouped-todo"
@@ -2108,6 +2304,10 @@ export default function App() {
                   const isReinserted = listReinsertedId === list.id;
                   const isHighlighted = listInsertHighlightId === list.id;
                   const isPendingDoneList = pendingDoneListIds.has(list.id);
+                  const isPendingDeletedList = pendingDeletedListIds.has(list.id);
+                  const isPendingAwayList = isPendingDoneList || isPendingDeletedList;
+                  const pendingListColour = isPendingDeletedList ? DELETED_LIST_COLOUR : DONE_LIST_COLOUR;
+                  const visibleCompletedCount = isPendingDoneList ? list.items.length : list.items.filter(i => i.completed).length;
                   const catColor = listCategoryColor[categoriseList(list)] || "#BABABA";
                   return (
                     <motion.div
@@ -2136,8 +2336,8 @@ export default function App() {
                                 onClick={() => handleListCompleteClick(list.id)}
                                 aria-label="Mark list as done"
                               >
-                                {isPendingDoneList ? (
-                                  <CompletedCircleIcon className="absolute block size-full" color={DONE_BLUE} />
+                                {isPendingAwayList ? (
+                                  <CompletedCircleIcon className="absolute block size-full" color={pendingListColour} />
                                 ) : (
                                   <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
                                     <path d="M12.5 0C19.4036 0 25 5.59644 25 12.5C25 19.4036 19.4036 25 12.5 25C5.59644 25 0 19.4036 0 12.5C0 5.59644 5.59644 0 12.5 0ZM12.5 2C6.70101 2 2 6.70101 2 12.5C2 18.299 6.70101 23 12.5 23C18.299 23 23 18.299 23 12.5C23 6.70101 18.299 2 12.5 2Z" fill={catColor} />
@@ -2145,9 +2345,9 @@ export default function App() {
                                 )}
                               </button>
                               <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
-                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDoneList ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingDoneList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.title}</p>
-                                <div className={`flex items-center gap-[8px] overflow-hidden cursor-pointer${isPendingDoneList ? ' line-through' : ''}`} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>
-                                  <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>{list.items.filter(i => i.completed).length} of {list.items.length} items completed</p>
+                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingAwayList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>{list.title}</p>
+                                <div className={`flex items-center gap-[8px] overflow-hidden cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setIsListsOverlayOpen(true); }}>
+                                  <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAwayList ? '#BABABA' : '#BABABA' }}>{visibleCompletedCount} of {list.items.length} items completed</p>
                                   {(list.smartReminders ?? true) && <SmartRemindersIndicator />}
                                 </div>
                               </div>
@@ -2171,7 +2371,7 @@ export default function App() {
                   if (checked > 0) return "started";
                   return "todo";
                 };
-                const visibleActiveLists = createdLists.filter((list) => list.completedAt == null || pendingDoneListIds.has(list.id));
+                const visibleActiveLists = createdLists.filter((list) => (list.status !== 'done' && list.status !== 'deleted') || pendingDoneListIds.has(list.id) || pendingDeletedListIds.has(list.id));
                 const hasVisible = activeListFilter === "all"
                   ? visibleActiveLists.length > 0
                   : activeListFilter === "grouped-todo"
@@ -2422,35 +2622,37 @@ export default function App() {
                                 const textCol = isPendingRestore ? (overdue ? OVERDUE_COLOUR : (isListsEnabled ? '#3F3F3F' : "#1c2c42")) : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : "#1C2C42"));
                                 const subtitleCol = isPendingRestore ? '#BABABA' : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE));
                                 return (
-                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ color: textCol, gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}>
-                                    <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px' }}>{getDisplayTitle(item)}</p>
-                                    {showSubtitles && (
-                                      <div className={`flex items-center gap-[8px] overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
-                                        <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: subtitleCol }}>{(() => {
-                                          if (item.repeatRule) {
-                                            const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
-                                            if (label) return label;
-                                          }
-                                          if (item.schedule.kind === 'scheduled' && item.schedule.date) {
-                                            const [sy, sm, sd] = item.schedule.date.split('-').map(Number);
-                                            const dateLabel = formatSelectedDate(new Date(sy, sm - 1, sd), now);
-                                            if (item.schedule.time) {
-                                              return `${dateLabel} at ${formatTime12h(item.schedule.time)}`;
+                                  <>
+                                    <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ color: textCol, gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}>
+                                      <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px' }}>{getDisplayTitle(item)}</p>
+                                      {showSubtitles && (
+                                        <div className={`flex items-center gap-[8px] overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
+                                          <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: subtitleCol }}>{(() => {
+                                            if (item.repeatRule) {
+                                              const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
+                                              if (label) return label;
                                             }
-                                            return dateLabel;
-                                          }
-                                          return 'No date / time set';
-                                        })()}</p>
-                                        {item.repeatRule && <RepeatReminderIndicator />}
-                                      </div>
-                                    )}
-                                  </div>
+                                            if (item.schedule.kind === 'scheduled' && item.schedule.date) {
+                                              const [sy, sm, sd] = item.schedule.date.split('-').map(Number);
+                                              const dateLabel = formatSelectedDate(new Date(sy, sm - 1, sd), now);
+                                              if (item.schedule.time) {
+                                                return `${dateLabel} at ${formatTime12h(item.schedule.time)}`;
+                                              }
+                                              return dateLabel;
+                                            }
+                                            return 'No date / time set';
+                                          })()}</p>
+                                          {item.repeatRule && <RepeatReminderIndicator />}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <RowMenuButton onClick={() => setDoneInfoTarget({ kind: 'reminder', id: item.id })} />
+                                  </>
                                 );
                               })()}
                             </div>
                           </div>
                         </div>
-                        <RowMenuButton onClick={() => setInfoReminder(item)} />
                       </div>
                     </motion.div>
                   ))}
@@ -2715,7 +2917,7 @@ export default function App() {
               setListInsertHighlightId((currentId) => currentId === targetId ? null : currentId);
               newListInsertTimerRef.current = window.setTimeout(() => {
                 newListInsertTimerRef.current = null;
-                setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, completedAt: l.completedAt ?? null } : l));
+                setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, status: l.status ?? 'active', statusChangedAt: l.statusChangedAt ?? null } : l));
               }, NEW_REMINDER_INSERT_DELAY);
             } else {
               const newId = crypto.randomUUID();
@@ -2725,7 +2927,7 @@ export default function App() {
               }
               newListInsertTimerRef.current = window.setTimeout(() => {
                 newListInsertTimerRef.current = null;
-                setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, completedAt: null }]);
+                setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, status: 'active', statusChangedAt: null }]);
                 setListReinsertedId(newId);
                 listInsertHighlightTimerRef.current = window.setTimeout(() => {
                   listInsertHighlightTimerRef.current = null;
@@ -2784,9 +2986,19 @@ export default function App() {
                         listItemHighlightTimerRef.current = null;
                         setListItemHighlightId(null);
                       }, INSERT_HIGHLIGHT_MS);
-                    }} isEmpty={listItems.length === 0} accentColor={currentListAccentColor} />
+                    }} isEmpty={listItems.length === 0} accentColor={currentListAccentColor} idleCircleColor={listOverlayMode === 'edit' ? '#939393' : currentListAccentColor} />
                   </div>
                   <div className="flex flex-col gap-[22px] items-start px-[20px] pb-[26px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[22px]">
+                    {listOverlayMode === 'create' && displayListItems.length === 0 && (
+                      <div
+                        className="pointer-events-none"
+                        style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 0 }}
+                      >
+                        <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
+                          Add your first item to start your list
+                        </p>
+                      </div>
+                    )}
                     <AnimatePresence initial={false}>
                     {displayListItems.map((item) => {
                       const isItemReinserted = listItemReinsertedId === item.id;
@@ -2908,10 +3120,47 @@ export default function App() {
                     handleListCompleteClick(listId);
                   }, 200);
                 }}
+                onDelete={() => {
+                  const listId = listInfoOverlayList.id;
+                  setListInfoOverlayListId(null);
+                  window.setTimeout(() => {
+                    handleListDeleteClick(listId);
+                  }, 200);
+                }}
               />
             </div>
           </div>
         </>
+      )}
+
+      {(doneInfoReminder || doneInfoList) && (
+        <DeletedInfoOverlay
+          title={doneInfoReminder ? getDisplayTitle(doneInfoReminder) : (doneInfoList?.title ?? '')}
+          buttonColor={doneInfoReminder ? '#4784f8' : '#1C2C42'}
+          buttonLabel={
+            doneInfoReminder
+              ? (doneInfoReminder.deletedAt != null ? 'Mark as not deleted' : 'Mark as not done')
+              : (doneInfoList?.status === 'deleted' ? 'Mark as not deleted' : 'Mark as not done')
+          }
+          onClose={() => setDoneInfoTarget(null)}
+          onMarkAsNotDone={() => {
+            const currentTarget = doneInfoTarget;
+            if (!currentTarget) return;
+            setDoneInfoTarget(null);
+            window.setTimeout(() => {
+              if (currentTarget.kind === 'reminder') {
+                handleUncompleteClick(currentTarget.id);
+              } else {
+                const list = createdLists.find((entry) => entry.id === currentTarget.id);
+                if (list?.status === 'deleted') {
+                  handleListUndeleteClick(currentTarget.id);
+                } else {
+                  handleListUndoClick(currentTarget.id);
+                }
+              }
+            }, 200);
+          }}
+        />
       )}
 
       {/* Dev Tools Overlay */}
