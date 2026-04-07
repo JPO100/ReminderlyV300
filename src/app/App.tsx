@@ -2149,7 +2149,7 @@ export default function App() {
       }}>
       {/* Header */}
       <div className="app-header relative shrink-0 w-full p-[20px]">
-        <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full max-w-[768px] mx-auto" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }}>
+        <div className="content-stretch flex flex-col gap-[17px] items-start relative w-full max-w-[768px] mx-auto" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }}>
           <div className="content-stretch flex items-center justify-center pb-[20px] pt-[50px] relative shrink-0 w-full">
             <div className="h-[35.653px] relative shrink-0 w-[209.653px]">
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
@@ -2520,7 +2520,7 @@ export default function App() {
               }
 
               return (
-                <div className="flex flex-col gap-[22px] w-full">
+                <div className="flex flex-col gap-[23px] w-full">
                   <AnimatePresence key={`${viewMode}-${activeMainTab}-${doneDeletedFilter}`}>
                     {doneDeletedLists.map((list) => {
                       const isPendingRestore = pendingUndoneListIds.has(list.id) || pendingUndeletedListIds.has(list.id);
@@ -2537,7 +2537,7 @@ export default function App() {
                           <div className="content-stretch flex items-start justify-between px-px relative w-full">
                             <div className="flex-[1_0_0] min-h-px min-w-px relative">
                               <div className="flex flex-row items-start size-full">
-                                <div className="content-stretch flex gap-[16px] items-start justify-between relative w-full">
+                                <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full">
                                   <button
                                     className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
                                     style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
@@ -2552,17 +2552,21 @@ export default function App() {
                                       <CompletedCircleIcon className="absolute block size-full" color={listStatusColor} />
                                     )}
                                   </button>
-                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
-                                    <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', color: isPendingRestore ? '#BABABA' : listStatusColor }}>{list.title}</p>
-                                    <div className={`flex items-center gap-[8px] overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
-                                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingRestore ? '#BABABA' : listStatusColor }}>{doneCount} of {list.items.length} items completed</p>
-                                      {isSmartRemindersEnabled && (list.smartReminders ?? true) && <SmartRemindersIndicator />}
+                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '9px', minHeight: '38px' }}>
+                                    <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor }}>{list.title}</p>
+                                    <div className={`flex items-center overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
+                                      <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor }}>{doneCount} of {list.items.length} items completed</p>
+                                      {isSmartRemindersEnabled && (list.smartReminders ?? true) && (
+                                        <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
+                                          <SmartRemindersIndicator />
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
-                                  <RowMenuButton onClick={() => setDoneInfoTarget({ kind: 'list', id: list.id })} />
                                 </div>
                               </div>
                             </div>
+                            <RowMenuButton onClick={() => setDoneInfoTarget({ kind: 'list', id: list.id })} />
                           </div>
                         </motion.div>
                       );
@@ -2638,7 +2642,7 @@ export default function App() {
             )}
             {/* Scrollable lists container */}
             <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full max-w-[768px] rounded-[10px]" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: 'auto' }}>
-              <div className="flex flex-col gap-[22px] w-full" style={{ position: 'relative', zIndex: 1 }}>
+              <div className="flex flex-col gap-[23px] w-full" style={{ position: 'relative', zIndex: 1 }}>
                 {/* Dynamic list cards */}
                 <AnimatePresence key={`lists-${activeListFilter}`}>
                 {(() => {
@@ -2699,7 +2703,7 @@ export default function App() {
                       <div className="content-stretch flex items-start justify-between px-px relative w-full">
                         <div className="flex-[1_0_0] min-h-px min-w-px relative">
                           <div className="flex flex-row items-start size-full">
-                            <div className="content-stretch flex gap-[16px] items-start justify-between relative w-full">
+                            <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full">
                               <button
                                 className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
                                 style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
@@ -2714,10 +2718,10 @@ export default function App() {
                                   </svg>
                                 )}
                               </button>
-                              <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '4px', minHeight: '38px' }}>
-                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingAwayList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setListSmartReminderDueDate(list.smartReminderDueDate ?? null); setIsListsOverlayOpen(true); }}>{list.title}</p>
-                                <div className={`flex items-center gap-[8px] overflow-hidden cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setListSmartReminderDueDate(list.smartReminderDueDate ?? null); setIsListsOverlayOpen(true); }}>
-                                  <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAwayList ? '#BABABA' : '#BABABA' }}>
+                              <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-hidden relative" style={{ gap: '9px', minHeight: '38px' }}>
+                                <p className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingAwayList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setListSmartReminderDueDate(list.smartReminderDueDate ?? null); setIsListsOverlayOpen(true); }}>{list.title}</p>
+                                <div className={`flex items-center overflow-hidden cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setListSmartReminderDueDate(list.smartReminderDueDate ?? null); setIsListsOverlayOpen(true); }}>
+                                  <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAwayList ? '#BABABA' : '#BABABA' }}>
                                     {visibleCompletedCount} of {list.items.length} items
                                     {isSmartRemindersEnabled && (list.smartReminders ?? true) ? (
                                       <span style={{ color: isDueDateHighlighted ? DONE_BLUE : '#BABABA' }}>
@@ -2725,13 +2729,17 @@ export default function App() {
                                       </span>
                                     ) : null}
                                   </p>
-                                  {isSmartRemindersEnabled && (list.smartReminders ?? true) && <SmartRemindersIndicator />}
+                                  {isSmartRemindersEnabled && (list.smartReminders ?? true) && (
+                                    <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
+                                      <SmartRemindersIndicator />
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                              <RowMenuButton onClick={() => setListInfoOverlayListId(list.id)} />
                             </div>
                           </div>
                         </div>
+                        <RowMenuButton onClick={() => setListInfoOverlayListId(list.id)} />
                       </div>
                     </motion.div>
                   );
@@ -2962,7 +2970,7 @@ export default function App() {
                 );
               }
               return (
-                <div className="flex flex-col gap-[22px] w-full">
+                <div className="flex flex-col gap-[23px] w-full">
                   <AnimatePresence key={`${viewMode}-${activeFilter}-${doneDeletedFilter}`}>
                   {completedItems.map((item) => (
                     <motion.div
@@ -3005,11 +3013,11 @@ export default function App() {
                                 const subtitleCol = isPendingRestore ? '#BABABA' : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE));
                                 return (
                                   <>
-                                    <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative" style={{ color: textCol, gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}>
-                                      <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px' }}>{getDisplayTitle(item)}</p>
+                                    <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-hidden relative" style={{ color: textCol, gap: '9px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}>
+                                      <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1 }}>{getDisplayTitle(item)}</p>
                                       {showSubtitles && (
-                                        <div className={`flex items-center gap-[8px] overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
-                                          <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: subtitleCol }}>{(() => {
+                                        <div className={`flex items-center overflow-hidden${isPendingRestore ? '' : ' line-through'}`}>
+                                          <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: subtitleCol }}>{(() => {
                                             if (item.repeatRule) {
                                               const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
                                               if (label) return label;
@@ -3024,8 +3032,12 @@ export default function App() {
                                             }
                                             return 'No date / time set';
                                           })()}</p>
-                                          {isSmartReminder && <SmartReminderReminderIndicator />}
-                                          {item.repeatRule && <RepeatReminderIndicator />}
+                                          {(isSmartReminder || item.repeatRule) && (
+                                            <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
+                                              {isSmartReminder && <SmartReminderReminderIndicator />}
+                                              {item.repeatRule && <RepeatReminderIndicator />}
+                                            </div>
+                                          )}
                                         </div>
                                       )}
                                     </div>
@@ -3061,7 +3073,7 @@ export default function App() {
             const sortedFiltered = filtered.length > 0 ? sortReminders(filtered, now) : [];
             return (
               <>
-              <div className="flex flex-col gap-[22px] w-full" style={{ position: 'relative', zIndex: 1 }}>
+              <div className="flex flex-col gap-[23px] w-full" style={{ position: 'relative', zIndex: 1 }}>
                 <AnimatePresence key={`${viewMode}-${activeFilter}`}>
                 {sortedFiltered.map((reminder) => {
                   const isPendingDone = pendingDoneIds.has(reminder.id);
@@ -3112,8 +3124,8 @@ export default function App() {
                                 )}
                               </button>
                               <div
-                                className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative cursor-pointer`}
-                                style={{ transition: 'color 300ms', gap: '4px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}
+                                className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-hidden relative cursor-pointer`}
+                                style={{ transition: 'color 300ms', gap: '9px', ...(!showSubtitles ? { minHeight: '38px' } : {}) }}
                                 onClick={() => {
                                   if (isSmartReminder) {
                                     openLinkedSmartReminderList(reminder.linkedListId);
@@ -3124,10 +3136,10 @@ export default function App() {
                                   setIsOverlayOpen(true);
                                 }}
                               >
-                                <p className={`leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '17px', color: isPendingAway ? pendingColour : textColour }}>{getDisplayTitle(reminder)}</p>
+                                <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingAway ? pendingColour : textColour }}>{getDisplayTitle(reminder)}</p>
                                 {showSubtitles && (
-                                  <div className={`flex items-center gap-[8px] overflow-hidden${isPendingAway ? ' line-through' : ''}`}>
-                                    <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isPendingAway ? pendingColour : '#BABABA' }}>{(() => {
+                                  <div className={`flex items-center overflow-hidden${isPendingAway ? ' line-through' : ''}`}>
+                                    <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAway ? pendingColour : '#BABABA' }}>{(() => {
                                       if (reminder.repeatRule) {
                                         const label = formatRepeatLabel(reminder.repeatRule, reminder.schedule.kind === 'scheduled' ? reminder.schedule.time : undefined, reminder.schedule.kind === 'scheduled' ? reminder.schedule.date : undefined);
                                         if (label) return label;
@@ -3142,8 +3154,12 @@ export default function App() {
                                       }
                                       return 'No date / time set';
                                     })()}</p>
-                                    {isSmartReminder && <SmartReminderReminderIndicator />}
-                                    {reminder.repeatRule && <RepeatReminderIndicator />}
+                                    {(isSmartReminder || reminder.repeatRule) && (
+                                      <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
+                                        {isSmartReminder && <SmartReminderReminderIndicator />}
+                                        {reminder.repeatRule && <RepeatReminderIndicator />}
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               </div>
@@ -3350,9 +3366,9 @@ export default function App() {
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
-              <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[20px] rounded-tr-[20px] size-full">
+              <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[15px] rounded-tr-[15px] size-full">
                 <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col">
-                  <div className="content-stretch flex flex-col gap-[30px] items-start pt-[26px] px-[20px] relative w-full shrink-0">
+                  <div className="content-stretch flex flex-col gap-[30px] items-start pt-[24px] px-[24px] relative w-full shrink-0">
                     <ListsHeader
                       key={isListsOverlayOpen ? 'open' : 'closed'}
                       value={listTitle}
@@ -3395,7 +3411,7 @@ export default function App() {
                       }, INSERT_HIGHLIGHT_MS);
                     }} isEmpty={listItems.length === 0} accentColor={currentListAccentColor} idleCircleColor={listOverlayMode === 'edit' ? '#939393' : currentListAccentColor} />
                   </div>
-                  <div className="flex flex-col gap-[22px] items-start px-[20px] pb-[26px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[22px]">
+                  <div className="flex flex-col gap-[23px] items-start px-[24px] pb-[24px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[22px]">
                     {listOverlayMode === 'create' && displayListItems.length === 0 && (
                       <div
                         className="pointer-events-none"

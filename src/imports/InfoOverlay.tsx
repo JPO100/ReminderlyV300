@@ -3,7 +3,7 @@ import { useState } from "react";
 import ListSmartReminderCalendar from "../app/components/ListSmartReminderCalendar";
 
 function formatOverlayDueDate(date: Date | null): string {
-  if (!date) return "Complete this list by...";
+  if (!date) return "No completion date set";
   const month = date.toLocaleString('en-US', { month: 'short' });
   const currentYear = new Date().getFullYear();
   if (date.getFullYear() === currentYear) {
@@ -16,7 +16,7 @@ function SmartRemindersLabel({ active, smartReminderDueDate }: { active: boolean
   return (
     <div className={`content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[5px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative ${active ? '' : 'text-[#d9d9d9]'}`}>
       <div className={`flex flex-col justify-center overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#1c2c42]' : ''}`}>
-        <p className="leading-[23px] overflow-hidden text-ellipsis">Smart reminders</p>
+        <p className="leading-[23px] overflow-hidden text-ellipsis">Set smart reminder</p>
       </div>
       <div className={`flex flex-col justify-center relative shrink-0 text-[13.5px] w-full ${active ? 'text-[#bababa]' : ''}`}>
         <p className="leading-[normal]">{formatOverlayDueDate(smartReminderDueDate)}</p>
@@ -110,7 +110,7 @@ function Frame3({ sortMode, onSortChange, smartReminders, onSmartRemindersChange
         </div>
       )}
       {showSortRows && (
-        <div className="content-stretch flex flex-col gap-[24px] items-start pt-[24px] w-full">
+        <div className="content-stretch flex flex-col gap-[24px] items-start w-full">
           <div className="content-stretch flex gap-[16px] items-start justify-center relative shrink-0 w-full cursor-pointer" onClick={() => onSortChange(isInsertion ? 'alphabetical' : 'insertion')}>
             <div className="h-[20.824px] relative shrink-0 w-[20.83px]" data-name="Union">
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20.8301 20.8242">
@@ -234,6 +234,9 @@ export default function InfoOverlay({ sortMode, onSortChange, listTitle, onUnche
   const handleCloseDatePicker = () => {
     setDraftSmartReminderDate(smartReminderDueDate ?? new Date());
     setIsDatePickerOpen(false);
+    if (smartReminderDueDate == null) {
+      onSmartRemindersChange(false);
+    }
   };
 
   const handleSetDate = () => {

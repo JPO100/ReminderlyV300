@@ -2,6 +2,8 @@
 
 Content from `/docs/colour-styles.md`.
 
+See also: `/docs/05-design-and-layout/text-styles.md`
+
 ## Primary Colours
 
 ### Reminderly Blue

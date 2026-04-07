@@ -178,7 +178,7 @@ export default function ReminderInfoOverlay({
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
-          className="bg-white relative flex flex-col gap-[40px] items-center py-[40px] px-[34px] rounded-[32px] pointer-events-auto outline-none"
+          className="bg-white relative flex flex-col gap-[40px] items-center pt-[24px] pb-[24px] px-[24px] rounded-[32px] pointer-events-auto outline-none"
           style={{ width: 322 }}
           onClick={(e) => e.stopPropagation()}
         >

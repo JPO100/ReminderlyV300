@@ -3,7 +3,7 @@ import { useState } from "react";
 import ListSmartReminderCalendar from "../app/components/ListSmartReminderCalendar";
 
 function formatOverlayDueDate(date: Date | null): string {
-  if (!date) return "Complete this list by...";
+  if (!date) return "No completion date set";
   const month = date.toLocaleString('en-US', { month: 'short' });
   const currentYear = new Date().getFullYear();
   if (date.getFullYear() === currentYear) {
@@ -16,7 +16,7 @@ function SmartRemindersLabel({ active, smartReminderDueDate }: { active: boolean
   return (
     <div className={`content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[5px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative ${active ? '' : 'text-[#d9d9d9]'}`}>
       <div className={`flex flex-col justify-center overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#1c2c42]' : ''}`}>
-        <p className="leading-[23px] overflow-hidden text-ellipsis">Smart reminders</p>
+        <p className="leading-[23px] overflow-hidden text-ellipsis">Set smart reminder</p>
       </div>
       <div className={`flex flex-col justify-center relative shrink-0 text-[13.5px] w-full ${active ? 'text-[#bababa]' : ''}`}>
         <p className="leading-[normal]">{formatOverlayDueDate(smartReminderDueDate)}</p>
@@ -183,6 +183,9 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
   const handleCloseDatePicker = () => {
     setDraftSmartReminderDate(smartReminderDueDate ?? new Date());
     setIsDatePickerOpen(false);
+    if (smartReminderDueDate == null) {
+      onSmartRemindersChange(false);
+    }
   };
 
   const handleSetDate = () => {
@@ -191,7 +194,7 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
   };
 
   return (
-    <div className="bg-white content-stretch flex flex-col gap-[40px] items-center justify-start px-[30px] py-[40px] relative rounded-[32px] mx-auto" style={{ width: 322 }} data-name="list-info-overlay">
+    <div className="bg-white content-stretch flex flex-col gap-[24px] items-center justify-start px-[24px] py-[24px] relative rounded-[32px] mx-auto" style={{ width: 322 }} data-name="list-info-overlay">
       <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
         <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>{listTitle}</p>
       </div>

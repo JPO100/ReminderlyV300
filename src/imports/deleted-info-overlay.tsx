@@ -18,7 +18,7 @@ export default function DeletedInfoOverlay({
       <div className="fixed inset-0 bg-black/50 z-[60]" onClick={onClose} />
       <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
         <div
-          className="bg-white relative flex flex-col gap-[40px] items-center py-[40px] px-[34px] rounded-[32px] pointer-events-auto outline-none"
+          className="bg-white relative flex flex-col gap-[40px] items-center pt-[24px] pb-[24px] px-[24px] rounded-[32px] pointer-events-auto outline-none"
           style={{ width: 322 }}
           onClick={(event) => event.stopPropagation()}
         >
