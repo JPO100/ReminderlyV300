@@ -1,6 +1,4 @@
 import svgPaths from "./svg-z3vqooufv8";
-import gearPaths from "./svg-2owmcw62lt";
-import backChevronPaths from "./svg-7vys4qis03";
 import { useEffect, useRef, useState } from "react";
 
 function AddTickBtn({ active, onClick }: { active: boolean; onClick?: () => void }) {
@@ -16,28 +14,20 @@ function AddTickBtn({ active, onClick }: { active: boolean; onClick?: () => void
   );
 }
 
-function GearBtn({ active, onClick }: { active: boolean; onClick?: () => void }) {
+function MenuDotsBtn({ active, onClick }: { active: boolean; onClick?: () => void }) {
   return (
     <button
-      className={`relative shrink-0 size-[24px] p-0 m-0 border-none bg-transparent flex items-center justify-center ${active ? "cursor-pointer" : "cursor-default"}`}
-      data-name="gear-btn"
+      className={`relative shrink-0 w-[35px] h-[35px] p-0 m-0 border-none bg-transparent flex items-center justify-center self-center ${active ? "cursor-pointer" : "cursor-default"}`}
+      data-name="menu-dots-btn"
       disabled={!active}
       onClick={active ? onClick : undefined}
+      type="button"
     >
-      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 23.1994 23.75">
-        <path clipRule="evenodd" d={gearPaths.p1100a300} fill={active ? "#1C2C42" : "#CCCCCC"} fillRule="evenodd" />
-        <path clipRule="evenodd" d={gearPaths.p11234300} fill={active ? "#1C2C42" : "#CCCCCC"} fillRule="evenodd" />
-      </svg>
-    </button>
-  );
-}
-
-function BackChevronBtn({ onClick }: { onClick?: () => void }) {
-  return (
-    <button className="cursor-pointer relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center" style={{ width: '22px', height: '26px' }} data-name="back-chevron-btn" onClick={onClick}>
-      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22 26">
-        <path d={backChevronPaths.p11888f80} fill="#1C2C42" />
-      </svg>
+      <div className="flex flex-row items-center justify-center gap-[3px]">
+        <span className={`block w-[3.5px] h-[3.5px] rounded-full ${active ? "bg-[#BABABA]" : "bg-[#CCCCCC]"}`} />
+        <span className={`block w-[3.5px] h-[3.5px] rounded-full ${active ? "bg-[#BABABA]" : "bg-[#CCCCCC]"}`} />
+        <span className={`block w-[3.5px] h-[3.5px] rounded-full ${active ? "bg-[#BABABA]" : "bg-[#CCCCCC]"}`} />
+      </div>
     </button>
   );
 }
@@ -81,7 +71,6 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
   return (
     <div className="flex flex-col relative w-full gap-[7px]" data-name="header">
       <div className="flex items-center justify-between relative w-full gap-[12px]">
-        <BackChevronBtn onClick={onSubmit} />
         <div className="flex-1 min-w-0">
           <input
             ref={inputRef}
@@ -97,18 +86,18 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
               event.currentTarget.blur();
             }}
             placeholder=""
-            className="font-['Lato:Bold',sans-serif] not-italic text-[20px] whitespace-nowrap bg-transparent border-none outline-none w-full min-w-0 placeholder-[#bababa] caret-[#1c2c42]"
-            style={{ color: textColor, transition: "color 300ms" }}
+            className="font-['Lato',sans-serif] not-italic text-[20px] whitespace-nowrap bg-transparent border-none outline-none w-full min-w-0 placeholder-[#bababa] caret-[#1c2c42]"
+            style={{ color: textColor, transition: "color 300ms", fontWeight: 700 }}
           />
         </div>
-        <GearBtn active={active} onClick={onGearClick} />
+        <MenuDotsBtn active={active} onClick={onGearClick} />
       </div>
       {subtitleText || reserveSmartRemindersSubtitleSpace ? (
         <div
-          className="flex items-center gap-[8px] min-w-0 pl-[34px] pr-[36px]"
+          className="flex items-center gap-[8px] min-w-0 pr-[36px]"
           style={subtitleText ? undefined : { visibility: "hidden" }}
         >
-          <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '13.5px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>
+          <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 700, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>
             {subtitleText?.includes('. Complete by ') ? (
               <>
                 {subtitleText.split('. Complete by ')[0]}
