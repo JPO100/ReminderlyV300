@@ -208,24 +208,33 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
             </p>
           </div>
           <div
-            className="content-stretch flex items-center justify-between leading-[normal] relative shrink-0 text-[#0088fe] text-nowrap w-[76px]"
+            className="content-stretch flex items-center justify-end gap-[32px] leading-[normal] ml-auto relative shrink-0 text-[#0088fe] text-nowrap"
             data-name="arrow-btns"
-            style={{ transform: "translateY(-5px)" }}
           >
-            <p
+            <button
               onClick={handlePrevMonth}
-              className="relative shrink-0 cursor-pointer select-none"
-              style={{ width: "32px", height: "32px", fontSize: "30px", fontWeight: 700, lineHeight: "32px", textAlign: "center" }}
+              className="relative shrink-0 cursor-pointer select-none bg-transparent border-none p-0 flex items-center justify-center"
+              style={{ width: "9px", height: "15px" }}
+              type="button"
+              aria-label="Previous month"
             >
-              ‹
-            </p>
-            <p
+              <svg width="9" height="15" viewBox="0 0 11 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.9209 0C9.1875 0 9.43066 0.0654297 9.64941 0.195312C9.87472 0.318336 10.0528 0.489446 10.1826 0.708008C10.3123 0.926614 10.377 1.17309 10.377 1.44629C10.3768 1.84257 10.2235 2.19153 9.91602 2.49219L3.4248 8.80859L9.91602 15.1143C10.2235 15.4218 10.377 15.7775 10.377 16.1807C10.377 16.4473 10.3125 16.6904 10.1826 16.9092C10.0528 17.1277 9.87478 17.3018 9.64941 17.4316C9.43066 17.5615 9.1875 17.627 8.9209 17.627C8.51782 17.627 8.1796 17.4899 7.90625 17.2168L0.523438 9.97754C0.338867 9.7998 0.205078 9.61816 0.123047 9.43359C0.0410748 9.24233 5.91461e-05 9.03399 0 8.80859C0 8.58317 0.0411364 8.37782 0.123047 8.19336C0.205078 8.00195 0.338867 7.81738 0.523438 7.63965L7.90625 0.410156C8.17964 0.136882 8.5177 0 8.9209 0Z" fill="#0088FE"/>
+              </svg>
+            </button>
+            <button
               onClick={handleNextMonth}
-              className="relative shrink-0 cursor-pointer select-none"
-              style={{ width: "32px", height: "32px", fontSize: "30px", fontWeight: 700, lineHeight: "32px", textAlign: "center" }}
+              className="relative shrink-0 cursor-pointer select-none bg-transparent border-none p-0 flex items-center justify-center"
+              style={{ width: "9px", height: "15px" }}
+              type="button"
+              aria-label="Next month"
             >
-              ›
-            </p>
+              <svg width="9" height="15" viewBox="0 0 11 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(11 0) scale(-1 1)">
+                  <path d="M8.9209 0C9.1875 0 9.43066 0.0654297 9.64941 0.195312C9.87472 0.318336 10.0528 0.489446 10.1826 0.708008C10.3123 0.926614 10.377 1.17309 10.377 1.44629C10.3768 1.84257 10.2235 2.19153 9.91602 2.49219L3.4248 8.80859L9.91602 15.1143C10.2235 15.4218 10.377 15.7775 10.377 16.1807C10.377 16.4473 10.3125 16.6904 10.1826 16.9092C10.0528 17.1277 9.87478 17.3018 9.64941 17.4316C9.43066 17.5615 9.1875 17.627 8.9209 17.627C8.51782 17.627 8.1796 17.4899 7.90625 17.2168L0.523438 9.97754C0.338867 9.7998 0.205078 9.61816 0.123047 9.43359C0.0410748 9.24233 5.91461e-05 9.03399 0 8.80859C0 8.58317 0.0411364 8.37782 0.123047 8.19336C0.205078 8.00195 0.338867 7.81738 0.523438 7.63965L7.90625 0.410156C8.17964 0.136882 8.5177 0 8.9209 0Z" fill="#0088FE"/>
+                </g>
+              </svg>
+            </button>
           </div>
         </div>
       </div>

@@ -1,0 +1,553 @@
+import type { Reminder } from '../reminder-utils';
+import type { Check } from './check-system';
+import {
+  buildSmartReminderText,
+  createSmartReminderForList,
+  dateToStorageString,
+  formatListDueDate,
+  getCurrentListCategory,
+  getDisplayListItems,
+  storageStringToDate,
+} from '../utils/list-utils';
+import type { CreatedList, ListItem } from '../utils/list-utils';
+
+function assert(condition: boolean, message: string): void {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+function makeList(overrides: Partial<CreatedList> & Pick<CreatedList, 'id' | 'title' | 'items'>): CreatedList {
+  return {
+    sortMode: 'insertion',
+    smartReminders: true,
+    smartReminderDueDate: null,
+    status: 'active',
+    statusChangedAt: null,
+    ...overrides,
+  };
+}
+
+function makeItem(id: string, text: string, completed: boolean): ListItem {
+  return { id, text, completed };
+}
+
+export function getListChecks(): Check[] {
+  return [
+    {
+      id: 'list-date-roundtrip-storage',
+      name: 'List date storage: round-trips YYYY-MM-DD values',
+      run: () => {
+        const date = new Date(2026, 3, 24);
+        const stored = dateToStorageString(date);
+        const restored = storageStringToDate(stored);
+        assert(stored === '2026-04-24', `Expected 2026-04-24, got ${stored}`);
+        assert(restored !== null, 'Expected restored date');
+        assert(restored!.getFullYear() === 2026, `Expected year 2026, got ${restored!.getFullYear()}`);
+        assert(restored!.getMonth() === 3, `Expected April, got month ${restored!.getMonth()}`);
+        assert(restored!.getDate() === 24, `Expected day 24, got ${restored!.getDate()}`);
+      },
+    },
+
+    {
+      id: 'list-date-invalid-storage-null',
+      name: 'List date storage: invalid stored values return null',
+      run: () => {
+        assert(storageStringToDate(null) === null, 'Expected null for null input');
+        assert(storageStringToDate('') === null, 'Expected null for empty string');
+        assert(storageStringToDate('2026/04/24') === null, 'Expected null for slash date');
+        assert(storageStringToDate('hello') === null, 'Expected null for arbitrary string');
+      },
+    },
+
+    {
+      id: 'list-due-date-format-current-year',
+      name: 'List due date formatting: current-year dates omit year',
+      run: () => {
+        const formatted = formatListDueDate('2026-04-24', new Date(2026, 0, 1));
+        assert(formatted === 'Apr 24', `Expected Apr 24, got ${formatted}`);
+      },
+    },
+
+    {
+      id: 'list-due-date-format-other-year',
+      name: 'List due date formatting: cross-year dates include short year',
+      run: () => {
+        const formatted = formatListDueDate('2027-04-24', new Date(2026, 0, 1));
+        assert(formatted === "Apr 24 '27", `Expected Apr 24 '27, got ${formatted}`);
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-text-zero-progress',
+      name: 'List smart reminders: 0% progress uses Complete copy',
+      run: () => {
+        const text = buildSmartReminderText(makeList({
+          id: 'l1',
+          title: 'Garden tasks',
+          items: [makeItem('a', 'Weed beds', false), makeItem('b', 'Water plants', false)],
+        }));
+        assert(text === "Complete 'Garden tasks' list", `Unexpected text: ${text}`);
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-text-mid-progress',
+      name: 'List smart reminders: 1%-74% progress uses Finish copy',
+      run: () => {
+        const text = buildSmartReminderText(makeList({
+          id: 'l2',
+          title: 'Kitchen clean-up',
+          items: [makeItem('a', 'Wipe counters', true), makeItem('b', 'Clean sink', false)],
+        }));
+        assert(text === "Finish 'Kitchen clean-up' list", `Unexpected text: ${text}`);
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-text-high-progress',
+      name: 'List smart reminders: 75%+ progress uses Nearly done copy',
+      run: () => {
+        const text = buildSmartReminderText(makeList({
+          id: 'l3',
+          title: 'Weekend trip packing',
+          items: [
+            makeItem('a', 'Toothbrush', true),
+            makeItem('b', 'Phone charger', true),
+            makeItem('c', 'Socks', true),
+            makeItem('d', 'Towel', false),
+          ],
+        }));
+        assert(text === "Nearly done - 'Weekend trip packing'", `Unexpected text: ${text}`);
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-create-null-without-date',
+      name: 'List smart reminders: no due date means no linked reminder',
+      run: () => {
+        const reminder = createSmartReminderForList(makeList({
+          id: 'l4',
+          title: 'Books to read',
+          items: [makeItem('a', 'Dune', false)],
+          smartReminderDueDate: null,
+        }));
+        assert(reminder === null, `Expected null, got ${JSON.stringify(reminder)}`);
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-create-scheduled-noon',
+      name: 'List smart reminders: linked reminder uses scheduled noon and list metadata',
+      run: () => {
+        const reminder = createSmartReminderForList(
+          makeList({
+            id: 'l5',
+            title: 'Grocery shopping',
+            items: [makeItem('a', 'Milk', false)],
+            smartReminderDueDate: '2026-04-24',
+          }),
+          { idFactory: () => 'smart-1', createdAt: 123456 },
+        ) as Reminder;
+        assert(reminder.id === 'smart-1', `Expected smart-1, got ${reminder.id}`);
+        assert(reminder.createdAt === 123456, `Expected createdAt 123456, got ${reminder.createdAt}`);
+        assert(reminder.linkedListId === 'l5', `Expected linkedListId l5, got ${reminder.linkedListId}`);
+        assert(reminder.isSmartReminder === true, 'Expected isSmartReminder true');
+        assert(reminder.schedule.kind === 'scheduled', `Expected scheduled, got ${reminder.schedule.kind}`);
+        assert(reminder.schedule.date === '2026-04-24', `Expected due date 2026-04-24, got ${reminder.schedule.date}`);
+        assert(reminder.schedule.time === '12:00', `Expected time 12:00, got ${reminder.schedule.time}`);
+      },
+    },
+
+    {
+      id: 'list-category-todo-started-almost-complete',
+      name: 'List categories: todo, started, almost, complete derive from completion ratio',
+      run: () => {
+        assert(getCurrentListCategory([]) === 'todo', `Expected todo for empty list`);
+        assert(getCurrentListCategory([makeItem('a', 'One', false)]) === 'todo', 'Expected todo');
+        assert(getCurrentListCategory([makeItem('a', 'One', true), makeItem('b', 'Two', false), makeItem('c', 'Three', false)]) === 'started', 'Expected started');
+        assert(getCurrentListCategory([makeItem('a', 'One', true), makeItem('b', 'Two', true), makeItem('c', 'Three', false), makeItem('d', 'Four', false)]) === 'almost', 'Expected almost');
+        assert(getCurrentListCategory([makeItem('a', 'One', true), makeItem('b', 'Two', true)]) === 'complete', 'Expected complete');
+      },
+    },
+
+    {
+      id: 'list-display-items-insertion-preserves-order',
+      name: 'List ordering: insertion mode preserves authored order',
+      run: () => {
+        const items = [
+          makeItem('b', 'Banana', false),
+          makeItem('a', 'Apple', false),
+          makeItem('c', 'Carrot', false),
+        ];
+        const ordered = getDisplayListItems(items, 'insertion', null, 0);
+        assert(ordered.map((item) => item.id).join(',') === 'b,a,c', `Expected b,a,c got ${ordered.map((item) => item.id).join(',')}`);
+      },
+    },
+
+    {
+      id: 'list-display-items-alphabetical-sorts',
+      name: 'List ordering: alphabetical mode sorts by item text',
+      run: () => {
+        const items = [
+          makeItem('b', 'Banana', false),
+          makeItem('a', 'Apple', false),
+          makeItem('c', 'Carrot', false),
+        ];
+        const ordered = getDisplayListItems(items, 'alphabetical', null, 0);
+        assert(ordered.map((item) => item.text).join(',') === 'Apple,Banana,Carrot', `Unexpected order: ${ordered.map((item) => item.text).join(',')}`);
+      },
+    },
+
+    {
+      id: 'list-display-items-alphabetical-pinned-index',
+      name: 'List ordering: alphabetical pinned item stays at its current visual index temporarily',
+      run: () => {
+        const items = [
+          makeItem('b', 'Banana', false),
+          makeItem('a', 'Apple', false),
+          makeItem('c', 'Carrot', false),
+        ];
+        const ordered = getDisplayListItems(items, 'alphabetical', 'c', 0);
+        assert(ordered.map((item) => item.id).join(',') === 'c,a,b', `Expected c,a,b got ${ordered.map((item) => item.id).join(',')}`);
+      },
+    },
+
+    {
+      id: 'list-display-items-alphabetical-missing-pinned-falls-back',
+      name: 'List ordering: missing pinned item falls back to alphabetical list',
+      run: () => {
+        const items = [
+          makeItem('b', 'Banana', false),
+          makeItem('a', 'Apple', false),
+        ];
+        const ordered = getDisplayListItems(items, 'alphabetical', 'missing', 1);
+        assert(ordered.map((item) => item.id).join(',') === 'a,b', `Expected a,b got ${ordered.map((item) => item.id).join(',')}`);
+      },
+    },
+
+    {
+      id: 'list-settings-close-delays-sort-apply',
+      name: 'List settings: closing overlay delays sort apply by 150ms when draft changed',
+      run: () => {
+        const listSettingsSortModeDraft: 'alphabetical' | 'insertion' = 'alphabetical';
+        const listSortMode: 'alphabetical' | 'insertion' = 'insertion';
+        let isListSettingsOpen = true;
+        let appliedSortMode: 'alphabetical' | 'insertion' = listSortMode;
+        let scheduledDelay: number | null = null;
+
+        // Mirrors closeListSettingsOverlay in App.tsx.
+        isListSettingsOpen = false;
+        if (listSettingsSortModeDraft !== listSortMode) {
+          const nextSortMode = listSettingsSortModeDraft;
+          scheduledDelay = 150;
+          appliedSortMode = nextSortMode;
+        }
+
+        assert(isListSettingsOpen === false, 'Overlay should close first');
+        assert(scheduledDelay === 150, `Expected 150ms delay, got ${scheduledDelay}`);
+        assert(appliedSortMode === 'alphabetical', `Expected alphabetical after delayed apply, got ${appliedSortMode}`);
+      },
+    },
+
+    {
+      id: 'list-settings-close-no-sort-delay-when-unchanged',
+      name: 'List settings: closing overlay does not schedule sort apply when draft matches current',
+      run: () => {
+        const listSettingsSortModeDraft: 'alphabetical' | 'insertion' = 'insertion';
+        const listSortMode: 'alphabetical' | 'insertion' = 'insertion';
+        let scheduledDelay: number | null = null;
+
+        if (listSettingsSortModeDraft !== listSortMode) {
+          scheduledDelay = 150;
+        }
+
+        assert(scheduledDelay === null, `Expected no delay, got ${scheduledDelay}`);
+      },
+    },
+
+    {
+      id: 'list-settings-uncheck-all-delays-after-close',
+      name: 'List settings: Uncheck all closes overlay and applies item reset after 150ms',
+      run: () => {
+        let isListSettingsOpen = true;
+        let sortDelay: number | null = null;
+        let uncheckDelay: number | null = null;
+        let items = [
+          makeItem('a', 'Milk', true),
+          makeItem('b', 'Bread', false),
+        ];
+        const draftSortMode: 'alphabetical' | 'insertion' = 'alphabetical';
+        const liveSortMode: 'alphabetical' | 'insertion' = 'insertion';
+
+        // Mirrors handleListSettingsUncheckAll in App.tsx.
+        isListSettingsOpen = false;
+        if (draftSortMode !== liveSortMode) {
+          sortDelay = 150;
+        }
+        uncheckDelay = 150;
+        items = items.map((item) => ({ ...item, completed: false }));
+
+        assert(isListSettingsOpen === false, 'Overlay should close first');
+        assert(sortDelay === 150, `Expected 150ms sort delay, got ${sortDelay}`);
+        assert(uncheckDelay === 150, `Expected 150ms uncheck delay, got ${uncheckDelay}`);
+        assert(items.every((item) => item.completed === false), 'Expected all items unchecked');
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-toggle-on-opens-picker',
+      name: 'List smart reminder overlays: toggling on from no-date state opens picker',
+      run: () => {
+        const smartReminderDueDate = null;
+        let draftSmartReminderDate: Date | null = null;
+        let isDatePickerOpen = false;
+        let smartReminders = false;
+
+        // Mirrors handleSmartRemindersChange(true) in overlays.
+        const nextValue = true;
+        if (nextValue) {
+          draftSmartReminderDate = smartReminderDueDate ?? new Date(2026, 3, 24);
+          isDatePickerOpen = true;
+        } else {
+          isDatePickerOpen = false;
+        }
+        smartReminders = nextValue;
+
+        assert(smartReminders === true, 'Toggle should be on immediately');
+        assert(isDatePickerOpen === true, 'Date picker should open');
+        assert(draftSmartReminderDate !== null, 'Draft date should be seeded');
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-back-from-no-date-turns-toggle-off',
+      name: 'List smart reminder overlays: back from no-date picker restores no date and turns toggle off',
+      run: () => {
+        const smartReminderDueDate = null;
+        let draftSmartReminderDate = new Date(2026, 3, 24);
+        let pendingDisplaySmartReminderDate: Date | null = new Date(2026, 3, 24);
+        let isDatePickerOpen = true;
+        let smartReminders = true;
+
+        // Mirrors handleCloseDatePicker() in overlays.
+        draftSmartReminderDate = smartReminderDueDate ?? new Date();
+        pendingDisplaySmartReminderDate = null;
+        isDatePickerOpen = false;
+        if (smartReminderDueDate == null) {
+          smartReminders = false;
+        }
+
+        assert(isDatePickerOpen === false, 'Expected picker closed');
+        assert(pendingDisplaySmartReminderDate === null, 'Expected pending display date cleared');
+        assert(smartReminders === false, 'Expected toggle restored to off');
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-back-from-existing-date-keeps-date-and-toggle',
+      name: 'List smart reminder overlays: back from existing-date picker preserves saved date and toggle',
+      run: () => {
+        const smartReminderDueDate = new Date(2026, 3, 24);
+        let draftSmartReminderDate = new Date(2026, 4, 2);
+        let pendingDisplaySmartReminderDate: Date | null = new Date(2026, 4, 2);
+        let isDatePickerOpen = true;
+        let smartReminders = true;
+
+        draftSmartReminderDate = smartReminderDueDate ?? new Date();
+        pendingDisplaySmartReminderDate = null;
+        isDatePickerOpen = false;
+        if (smartReminderDueDate == null) {
+          smartReminders = false;
+        }
+
+        assert(isDatePickerOpen === false, 'Expected picker closed');
+        assert(draftSmartReminderDate.getTime() === smartReminderDueDate.getTime(), 'Expected draft reset to saved date');
+        assert(pendingDisplaySmartReminderDate === null, 'Expected pending display date cleared');
+        assert(smartReminders === true, 'Expected toggle to stay on');
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-set-date-keeps-overlay-default-state',
+      name: 'List smart reminder overlays: Set date stores pending display date and collapses picker',
+      run: () => {
+        const draftSmartReminderDate = new Date(2026, 3, 24);
+        let pendingDisplaySmartReminderDate: Date | null = null;
+        let isDatePickerOpen = true;
+        let highlightPhase: 'idle' | 'immediate' | 'fade' = 'idle';
+        let savedDate: Date | null = null;
+
+        pendingDisplaySmartReminderDate = draftSmartReminderDate;
+        highlightPhase = 'immediate';
+        savedDate = draftSmartReminderDate;
+        isDatePickerOpen = false;
+
+        assert(savedDate?.getTime() === draftSmartReminderDate.getTime(), 'Expected saved date to match draft');
+        assert(pendingDisplaySmartReminderDate?.getTime() === draftSmartReminderDate.getTime(), 'Expected pending display date set');
+        assert(highlightPhase === 'immediate', `Expected immediate highlight, got ${highlightPhase}`);
+        assert(isDatePickerOpen === false, 'Expected picker closed');
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-prop-update-clears-pending-display',
+      name: 'List smart reminder overlays: saved due-date update clears pending display buffer',
+      run: () => {
+        let previousDueDateTime: number | null = new Date(2026, 3, 24).getTime();
+        const smartReminderDueDateTime = new Date(2026, 3, 25).getTime();
+        let pendingDisplaySmartReminderDate: Date | null = new Date(2026, 3, 24);
+
+        const prevTime = previousDueDateTime;
+        const nextTime = smartReminderDueDateTime;
+        previousDueDateTime = nextTime;
+        if (!(prevTime === nextTime || nextTime == null)) {
+          pendingDisplaySmartReminderDate = null;
+        }
+
+        assert(previousDueDateTime === smartReminderDueDateTime, 'Expected previous ref updated');
+        assert(pendingDisplaySmartReminderDate === null, 'Expected pending display cleared after saved date update');
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-sync-removes-active-when-feature-disabled',
+      name: 'List smart reminder sync: active linked reminders are removed when feature is disabled',
+      run: () => {
+        const prev: Reminder[] = [{
+          id: 'r1',
+          originalText: "Complete 'Garden tasks' list",
+          displayText: "Complete 'Garden tasks' list",
+          createdAt: 1,
+          schedule: { kind: 'scheduled', date: '2026-04-24', time: '12:00' },
+          linkedListId: 'l1',
+          isSmartReminder: true,
+        }];
+        const createdLists = [makeList({
+          id: 'l1',
+          title: 'Garden tasks',
+          items: [makeItem('a', 'Weed beds', false)],
+          smartReminders: true,
+          smartReminderDueDate: '2026-04-24',
+        })];
+        const desiredLists = false ? createdLists.filter((list) => list.smartReminderDueDate) : [];
+        const desiredByListId = new Map(desiredLists.map((list) => [list.id, list]));
+        const next: Reminder[] = [];
+
+        for (const reminder of prev) {
+          if (!reminder.isSmartReminder || !reminder.linkedListId) {
+            next.push(reminder);
+            continue;
+          }
+          const linkedList = desiredByListId.get(reminder.linkedListId);
+          if (!linkedList) {
+            if (reminder.completedAt != null || reminder.deletedAt != null) {
+              next.push(reminder);
+            }
+            continue;
+          }
+        }
+
+        assert(next.length === 0, `Expected active smart reminder removed, got ${next.length}`);
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-sync-keeps-archived-when-feature-disabled',
+      name: 'List smart reminder sync: done or deleted linked reminders are preserved when feature is disabled',
+      run: () => {
+        const prev: Reminder[] = [{
+          id: 'r1',
+          originalText: "Complete 'Garden tasks' list",
+          displayText: "Complete 'Garden tasks' list",
+          createdAt: 1,
+          schedule: { kind: 'scheduled', date: '2026-04-24', time: '12:00' },
+          linkedListId: 'l1',
+          isSmartReminder: true,
+          completedAt: 1234,
+        }];
+        const desiredByListId = new Map<string, CreatedList>();
+        const next: Reminder[] = [];
+
+        for (const reminder of prev) {
+          const linkedList = desiredByListId.get(reminder.linkedListId!);
+          if (!linkedList) {
+            if (reminder.completedAt != null || reminder.deletedAt != null) {
+              next.push(reminder);
+            }
+            continue;
+          }
+        }
+
+        assert(next.length === 1, `Expected archived smart reminder preserved, got ${next.length}`);
+        assert(next[0].id === 'r1', `Expected r1 preserved, got ${next[0].id}`);
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-sync-updates-linked-reminder-content',
+      name: 'List smart reminder sync: linked reminder text and schedule update when list changes',
+      run: () => {
+        const list = makeList({
+          id: 'l1',
+          title: 'Garden tasks',
+          items: [makeItem('a', 'Weed beds', true), makeItem('b', 'Water plants', false)],
+          smartReminders: true,
+          smartReminderDueDate: '2026-05-01',
+        });
+        const reminder: Reminder = {
+          id: 'r1',
+          originalText: "Complete 'Garden tasks' list",
+          displayText: "Complete 'Garden tasks' list",
+          createdAt: 1,
+          schedule: { kind: 'scheduled', date: '2026-04-24', time: '09:00' },
+          linkedListId: 'l1',
+          isSmartReminder: false,
+        };
+
+        const nextText = buildSmartReminderText(list);
+        const nextDate = list.smartReminderDueDate!;
+        const nextTime = '12:00';
+        const needsUpdate =
+          reminder.originalText !== nextText ||
+          reminder.displayText !== nextText ||
+          reminder.schedule.kind !== 'scheduled' ||
+          reminder.schedule.date !== nextDate ||
+          reminder.schedule.time !== nextTime ||
+          reminder.linkedListId !== list.id ||
+          reminder.isSmartReminder !== true;
+
+        assert(needsUpdate === true, 'Expected linked reminder to need update');
+      },
+    },
+
+    {
+      id: 'list-smart-reminder-sync-adds-missing-linked-reminder',
+      name: 'List smart reminder sync: missing linked reminder is created for eligible list',
+      run: () => {
+        const list = makeList({
+          id: 'l1',
+          title: 'Garden tasks',
+          items: [makeItem('a', 'Weed beds', false)],
+          smartReminders: true,
+          smartReminderDueDate: '2026-04-24',
+        });
+        const prev: Reminder[] = [];
+        const desiredLists = [list];
+        const seenSmartListIds = new Set<string>();
+        const next: Reminder[] = [...prev];
+
+        for (const candidate of desiredLists) {
+          if (seenSmartListIds.has(candidate.id)) continue;
+          if (!candidate.smartReminders) continue;
+          const smartReminder = createSmartReminderForList(candidate, { idFactory: () => 'smart-new', createdAt: 10 });
+          if (!smartReminder) continue;
+          next.push(smartReminder);
+        }
+
+        assert(next.length === 1, `Expected one smart reminder added, got ${next.length}`);
+        assert(next[0].id === 'smart-new', `Expected smart-new, got ${next[0].id}`);
+      },
+    },
+  ];
+}

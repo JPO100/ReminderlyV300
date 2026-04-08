@@ -178,8 +178,8 @@ export default function ReminderInfoOverlay({
           tabIndex={-1}
           role="dialog"
           aria-modal="true"
-          className="bg-white relative flex flex-col gap-[40px] items-center pt-[24px] pb-[24px] px-[24px] rounded-[32px] pointer-events-auto outline-none"
-          style={{ width: 322 }}
+          className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] pointer-events-auto outline-none"
+          style={{ width: 340 }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Reminder text in single quotes */}
@@ -189,7 +189,7 @@ export default function ReminderInfoOverlay({
 
           {/* Due line */}
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[17px] text-center w-[min-content]" style={{ color: dueLineColour }}>
-            <p className="leading-[normal] whitespace-pre-wrap">{dueLine}</p>
+            <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{dueLine}</p>
           </div>
 
           {smartReminderLine && (
@@ -203,21 +203,21 @@ export default function ReminderInfoOverlay({
                   </g>
                 </svg>
               </div>
-              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] text-center">
-                <p className="leading-[normal] whitespace-pre-wrap">{smartReminderLine}</p>
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#bababa] text-[17px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{smartReminderLine}</p>
               </div>
             </div>
           )}
 
           {/* Repeats line (optional) */}
           {repeatsLine && (
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[#1c2c42] text-[17px] text-center w-[min-content]">
-              <p className="leading-[normal] whitespace-pre-wrap">{repeatsLine}</p>
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[#bababa] text-[17px] text-center w-[min-content]">
+              <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{repeatsLine}</p>
             </div>
           )}
 
           {/* Buttons */}
-          <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
+          <div className="content-stretch flex flex-col gap-[30px] items-start mt-[7px] relative shrink-0 w-full">
             <button
               className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
               onClick={onMarkAsDone}

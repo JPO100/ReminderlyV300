@@ -32,15 +32,18 @@ export default function EditableListItem({
 }: EditableListItemProps) {
     const DELETE_REVEAL_OFFSET = 64;
     const SWIPE_REVEAL_THRESHOLD = 28;
+    const UNCHECK_FADE_MS = 150;
     const [isFocused, setIsFocused] = useState(false);
     const [hasTypedSinceFocus, setHasTypedSinceFocus] = useState(false);
     const [draftValue, setDraftValue] = useState(name);
     const [dragOffsetX, setDragOffsetX] = useState(0);
     const [isSwipeDragging, setIsSwipeDragging] = useState(false);
+    const [isAnimatingUncheck, setIsAnimatingUncheck] = useState(false);
     const lastCommittedValueRef = useRef(name);
     const rootRef = useRef<HTMLDivElement | null>(null);
     const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
     const swipeActiveRef = useRef(false);
+    const previousCompletedRef = useRef(Boolean(completed));
 
     const showGrey = editable && isFocused && !hasTypedSinceFocus;
     const textColor = isDeleteRevealed ? "#FF1E0A" : isHighlighted ? accentColor : completed ? "#1C2C42" : showGrey ? "#B7B7B7" : "#1c2c42";
@@ -50,6 +53,26 @@ export default function EditableListItem({
         setDraftValue(name);
         lastCommittedValueRef.current = name;
     }, [name]);
+
+    useEffect(() => {
+        const wasCompleted = previousCompletedRef.current;
+        const isCompleted = Boolean(completed);
+
+        if (wasCompleted && !isCompleted) {
+            setIsAnimatingUncheck(true);
+            const timeoutId = window.setTimeout(() => {
+                setIsAnimatingUncheck(false);
+            }, UNCHECK_FADE_MS);
+            previousCompletedRef.current = isCompleted;
+            return () => window.clearTimeout(timeoutId);
+        }
+
+        if (isCompleted) {
+            setIsAnimatingUncheck(false);
+        }
+
+        previousCompletedRef.current = isCompleted;
+    }, [completed]);
 
     useEffect(() => {
         if (!isDeleteRevealed) return;
@@ -162,23 +185,31 @@ export default function EditableListItem({
                     disabled={isDeleteRevealed}
                 >
                     <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                        {completed ? (
-                            <g>
-                                <rect fill="#1C2C42" height="23" rx="11.5" width="23" x="1" y="1" />
-                                <rect height="23" rx="11.5" stroke="#1C2C42" strokeWidth="2" width="23" x="1" y="1" />
-                                <path d={DONE_TICK_PATH} fill="white" />
-                            </g>
-                        ) : (
-                            <circle
-                                cx="12.5"
-                                cy="12.5"
-                                fill="var(--fill-0, white)"
-                                id="Tick box"
-                                r="11.5"
-                                stroke={circleColor}
-                                strokeWidth="2"
-                            />
-                        )}
+                        <circle
+                            cx="12.5"
+                            cy="12.5"
+                            fill="var(--fill-0, white)"
+                            id="Tick box"
+                            r="11.5"
+                            stroke={circleColor}
+                            strokeWidth="2"
+                        />
+                    </svg>
+                    <svg
+                        className="absolute inset-0 block size-full"
+                        fill="none"
+                        preserveAspectRatio="none"
+                        viewBox="0 0 25 25"
+                        style={{
+                            opacity: completed ? 1 : (isAnimatingUncheck ? 0 : 0),
+                            transition: `opacity ${UNCHECK_FADE_MS}ms ease`,
+                        }}
+                    >
+                        <g>
+                            <rect fill="#1C2C42" height="23" rx="11.5" width="23" x="1" y="1" />
+                            <rect height="23" rx="11.5" stroke="#1C2C42" strokeWidth="2" width="23" x="1" y="1" />
+                            <path d={DONE_TICK_PATH} fill="white" />
+                        </g>
                     </svg>
                 </button>
                 <div className="content-stretch relative flex w-[278px] shrink-0 flex-col items-start justify-center self-center">

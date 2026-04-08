@@ -8,6 +8,7 @@ import { getNlcInteractionChecks } from "../dev/nlc-interaction-checks";
 import { getDoneDeletedChecks } from "../dev/done-deleted-checks";
 import { getCompletionChecks } from "../dev/completion-checks";
 import { getDevToolsChecks } from "../dev/dev-tools-checks";
+import { getListChecks } from "../dev/list-checks";
 import type { Check } from "../dev/check-system";
 import DevToolsHome from "../../imports/DevTools";
 import DummyRemindersPage from "../../imports/DummyReminders";
@@ -86,8 +87,9 @@ function SelfChecks({ onBack, onClose }: { onBack: () => void; onClose: () => vo
         const nlcInteractionChecks = getNlcInteractionChecks().map(c => ({ ...c, name: `[Natural language interaction] ${c.name}` }));
         const doneDeletedChecks = getDoneDeletedChecks().map(c => ({ ...c, name: `[Done, deleted, and completion] ${c.name}` }));
         const completionChecks = getCompletionChecks().map(c => ({ ...c, name: `[Done, deleted, and completion] ${c.name}` }));
+        const listChecks = getListChecks().map(c => ({ ...c, name: `[Lists and smart reminders] ${c.name}` }));
         const devToolsChecks = getDevToolsChecks().map(c => ({ ...c, name: `[Dev tools and feature flags] ${c.name}` }));
-        return [...scheduleChecks, ...reminderChecks, ...nlcParserChecks, ...nlcInteractionChecks, ...doneDeletedChecks, ...completionChecks, ...devToolsChecks];
+        return [...scheduleChecks, ...reminderChecks, ...nlcParserChecks, ...nlcInteractionChecks, ...doneDeletedChecks, ...completionChecks, ...listChecks, ...devToolsChecks];
       });
       setReport(result);
     } catch (error) {
