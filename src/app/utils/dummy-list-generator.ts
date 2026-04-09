@@ -22,6 +22,19 @@ export interface GeneratedList {
   statusChangedAt?: number | null;
 }
 
+export interface GeneratedSavedList {
+  id: string;
+  title: string;
+  items: ListItem[];
+  status?: 'active' | 'deleted';
+  statusChangedAt?: number | null;
+}
+
+export interface GeneratedDummyListsPayload {
+  lists: GeneratedList[];
+  savedLists: GeneratedSavedList[];
+}
+
 // Each entry: [listTitle, ...possible items related to that title]
 const LIST_TEMPLATES: [string, string[]][] = [
   ['Grocery shopping', [
@@ -202,7 +215,8 @@ export function generateDummyLists(
   maxListItems: number,
   includeDoneItems: boolean,
   includeSmartReminderLists: boolean,
-): GeneratedList[] {
+  includeSavedLists: boolean,
+): GeneratedDummyListsPayload {
   const count = Math.max(4, Math.min(numberOfLists, LIST_TEMPLATES.length));
   const allTemplates = shuffleArray(LIST_TEMPLATES);
 
@@ -260,5 +274,25 @@ export function generateDummyLists(
     };
   });
 
-  return [...guaranteedLists, ...extraLists];
+  const usedTitles = new Set([...guaranteedLists, ...extraLists].map((list) => list.title));
+  const savedListTemplates = shuffleArray(
+    LIST_TEMPLATES.filter(([title]) => !usedTitles.has(title)),
+  ).slice(0, includeSavedLists ? 7 : 0);
+
+  const savedLists: GeneratedSavedList[] = savedListTemplates.map(([title, allItems]) => {
+    const itemCount = Math.max(2, Math.floor(Math.random() * maxListItems) + 1);
+    const selectedItems = shuffleArray(allItems).slice(0, Math.min(itemCount, allItems.length));
+    return {
+      id: crypto.randomUUID(),
+      title,
+      items: selectedItems.map((text) => ({ text, completed: false })),
+      status: 'active',
+      statusChangedAt: null,
+    };
+  });
+
+  return {
+    lists: [...guaranteedLists, ...extraLists],
+    savedLists,
+  };
 }

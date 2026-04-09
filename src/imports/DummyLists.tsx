@@ -2,7 +2,7 @@ import svgPaths from "./svg-enpj30u9ti";
 import { useState, useEffect, useRef } from "react";
 import { isListsEnabled } from "../app/utils/featureFlags";
 import { generateDummyLists } from "../app/utils/dummy-list-generator";
-import type { GeneratedList } from "../app/utils/dummy-list-generator";
+import type { GeneratedDummyListsPayload } from "../app/utils/dummy-list-generator";
 
 function Header({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
   return (
@@ -37,11 +37,13 @@ function Header({ onBack, onClose }: { onBack: () => void; onClose: () => void }
   );
 }
 
-export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLists }: { onBack: () => void; onClose: () => void; onClearLists: () => void; onGenerateLists: (lists: GeneratedList[]) => void }) {
+export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLists }: { onBack: () => void; onClose: () => void; onClearLists: () => void; onGenerateLists: (payload: GeneratedDummyListsPayload) => void }) {
   const [numberOfLists, setNumberOfLists] = useState("11");
   const [maxListItems, setMaxListItems] = useState("15");
   const [includeDone, setIncludeDone] = useState(true);
   const [includeSmartReminderLists, setIncludeSmartReminderLists] = useState(true);
+  const [includeSavedLists, setIncludeSavedLists] = useState(true);
+  const [showDone, setShowDone] = useState(false);
   const [clearState, setClearState] = useState<'idle' | 'confirming' | 'cleared'>('idle');
   const clearBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -83,13 +85,16 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
   };
 
   const handleGenerate = () => {
+    if (showDone) return;
     const lists = generateDummyLists(
       parseCount(numberOfLists),
       parseCount(maxListItems),
       includeDone,
       includeSmartReminderLists,
+      includeSavedLists,
     );
     onGenerateLists(lists);
+    setShowDone(true);
     setTimeout(() => {
       onClose();
     }, 500);
@@ -175,6 +180,23 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
               </div>
             </div>
           </button>
+          <button
+            onClick={() => setIncludeSavedLists(!includeSavedLists)}
+            className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
+          >
+            <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
+              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSavedLists ? '#1C2C42' : '#C9C9C9' }}>Include Saved lists</p>
+            </div>
+            <div
+              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSavedLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+            >
+              <div className="relative shrink-0 size-[22.5px]">
+                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+                  <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
+                </svg>
+              </div>
+            </div>
+          </button>
         </div>
         {/* Clear lists and Generate lists buttons */}
         <div className="flex gap-[30px] items-center relative shrink-0 w-full">
@@ -195,14 +217,14 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
           </button>
           <button
             onClick={handleGenerate}
-            className="bg-[#4784F8] relative rounded-[100px] flex-1 cursor-pointer"
+            className={`${showDone ? 'bg-[#3060C0]' : 'bg-[#4784F8]'} relative rounded-[100px] flex-1 cursor-pointer`}
             data-name="generate-btn"
             style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
           >
             <div className="flex flex-row items-center justify-center size-full">
               <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
                 <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-                  <p className="leading-[normal]">Generate lists</p>
+                  <p className="leading-[normal]">{showDone ? 'Done' : 'Generate lists'}</p>
                 </div>
               </div>
             </div>
