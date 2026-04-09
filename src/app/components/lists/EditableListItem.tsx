@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
 const DONE_TICK_PATH = "M16.2615 8.39052C16.7715 7.86975 17.599 7.8699 18.1091 8.39052C18.6187 8.91126 18.6187 9.75551 18.1091 10.2763L11.3376 17.1903C11.0808 17.4525 10.7437 17.5819 10.407 17.58C10.0711 17.5887 9.73154 17.4668 9.46948 17.2108L6.40308 14.2157C5.882 13.7063 5.86382 12.8619 6.36206 12.33C6.86047 11.7985 7.6864 11.7808 8.20776 12.2899L10.3718 14.4042L16.2615 8.39052Z";
@@ -15,6 +16,7 @@ type EditableListItemProps = {
     onToggle?: () => void;
     isHighlighted?: boolean;
     accentColor?: string;
+    leadingIcon?: ReactNode;
 };
 
 export default function EditableListItem({
@@ -29,6 +31,7 @@ export default function EditableListItem({
     onToggle,
     isHighlighted,
     accentColor = "#00AFEE",
+    leadingIcon,
 }: EditableListItemProps) {
     const DELETE_REVEAL_OFFSET = 64;
     const SWIPE_REVEAL_THRESHOLD = 28;
@@ -178,40 +181,46 @@ export default function EditableListItem({
                     resetSwipeTracking();
                 }}
             >
-                <button
-                    className="relative size-[25px] shrink-0 self-center cursor-pointer border-none bg-transparent p-0 leading-[0]"
-                    data-name="Tick box"
-                    onClick={isDeleteRevealed ? undefined : onToggle}
-                    disabled={isDeleteRevealed}
-                >
-                    <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                        <circle
-                            cx="12.5"
-                            cy="12.5"
-                            fill="var(--fill-0, white)"
-                            id="Tick box"
-                            r="11.5"
-                            stroke={circleColor}
-                            strokeWidth="2"
-                        />
-                    </svg>
-                    <svg
-                        className="absolute inset-0 block size-full"
-                        fill="none"
-                        preserveAspectRatio="none"
-                        viewBox="0 0 25 25"
-                        style={{
-                            opacity: completed ? 1 : (isAnimatingUncheck ? 0 : 0),
-                            transition: `opacity ${UNCHECK_FADE_MS}ms ease`,
-                        }}
+                {leadingIcon ? (
+                    <div className="relative size-[25px] shrink-0 self-center" data-name="Tick box">
+                        {leadingIcon}
+                    </div>
+                ) : (
+                    <button
+                        className="relative size-[25px] shrink-0 self-center cursor-pointer border-none bg-transparent p-0 leading-[0]"
+                        data-name="Tick box"
+                        onClick={isDeleteRevealed ? undefined : onToggle}
+                        disabled={isDeleteRevealed}
                     >
-                        <g>
-                            <rect fill="#1C2C42" height="23" rx="11.5" width="23" x="1" y="1" />
-                            <rect height="23" rx="11.5" stroke="#1C2C42" strokeWidth="2" width="23" x="1" y="1" />
-                            <path d={DONE_TICK_PATH} fill="white" />
-                        </g>
-                    </svg>
-                </button>
+                        <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                            <circle
+                                cx="12.5"
+                                cy="12.5"
+                                fill="var(--fill-0, white)"
+                                id="Tick box"
+                                r="11.5"
+                                stroke={circleColor}
+                                strokeWidth="2"
+                            />
+                        </svg>
+                        <svg
+                            className="absolute inset-0 block size-full"
+                            fill="none"
+                            preserveAspectRatio="none"
+                            viewBox="0 0 25 25"
+                            style={{
+                                opacity: completed ? 1 : (isAnimatingUncheck ? 0 : 0),
+                                transition: `opacity ${UNCHECK_FADE_MS}ms ease`,
+                            }}
+                        >
+                            <g>
+                                <rect fill="#1C2C42" height="23" rx="11.5" width="23" x="1" y="1" />
+                                <rect height="23" rx="11.5" stroke="#1C2C42" strokeWidth="2" width="23" x="1" y="1" />
+                                <path d={DONE_TICK_PATH} fill="white" />
+                            </g>
+                        </svg>
+                    </button>
+                )}
                 <div className="content-stretch relative flex w-[278px] shrink-0 flex-col items-start justify-center self-center">
                     {editable ? (
                         <input

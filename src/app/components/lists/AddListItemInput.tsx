@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 
 function AddTickButton({ active }: { active: boolean }) {
@@ -22,6 +23,8 @@ type AddListItemInputProps = {
     isEmpty?: boolean;
     accentColor?: string;
     idleCircleColor?: string;
+    leadingIcon?: ReactNode;
+    activeLeadingIcon?: ReactNode;
 };
 
 export default function AddListItemInput({
@@ -29,9 +32,12 @@ export default function AddListItemInput({
     isEmpty,
     accentColor = "#D9D9D9",
     idleCircleColor,
+    leadingIcon,
+    activeLeadingIcon,
 }: AddListItemInputProps) {
     const [itemText, setItemText] = useState("");
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const hasTypedText = itemText.trim().length > 0;
 
     const handleAdd = () => {
         const trimmed = itemText.trim();
@@ -44,9 +50,11 @@ export default function AddListItemInput({
         <div className="content-stretch relative flex w-full flex-col items-start pr-px" data-name="list-item">
             <div className="content-stretch relative flex h-[33px] w-full shrink-0 items-center gap-[16px]">
                 <div className="relative size-[25px] shrink-0" data-name="Tick box">
-                    <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                        <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={idleCircleColor ?? accentColor} strokeWidth="2" />
-                    </svg>
+                    {leadingIcon ? (hasTypedText ? (activeLeadingIcon ?? leadingIcon) : leadingIcon) : (
+                        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                            <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={hasTypedText ? accentColor : (idleCircleColor ?? accentColor)} strokeWidth="2" />
+                        </svg>
+                    )}
                 </div>
                 <div className="content-stretch relative flex min-h-px min-w-px flex-[1_0_0] flex-col items-start justify-center">
                     <input
