@@ -131,6 +131,20 @@ function MarkAsDoneBtn({ onClick }: { onClick: () => void }) {
   );
 }
 
+function EditListBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <button className="bg-[#1c2c42] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="edit-list-btn" onClick={onClick}>
+      <div className="flex flex-row items-center justify-center size-full">
+        <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+            <p className="leading-[normal]">Edit list</p>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+}
+
 function DeleteBtn({ onClick }: { onClick: () => void }) {
   return (
     <button className="bg-[#939393] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="delete-btn" onClick={onClick}>
@@ -145,19 +159,20 @@ function DeleteBtn({ onClick }: { onClick: () => void }) {
   );
 }
 
-function Buttons({ onMarkAsDone, onDelete, showActionButtons }: { onMarkAsDone: () => void; onDelete: () => void; showActionButtons: boolean }) {
+function Buttons({ onMarkAsDone, onEdit, onDelete, showActionButtons }: { onMarkAsDone: () => void; onEdit: () => void; onDelete: () => void; showActionButtons: boolean }) {
   if (!showActionButtons) return null;
   return (
     <div className="content-stretch flex flex-col gap-[30px] items-start mt-[12px] relative shrink-0 w-full" data-name="buttons">
       <>
         <MarkAsDoneBtn onClick={onMarkAsDone} />
+        <EditListBtn onClick={onEdit} />
         <DeleteBtn onClick={onDelete} />
       </>
     </div>
   );
 }
 
-export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange, showSmartReminders, smartReminderDueDate, onSetSmartReminderDueDate, onMarkAsDone, onDelete }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; showSmartReminders: boolean; smartReminderDueDate: Date | null; onSetSmartReminderDueDate: (date: Date) => void; onMarkAsDone: () => void; onDelete: () => void }) {
+export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange, showSmartReminders, smartReminderDueDate, onSetSmartReminderDueDate, onMarkAsDone, onEdit, onDelete }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; showSmartReminders: boolean; smartReminderDueDate: Date | null; onSetSmartReminderDueDate: (date: Date) => void; onMarkAsDone: () => void; onEdit: () => void; onDelete: () => void }) {
   const smartRemindersActive = showSmartReminders && smartReminders;
   const [draftSmartReminderDate, setDraftSmartReminderDate] = useState<Date>(smartReminderDueDate ?? new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(smartRemindersActive && smartReminderDueDate == null);
@@ -246,7 +261,7 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
           <Frame3 smartReminders={smartReminders} onSmartRemindersChange={handleSmartRemindersChange} displaySmartReminderDate={displaySmartReminderDate} selectedSmartReminderDate={draftSmartReminderDate} isDatePickerOpen={isDatePickerOpen} onDateSelect={setDraftSmartReminderDate} onSetDate={handleSetDate} onCloseDatePicker={handleCloseDatePicker} onOpenDatePicker={handleOpenDatePicker} highlightDueDate={dueDateHighlightPhase !== 'idle'} animateFadeOut={dueDateHighlightPhase === 'fade'} />
         </div>
       )}
-      <Buttons onMarkAsDone={onMarkAsDone} onDelete={onDelete} showActionButtons={!smartRemindersActive || !isDatePickerOpen} />
+      <Buttons onMarkAsDone={onMarkAsDone} onEdit={onEdit} onDelete={onDelete} showActionButtons={!smartRemindersActive || !isDatePickerOpen} />
     </div>
   );
 }

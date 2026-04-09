@@ -46,6 +46,12 @@ export default function AddListItemInput({
         setItemText("");
     };
 
+    const focusInputWithoutScroll = () => {
+        inputRef.current?.focus({ preventScroll: true });
+        const valueLength = inputRef.current?.value.length ?? 0;
+        inputRef.current?.setSelectionRange(valueLength, valueLength);
+    };
+
     return (
         <div className="content-stretch relative flex w-full flex-col items-start pr-px" data-name="list-item">
             <div className="content-stretch relative flex h-[33px] w-full shrink-0 items-center gap-[16px]">
@@ -63,9 +69,8 @@ export default function AddListItemInput({
                         value={itemText}
                         onChange={(event) => setItemText(event.target.value)}
                         onPointerDownCapture={(event) => {
-                            if (!isEmpty) return;
                             event.preventDefault();
-                            inputRef.current?.focus({ preventScroll: true });
+                            focusInputWithoutScroll();
                         }}
                         onKeyDown={(event) => {
                             if (event.key === "Enter") handleAdd();

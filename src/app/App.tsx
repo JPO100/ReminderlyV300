@@ -341,6 +341,7 @@ export default function App() {
   const [activeFilter, setActiveFilter] = useState<ReminderCategory | "all">("all");
   const [activeListFilter, setActiveListFilter] = useState<"all" | "complete" | "almost" | "started" | "todo" | "grouped-todo">("all");
   const [savedListsPanelOpen, setSavedListsPanelOpen] = useState(false);
+  const [restoreSavedListsPanelAfterOverlayClose, setRestoreSavedListsPanelAfterOverlayClose] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode | 'lists-done'>("list");
 
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
@@ -348,7 +349,7 @@ export default function App() {
   const [isListsOverlayOpen, setIsListsOverlayOpen] = useState(false);
   const [isSavedListsOverlayOpen, setIsSavedListsOverlayOpen] = useState(false);
   const [savedListMenuId, setSavedListMenuId] = useState<string | null>(null);
-  const [savedListUseFeedback, setSavedListUseFeedback] = useState<{ id: string; createdListId: string; stage: 'idle' | 'copied' | 'blank' | 'go' } | null>(null);
+  const [savedListUseFeedback, setSavedListUseFeedback] = useState<{ id: string; createdListId: string; stage: 'idle' | 'fill' | 'copied' | 'blank' | 'go' } | null>(null);
   const [editingSavedListId, setEditingSavedListId] = useState<string | null>(null);
   const [listItems, setListItems] = useState<ListItem[]>([]);
   const [listTitle, setListTitle] = useState("");
@@ -1366,7 +1367,21 @@ export default function App() {
     setListSortMode('insertion');
     setListSmartReminders(false);
     setListSmartReminderDueDate(null);
+    setRestoreSavedListsPanelAfterOverlayClose(savedListsPanelOpen);
+    setSavedListsPanelOpen(false);
     setIsSavedListsOverlayOpen(true);
+  };
+
+  const openListEditor = (list: CreatedList) => {
+    setListInfoOverlayListId(null);
+    setListTitle(list.title);
+    setListItems(list.items.map((item) => ({ id: (item as any).id || crypto.randomUUID(), ...item })));
+    setListOverlayMode('edit');
+    setEditingListId(list.id);
+    setListSortMode(list.sortMode || 'insertion');
+    setListSmartReminders(list.smartReminders ?? true);
+    setListSmartReminderDueDate(list.smartReminderDueDate ?? null);
+    setIsListsOverlayOpen(true);
   };
 
   const useSavedList = (list: SavedListTemplate) => {
@@ -1398,19 +1413,25 @@ export default function App() {
 
     const createdListId = useSavedList(list);
     clearSavedListUseFeedbackTimers();
-    setSavedListUseFeedback({ id: list.id, createdListId, stage: 'copied' });
+    setSavedListUseFeedback({ id: list.id, createdListId, stage: 'fill' });
+
+    savedListUseFeedbackTimersRef.current.push(window.setTimeout(() => {
+      setSavedListUseFeedback((current) => (
+        current?.id === list.id ? { ...current, stage: 'copied' } : current
+      ));
+    }, 150));
 
     savedListUseFeedbackTimersRef.current.push(window.setTimeout(() => {
       setSavedListUseFeedback((current) => (
         current?.id === list.id ? { ...current, stage: 'blank' } : current
       ));
-    }, 1250));
+    }, 1300));
 
     savedListUseFeedbackTimersRef.current.push(window.setTimeout(() => {
       setSavedListUseFeedback((current) => (
         current?.id === list.id ? { ...current, stage: 'go' } : current
       ));
-    }, 1650));
+    }, 1550));
   }, [clearSavedListUseFeedbackTimers, openListOverlayForListId, savedListUseFeedback]);
 
   const handleSavedListDeleteClick = (savedListId: string) => {
@@ -2709,7 +2730,7 @@ export default function App() {
 
               if (archivedLists.length === 0) {
                 return (
-                  <div className="flex flex-col items-center justify-center flex-1 w-full">
+                  <div className="flex flex-col items-center justify-center flex-1 min-h-0 w-full">
                     <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
                       {doneDeletedFilter === 'deleted' ? 'No deleted lists yet…' : doneDeletedFilter === 'done' ? 'No done lists yet…' : 'No done or deleted lists yet…'}
                     </p>
@@ -2718,7 +2739,7 @@ export default function App() {
               }
 
               return (
-                <div className="flex flex-col gap-[23px] w-full">
+                <div className="flex flex-col gap-[23px] w-full flex-1 min-h-0 overflow-y-auto">
                   <AnimatePresence key={`${viewMode}-${activeMainTab}-${doneDeletedFilter}`}>
                     {archivedLists.map((entry) => {
                       const list = entry.list;
@@ -2743,7 +2764,7 @@ export default function App() {
                                       className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
                                       style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
                                       onClick={() => handleSavedListRestoreClick(list.id)}
-                                      aria-label="Restore saved list"
+                                      aria-label="Restore list template"
                                     >
                                       <SavedListTemplateIcon color={listStatusColor} />
                                     </button>
@@ -2826,7 +2847,7 @@ export default function App() {
                       onClick={() => setSavedListsPanelOpen(true)}
                     >
                       <div className="font-['Lato',sans-serif] font-bold text-[14px] text-white whitespace-nowrap">
-                        Saved lists
+                        Templates
                       </div>
                     </button>
                   </>
@@ -2971,12 +2992,12 @@ export default function App() {
                                   )}
                                 </button>
                                 <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
-                                  <p className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingAwayList ? '#BABABA' : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setListSmartReminderDueDate(list.smartReminderDueDate ?? null); setIsListsOverlayOpen(true); }}>{list.title}</p>
-                                  <div className={`flex items-center overflow-visible cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} onClick={() => { setListInfoOverlayListId(null); setListTitle(list.title); setListItems(list.items.map(i => ({ id: (i as any).id || crypto.randomUUID(), ...i }))); setListOverlayMode('edit'); setEditingListId(list.id); setListSortMode(list.sortMode || 'insertion'); setListSmartReminders(list.smartReminders ?? true); setListSmartReminderDueDate(list.smartReminderDueDate ?? null); setIsListsOverlayOpen(true); }}>
-                                    <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAwayList ? '#BABABA' : '#BABABA' }}>
+                                  <p className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => openListEditor(list)}>{list.title}</p>
+                                  <div className={`flex items-center overflow-visible cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }} onClick={() => openListEditor(list)}>
+                                    <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAwayList ? DELETED_GREY : '#BABABA', textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
                                       {visibleCompletedCount} of {list.items.length} items
                                       {isSmartRemindersEnabled && (list.smartReminders ?? true) ? (
-                                        <span style={{ color: '#BABABA' }}>
+                                        <span style={{ color: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
                                           {`. Complete by ${formatListDueDate(list.smartReminderDueDate)}`}
                                         </span>
                                       ) : null}
@@ -3054,21 +3075,21 @@ export default function App() {
                 </div>
               </button>
             </div>
-            {savedListsPanelOpen && (
+            {(savedListsPanelOpen || (isSavedListsOverlayOpen && restoreSavedListsPanelAfterOverlayClose)) && (
                 <div
                   className="absolute inset-0 bg-white"
-                  style={{ zIndex: 2 }}
+                  style={{ zIndex: 2, pointerEvents: savedListsPanelOpen ? 'auto' : 'none' }}
                 >
                   <div className="relative flex flex-col gap-[32px] w-full h-full min-h-0">
                     <div className="filters-menu flex items-center justify-between relative shrink-0 w-full pt-[8px]">
                       <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
-                        Saved lists
+                        List templates
                       </div>
                       <button
                         className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center cursor-pointer"
                         type="button"
                         onClick={() => setSavedListsPanelOpen(false)}
-                        aria-label="Close saved lists"
+                        aria-label="Close list templates"
                       >
                         <svg className="block shrink-0" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                           <path d="M11.7528 0.439116C12.3385 -0.146356 13.2882 -0.146389 13.8739 0.439116C14.4596 1.02493 14.4596 1.97537 13.8739 2.56119L9.27819 7.15787L13.8739 11.7536C14.4596 12.3394 14.4596 13.2898 13.8739 13.8756C13.2882 14.4612 12.3385 14.4611 11.7528 13.8756L7.15709 9.27896L2.56041 13.8756C1.97466 14.461 1.02496 14.4612 0.439319 13.8756C-0.14644 13.2898 -0.146439 12.3394 0.439319 11.7536L5.03502 7.15787L0.439319 2.56119C-0.146439 1.97537 -0.14644 1.02493 0.439319 0.439116C1.02496 -0.146462 1.97466 -0.146282 2.56041 0.439116L7.15709 5.0358L11.7528 0.439116Z" fill="#BABABA"/>
@@ -3076,11 +3097,11 @@ export default function App() {
                       </button>
                     </div>
                     <div className="relative w-full max-w-[768px] flex-1 min-h-0">
-                      <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: 'auto', height: '100%' }}>
+                      <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: savedListsPanelOpen ? 'auto' : 'hidden', height: '100%' }}>
                         {savedLists.length === 0 ? (
                           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 0 }}>
                             <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
-                              No saved lists yet.. get busy!
+                              No list templates yet.. get busy!
                             </p>
                           </div>
                         ) : (
@@ -3148,6 +3169,8 @@ export default function App() {
                           setListSortMode('insertion');
                           setListSmartReminders(false);
                           setListSmartReminderDueDate(null);
+                          setRestoreSavedListsPanelAfterOverlayClose(true);
+                          setSavedListsPanelOpen(false);
                           setIsSavedListsOverlayOpen(true);
                         }}
                       >
@@ -3157,7 +3180,7 @@ export default function App() {
                           </svg>
                         </div>
                         <div className="font-['Lato',sans-serif] font-bold text-[20px] text-white whitespace-nowrap">
-                          Add new saved list
+                          Create new template
                         </div>
                       </button>
                     </div>
@@ -3658,7 +3681,7 @@ export default function App() {
                   if (!shouldCloseBottomSheetFromDrag(info.offset.y, info.velocity.y)) return;
                   handleOverlayClose();
                 }}
-                className="relative"
+                className="bg-white relative rounded-tl-[15px] rounded-tr-[15px] size-full"
               >
                 <div
                   className="absolute left-0 right-0 top-0 h-[24px] z-[2] touch-pan-y"
@@ -3707,6 +3730,10 @@ export default function App() {
               }
               if (closeAfterSave) {
                 setIsSavedListsOverlayOpen(false);
+                if (restoreSavedListsPanelAfterOverlayClose) {
+                  setSavedListsPanelOpen(true);
+                  setRestoreSavedListsPanelAfterOverlayClose(false);
+                }
               }
               return;
             }
@@ -3934,6 +3961,9 @@ export default function App() {
                     handleListCompleteClick(listId);
                   }, 200);
                 }}
+                onEdit={() => {
+                  openListEditor(listInfoOverlayList);
+                }}
                 onDelete={() => {
                   const listId = listInfoOverlayList.id;
                   setListInfoOverlayListId(null);
@@ -3973,8 +4003,8 @@ export default function App() {
                   <button
                     className="cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
                     style={{
-                      backgroundColor: useButtonStage === 'copied' ? '#3A8582' : '#1C2C42',
-                      transition: `background-color ${useButtonStage === 'copied' ? '250ms' : '150ms'} ease`,
+                      backgroundColor: '#1C2C42',
+                      transition: 'background-color 150ms ease',
                     }}
                     onClick={() => handleUseSavedListWithFeedback(savedList)}
                   >
@@ -3992,7 +4022,7 @@ export default function App() {
                               <path d="M16.8246 6.36342C17.5753 6.46187 18.2311 6.66015 18.7737 7.10653C19.3251 7.56022 19.5989 8.13783 19.734 8.81089C19.8203 9.241 19.5417 9.65914 19.1115 9.74553C18.6814 9.83176 18.2633 9.55315 18.1769 9.12303C18.0931 8.7059 17.9616 8.49507 17.7645 8.33292C17.5466 8.15367 17.2255 8.01798 16.618 7.93831C16.183 7.88125 15.8766 7.48289 15.9334 7.048C15.9904 6.61291 16.3895 6.30636 16.8246 6.36342Z" fill="white"/>
                             </svg>
                             <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-                              <p className="leading-[normal]">Copy added to your lists!</p>
+                              <p className="leading-[normal]">Added to your lists!</p>
                             </div>
                           </div>
                         ) : (
@@ -4000,10 +4030,10 @@ export default function App() {
                             className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap"
                             style={{
                               opacity: useButtonStage === 'blank' ? 0 : 1,
-                              transition: 'opacity 250ms ease',
+                              transition: `opacity ${useButtonStage === 'go' ? '250ms' : '150ms'} ease`,
                             }}
                           >
-                            <p className="leading-[normal]">{useButtonStage === 'go' ? 'Go to list?' : useButtonStage === 'blank' ? '' : 'Use as list'}</p>
+                            <p className="leading-[normal]">{useButtonStage === 'go' ? 'Go to list?' : (useButtonStage === 'blank' || useButtonStage === 'fill') ? '' : 'Use as list'}</p>
                           </div>
                         )}
                       </div>
@@ -4020,7 +4050,7 @@ export default function App() {
                     <div className="flex flex-row items-center justify-center size-full">
                       <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
                         <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-                          <p className="leading-[normal]">Edit saved list</p>
+                          <p className="leading-[normal]">Edit template</p>
                         </div>
                       </div>
                     </div>
@@ -4036,7 +4066,7 @@ export default function App() {
                     <div className="flex flex-row items-center justify-center size-full">
                       <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
                         <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-                          <p className="leading-[normal]">Delete saved list</p>
+                          <p className="leading-[normal]">Delete template</p>
                         </div>
                       </div>
                     </div>

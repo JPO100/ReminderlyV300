@@ -185,7 +185,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
             className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
           >
             <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSavedLists ? '#1C2C42' : '#C9C9C9' }}>Include Saved lists</p>
+              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSavedLists ? '#1C2C42' : '#C9C9C9' }}>Include List templates</p>
             </div>
             <div
               className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSavedLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}

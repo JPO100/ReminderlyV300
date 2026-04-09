@@ -688,7 +688,7 @@ function ListsPage({ onBack, onClose, smartRemindersEnabled, onSmartRemindersEna
                     <path d="M16.8246 6.36342C17.5753 6.46187 18.2311 6.66015 18.7737 7.10653C19.3251 7.56022 19.5989 8.13783 19.734 8.81089C19.8203 9.241 19.5417 9.65914 19.1115 9.74553C18.6814 9.83176 18.2633 9.55315 18.1769 9.12303C18.0931 8.7059 17.9616 8.49507 17.7645 8.33292C17.5466 8.15367 17.2255 8.01798 16.618 7.93831C16.183 7.88125 15.8766 7.48289 15.9334 7.048C15.9904 6.61291 16.3895 6.30636 16.8246 6.36342Z" fill={savedListsEnabled ? '#1C2C42' : '#C9C9C9'} />
                   </svg>
                 </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: savedListsEnabled ? '#1C2C42' : '#C9C9C9' }}>Saved lists</p>
+                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: savedListsEnabled ? '#1C2C42' : '#C9C9C9' }}>List templates</p>
               </div>
               <div
                 className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${savedListsEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
