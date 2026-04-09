@@ -42,6 +42,8 @@ type SavedListTemplate = {
   id: string;
   title: string;
   items: ListItem[];
+  status?: 'active' | 'deleted';
+  statusChangedAt?: number | null;
 };
 
 // Category colours matching existing static component tick circles
@@ -345,6 +347,7 @@ export default function App() {
   const [isReminderOverlayFocusReady, setIsReminderOverlayFocusReady] = useState(false);
   const [isListsOverlayOpen, setIsListsOverlayOpen] = useState(false);
   const [isSavedListsOverlayOpen, setIsSavedListsOverlayOpen] = useState(false);
+  const [savedListMenuId, setSavedListMenuId] = useState<string | null>(null);
   const [editingSavedListId, setEditingSavedListId] = useState<string | null>(null);
   const [listItems, setListItems] = useState<ListItem[]>([]);
   const [listTitle, setListTitle] = useState("");
@@ -386,6 +389,8 @@ export default function App() {
                   completed: false,
                 }))
               : [],
+            status: list.status === 'deleted' ? 'deleted' : 'active',
+            statusChangedAt: typeof list.statusChangedAt === 'number' ? list.statusChangedAt : null,
           }));
         }
       }
@@ -399,6 +404,7 @@ export default function App() {
   const [isListSettingsOpen, setIsListSettingsOpen] = useState(false);
   const [listInfoOverlayListId, setListInfoOverlayListId] = useState<string | null>(null);
   const [doneInfoTarget, setDoneInfoTarget] = useState<{ kind: 'reminder' | 'list'; id: string } | null>(null);
+  const [savedDeletedListInfoId, setSavedDeletedListInfoId] = useState<string | null>(null);
   const [listSortMode, setListSortMode] = useState<'alphabetical' | 'insertion'>('insertion');
   const [listSettingsSortModeDraft, setListSettingsSortModeDraft] = useState<'alphabetical' | 'insertion'>('insertion');
   const [listSmartReminders, setListSmartReminders] = useState(false);
@@ -505,6 +511,7 @@ export default function App() {
   const [pendingDoneListIds, setPendingDoneListIds] = useState<Set<string>>(new Set());
   const [pendingUndoneListIds, setPendingUndoneListIds] = useState<Set<string>>(new Set());
   const [pendingDeletedListIds, setPendingDeletedListIds] = useState<Set<string>>(new Set());
+  const [pendingDeletedSavedListIds, setPendingDeletedSavedListIds] = useState<Set<string>>(new Set());
   const [pendingUndeletedListIds, setPendingUndeletedListIds] = useState<Set<string>>(new Set());
   const handleCompleteClickRef = useRef<((reminderId: string, opts?: { armEmptyDelay?: boolean; filterKey?: string; isRepeat?: boolean; source?: 'manual' | 'list-sync' }) => void) | null>(null);
   const handleUncompleteClickRef = useRef<((reminderId: string, opts?: { source?: 'manual' | 'list-sync' }) => void) | null>(null);
@@ -514,6 +521,7 @@ export default function App() {
   const completeListTimersRef = useRef<Map<string, number>>(new Map());
   const undoListTimersRef = useRef<Map<string, number>>(new Map());
   const deleteListTimersRef = useRef<Map<string, number>>(new Map());
+  const deleteSavedListTimersRef = useRef<Map<string, number>>(new Map());
   const undeleteListTimersRef = useRef<Map<string, number>>(new Map());
   const [alphabeticalPinnedListItemId, setAlphabeticalPinnedListItemId] = useState<string | null>(null);
   const [alphabeticalPinnedListItemIndex, setAlphabeticalPinnedListItemIndex] = useState<number>(0);
@@ -530,6 +538,9 @@ export default function App() {
     : null;
   const doneInfoList = doneInfoTarget?.kind === 'list'
     ? createdLists.find((list) => list.id === doneInfoTarget.id) ?? null
+    : null;
+  const savedDeletedListInfo = savedDeletedListInfoId != null
+    ? savedLists.find((list) => list.id === savedDeletedListInfoId) ?? null
     : null;
   const displayListItems = getDisplayListItems(
     listItems,
@@ -1327,6 +1338,66 @@ export default function App() {
   const handleTutorialOpen = () => {
     setIsTutorialOpen(true);
     setTimeout(() => setIsSettingsOpen(false), 250);
+  };
+
+  const openSavedListEditor = (list: SavedListTemplate) => {
+    setListTitle(list.title);
+    setListItems(list.items.map((item) => ({ ...item, completed: false })));
+    setListOverlayMode('edit');
+    setEditingListId(null);
+    setEditingSavedListId(list.id);
+    setListSortMode('insertion');
+    setListSmartReminders(false);
+    setListSmartReminderDueDate(null);
+    setIsSavedListsOverlayOpen(true);
+  };
+
+  const useSavedList = (list: SavedListTemplate) => {
+    const newId = crypto.randomUUID();
+    setCreatedLists((prev) => [...prev, {
+      id: newId,
+      title: list.title,
+      items: list.items.map((item) => ({ ...item, id: crypto.randomUUID(), completed: false })),
+      sortMode: 'insertion',
+      smartReminders: false,
+      smartReminderDueDate: null,
+      status: 'active',
+      statusChangedAt: null,
+    }]);
+    setSavedListMenuId(null);
+    setSavedListsPanelOpen(false);
+    setActiveMainTab('lists');
+  };
+
+  const handleSavedListDeleteClick = (savedListId: string) => {
+    if (deleteSavedListTimersRef.current.has(savedListId)) return;
+
+    setPendingDeletedSavedListIds((prev) => {
+      const next = new Set(prev);
+      next.add(savedListId);
+      return next;
+    });
+    setSavedListMenuId(null);
+
+    const timer = window.setTimeout(() => {
+      deleteSavedListTimersRef.current.delete(savedListId);
+      setSavedLists((prev) => prev.map((list) => (
+        list.id === savedListId ? { ...list, status: 'deleted', statusChangedAt: Date.now() } : list
+      )));
+      setPendingDeletedSavedListIds((prev) => {
+        const next = new Set(prev);
+        next.delete(savedListId);
+        return next;
+      });
+    }, COMPLETION_DELAY);
+
+    deleteSavedListTimersRef.current.set(savedListId, timer);
+  };
+
+  const handleSavedListRestoreClick = (savedListId: string) => {
+    setSavedLists((prev) => prev.map((list) => (
+      list.id === savedListId ? { ...list, status: 'active', statusChangedAt: null } : list
+    )));
   };
 
   const handleLogoClick = () => {
@@ -2551,21 +2622,48 @@ export default function App() {
                   if (doneDeletedFilter === 'done') return list.status === 'done' || pendingUndoneListIds.has(list.id);
                   return list.status === 'deleted' || pendingUndeletedListIds.has(list.id);
                 })
+                .map((list) => ({ kind: 'created' as const, list }))
                 .sort((a, b) => {
                   const tsA =
-                    pendingUndeletedListStatusChangedAtRef.current.get(a.id) ??
-                    pendingUndoneListStatusChangedAtRef.current.get(a.id) ??
-                    a.statusChangedAt ??
+                    pendingUndeletedListStatusChangedAtRef.current.get(a.list.id) ??
+                    pendingUndoneListStatusChangedAtRef.current.get(a.list.id) ??
+                    a.list.statusChangedAt ??
                     0;
                   const tsB =
-                    pendingUndeletedListStatusChangedAtRef.current.get(b.id) ??
-                    pendingUndoneListStatusChangedAtRef.current.get(b.id) ??
-                    b.statusChangedAt ??
+                    pendingUndeletedListStatusChangedAtRef.current.get(b.list.id) ??
+                    pendingUndoneListStatusChangedAtRef.current.get(b.list.id) ??
+                    b.list.statusChangedAt ??
                     0;
                   return tsB - tsA;
                 });
 
-              if (doneDeletedLists.length === 0) {
+              const deletedSavedLists = savedLists
+                .filter((list) => (list.status ?? 'active') === 'deleted')
+                .filter((list) => doneDeletedFilter !== 'done')
+                .map((list) => ({ kind: 'saved' as const, list }))
+                .sort((a, b) => (b.list.statusChangedAt ?? 0) - (a.list.statusChangedAt ?? 0));
+
+              const archivedLists = [...doneDeletedLists, ...deletedSavedLists].sort((a, b) => {
+                const tsA = a.kind === 'created'
+                  ? (
+                    pendingUndeletedListStatusChangedAtRef.current.get(a.list.id) ??
+                    pendingUndoneListStatusChangedAtRef.current.get(a.list.id) ??
+                    a.list.statusChangedAt ??
+                    0
+                  )
+                  : (a.list.statusChangedAt ?? 0);
+                const tsB = b.kind === 'created'
+                  ? (
+                    pendingUndeletedListStatusChangedAtRef.current.get(b.list.id) ??
+                    pendingUndoneListStatusChangedAtRef.current.get(b.list.id) ??
+                    b.list.statusChangedAt ??
+                    0
+                  )
+                  : (b.list.statusChangedAt ?? 0);
+                return tsB - tsA;
+              });
+
+              if (archivedLists.length === 0) {
                 return (
                   <div className="flex flex-col items-center justify-center flex-1 w-full">
                     <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
@@ -2578,14 +2676,16 @@ export default function App() {
               return (
                 <div className="flex flex-col gap-[23px] w-full">
                   <AnimatePresence key={`${viewMode}-${activeMainTab}-${doneDeletedFilter}`}>
-                    {doneDeletedLists.map((list) => {
-                      const isPendingRestore = pendingUndoneListIds.has(list.id) || pendingUndeletedListIds.has(list.id);
-                      const isDeletedList = list.status === 'deleted' && !pendingUndeletedListIds.has(list.id);
+                    {archivedLists.map((entry) => {
+                      const list = entry.list;
+                      const isSavedList = entry.kind === 'saved';
+                      const isPendingRestore = !isSavedList && (pendingUndoneListIds.has(list.id) || pendingUndeletedListIds.has(list.id));
+                      const isDeletedList = isSavedList ? true : (list.status === 'deleted' && !pendingUndeletedListIds.has(list.id));
                       const doneCount = list.items.filter(i => i.completed).length;
-                      const listStatusColor = isDeletedList ? DELETED_LIST_COLOUR : DONE_LIST_COLOUR;
+                      const listStatusColor = isSavedList && isDeletedList ? '#898989' : (isDeletedList ? DELETED_LIST_COLOUR : DONE_LIST_COLOUR);
                       return (
                         <motion.div
-                          key={list.id}
+                          key={`${entry.kind}-${list.id}`}
                           layout
                           exit={{ opacity: 0 }}
                           transition={{ layout: { duration: 0.25 } }}
@@ -2594,25 +2694,38 @@ export default function App() {
                             <div className="flex-[1_0_0] min-h-px min-w-px relative">
                               <div className="flex flex-row items-start size-full">
                                 <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full">
-                                  <button
-                                    className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
-                                    style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
-                                    onClick={() => isDeletedList ? handleListUndeleteClick(list.id) : handleListUndoClick(list.id)}
-                                    aria-label="Mark list as not done"
-                                  >
-                                    {isPendingRestore ? (
-                                      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                                        <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke="#BABABA" strokeWidth="2" />
-                                      </svg>
-                                    ) : (
-                                      <CompletedCircleIcon className="absolute block size-full" color={listStatusColor} />
-                                    )}
-                                  </button>
+                                  {isSavedList ? (
+                                    <button
+                                      className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                                      style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
+                                      onClick={() => handleSavedListRestoreClick(list.id)}
+                                      aria-label="Restore saved list"
+                                    >
+                                      <SavedListTemplateIcon color={listStatusColor} />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
+                                      style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
+                                      onClick={() => isDeletedList ? handleListUndeleteClick(list.id) : handleListUndoClick(list.id)}
+                                      aria-label="Mark list as not done"
+                                    >
+                                      {isPendingRestore ? (
+                                        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                                          <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke="#BABABA" strokeWidth="2" />
+                                        </svg>
+                                      ) : (
+                                        <CompletedCircleIcon className="absolute block size-full" color={listStatusColor} />
+                                      )}
+                                    </button>
+                                  )}
                                   <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
-                                    <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor }}>{list.title}</p>
-                                    <div className={`flex items-center overflow-visible${isPendingRestore ? '' : ' line-through'}`}>
-                                      <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor }}>{doneCount} of {list.items.length} items completed</p>
-                                      {isSmartRemindersEnabled && (list.smartReminders ?? true) && (
+                                    <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor, textDecorationColor: isPendingRestore ? '#BABABA' : listStatusColor }}>{list.title}</p>
+                                    <div className={`flex items-center overflow-visible${isPendingRestore ? '' : ' line-through'}`} style={{ textDecorationColor: isPendingRestore ? '#BABABA' : listStatusColor }}>
+                                      <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor }}>
+                                        {isSavedList ? `${list.items.length} ${list.items.length === 1 ? 'item' : 'items'}` : `${doneCount} of ${list.items.length} items completed`}
+                                      </p>
+                                      {!isSavedList && isSmartRemindersEnabled && (list.smartReminders ?? true) && (
                                         <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
                                           <SmartRemindersIndicator color={isPendingRestore ? '#BABABA' : listStatusColor} />
                                         </div>
@@ -2622,7 +2735,7 @@ export default function App() {
                                 </div>
                               </div>
                             </div>
-                            <RowMenuButton onClick={() => setDoneInfoTarget({ kind: 'list', id: list.id })} />
+                            <RowMenuButton onClick={() => isSavedList ? setSavedDeletedListInfoId(list.id) : setDoneInfoTarget({ kind: 'list', id: list.id })} />
                           </div>
                         </motion.div>
                       );
@@ -2903,20 +3016,18 @@ export default function App() {
                   style={{ zIndex: 2 }}
                 >
                   <div className="relative flex flex-col gap-[32px] w-full h-full min-h-0">
-                    <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
+                    <div className="filters-menu flex items-center justify-between relative shrink-0 w-full pt-[8px]">
                       <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
                         Saved lists
                       </div>
                       <button
-                        className="bg-[#1C2C42] content-stretch flex items-center justify-center gap-[8px] px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer"
+                        className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center cursor-pointer"
                         type="button"
                         onClick={() => setSavedListsPanelOpen(false)}
+                        aria-label="Close saved lists"
                       >
-                        <div className="font-['Lato',sans-serif] font-bold text-[14px] text-white whitespace-nowrap">
-                          Close
-                        </div>
-                        <svg className="block shrink-0" width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                          <path d="M8.38658 0.29281C8.77711 -0.097604 9.41011 -0.0976027 9.80064 0.29281C10.1912 0.683313 10.1912 1.31637 9.80064 1.70687L6.4608 5.04574L9.80064 8.38558C10.1912 8.77609 10.1912 9.40915 9.80064 9.79965C9.41012 10.19 8.7771 10.19 8.38658 9.79965L5.04674 6.46078L1.70689 9.79965C1.31633 10.1899 0.683304 10.1901 0.29283 9.79965C-0.09764 9.40919 -0.0975685 8.77609 0.29283 8.38558L3.63267 5.04574L0.29283 1.70687C-0.0975943 1.31638 -0.0976257 0.683283 0.29283 0.29281C0.683316 -0.0976234 1.31633 -0.0975083 1.70689 0.29281L5.04674 3.63168L8.38658 0.29281Z" fill="white"/>
+                        <svg className="block shrink-0" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M11.7528 0.439116C12.3385 -0.146356 13.2882 -0.146389 13.8739 0.439116C14.4596 1.02493 14.4596 1.97537 13.8739 2.56119L9.27819 7.15787L13.8739 11.7536C14.4596 12.3394 14.4596 13.2898 13.8739 13.8756C13.2882 14.4612 12.3385 14.4611 11.7528 13.8756L7.15709 9.27896L2.56041 13.8756C1.97466 14.461 1.02496 14.4612 0.439319 13.8756C-0.14644 13.2898 -0.146439 12.3394 0.439319 11.7536L5.03502 7.15787L0.439319 2.56119C-0.146439 1.97537 -0.14644 1.02493 0.439319 0.439116C1.02496 -0.146462 1.97466 -0.146282 2.56041 0.439116L7.15709 5.0358L11.7528 0.439116Z" fill="#BABABA"/>
                         </svg>
                       </button>
                     </div>
@@ -2929,48 +3040,39 @@ export default function App() {
                             </p>
                           </div>
                         ) : (
-                          <div className="flex flex-col gap-[23px] w-full" style={{ position: 'relative', zIndex: 1 }}>
-                            {savedLists.map((list) => (
-                              <div key={list.id} className="content-stretch flex items-start justify-between px-px relative w-full">
+                          <div className="flex flex-col gap-[23px] w-full pt-[2px]" style={{ position: 'relative', zIndex: 1 }}>
+                            <AnimatePresence initial={false}>
+                            {savedLists.filter((list) => (list.status ?? 'active') !== 'deleted' || pendingDeletedSavedListIds.has(list.id)).map((list) => {
+                              const isPendingDeletedSavedList = pendingDeletedSavedListIds.has(list.id);
+                              const deletedSavedListColor = '#898989';
+                              return (
+                              <motion.div
+                                key={list.id}
+                                layout
+                                exit={{ opacity: 0 }}
+                                transition={{ layout: { duration: 0.25 } }}
+                              >
+                              <div className="content-stretch flex items-start justify-between px-px relative w-full">
                                 <div className="flex-[1_0_0] min-h-px min-w-px relative">
                                   <div className="flex flex-row items-start size-full">
                                     <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full">
                                       <div className="relative shrink-0 size-[25px]">
-                                        <SavedListTemplateIcon />
+                                        <SavedListTemplateIcon color={isPendingDeletedSavedList ? deletedSavedListColor : undefined} />
                                       </div>
                                       <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
                                         <p
-                                          className="overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
-                                          style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: '#1c2c42' }}
-                                          onClick={() => {
-                                            setListTitle(list.title);
-                                            setListItems(list.items.map((item) => ({ ...item, completed: false })));
-                                            setListOverlayMode('edit');
-                                            setEditingListId(null);
-                                            setEditingSavedListId(list.id);
-                                            setListSortMode('insertion');
-                                            setListSmartReminders(false);
-                                            setListSmartReminderDueDate(null);
-                                            setIsSavedListsOverlayOpen(true);
-                                          }}
+                                          className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDeletedSavedList ? ' line-through' : ''}`}
+                                          style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingDeletedSavedList ? deletedSavedListColor : '#1c2c42', textDecorationColor: isPendingDeletedSavedList ? deletedSavedListColor : '#1c2c42' }}
+                                          onClick={() => openSavedListEditor(list)}
                                         >
                                           {list.title}
                                         </p>
                                         <div
-                                          className="flex items-center overflow-visible cursor-pointer"
-                                          onClick={() => {
-                                            setListTitle(list.title);
-                                            setListItems(list.items.map((item) => ({ ...item, completed: false })));
-                                            setListOverlayMode('edit');
-                                            setEditingListId(null);
-                                            setEditingSavedListId(list.id);
-                                            setListSortMode('insertion');
-                                            setListSmartReminders(false);
-                                            setListSmartReminderDueDate(null);
-                                            setIsSavedListsOverlayOpen(true);
-                                          }}
+                                          className={`flex items-center overflow-visible cursor-pointer${isPendingDeletedSavedList ? ' line-through' : ''}`}
+                                          style={{ textDecorationColor: isPendingDeletedSavedList ? deletedSavedListColor : '#BABABA' }}
+                                          onClick={() => openSavedListEditor(list)}
                                         >
-                                          <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: '#BABABA' }}>
+                                          <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingDeletedSavedList ? deletedSavedListColor : '#BABABA' }}>
                                             {list.items.length} {list.items.length === 1 ? 'item' : 'items'}
                                           </p>
                                         </div>
@@ -2978,8 +3080,12 @@ export default function App() {
                                     </div>
                                   </div>
                                 </div>
+                                <RowMenuButton onClick={() => setSavedListMenuId(list.id)} />
                               </div>
-                            ))}
+                              </motion.div>
+                            );
+                            })}
+                            </AnimatePresence>
                           </div>
                         )}
                       </div>
@@ -3229,9 +3335,9 @@ export default function App() {
                                 const subtitleCol = isPendingRestore ? '#BABABA' : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE));
                                 return (
                                   <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ color: textCol, gap: '9px', minHeight: '38px' }}>
-                                    <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1 }}>{getDisplayTitle(item)}</p>
+                                    <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, textDecorationColor: textCol }}>{getDisplayTitle(item)}</p>
                                     {showSubtitles && (
-                                      <div className={`flex items-center overflow-visible${isPendingRestore ? '' : ' line-through'}`}>
+                                      <div className={`flex items-center overflow-visible${isPendingRestore ? '' : ' line-through'}`} style={{ textDecorationColor: subtitleCol }}>
                                         <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: subtitleCol }}>{(() => {
                                           if (item.repeatRule) {
                                             const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
@@ -3350,9 +3456,9 @@ export default function App() {
                                   setIsOverlayOpen(true);
                                 }}
                               >
-                                <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingAway ? pendingColour : textColour }}>{getDisplayTitle(reminder)}</p>
+                                <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingAway ? pendingColour : textColour, textDecorationColor: isPendingAway ? pendingColour : textColour }}>{getDisplayTitle(reminder)}</p>
                                 {showSubtitles && (
-                                  <div className={`flex items-center overflow-visible${isPendingAway ? ' line-through' : ''}`}>
+                                  <div className={`flex items-center overflow-visible${isPendingAway ? ' line-through' : ''}`} style={{ textDecorationColor: isPendingAway ? pendingColour : '#BABABA' }}>
                                     <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAway ? pendingColour : '#BABABA' }}>{(() => {
                                       if (reminder.repeatRule) {
                                         const label = formatRepeatLabel(reminder.repeatRule, reminder.schedule.kind === 'scheduled' ? reminder.schedule.time : undefined, reminder.schedule.kind === 'scheduled' ? reminder.schedule.date : undefined);
@@ -3797,6 +3903,89 @@ export default function App() {
         </>
       )}
 
+      {savedListMenuId && (() => {
+        const savedList = savedLists.find((list) => list.id === savedListMenuId);
+        if (!savedList) return null;
+        return (
+          <>
+            <div
+              className="fixed inset-0 bg-black/50 z-[60]"
+              onClick={() => setSavedListMenuId(null)}
+            />
+            <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none px-[20px]">
+              <div
+                className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] pointer-events-auto outline-none"
+                style={{ width: 340 }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
+                  <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>
+                    {savedList.title}
+                  </p>
+                </div>
+
+                <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
+                  <button
+                    className="cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
+                    style={{ backgroundColor: '#1C2C42' }}
+                    onClick={() => useSavedList(savedList)}
+                  >
+                    <div className="flex flex-row items-center justify-center size-full">
+                      <div className="content-stretch flex gap-[12px] items-center justify-center px-[18px] py-[15px] relative size-full">
+                        <svg className="block shrink-0" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M14.4152 18.1609C14.854 18.1609 15.2098 18.5167 15.2098 18.9555C15.2098 19.3943 14.854 19.75 14.4152 19.75H11.6911C11.2523 19.75 10.8966 19.3943 10.8966 18.9555C10.8966 18.5167 11.2523 18.1609 11.6911 18.1609H14.4152Z" fill="white"/>
+                          <path d="M6.99479 16.3608C7.42491 16.2746 7.84305 16.5532 7.92944 16.9833C8.01327 17.4004 8.14468 17.6113 8.34179 17.7734C8.55972 17.9527 8.88081 18.0883 9.48837 18.168C9.92328 18.2251 10.2297 18.6234 10.173 19.0583C10.1159 19.4934 9.71684 19.8 9.28176 19.7429C8.53098 19.6445 7.87526 19.4462 7.33265 18.9998C6.78118 18.5461 6.50747 17.9685 6.37228 17.2954C6.28606 16.8653 6.56467 16.4472 6.99479 16.3608Z" fill="white"/>
+                          <path d="M18.1769 16.9833C18.2633 16.5532 18.6814 16.2746 19.1115 16.3608C19.5417 16.4472 19.8203 16.8653 19.734 17.2954C19.5989 17.9685 19.3251 18.5461 18.7737 18.9998C18.2311 19.4462 17.5753 19.6445 16.8246 19.7429C16.3895 19.8 15.9904 19.4934 15.9334 19.0583C15.8766 18.6234 16.183 18.2251 16.618 18.168C17.2255 18.0883 17.5466 17.9527 17.7645 17.7734C17.9616 17.6113 18.0931 17.4004 18.1769 16.9833Z" fill="white"/>
+                          <path d="M7.60489 1.44977e-06C9.07801 1.55801e-06 10.2527 -0.00166324 11.1821 0.108187C12.129 0.220112 12.9241 0.457041 13.5914 1.0047C13.8156 1.18865 14.0211 1.3942 14.2051 1.61835C14.724 2.2507 14.964 2.99778 15.083 3.88048C15.1995 4.74551 15.2087 5.82103 15.2098 7.14998C15.2098 7.38362 15.1078 7.59341 14.9473 7.73879C14.926 7.75812 14.9041 7.77682 14.8808 7.79377C14.7912 7.85875 14.6881 7.90641 14.5757 7.92944C14.5242 7.94003 14.4708 7.94534 14.4161 7.9454L14.4152 7.94452L11.6911 7.9454C11.2523 7.9454 10.8966 7.58968 10.8966 7.15086C10.8966 6.71205 11.2523 6.35632 11.6911 6.35632H13.6171C13.6101 5.40556 13.587 4.67936 13.5081 4.0933C13.4108 3.37144 13.2394 2.94651 12.9769 2.6266C12.859 2.48291 12.7269 2.35079 12.5832 2.23287C12.246 1.9562 11.7924 1.78081 10.9959 1.68663C10.1815 1.59036 9.11694 1.58908 7.60489 1.58908C6.09283 1.58908 5.0283 1.59036 4.2139 1.68663C3.4174 1.78081 2.96381 1.9562 2.6266 2.23287C2.48291 2.35079 2.35079 2.48291 2.23287 2.6266C1.9562 2.96381 1.78081 3.4174 1.68663 4.2139C1.59036 5.0283 1.58908 6.09283 1.58908 7.60489C1.58908 9.11694 1.59036 10.1815 1.68663 10.9959C1.78081 11.7924 1.9562 12.246 2.23287 12.5832C2.35079 12.7269 2.48291 12.859 2.6266 12.9769C2.94651 13.2394 3.37144 13.4108 4.0933 13.5081C4.67936 13.587 5.40556 13.6092 6.35632 13.6163V11.6911C6.35632 11.2523 6.71205 10.8966 7.15086 10.8966C7.58968 10.8966 7.9454 11.2523 7.9454 11.6911V14.4152C7.9454 14.5523 7.91075 14.6813 7.84963 14.7939C7.81927 14.8498 7.78115 14.9005 7.73879 14.9473C7.7146 14.974 7.68922 14.9994 7.66164 15.0227C7.65471 15.0285 7.64748 15.0339 7.64036 15.0395C7.50532 15.1455 7.33587 15.2098 7.15086 15.2098L7.14998 15.2089C5.82102 15.2078 4.74552 15.1995 3.88048 15.083C2.99778 14.964 2.2507 14.724 1.61835 14.2051C1.3942 14.0211 1.18865 13.8156 1.0047 13.5914C0.457041 12.9241 0.220112 12.129 0.108187 11.1821C-0.00166323 10.2527 1.34081e-06 9.07801 1.44956e-06 7.60489C1.55651e-06 6.13177 -0.00166326 4.95703 0.108187 4.02768C0.220112 3.0808 0.457041 2.28568 1.0047 1.61835C1.18865 1.3942 1.3942 1.18865 1.61835 1.0047C2.28568 0.457041 3.0808 0.220112 4.02768 0.108187C4.95703 -0.00166331 6.13177 1.34101e-06 7.60489 1.44977e-06Z" fill="white"/>
+                          <path d="M18.9555 10.8966C19.3943 10.8966 19.75 11.2523 19.75 11.6911V14.4152C19.75 14.854 19.3943 15.2098 18.9555 15.2098C18.5167 15.2098 18.1609 14.854 18.1609 14.4152V11.6911C18.1609 11.2523 18.5167 10.8966 18.9555 10.8966Z" fill="white"/>
+                          <path d="M9.28176 6.36342C9.71684 6.30636 10.1159 6.61291 10.173 7.048C10.2297 7.48289 9.92328 7.88125 9.48837 7.93831C8.88081 8.01798 8.55972 8.15367 8.34179 8.33292C8.14468 8.49507 8.01327 8.7059 7.92944 9.12303C7.84305 9.55315 7.42491 9.83176 6.99479 9.74553C6.56467 9.65914 6.28606 9.241 6.37228 8.81089C6.50747 8.13783 6.78118 7.56022 7.33265 7.10653C7.87526 6.66015 8.53098 6.46187 9.28176 6.36342Z" fill="white"/>
+                          <path d="M16.8246 6.36342C17.5753 6.46187 18.2311 6.66015 18.7737 7.10653C19.3251 7.56022 19.5989 8.13783 19.734 8.81089C19.8203 9.241 19.5417 9.65914 19.1115 9.74553C18.6814 9.83176 18.2633 9.55315 18.1769 9.12303C18.0931 8.7059 17.9616 8.49507 17.7645 8.33292C17.5466 8.15367 17.2255 8.01798 16.618 7.93831C16.183 7.88125 15.8766 7.48289 15.9334 7.048C15.9904 6.61291 16.3895 6.30636 16.8246 6.36342Z" fill="white"/>
+                        </svg>
+                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                          <p className="leading-[normal]">Use a list</p>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    className="cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
+                    style={{ backgroundColor: '#1C2C42' }}
+                    onClick={() => {
+                      setSavedListMenuId(null);
+                      openSavedListEditor(savedList);
+                    }}
+                  >
+                    <div className="flex flex-row items-center justify-center size-full">
+                      <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                          <p className="leading-[normal]">Edit saved list</p>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                  <button
+                    className="cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
+                    style={{ backgroundColor: '#939393' }}
+                    onClick={() => {
+                      handleSavedListDeleteClick(savedList.id);
+                      setSavedListMenuId(null);
+                    }}
+                  >
+                    <div className="flex flex-row items-center justify-center size-full">
+                      <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                          <p className="leading-[normal]">Delete saved list</p>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      })()}
+
       {(doneInfoReminder || doneInfoList) && (
         <DeletedInfoOverlay
           title={doneInfoReminder ? getDisplayTitle(doneInfoReminder) : (doneInfoList?.title ?? '')}
@@ -3822,6 +4011,22 @@ export default function App() {
                   handleListUndoClick(currentTarget.id);
                 }
               }
+            }, 200);
+          }}
+        />
+      )}
+
+      {savedDeletedListInfo && (
+        <DeletedInfoOverlay
+          title={savedDeletedListInfo.title}
+          buttonColor="#1C2C42"
+          buttonLabel="Mark as not deleted"
+          onClose={() => setSavedDeletedListInfoId(null)}
+          onMarkAsNotDone={() => {
+            const listId = savedDeletedListInfo.id;
+            setSavedDeletedListInfoId(null);
+            window.setTimeout(() => {
+              handleSavedListRestoreClick(listId);
             }, 200);
           }}
         />
