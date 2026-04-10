@@ -1138,6 +1138,7 @@ export default function App() {
 
   useNotificationTapHandler({
     reminders,
+    setActiveMainTab,
     setIsTutorialOpen,
     setIsOverlayOpen,
     setIsListsOverlayOpen,
@@ -2846,8 +2847,13 @@ export default function App() {
                       type="button"
                       onClick={() => setSavedListsPanelOpen(true)}
                     >
-                      <div className="font-['Lato',sans-serif] font-bold text-[14px] text-white whitespace-nowrap">
-                        Templates
+                      <div className="content-stretch flex items-center justify-center gap-[8px] relative">
+                        <div className="font-['Lato',sans-serif] font-bold text-[14px] text-white whitespace-nowrap">
+                          Templates
+                        </div>
+                        <svg className="block shrink-0" width="7" height="10" viewBox="0 0 7 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M1.72101 0.269035C1.34568 -0.0896783 0.737045 -0.0896783 0.361708 0.269035C-0.0135638 0.627741 -0.0135771 1.20921 0.361708 1.56791L3.91284 4.96154L0.281458 8.43209C-0.0938212 8.79079 -0.0938182 9.37226 0.281458 9.73096C0.656796 10.0897 1.26543 10.0897 1.64076 9.73096L5.80081 5.75517C5.86027 5.71933 5.91677 5.67686 5.96858 5.62735C6.34382 5.26866 6.3438 4.68717 5.96858 4.32847L1.72101 0.269035Z" fill="white"/>
+                        </svg>
                       </div>
                     </button>
                   </>
@@ -3086,7 +3092,7 @@ export default function App() {
                         List templates
                       </div>
                       <button
-                        className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center cursor-pointer"
+                        className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center cursor-pointer w-[30px] h-[30px]"
                         type="button"
                         onClick={() => setSavedListsPanelOpen(false)}
                         aria-label="Close list templates"

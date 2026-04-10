@@ -4,6 +4,7 @@ import { NOTIFICATION_TAP_EVENT, PENDING_NOTIFICATION_REMINDER_ID_KEY } from "./
 
 type NotificationTapHandlerOptions = {
     reminders: Reminder[];
+    setActiveMainTab: (value: "reminders" | "lists") => void;
     setIsTutorialOpen: (value: boolean) => void;
     setIsOverlayOpen: (value: boolean) => void;
     setIsListsOverlayOpen: (value: boolean) => void;
@@ -16,6 +17,7 @@ type NotificationTapHandlerOptions = {
 
 export function useNotificationTapHandler({
     reminders,
+    setActiveMainTab,
     setIsTutorialOpen,
     setIsOverlayOpen,
     setIsListsOverlayOpen,
@@ -40,6 +42,7 @@ export function useNotificationTapHandler({
             setIsListsOverlayOpen(false);
             setIsRepeatsOverlayOpen(false);
             setIsSettingsOpen(false);
+            setActiveMainTab("reminders");
             setViewMode("list");
             setActiveFilter("all");
 
@@ -64,6 +67,7 @@ export function useNotificationTapHandler({
         };
     }, [
         reminders,
+        setActiveMainTab,
         setActiveFilter,
         setInfoReminder,
         setIsListsOverlayOpen,
