@@ -46,6 +46,37 @@ type SavedListTemplate = {
   statusChangedAt?: number | null;
 };
 
+const DEFAULT_TEMPLATE_SEED: Array<{ title: string; items: string[] }> = [
+  {
+    title: "Weekly food shop",
+    items: ["Milk", "Bread", "Eggs", "Chicken", "Rice", "Pasta", "Fruit", "Vegetables"],
+  },
+  {
+    title: "Morning routine",
+    items: ["Wake up", "Drink water", "Shower", "Get dressed", "Breakfast", "Check calendar"],
+  },
+  {
+    title: "Weekend tasks",
+    items: ["Clean kitchen", "Laundry", "Food shop", "Tidy living space", "Plan upcoming week"],
+  },
+  {
+    title: "Packing list (weekend away)",
+    items: ["Clothes", "Underwear", "Toiletries", "Phone charger", "Shoes", "Travel documents"],
+  },
+  {
+    title: "Spaghetti bolognese",
+    items: ["Minced beef", "Onion", "Garlic", "Chopped tomatoes", "Tomato purée", "Spaghetti"],
+  },
+  {
+    title: "Pancakes (classic)",
+    items: ["Flour", "Eggs", "Milk", "Butter", "Sugar", "Maple syrup"],
+  },
+  {
+    title: "Films to watch",
+    items: ["The Shawshank Redemption", "Inception", "The Dark Knight", "Forrest Gump", "Interstellar"],
+  },
+];
+
 // Category colours matching existing static component tick circles
 const CATEGORY_COLOURS: Record<string, string> = {
   today: "#00AFEE",
@@ -68,6 +99,7 @@ const OVERDUE_COLOUR = "#FF0000";
 
 // Reminderly dark blue constant for done styling
 const DONE_BLUE = "#1C2C42";
+const DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY = 'reminderly-dev-default-templates-in-clean-state';
 const DONE_LIST_COLOUR = "#404040";
 
 // Deleted grey constant for deleted styling
@@ -718,6 +750,13 @@ export default function App() {
       return false;
     }
   });
+  const [useDefaultTemplatesInCleanState, setUseDefaultTemplatesInCleanState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
   const isSmartRemindersEnabled = isListsEnabled && smartRemindersFeatureEnabled;
 
   // Dev-only: filters menu variant for A/B testing (standard vs grouped)
@@ -992,6 +1031,14 @@ export default function App() {
       // Fail silently
     }
   }, [savedListsFeatureEnabled]);
+
+  useEffect(() => {
+    try {
+      persistStringIfChanged(DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY, String(useDefaultTemplatesInCleanState));
+    } catch {
+      // Fail silently
+    }
+  }, [useDefaultTemplatesInCleanState]);
 
   useEffect(() => {
     if (!savedListMenuId) {
@@ -2593,9 +2640,9 @@ export default function App() {
             </div>
           </div>
           <div
-            className={`${activeMainTab === 'lists' ? 'bg-white' : 'bg-[rgba(255,255,255,0.25)]'} flex-[1_0_0] min-h-px min-w-px relative rounded-tl-[12px] rounded-tr-[12px] cursor-pointer h-[52px]`}
+            className={`${activeMainTab === 'lists' ? 'bg-white' : 'bg-[rgba(255,255,255,0.25)]'} flex-[1_0_0] min-h-px min-w-px relative rounded-tl-[12px] rounded-tr-[12px] h-[52px] ${isListsEnabled ? 'cursor-pointer' : 'cursor-default opacity-50'}`}
             data-name="today-btn"
-            onClick={() => {
+            onClick={isListsEnabled ? () => {
               if (viewMode === 'done-deleted') {
                 setViewMode('list');
               }
@@ -2603,7 +2650,7 @@ export default function App() {
               setActiveListFilter('all');
               setSavedListsPanelOpen(false);
               setActiveMainTab('lists');
-            }}
+            } : undefined}
           >
             {activeMainTab === 'lists' && (
               <div aria-hidden="true" className="absolute border-[1.5px] border-solid border-white inset-[-0.75px] pointer-events-none rounded-tl-[12.75px] rounded-tr-[12.75px]" />
@@ -4153,9 +4200,23 @@ export default function App() {
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
-              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} savedListsEnabled={savedListsFeatureEnabled} onSavedListsEnabledChange={handleSavedListsFeatureEnabledChange} onClearLists={() => {
+              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} savedListsEnabled={savedListsFeatureEnabled} onSavedListsEnabledChange={handleSavedListsFeatureEnabledChange} useDefaultTemplatesInCleanState={useDefaultTemplatesInCleanState} onUseDefaultTemplatesInCleanStateChange={setUseDefaultTemplatesInCleanState} onClearLists={(useDefaultTemplatesInCleanState) => {
                 setCreatedLists([]);
-                setSavedLists([]);
+                setSavedLists(
+                  useDefaultTemplatesInCleanState
+                    ? DEFAULT_TEMPLATE_SEED.map((template) => ({
+                        id: crypto.randomUUID(),
+                        title: template.title,
+                        items: template.items.map((text) => ({
+                          id: crypto.randomUUID(),
+                          text,
+                          completed: false,
+                        })),
+                        status: 'active' as const,
+                        statusChangedAt: null,
+                      }))
+                    : [],
+                );
               }} onGenerateLists={({ lists, savedLists }) => {
                 setCreatedLists(lists.map((list) => ({ ...list, status: list.status ?? 'active', statusChangedAt: list.statusChangedAt ?? null, smartReminderDueDate: list.smartReminderDueDate ?? null })));
                 setSavedLists(savedLists.map((list) => ({
@@ -4165,6 +4226,7 @@ export default function App() {
                   status: list.status ?? 'active',
                   statusChangedAt: list.statusChangedAt ?? null,
                 })));
+                setUseDefaultTemplatesInCleanState(false);
               }} />
             </motion.div>
           </>
