@@ -1751,6 +1751,16 @@ export default function App() {
     )));
   };
 
+  const runOverlayDeleteSequence = useCallback((closeOverlay: () => void, closePanel: () => void, deleteAction: () => void) => {
+    closeOverlay();
+    window.setTimeout(() => {
+      closePanel();
+      window.setTimeout(() => {
+        deleteAction();
+      }, 50);
+    }, 50);
+  }, []);
+
   const handleLogoClick = () => {
     clickCountRef.current += 1;
 
@@ -4204,24 +4214,34 @@ export default function App() {
                 </div>
               </motion.div>
             </motion.div>
-            {/* List Settings Overlay */}
-            {isListSettingsOpen && (
-              <>
-                <div
-                  className="fixed inset-0 bg-black/50 z-[60]"
-                  onClick={closeListSettingsOverlay}
-                />
-                <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none px-[20px]">
-                  <div className="pointer-events-auto w-full max-w-[400px]">
-                    <InfoOverlay sortMode={listSettingsSortModeDraft} onSortChange={setListSettingsSortModeDraft} listTitle={listTitle} onUncheckAll={handleListSettingsUncheckAll} onCreateTemplate={handleCreateTemplateFromListSettingsFeedback} createTemplateStage={createTemplateFeedback?.source === 'list-settings' && createTemplateFeedback.key === (editingListId ?? 'list-settings') ? createTemplateFeedback.stage : 'idle'} allUnchecked={listItems.every(i => !i.completed)} smartReminders={listSmartReminders} onSmartRemindersChange={handleSmartRemindersChange} showSmartReminders={isSmartRemindersEnabled} smartReminderDueDate={storageStringToDate(listSmartReminderDueDate)} onSetSmartReminderDueDate={(date) => { setListSmartReminderDueDate(dateToStorageString(date)); }} />
-                  </div>
-                </div>
-              </>
-            )}
           </>
           );
         })()}
       </AnimatePresence>
+
+      {isListSettingsOpen && isListsEnabled && activeMainTab === 'lists' && isListsOverlayOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-[60]"
+            onClick={closeListSettingsOverlay}
+          />
+          <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none px-[20px]">
+            <div className="pointer-events-auto w-full max-w-[400px]">
+              <InfoOverlay sortMode={listSettingsSortModeDraft} onSortChange={setListSettingsSortModeDraft} listTitle={listTitle} onUncheckAll={handleListSettingsUncheckAll} onCreateTemplate={handleCreateTemplateFromListSettingsFeedback} createTemplateStage={createTemplateFeedback?.source === 'list-settings' && createTemplateFeedback.key === (editingListId ?? 'list-settings') ? createTemplateFeedback.stage : 'idle'} onDelete={() => {
+                const listId = editingListId;
+                if (!listId) return;
+                runOverlayDeleteSequence(() => {
+                  setIsListSettingsOpen(false);
+                }, () => {
+                  setIsListsOverlayOpen(false);
+                }, () => {
+                  handleListDeleteClick(listId);
+                });
+              }} allUnchecked={listItems.every(i => !i.completed)} smartReminders={listSmartReminders} onSmartRemindersChange={handleSmartRemindersChange} showSmartReminders={isSmartRemindersEnabled} smartReminderDueDate={storageStringToDate(listSmartReminderDueDate)} onSetSmartReminderDueDate={(date) => { setListSmartReminderDueDate(dateToStorageString(date)); }} />
+            </div>
+          </div>
+        </>
+      )}
 
       {listInfoOverlayList && (
         <>
@@ -4441,12 +4461,14 @@ export default function App() {
                     className="cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
                     style={{ backgroundColor: '#939393' }}
                     onClick={() => {
-                      setTemplateEditorMenuId(null);
-                      setSavedListsPanelOpen(true);
-                      setIsSavedListsOverlayOpen(false);
-                      window.setTimeout(() => {
+                      runOverlayDeleteSequence(() => {
+                        setTemplateEditorMenuId(null);
+                      }, () => {
+                        setSavedListsPanelOpen(true);
+                        setIsSavedListsOverlayOpen(false);
+                      }, () => {
                         handleSavedListDeleteClick(savedList.id);
-                      }, 200);
+                      });
                     }}
                   >
                     <div className="flex flex-row items-center justify-center size-full">
