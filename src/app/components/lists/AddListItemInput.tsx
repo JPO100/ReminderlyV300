@@ -23,8 +23,12 @@ type AddListItemInputProps = {
     isEmpty?: boolean;
     accentColor?: string;
     idleCircleColor?: string;
+    focusedCircleColor?: string;
     leadingIcon?: ReactNode;
     activeLeadingIcon?: ReactNode;
+    focusedLeadingIcon?: ReactNode;
+    emptyPlaceholder?: string;
+    nextPlaceholder?: string;
 };
 
 export default function AddListItemInput({
@@ -32,10 +36,15 @@ export default function AddListItemInput({
     isEmpty,
     accentColor = "#D9D9D9",
     idleCircleColor,
+    focusedCircleColor = "#BABABA",
     leadingIcon,
     activeLeadingIcon,
+    focusedLeadingIcon,
+    emptyPlaceholder = "Add your first item...",
+    nextPlaceholder = "Add your next item...",
 }: AddListItemInputProps) {
     const [itemText, setItemText] = useState("");
+    const [isFocused, setIsFocused] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const hasTypedText = itemText.trim().length > 0;
 
@@ -56,9 +65,9 @@ export default function AddListItemInput({
         <div className="content-stretch relative flex w-full flex-col items-start pr-px" data-name="list-item">
             <div className="content-stretch relative flex h-[33px] w-full shrink-0 items-center gap-[16px]">
                 <div className="relative size-[25px] shrink-0" data-name="Tick box">
-                    {leadingIcon ? (hasTypedText ? (activeLeadingIcon ?? leadingIcon) : leadingIcon) : (
+                    {leadingIcon ? ((hasTypedText ? activeLeadingIcon : (isFocused ? (focusedLeadingIcon ?? leadingIcon) : leadingIcon)) ?? leadingIcon) : (
                         <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                            <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={hasTypedText ? accentColor : (idleCircleColor ?? accentColor)} strokeWidth="2" />
+                            <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={hasTypedText ? accentColor : (isFocused ? focusedCircleColor : (idleCircleColor ?? accentColor))} strokeWidth="2" />
                         </svg>
                     )}
                 </div>
@@ -68,6 +77,8 @@ export default function AddListItemInput({
                         type="text"
                         value={itemText}
                         onChange={(event) => setItemText(event.target.value)}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
                         onPointerDownCapture={(event) => {
                             event.preventDefault();
                             focusInputWithoutScroll();
@@ -75,7 +86,7 @@ export default function AddListItemInput({
                         onKeyDown={(event) => {
                             if (event.key === "Enter") handleAdd();
                         }}
-                        placeholder={isEmpty ? "Add your first item..." : "Add your next item..."}
+                        placeholder={isEmpty ? emptyPlaceholder : nextPlaceholder}
                         className="font-['Lato:Bold',sans-serif] w-full border-none bg-transparent text-[17px] not-italic text-[#1c2c42] caret-[#1c2c42] outline-none placeholder-[#D9D9D9]"
                     />
                 </div>
