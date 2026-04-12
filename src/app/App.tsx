@@ -3399,7 +3399,7 @@ export default function App() {
                     </div>
                     <div className="relative w-full max-w-[768px] flex-1 min-h-0">
                       <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: savedListsPanelOpen ? 'auto' : 'hidden', height: '100%' }}>
-                        {savedLists.length === 0 ? (
+                        {savedLists.filter((list) => (list.status ?? 'active') !== 'deleted' || pendingDeletedSavedListIds.has(list.id)).length === 0 ? (
                           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 0 }}>
                             <p className="font-['Lato',sans-serif] text-[17px] text-[#CCCCCC]">
                               No list templates yet.. get busy!
