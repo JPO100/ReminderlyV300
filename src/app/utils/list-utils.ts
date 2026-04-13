@@ -1,6 +1,11 @@
 import type { Reminder } from "../reminder-utils";
 
-export type ListItem = { id: string; text: string; completed: boolean };
+export type ListItem = {
+  id: string;
+  text: string;
+  completed: boolean;
+  completedAt?: number | null;
+};
 
 export type CreatedList = {
   id: string;
@@ -87,15 +92,41 @@ export function getDisplayListItems(
   alphabeticalPinnedListItemId: string | null,
   alphabeticalPinnedListItemIndex: number,
 ): ListItem[] {
-  if (sortMode !== 'alphabetical') return listItems;
+  if (sortMode !== 'alphabetical') {
+    const incompleteItems: ListItem[] = [];
+    const completedItems: Array<ListItem & { originalIndex: number }> = [];
+
+    listItems.forEach((item, index) => {
+      if (item.completed) {
+        completedItems.push({ ...item, originalIndex: index });
+        return;
+      }
+      incompleteItems.push(item);
+    });
+
+    completedItems.sort((a, b) => {
+      const completedAtDiff = (b.completedAt ?? 0) - (a.completedAt ?? 0);
+      if (completedAtDiff !== 0) return completedAtDiff;
+      return a.originalIndex - b.originalIndex;
+    });
+
+    return [
+      ...incompleteItems,
+      ...completedItems.map(({ originalIndex: _originalIndex, ...item }) => item),
+    ];
+  }
+
+  const alphabeticalSort = (a: ListItem, b: ListItem) => a.text.localeCompare(b.text);
+  const incompleteItems = listItems.filter((item) => !item.completed).sort(alphabeticalSort);
+  const completedItems = listItems.filter((item) => item.completed).sort(alphabeticalSort);
+  const sortedItems = [...incompleteItems, ...completedItems];
+
   if (!alphabeticalPinnedListItemId) {
-    return [...listItems].sort((a, b) => a.text.localeCompare(b.text));
+    return sortedItems;
   }
 
   const pinnedItem = listItems.find((item) => item.id === alphabeticalPinnedListItemId);
-  const remainingItems = listItems
-    .filter((item) => item.id !== alphabeticalPinnedListItemId)
-    .sort((a, b) => a.text.localeCompare(b.text));
+  const remainingItems = sortedItems.filter((item) => item.id !== alphabeticalPinnedListItemId);
   if (!pinnedItem) return remainingItems;
 
   const insertIndex = Math.max(0, Math.min(alphabeticalPinnedListItemIndex, remainingItems.length));

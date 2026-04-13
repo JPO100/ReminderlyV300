@@ -446,7 +446,14 @@ export default function App() {
           return parsed.map((list: any) => ({
             ...list,
             items: Array.isArray(list.items) ? list.items.map((item: any) =>
-              typeof item === 'string' ? { id: crypto.randomUUID(), text: item, completed: false } : { id: item.id || crypto.randomUUID(), text: item.text, completed: item.completed }
+              typeof item === 'string'
+                ? { id: crypto.randomUUID(), text: item, completed: false, completedAt: null }
+                : {
+                    id: item.id || crypto.randomUUID(),
+                    text: item.text,
+                    completed: item.completed,
+                    completedAt: typeof item.completedAt === 'number' ? item.completedAt : null,
+                  }
             ) : [],
             status: list.status ?? (list.completedAt != null ? 'done' : 'active'),
             statusChangedAt: list.statusChangedAt ?? list.completedAt ?? null,
@@ -472,6 +479,7 @@ export default function App() {
                   id: item.id || crypto.randomUUID(),
                   text: typeof item.text === 'string' ? item.text : String(item ?? ''),
                   completed: false,
+                  completedAt: null,
                 }))
               : [],
             status: list.status === 'deleted' ? 'deleted' : 'active',
@@ -600,7 +608,7 @@ export default function App() {
     }
     listSettingsUncheckAllTimerRef.current = window.setTimeout(() => {
       listSettingsUncheckAllTimerRef.current = null;
-      setListItems(prev => prev.map(i => ({ ...i, completed: false })));
+      setListItems(prev => prev.map(i => ({ ...i, completed: false, completedAt: null })));
     }, 150);
   }, [listSettingsSortModeDraft, listSortMode]);
 
@@ -1494,11 +1502,11 @@ export default function App() {
 
   const openSavedListEditor = (list: SavedListTemplate) => {
     setListTitle(list.title);
-    setListItems(list.items.map((item) => ({ ...item, completed: false })));
+    setListItems(list.items.map((item) => ({ ...item, completed: false, completedAt: null })));
     setListOverlayMode('edit');
     setEditingListId(null);
     setEditingSavedListId(list.id);
-    setListSortMode('insertion');
+    setListSortMode('alphabetical');
     setListSmartReminders(false);
     setListSmartReminderDueDate(null);
     setRestoreSavedListsPanelAfterOverlayClose(savedListsPanelOpen);
@@ -1508,11 +1516,11 @@ export default function App() {
 
   const openSavedListEditorFromTemplatesPanel = (list: SavedListTemplate) => {
     setListTitle(list.title);
-    setListItems(list.items.map((item) => ({ ...item, completed: false })));
+    setListItems(list.items.map((item) => ({ ...item, completed: false, completedAt: null })));
     setListOverlayMode('edit');
     setEditingListId(null);
     setEditingSavedListId(list.id);
-    setListSortMode('insertion');
+    setListSortMode('alphabetical');
     setListSmartReminders(false);
     setListSmartReminderDueDate(null);
     setRestoreSavedListsPanelAfterOverlayClose(false);
@@ -1542,7 +1550,7 @@ export default function App() {
     setCreatedLists((prev) => [...prev, {
       id: newId,
       title: list.title,
-      items: list.items.map((item) => ({ ...item, id: crypto.randomUUID(), completed: false })),
+      items: list.items.map((item) => ({ ...item, id: crypto.randomUUID(), completed: false, completedAt: null })),
       sortMode: 'insertion',
       smartReminders: false,
       smartReminderDueDate: null,
@@ -1560,6 +1568,7 @@ export default function App() {
         id: crypto.randomUUID(),
         text: item.text,
         completed: false,
+        completedAt: null,
       })),
       status: 'active',
       statusChangedAt: null,
@@ -1826,7 +1835,7 @@ export default function App() {
           list.id === listId
             ? {
                 ...list,
-                items: list.items.map((item) => ({ ...item, completed: true })),
+                items: list.items.map((item) => ({ ...item, completed: true, completedAt: Date.now() })),
                 status: 'done',
                 statusChangedAt: Date.now(),
               }
@@ -1860,7 +1869,7 @@ export default function App() {
         list.id === listId
           ? {
               ...list,
-              items: list.items.map((item) => ({ ...item, completed: false })),
+              items: list.items.map((item) => ({ ...item, completed: false, completedAt: null })),
               status: 'active',
               statusChangedAt: null,
             }
@@ -2434,6 +2443,39 @@ export default function App() {
     pendingDeleteTimersRef.current.set(reminderId, timer);
   }, [reminders]);
 
+  const handleMoveReminderToTomorrow = useCallback((reminderId: string) => {
+    const targetReminder = reminders.find((reminder) => reminder.id === reminderId);
+    if (!targetReminder || targetReminder.schedule.kind !== "scheduled") return;
+
+    const tomorrow = new Date();
+    tomorrow.setHours(0, 0, 0, 0);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const nextDate = dateToStorageString(tomorrow);
+
+    setReminders((prev) =>
+      prev.map((reminder) => {
+        if (reminder.id !== reminderId || reminder.schedule.kind !== "scheduled") return reminder;
+        return {
+          ...reminder,
+          schedule: {
+            ...reminder.schedule,
+            date: nextDate,
+          },
+        };
+      })
+    );
+
+    if (targetReminder.isSmartReminder === true && targetReminder.linkedListId) {
+      setCreatedLists((prev) =>
+        prev.map((list) =>
+          list.id === targetReminder.linkedListId
+            ? { ...list, smartReminderDueDate: nextDate }
+            : list
+        )
+      );
+    }
+  }, [reminders]);
+
   useEffect(() => {
     handleCompleteClickRef.current = handleCompleteClick;
   }, [handleCompleteClick]);
@@ -2469,11 +2511,16 @@ export default function App() {
     })
     .length;
 
+  const visibleDeletedSavedListCount = savedLists
+    .filter((list) => (list.status ?? 'active') === 'deleted')
+    .filter((list) => doneDeletedFilter !== 'done')
+    .length;
+
   const isClearAllDisabled =
     viewMode === 'done-deleted'
       ? visibleDoneDeletedReminderCount === 0
       : (isListsEnabled && activeMainTab === 'lists' && viewMode === 'lists-done')
-        ? visibleDoneDeletedListCount === 0
+        ? visibleDoneDeletedListCount + visibleDeletedSavedListCount === 0
         : false;
 
   // Clear list: 3-step confirmation handler
@@ -2491,6 +2538,12 @@ export default function App() {
     setDoneDeletedFilter('all');
 
     if (isListsEnabled && activeMainTab === 'lists' && viewMode === 'lists-done') {
+      const savedListIdsToRemove = new Set(
+        savedLists
+          .filter((list) => (list.status ?? 'active') === 'deleted')
+          .map((list) => list.id)
+      );
+
       setCreatedLists((prev) => {
         const idsToRemove = new Set<string>();
 
@@ -2543,6 +2596,18 @@ export default function App() {
 
         return prev.filter((list) => !idsToRemove.has(list.id));
       });
+
+      if (savedListIdsToRemove.size > 0) {
+        setSavedLists((prev) => prev.filter((list) => !savedListIdsToRemove.has(list.id)));
+        setPendingDeletedSavedListIds((current) => {
+          let changed = false;
+          const next = new Set(current);
+          for (const id of savedListIdsToRemove) {
+            if (next.delete(id)) changed = true;
+          }
+          return changed ? next : current;
+        });
+      }
 
       if (clearListTimerRef.current !== null) {
         clearTimeout(clearListTimerRef.current);
@@ -3081,7 +3146,9 @@ export default function App() {
                                     </button>
                                   )}
                                   <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
-                                    <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor, textDecorationColor: isPendingRestore ? '#BABABA' : listStatusColor }}>{list.title}</p>
+                                    <div className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ color: isPendingRestore ? '#BABABA' : listStatusColor, textDecorationColor: isPendingRestore ? '#BABABA' : listStatusColor, clipPath: 'inset(0 0 -4px 0)' }}>
+                                      <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>{list.title}</p>
+                                    </div>
                                     <div className={`flex items-center overflow-visible${isPendingRestore ? '' : ' line-through'}`} style={{ textDecorationColor: isPendingRestore ? '#BABABA' : listStatusColor }}>
                                       <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor }}>
                                         {isSavedList ? `${list.items.length} ${list.items.length === 1 ? 'item' : 'items'}` : `${doneCount} of ${list.items.length} items completed`}
@@ -3277,7 +3344,7 @@ export default function App() {
                         <div className="content-stretch flex items-start justify-between px-px relative w-full">
                           <div className="flex-[1_0_0] min-h-px min-w-px relative">
                             <div className="flex flex-row items-start size-full">
-                              <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full">
+                              <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full min-w-0">
                                 <button
                                   className="relative shrink-0 size-[25px] cursor-pointer flex items-center justify-center"
                                   style={{ padding: 0, background: 'none', border: 'none', lineHeight: 0, marginTop: '3px' }}
@@ -3293,8 +3360,10 @@ export default function App() {
                                   )}
                                 </button>
                                 <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
-                                  <p className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42') }} onClick={() => openListEditor(list)}>{list.title}</p>
-                                  <div className={`flex items-center overflow-visible cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }} onClick={() => openListEditor(list)}>
+                                  <div className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), clipPath: 'inset(0 0 -4px 0)' }} onClick={() => openListEditor(list)}>
+                                    <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>{list.title}</p>
+                                  </div>
+                                  <div className={`flex items-center overflow-visible cursor-pointer${isPendingAwayList ? ' line-through' : ''} min-w-0`} style={{ textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }} onClick={() => openListEditor(list)}>
                                     <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAwayList ? DELETED_GREY : '#BABABA', textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
                                       {visibleCompletedCount} of {list.items.length} items
                                       {isSmartRemindersEnabled && (list.smartReminders ?? true) ? (
@@ -3344,8 +3413,8 @@ export default function App() {
                       complete: "No fully checked off lists yet",
                       almost: "Nothing close to completion yet",
                       started: "All your lists are well underway",
-                      todo: "All your lists have been started!",
-                      "grouped-todo": "All your lists have been started!",
+                      todo: "Nothing 'todo' here!",
+                      "grouped-todo": "Nothing 'todo' here!",
                     };
                     return (
                       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 0 }}>
@@ -3421,20 +3490,22 @@ export default function App() {
                               <div className="content-stretch flex items-start justify-between px-px relative w-full">
                                 <div className="flex-[1_0_0] min-h-px min-w-px relative">
                                   <div className="flex flex-row items-start size-full">
-                                    <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full">
+                                    <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full min-w-0">
                                       <div className="relative shrink-0 size-[25px]">
                                         <SavedListTemplateIcon color={isPendingDeletedSavedList ? deletedSavedListColor : undefined} />
                                       </div>
                                       <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
-                                        <p
+                                        <div
                                           className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDeletedSavedList ? ' line-through' : ''}`}
-                                          style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingDeletedSavedList ? deletedSavedListColor : '#1c2c42', textDecorationColor: isPendingDeletedSavedList ? deletedSavedListColor : '#1c2c42' }}
+                                          style={{ color: isPendingDeletedSavedList ? deletedSavedListColor : '#1c2c42', textDecorationColor: isPendingDeletedSavedList ? deletedSavedListColor : '#1c2c42', clipPath: 'inset(0 0 -4px 0)' }}
                                           onClick={() => openSavedListEditor(list)}
                                         >
-                                          {list.title}
-                                        </p>
+                                          <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>
+                                            {list.title}
+                                          </p>
+                                        </div>
                                         <div
-                                          className={`flex items-center overflow-visible cursor-pointer${isPendingDeletedSavedList ? ' line-through' : ''}`}
+                                          className={`flex items-center overflow-visible cursor-pointer${isPendingDeletedSavedList ? ' line-through' : ''} min-w-0`}
                                           style={{ textDecorationColor: isPendingDeletedSavedList ? deletedSavedListColor : '#BABABA' }}
                                           onClick={() => openSavedListEditor(list)}
                                         >
@@ -3467,7 +3538,7 @@ export default function App() {
                           setListOverlayMode('create');
                           setEditingListId(null);
                           setEditingSavedListId(null);
-                          setListSortMode('insertion');
+                          setListSortMode('alphabetical');
                           setListSmartReminders(false);
                           setListSmartReminderDueDate(null);
                           setRestoreSavedListsPanelAfterOverlayClose(true);
@@ -3703,7 +3774,9 @@ export default function App() {
                                 const subtitleCol = isPendingRestore ? '#BABABA' : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE));
                                 return (
                                   <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ color: textCol, gap: '9px', minHeight: '38px' }}>
-                                    <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, textDecorationColor: textCol }}>{getDisplayTitle(item)}</p>
+                                    <div className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ textDecorationColor: textCol, clipPath: 'inset(0 0 -4px 0)' }}>
+                                      <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>{getDisplayTitle(item)}</p>
+                                    </div>
                                     {showSubtitles && (
                                       <div className={`flex items-center overflow-visible${isPendingRestore ? '' : ' line-through'}`} style={{ textDecorationColor: subtitleCol }}>
                                         <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: subtitleCol }}>{(() => {
@@ -3824,7 +3897,9 @@ export default function App() {
                                   setIsOverlayOpen(true);
                                 }}
                               >
-                                <p className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, color: isPendingAway ? pendingColour : textColour, textDecorationColor: isPendingAway ? pendingColour : textColour }}>{getDisplayTitle(reminder)}</p>
+                                <div className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ color: isPendingAway ? pendingColour : textColour, textDecorationColor: isPendingAway ? pendingColour : textColour, clipPath: 'inset(0 0 -4px 0)' }}>
+                                  <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>{getDisplayTitle(reminder)}</p>
+                                </div>
                                 {showSubtitles && (
                                   <div className={`flex items-center overflow-visible${isPendingAway ? ' line-through' : ''}`} style={{ textDecorationColor: isPendingAway ? pendingColour : '#BABABA' }}>
                                     <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAway ? pendingColour : '#BABABA' }}>{(() => {
@@ -3906,6 +3981,17 @@ export default function App() {
                       setRepeatConfig(repeatRuleToConfig(reminderToEdit.repeatRule));
                       setEditingReminder(reminderToEdit);
                       setIsOverlayOpen(true);
+                    }, 200);
+                  }}
+                  onMoveToTomorrow={() => {
+                    const reminderId = infoReminder.id;
+                    setInfoReminder(null);
+                    if (overlayEditTimerRef.current !== null) {
+                      clearTimeout(overlayEditTimerRef.current);
+                    }
+                    overlayEditTimerRef.current = window.setTimeout(() => {
+                      overlayEditTimerRef.current = null;
+                      handleMoveReminderToTomorrow(reminderId);
                     }, 200);
                   }}
                   onDelete={() => {
@@ -4013,13 +4099,13 @@ export default function App() {
         {isListsEnabled && activeMainTab === 'lists' && (isListsOverlayOpen || isSavedListsOverlayOpen) && (() => {
           const isSavedListCreateOverlay = isSavedListsOverlayOpen && !isListsOverlayOpen;
           const isSavedListEditOverlay = isSavedListCreateOverlay && editingSavedListId !== null;
-          const overlayDisplayListItems = isSavedListCreateOverlay ? listItems : displayListItems;
+          const overlayDisplayListItems = displayListItems;
           const persistOverlayListDraft = ({ closeAfterSave = false, nextTitle, nextItems }: { closeAfterSave?: boolean; nextTitle?: string; nextItems?: typeof listItems } = {}) => {
             setIsListSettingsOpen(false);
             const title = (nextTitle ?? listTitle).trim();
             const items = (nextItems ?? listItems).map((item) => ({ ...item }));
             if (isSavedListCreateOverlay) {
-              const savedItems = items.map((item) => ({ ...item, completed: false }));
+              const savedItems = items.map((item) => ({ ...item, completed: false, completedAt: null }));
               if (editingSavedListId !== null) {
                 setSavedLists((prev) => prev.map((list) => (
                   list.id === editingSavedListId ? { ...list, title, items: savedItems } : list
@@ -4114,7 +4200,7 @@ export default function App() {
                     />
                     <AddListItemInput onAdd={(text: string) => {
                       const newId = crypto.randomUUID();
-                      const nextItems = [{ id: newId, text, completed: false }, ...listItems];
+                      const nextItems = [{ id: newId, text, completed: false, completedAt: null }, ...listItems];
                       setRevealedDeleteListItemId(null);
                       setListItems(nextItems);
                       if (isSavedListCreateOverlay) {
@@ -4177,7 +4263,7 @@ export default function App() {
                           }}
                           className="w-full"
                         >
-                          <EditableListItem name={item.text} completed={isSavedListCreateOverlay ? false : item.completed} isHighlighted={isItemHighlighted} accentColor={isSavedListCreateOverlay ? '#1C2C42' : currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={isSavedListCreateOverlay ? undefined : () => { setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { next[idx] = { ...next[idx], completed: !next[idx].completed }; } return next; }); }} onDelete={() => { setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={true} leadingIcon={isSavedListCreateOverlay ? <SavedListOverlayCheckCircle /> : undefined} onCommit={(val: string) => {
+                          <EditableListItem name={item.text} completed={isSavedListCreateOverlay ? false : item.completed} isHighlighted={isItemHighlighted} accentColor={isSavedListCreateOverlay ? '#1C2C42' : currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={isSavedListCreateOverlay ? undefined : () => { setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { const wasCompleted = next[idx].completed; next[idx] = { ...next[idx], completed: !wasCompleted, completedAt: wasCompleted ? null : Date.now() }; } return next; }); }} onDelete={() => { setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={true} leadingIcon={isSavedListCreateOverlay ? <SavedListOverlayCheckCircle /> : undefined} onCommit={(val: string) => {
                             const currentIndex = overlayDisplayListItems.findIndex((displayItem) => displayItem.id === item.id);
                             setRevealedDeleteListItemId(null);
                             const nextItems = listItems.map((listItem) => (
@@ -4566,6 +4652,7 @@ export default function App() {
                           id: crypto.randomUUID(),
                           text,
                           completed: false,
+                          completedAt: null,
                         })),
                         status: 'active' as const,
                         statusChangedAt: null,
@@ -4577,7 +4664,7 @@ export default function App() {
                 setSavedLists(savedLists.map((list) => ({
                   id: list.id,
                   title: list.title,
-                  items: list.items.map((item) => ({ id: crypto.randomUUID(), text: item.text, completed: false })),
+                  items: list.items.map((item) => ({ id: crypto.randomUUID(), text: item.text, completed: false, completedAt: null })),
                   status: list.status ?? 'active',
                   statusChangedAt: list.statusChangedAt ?? null,
                 })));

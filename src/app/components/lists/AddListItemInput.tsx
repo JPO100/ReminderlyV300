@@ -76,6 +76,8 @@ export default function AddListItemInput({
                         ref={inputRef}
                         type="text"
                         value={itemText}
+                        autoCorrect="on"
+                        spellCheck={true}
                         onChange={(event) => setItemText(event.target.value)}
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}

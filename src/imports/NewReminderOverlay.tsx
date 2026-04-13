@@ -1223,8 +1223,8 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
             placeholder="Don't forget..."
             autoCapitalize="sentences"
             autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
+            autoCorrect="on"
+            spellCheck={true}
             data-name="text-field"
             value={reminderText}
             onChange={(e) => setReminderText(e.target.value)}

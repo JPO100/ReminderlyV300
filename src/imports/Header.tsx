@@ -109,6 +109,8 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
             ref={inputRef}
             type="text"
             value={draftValue}
+            autoCorrect="on"
+            spellCheck={true}
             onFocus={() => { setIsFocused(true); setHasTypedSinceFocus(false); }}
             onBlur={() => { commitDraft(); setIsFocused(false); setHasTypedSinceFocus(false); }}
             onChange={(e) => { if (!hasTypedSinceFocus) setHasTypedSinceFocus(true); setDraftValue(e.target.value); onChange(e.target.value); }}

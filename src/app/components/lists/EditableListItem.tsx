@@ -44,9 +44,14 @@ export default function EditableListItem({
     const [isAnimatingUncheck, setIsAnimatingUncheck] = useState(false);
     const lastCommittedValueRef = useRef(name);
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const inputRef = useRef<HTMLInputElement | null>(null);
     const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
     const swipeActiveRef = useRef(false);
     const previousCompletedRef = useRef(Boolean(completed));
+    const marqueeDelayTimeoutRef = useRef<number | null>(null);
+    const marqueeFrameRef = useRef<number | null>(null);
+    const [isMarqueeActive, setIsMarqueeActive] = useState(false);
+    const [hasCompletedMarqueeScroll, setHasCompletedMarqueeScroll] = useState(false);
 
     const showGrey = editable && isFocused && !hasTypedSinceFocus;
     const textColor = isDeleteRevealed ? "#FF1E0A" : isHighlighted ? accentColor : completed ? "#1C2C42" : showGrey ? "#B7B7B7" : "#1c2c42";
@@ -93,6 +98,17 @@ export default function EditableListItem({
         };
     }, [isDeleteRevealed]);
 
+    useEffect(() => {
+        return () => {
+            if (marqueeDelayTimeoutRef.current !== null) {
+                window.clearTimeout(marqueeDelayTimeoutRef.current);
+            }
+            if (marqueeFrameRef.current !== null) {
+                window.cancelAnimationFrame(marqueeFrameRef.current);
+            }
+        };
+    }, []);
+
     const commitDraft = () => {
         const normalizedValue = draftValue.trim();
         if (normalizedValue.length === 0) {
@@ -105,6 +121,59 @@ export default function EditableListItem({
     };
 
     const canSwipeToDelete = editable && !isFocused && typeof onDelete === "function";
+
+    const resetMarquee = () => {
+        if (marqueeDelayTimeoutRef.current !== null) {
+            window.clearTimeout(marqueeDelayTimeoutRef.current);
+            marqueeDelayTimeoutRef.current = null;
+        }
+        if (marqueeFrameRef.current !== null) {
+            window.cancelAnimationFrame(marqueeFrameRef.current);
+            marqueeFrameRef.current = null;
+        }
+        if (inputRef.current) {
+            inputRef.current.scrollLeft = 0;
+        }
+        setIsMarqueeActive(false);
+        setHasCompletedMarqueeScroll(false);
+    };
+
+    const startMarqueeIfNeeded = () => {
+        resetMarquee();
+        const input = inputRef.current;
+        if (!input) return;
+        const overflow = input.scrollWidth - input.clientWidth;
+        if (overflow <= 1) return;
+
+        marqueeDelayTimeoutRef.current = window.setTimeout(() => {
+            marqueeDelayTimeoutRef.current = null;
+            const duration = Math.max(1200, overflow * 35);
+            const startTime = performance.now();
+            setIsMarqueeActive(true);
+
+            const step = (timestamp: number) => {
+                const inputNode = inputRef.current;
+                if (!inputNode) {
+                    setIsMarqueeActive(false);
+                    setHasCompletedMarqueeScroll(false);
+                    marqueeFrameRef.current = null;
+                    return;
+                }
+                const elapsed = timestamp - startTime;
+                const progress = Math.min(1, elapsed / duration);
+                inputNode.scrollLeft = overflow * progress;
+                if (progress < 1) {
+                    marqueeFrameRef.current = window.requestAnimationFrame(step);
+                    return;
+                }
+                marqueeFrameRef.current = null;
+                setIsMarqueeActive(false);
+                setHasCompletedMarqueeScroll(true);
+            };
+
+            marqueeFrameRef.current = window.requestAnimationFrame(step);
+        }, 250);
+    };
 
     const resetSwipeTracking = () => {
         swipeStartRef.current = null;
@@ -221,23 +290,35 @@ export default function EditableListItem({
                         </svg>
                     </button>
                 )}
-                <div className="content-stretch relative flex w-[278px] shrink-0 flex-col items-start justify-center self-center">
+                <div className="content-stretch relative flex min-w-0 flex-1 flex-col items-start justify-center self-center">
                     {editable ? (
                         <input
+                            ref={inputRef}
                             type="text"
                             value={draftValue}
+                            autoCorrect="on"
+                            spellCheck={true}
                             readOnly={isDeleteRevealed}
                             onFocus={() => {
                                 onDeleteRevealChange?.(false);
                                 setIsFocused(true);
                                 setHasTypedSinceFocus(false);
+                                startMarqueeIfNeeded();
                             }}
                             onBlur={() => {
+                                resetMarquee();
                                 commitDraft();
                                 setIsFocused(false);
                                 setHasTypedSinceFocus(false);
                             }}
+                            onPointerDown={(event) => {
+                                if (!isMarqueeActive && !hasCompletedMarqueeScroll) return;
+                                event.preventDefault();
+                                resetMarquee();
+                                inputRef.current?.focus();
+                            }}
                             onChange={(event) => {
+                                resetMarquee();
                                 if (!hasTypedSinceFocus) setHasTypedSinceFocus(true);
                                 setDraftValue(event.target.value);
                                 onChange?.(event.target.value);
@@ -248,12 +329,12 @@ export default function EditableListItem({
                                 commitDraft();
                                 event.currentTarget.blur();
                             }}
-                            className={`font-['Lato:Bold',sans-serif] w-full border-none bg-transparent text-[17px] not-italic leading-[normal] caret-[#1c2c42] outline-none${completed ? " line-through" : ""}`}
+                            className={`font-['Lato:Bold',sans-serif] w-full min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent text-[17px] not-italic leading-[normal] caret-[#1c2c42] outline-none${completed ? " line-through" : ""}`}
                             style={{ color: textColor, transition: "color 300ms" }}
                         />
                     ) : (
                         <div
-                            className={`flex w-full shrink-0 flex-col justify-center overflow-hidden font-['Lato:Bold',sans-serif] text-[17px] not-italic leading-[0] whitespace-nowrap${completed ? " line-through" : ""}`}
+                            className={`flex w-full min-w-0 shrink-0 flex-col justify-center overflow-hidden font-['Lato:Bold',sans-serif] text-[17px] not-italic leading-[0] whitespace-nowrap${completed ? " line-through" : ""}`}
                             style={{ color: textColor, transition: "color 300ms" }}
                         >
                             <p className="overflow-hidden text-ellipsis leading-[normal]">{name}</p>
