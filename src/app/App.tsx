@@ -3441,7 +3441,7 @@ export default function App() {
                   </svg>
                 </div>
                 <div className="font-['Lato',sans-serif] font-bold text-[20px] text-white whitespace-nowrap">
-                  Add new list
+                  New list
                 </div>
               </button>
             </div>
