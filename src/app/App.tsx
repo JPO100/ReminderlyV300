@@ -4405,7 +4405,11 @@ export default function App() {
                   }, 200);
                 }}
                 onEdit={() => {
-                  openListEditor(listInfoOverlayList);
+                  const listToEdit = listInfoOverlayList;
+                  setListInfoOverlayListId(null);
+                  window.setTimeout(() => {
+                    openListEditor(listToEdit);
+                  }, 100);
                 }}
                 onCreateTemplate={() => {
                   handleCreateTemplateFromListInfoFeedback(listInfoOverlayList);
