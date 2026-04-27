@@ -339,8 +339,8 @@ function IconDetails1({ isOn, selectedTime, onLabelClick }: { isOn: boolean; sel
   );
 }
 
-function IconDetails2({ isOn, repeatConfig, onLabelClick }: { isOn: boolean; repeatConfig: RepeatConfig; onLabelClick?: () => void }) {
-  const color = isOn ? "#1C2C42" : "#B7B7B7";
+function IconDetails2({ isOn, repeatConfig, onLabelClick, inactiveColor = "#B7B7B7" }: { isOn: boolean; repeatConfig: RepeatConfig; onLabelClick?: () => void; inactiveColor?: string }) {
+  const color = isOn ? "#1C2C42" : inactiveColor;
   const repeatLabel = isOn ? formatRepeatConfig(repeatConfig) : null;
   return (
     <div className="content-stretch flex gap-[16px] items-center relative min-w-0 flex-1" data-name="icon-details">
@@ -480,19 +480,19 @@ function SetTime({
   );
 }
 
-function SetRepeatsFrame({ isRepeatsOn, onRepeatsToggle, repeatConfig, onLabelClick }: { isRepeatsOn: boolean; onRepeatsToggle: () => void; repeatConfig: RepeatConfig; onLabelClick?: () => void }) {
+function SetRepeatsFrame({ isRepeatsOn, onRepeatsToggle, repeatConfig, onLabelClick, inactiveColor }: { isRepeatsOn: boolean; onRepeatsToggle: () => void; repeatConfig: RepeatConfig; onLabelClick?: () => void; inactiveColor?: string }) {
   return (
     <div className="content-stretch flex items-center justify-between gap-[16px] relative shrink-0 w-full" data-name="set-repeats-frame">
-      <IconDetails2 isOn={isRepeatsOn} repeatConfig={repeatConfig} onLabelClick={onLabelClick} />
+      <IconDetails2 isOn={isRepeatsOn} repeatConfig={repeatConfig} onLabelClick={onLabelClick} inactiveColor={inactiveColor} />
       <ToggleBtn isOn={isRepeatsOn} onToggle={onRepeatsToggle} />
     </div>
   );
 }
 
-function SetRepeats({ isRepeatsOn, onRepeatsToggle, repeatConfig, onLabelClick, disabled }: { isRepeatsOn: boolean; onRepeatsToggle: () => void; repeatConfig: RepeatConfig; onLabelClick?: () => void; disabled?: boolean }) {
+function SetRepeats({ isRepeatsOn, onRepeatsToggle, repeatConfig, onLabelClick, disabled, keepFullOpacityWhenDisabled = false, inactiveColor }: { isRepeatsOn: boolean; onRepeatsToggle: () => void; repeatConfig: RepeatConfig; onLabelClick?: () => void; disabled?: boolean; keepFullOpacityWhenDisabled?: boolean; inactiveColor?: string }) {
   return (
-    <div className={`content-stretch flex flex-col items-start relative shrink-0 w-full transition-opacity duration-200 ${disabled ? 'opacity-30 pointer-events-none' : ''}`} data-name="set-repeats">
-      <SetRepeatsFrame isRepeatsOn={isRepeatsOn} onRepeatsToggle={onRepeatsToggle} repeatConfig={repeatConfig} onLabelClick={onLabelClick} />
+    <div className={`content-stretch flex flex-col items-start relative shrink-0 w-full transition-opacity duration-200 ${disabled ? `${keepFullOpacityWhenDisabled ? '' : 'opacity-30 '}pointer-events-none` : ''}`} data-name="set-repeats">
+      <SetRepeatsFrame isRepeatsOn={isRepeatsOn} onRepeatsToggle={onRepeatsToggle} repeatConfig={repeatConfig} onLabelClick={onLabelClick} inactiveColor={inactiveColor} />
     </div>
   );
 }
@@ -514,6 +514,8 @@ function ReminderOptions({
   onTimeLabelClick,
   onRepeatsLabelClick,
   useOneMinuteIncrements = false,
+  disableRepeats = false,
+  repeatInactiveColor,
 }: { 
   isDateOn: boolean; 
   onDateToggle: () => void; 
@@ -531,6 +533,8 @@ function ReminderOptions({
   onTimeLabelClick: () => void;
   onRepeatsLabelClick: () => void;
   useOneMinuteIncrements?: boolean;
+  disableRepeats?: boolean;
+  repeatInactiveColor?: string;
 }) {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full flex-1 min-h-0 overflow-y-auto" data-name="reminder-options">
@@ -543,13 +547,14 @@ function ReminderOptions({
         onLabelClick={onDateLabelClick}
       />
       <SetTime isTimeOn={isTimeOn} onTimeToggle={onTimeToggle} selectedTime={selectedTime} onTimeSelect={onTimeSelect} isDrawerOpen={openDrawer === 'time'} onLabelClick={onTimeLabelClick} useOneMinuteIncrements={useOneMinuteIncrements} />
-      <SetRepeats isRepeatsOn={isRepeatsOn} onRepeatsToggle={onRepeatsToggle} repeatConfig={repeatConfig} onLabelClick={onRepeatsLabelClick} disabled={!isDateOn && !isTimeOn} />
+      <SetRepeats isRepeatsOn={isRepeatsOn} onRepeatsToggle={onRepeatsToggle} repeatConfig={repeatConfig} onLabelClick={onRepeatsLabelClick} disabled={disableRepeats || (!isDateOn && !isTimeOn)} keepFullOpacityWhenDisabled={disableRepeats} inactiveColor={repeatInactiveColor} />
     </div>
   );
 }
 
 function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, editReminder, updateReminder, useOneMinuteIncrements = false, autoFocusReady = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; useOneMinuteIncrements?: boolean; autoFocusReady?: boolean }) {
   const isEditMode = !!editReminder;
+  const isSmartReminderEdit = editReminder?.isSmartReminder === true;
 
   const [isDateOn, setIsDateOn] = useState(() => {
     if (editReminder?.schedule.kind === 'scheduled') return true;
@@ -961,6 +966,10 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
 
   const handleDateToggle = () => {
     if (isDateOn) {
+      if (isSmartReminderEdit) {
+        setOpenDrawer(openDrawer === 'date' ? null : 'date');
+        return;
+      }
       // Turning OFF: clear toggle, clear date value, close drawer if open
       setIsDateOn(false);
       setSelectedDate(null);
@@ -987,6 +996,10 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
 
   const handleTimeToggle = () => {
     if (isTimeOn) {
+      if (isSmartReminderEdit) {
+        setOpenDrawer(openDrawer === 'time' ? null : 'time');
+        return;
+      }
       // Turning OFF: clear toggle, clear time value, close drawer if open
       setIsTimeOn(false);
       setSelectedTime(null);
@@ -1149,7 +1162,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
   return (
     <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col" data-name="new-reminder-elements">
       <div className="content-stretch flex flex-col gap-[22px] items-start pt-[24px] px-[24px] relative w-full shrink-0">
-        <Header isSubmitActive={isSubmitActive} onSubmit={handleSubmit} title={isEditMode ? 'Edit reminder' : 'New reminder'} />
+        <Header isSubmitActive={isSubmitActive} onSubmit={handleSubmit} title={isEditMode ? (isSmartReminderEdit ? 'Edit smart reminder' : 'Edit reminder') : 'New reminder'} />
         {/* NLC: Container wraps mirror layer + textarea for alignment */}
         {/* Mirror and hit layer must stay identical in text metrics (font, size, line-height, padding, whitespace). Any styling change must be applied to both. */}
         <motion.div
@@ -1159,7 +1172,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
           data-name="text-field-container"
         >
           {/* NLC layers: mirror (coloured text) + hit (click targets) — only render when NLC is enabled */}
-          {nlcEnabled && (
+          {nlcEnabled && !isSmartReminderEdit && (
             <>
               {/* Mirror layer: renders coloured text behind the transparent textarea */}
               <div
@@ -1201,7 +1214,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
           <textarea
             ref={textareaRef}
             className="w-full h-full p-[12px] font-['Lato',sans-serif] text-[17px] resize-none border-none outline-none bg-transparent relative z-10 placeholder:font-medium placeholder:text-[#bababa]"
-            style={{ color: nlcEnabled ? 'transparent' : '#1c2c42', caretColor: '#1c2c42', lineHeight: 'normal' }}
+            style={{ color: isSmartReminderEdit ? '#BABABA' : (nlcEnabled ? 'transparent' : '#1c2c42'), caretColor: isSmartReminderEdit ? '#BABABA' : '#1c2c42', lineHeight: 'normal' }}
             placeholder="Don't forget..."
             autoCapitalize="sentences"
             autoComplete="off"
@@ -1213,6 +1226,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
             onScroll={handleTextareaScroll}
             onPointerDown={handleTextareaPointerDown}
             onClick={handleTextareaClick}
+            readOnly={isSmartReminderEdit}
           />
         </motion.div>
       </div>
@@ -1234,6 +1248,8 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
         onTimeLabelClick={handleTimeLabelClick}
         onRepeatsLabelClick={handleRepeatsLabelClick}
         useOneMinuteIncrements={useOneMinuteIncrements}
+        disableRepeats={isSmartReminderEdit}
+        repeatInactiveColor={isSmartReminderEdit ? '#D9D9D9' : undefined}
       />
       </div>
     </div>

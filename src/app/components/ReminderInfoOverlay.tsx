@@ -1,11 +1,9 @@
 import { useEffect, useRef } from "react";
 import svgPaths from "../../imports/svg-oxn8g14l6y";
 import type { Reminder } from "../reminder-utils";
-import { formatRepeatLabel, formatScheduledDateForRow, isOverdue } from "../reminder-utils";
+import { formatRepeatRuleText, formatScheduledDateForRow, isOverdue } from "../reminder-utils";
 
 // ── Due line formatting ──────────────────────────────────────────────
-
-const WEEKDAY_DISPLAY_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function formatTime12h(time: string): string {
   const [hh, mm] = time.split(":").map(Number);
@@ -46,32 +44,6 @@ export function formatDueLine(reminder: Reminder, now: Date = new Date()): strin
   return `${prefix} at ${timePart}`;
 }
 
-// ── Repeats line formatting ──────────────────────────────────────────
-
-export function formatRepeatsLine(
-  repeatRule: Reminder["repeatRule"]
-): string | null {
-  const label = formatRepeatLabel(repeatRule);
-  if (!label) return null;
-  const match = label.match(/^(.*)\(([^)]+)\)\s*$/);
-  if (!match) return label;
-
-  const prefix = match[1].trim();
-  const days = match[2]
-    .split(",")
-    .map((day) => day.trim())
-    .filter(Boolean)
-    .sort((a, b) => WEEKDAY_DISPLAY_ORDER.indexOf(a) - WEEKDAY_DISPLAY_ORDER.indexOf(b));
-
-  if (days.length === 0) return label;
-  if (days.length === 1) return `${prefix} on :\n${days[0]}`;
-  if (days.length === 2) return `${prefix} on :\n${days[0]} and ${days[1]}`;
-
-  const lastDay = days[days.length - 1];
-  const leadingDays = days.slice(0, -1).join(", ");
-  return `${prefix} on :\n${leadingDays} and ${lastDay}`;
-}
-
 // ── Component ────────────────────────────────────────────────────────
 
 interface ReminderInfoOverlayProps {
@@ -79,6 +51,7 @@ interface ReminderInfoOverlayProps {
   onClose: () => void;
   onMarkAsDone: () => void;
   onEdit?: () => void;
+  onGoToList?: () => void;
   onMoveToTomorrow?: () => void;
   onDelete: () => void;
 }
@@ -88,6 +61,7 @@ export default function ReminderInfoOverlay({
   onClose,
   onMarkAsDone,
   onEdit,
+  onGoToList,
   onMoveToTomorrow,
   onDelete,
 }: ReminderInfoOverlayProps) {
@@ -119,8 +93,13 @@ export default function ReminderInfoOverlay({
   }, []);
 
   const dueLine = formatDueLine(reminder);
-  const smartReminderLine = reminder.isSmartReminder ? "Smart reminder" : null;
-  const repeatsLine = formatRepeatsLine(reminder.repeatRule);
+  const repeatRuleText = formatRepeatRuleText(
+    reminder.repeatRule,
+    reminder.schedule.kind === "scheduled" ? reminder.schedule.date : undefined
+  );
+  const repeatsLine = repeatRuleText
+    ? `Repeats ${repeatRuleText.charAt(0).toLowerCase()}${repeatRuleText.slice(1)}`
+    : null;
   const overdue = isOverdue(reminder, new Date());
   const dueLineColour = overdue ? "#FF0000" : "#1c2c42";
 
@@ -149,30 +128,26 @@ export default function ReminderInfoOverlay({
           </div>
 
           {/* Due line */}
-          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[17px] text-center w-[min-content]" style={{ color: dueLineColour }}>
-            <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{dueLine}</p>
-          </div>
-
-          {smartReminderLine && (
-            <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
+          <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
+            {reminder.isSmartReminder ? (
               <div className="h-[21.5px] relative shrink-0 w-[24px] flex items-center justify-center" aria-hidden="true">
                 <svg className="block h-[21.5px] w-[24px]" fill="none" preserveAspectRatio="xMidYMid meet" viewBox="0 0 19.5002 21.5002">
                   <g>
-                    <path clipRule="evenodd" d={svgPaths.p23b20a00} fill="#BABABA" fillRule="evenodd" />
-                    <path clipRule="evenodd" d={svgPaths.p15d6fbb2} fill="#BABABA" fillRule="evenodd" />
-                    <path clipRule="evenodd" d={svgPaths.p1797f00} fill="#BABABA" fillRule="evenodd" />
+                    <path clipRule="evenodd" d={svgPaths.p23b20a00} fill={dueLineColour} fillRule="evenodd" />
+                    <path clipRule="evenodd" d={svgPaths.p15d6fbb2} fill={dueLineColour} fillRule="evenodd" />
+                    <path clipRule="evenodd" d={svgPaths.p1797f00} fill={dueLineColour} fillRule="evenodd" />
                   </g>
                 </svg>
               </div>
-              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#bababa] text-[17px] text-center">
-                <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{smartReminderLine}</p>
-              </div>
+            ) : null}
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[17px] text-center max-w-full" style={{ color: dueLineColour }}>
+              <p className="leading-[normal] whitespace-nowrap" style={{ fontWeight: 700 }}>{dueLine}</p>
             </div>
-          )}
+          </div>
 
           {/* Repeats line (optional) */}
           {repeatsLine && (
-            <div className="content-stretch flex items-center justify-center gap-[16px] min-w-full relative shrink-0">
+            <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
               <div className="relative shrink-0 w-[21px] h-[21px] flex items-center justify-center" aria-hidden="true">
                 <svg
                   width="21"
@@ -206,21 +181,6 @@ export default function ReminderInfoOverlay({
               </div>
             </button>
 
-            {!reminder.isSmartReminder && onEdit && (
-              <button
-                className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
-                onClick={onEdit}
-              >
-                <div className="flex flex-row items-center justify-center size-full">
-                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-                      <p className="leading-[normal]">Edit reminder</p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-            )}
-
             {overdue && onMoveToTomorrow && (
               <button
                 className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
@@ -236,6 +196,36 @@ export default function ReminderInfoOverlay({
               </button>
             )}
 
+            {onEdit && (
+              <button
+                className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
+                onClick={onEdit}
+              >
+                <div className="flex flex-row items-center justify-center size-full">
+                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Edit reminder</p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            )}
+
+            {reminder.isSmartReminder && reminder.linkedListId && onGoToList && (
+              <button
+                className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
+                onClick={onGoToList}
+              >
+                <div className="flex flex-row items-center justify-center size-full">
+                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Go to list</p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            )}
+
             <button
               className="bg-[#939393] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
               onClick={onDelete}
@@ -243,7 +233,7 @@ export default function ReminderInfoOverlay({
               <div className="flex flex-row items-center justify-center size-full">
                 <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
                   <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-                    <p className="leading-[normal]">Delete</p>
+                    <p className="leading-[normal]">Delete reminder</p>
                   </div>
                 </div>
               </div>

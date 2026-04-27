@@ -136,12 +136,12 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
           style={subtitleText ? undefined : { visibility: "hidden" }}
         >
           <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '15px', fontWeight: 700, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>
-            {subtitleText?.includes('. Complete by ') ? (
+            {subtitleText?.includes('. Due by ') ? (
               <>
-                {subtitleText.split('. Complete by ')[0]}
+                {subtitleText.split('. Due by ')[0]}
                 {'. '}
                 <span style={{ color: subtitleHighlightColor ?? '#BABABA' }}>
-                  {`Complete by ${subtitleText.split('. Complete by ')[1]}`}
+                  {`Due by ${subtitleText.split('. Due by ')[1]}`}
                 </span>
               </>
             ) : (

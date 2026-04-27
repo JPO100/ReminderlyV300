@@ -15,6 +15,7 @@ export type CreatedList = {
   sortMode?: 'alphabetical' | 'insertion';
   smartReminders?: boolean;
   smartReminderDueDate?: string | null;
+  smartReminderTime?: string | null;
   status?: 'active' | 'done' | 'deleted';
   statusChangedAt?: number | null;
 };
@@ -40,6 +41,27 @@ export function formatListDueDate(value: string | null | undefined, now: Date = 
   const date = storageStringToDate(value);
   if (!date) return 'Jan 1st 2026';
   return formatShortMonthDay(date, now, { yearFormat: 'short' });
+}
+
+function formatTime12h(time: string): string {
+  const [hh, mm] = time.split(":").map(Number);
+  const suffix = hh >= 12 ? "pm" : "am";
+  const h12 = hh === 0 ? 12 : hh > 12 ? hh - 12 : hh;
+  if (mm === 0) return `${h12}${suffix}`;
+  return `${h12}:${String(mm).padStart(2, "0")}${suffix}`;
+}
+
+export function getSmartReminderTime(value: string | null | undefined): string {
+  return value || "12:00";
+}
+
+export function formatSmartReminderDueBy(dateValue: string | null | undefined, timeValue: string | null | undefined, now: Date = new Date()): string {
+  return `Due by ${formatListDueDate(dateValue, now)} at ${formatTime12h(getSmartReminderTime(timeValue))}`;
+}
+
+export function formatSmartReminderDueByFromDate(date: Date | null, timeValue: string | null | undefined, now: Date = new Date()): string {
+  if (!date) return "No completion date set";
+  return `Due by ${formatShortMonthDay(date, now, { yearFormat: 'short' })} at ${formatTime12h(getSmartReminderTime(timeValue))}`;
 }
 
 export function formatListProgress(doneCount: number, totalCount: number): string {
@@ -71,7 +93,7 @@ export function createSmartReminderForList(
     originalText: text,
     displayText: text,
     createdAt: options?.createdAt ?? Date.now(),
-    schedule: { kind: "scheduled", date: list.smartReminderDueDate, time: "12:00" },
+    schedule: { kind: "scheduled", date: list.smartReminderDueDate, time: getSmartReminderTime(list.smartReminderTime) },
     linkedListId: list.id,
     isSmartReminder: true,
   };
