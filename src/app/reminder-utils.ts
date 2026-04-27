@@ -223,16 +223,49 @@ const DAY_ABBREV_ORDER: Record<string, number> = {
   mo: 0, tu: 1, we: 2, th: 3, fr: 4, sa: 5, su: 6,
 };
 
-function formatOrdinal(day: number): string {
+function formatOrdinalDay(day: number): string {
   if (day >= 11 && day <= 13) return `${day}th`;
-  const lastDigit = day % 10;
-  if (lastDigit === 1) return `${day}st`;
-  if (lastDigit === 2) return `${day}nd`;
-  if (lastDigit === 3) return `${day}rd`;
-  return `${day}th`;
+  switch (day % 10) {
+    case 1: return `${day}st`;
+    case 2: return `${day}nd`;
+    case 3: return `${day}rd`;
+    default: return `${day}th`;
+  }
 }
 
-export function formatRepeatLabel(repeatRule: RepeatRule | null | undefined, time?: string | null, scheduleDate?: string | null): string | null {
+const WEEKDAY_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+export function formatScheduledDateForRow(date: string, now: Date): string {
+  const [y, m, d] = date.split('-').map(Number);
+  const scheduledDate = new Date(y, m - 1, d);
+  scheduledDate.setHours(0, 0, 0, 0);
+
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.round((scheduledDate.getTime() - today.getTime()) / 86400000);
+
+  if (diffDays === -1) return 'Yesterday';
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays >= 2 && diffDays <= 5) return WEEKDAY_LONG[scheduledDate.getDay()];
+
+  const label = `${MONTH_SHORT[scheduledDate.getMonth()]} ${formatOrdinalDay(scheduledDate.getDate())}`;
+  if (scheduledDate.getFullYear() !== today.getFullYear()) {
+    return `${label}, ${scheduledDate.getFullYear()}`;
+  }
+  return label;
+}
+
+export function formatReminderNextOccurrenceLabel(date: string | null | undefined, time?: string | null, now: Date = new Date()): string | null {
+  if (!date) return null;
+  const dateLabel = formatScheduledDateForRow(date, now);
+  if (time) return `${dateLabel} at ${formatTime12h(time)}`;
+  return dateLabel;
+}
+
+export function formatRepeatRuleText(repeatRule: RepeatRule | null | undefined, scheduleDate?: string | null): string | null {
   if (repeatRule == null) return null;
 
   const { frequency, interval, byDay } = repeatRule;
@@ -249,10 +282,21 @@ export function formatRepeatLabel(repeatRule: RepeatRule | null | undefined, tim
   if (!unit) return null;
 
   let base: string;
-  if (interval === 1) {
-    base = `Repeats every ${unit.singular}`;
+  if (frequency === 'daily' && interval === 2) {
+    base = 'Every other day';
+  } else if (frequency === 'weekly' && interval === 2 && byDay && byDay.length === 1) {
+    const onlyDay = DAY_ABBREV_TO_SHORT[byDay[0]] ?? byDay[0];
+    base = `Every other ${onlyDay}`;
+  } else if (frequency === 'weekly' && interval === 2) {
+    base = 'Every other week';
+  } else if (frequency === 'monthly' && interval === 2) {
+    base = 'Every other month';
+  } else if (frequency === 'yearly' && interval === 2) {
+    base = 'Every other year';
+  } else if (interval === 1) {
+    base = `Every ${unit.singular}`;
   } else {
-    base = `Repeats every ${interval} ${unit.plural}`;
+    base = `Every ${interval} ${unit.plural}`;
   }
 
   if (frequency === 'weekly' && byDay && byDay.length > 0) {
@@ -260,20 +304,23 @@ export function formatRepeatLabel(repeatRule: RepeatRule | null | undefined, tim
       .sort((a, b) => (DAY_ABBREV_ORDER[a] ?? Number.MAX_SAFE_INTEGER) - (DAY_ABBREV_ORDER[b] ?? Number.MAX_SAFE_INTEGER))
       .map((d) => DAY_ABBREV_TO_SHORT[d] ?? d)
       .join(', ');
-    const suffix = time ? ` at ${formatTime12h(time)}` : '';
-    return `${base} (${days})${suffix}`;
+    if (interval === 2 && byDay.length === 1) {
+      return base;
+    }
+    return `${base} (${days})`;
   }
 
   if (frequency === 'monthly' && scheduleDate) {
     const dayNum = parseInt(scheduleDate.split('-')[2], 10);
-    const onPart = ` on ${formatOrdinal(dayNum)}`;
-    const timePart = time ? ` at ${formatTime12h(time)}` : '';
-    return `${base}${onPart}${timePart}`;
-  }
-
-  if (time) {
-    return `${base} at ${formatTime12h(time)}`;
+    return `${base} on ${formatOrdinalDay(dayNum)}`;
   }
 
   return base;
+}
+
+export function formatRepeatLabel(repeatRule: RepeatRule | null | undefined, time?: string | null, scheduleDate?: string | null): string | null {
+  const ruleText = formatRepeatRuleText(repeatRule, scheduleDate);
+  if (!ruleText) return null;
+  const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(scheduleDate, time);
+  return nextOccurrenceLabel ? `${nextOccurrenceLabel}. ${ruleText}` : ruleText;
 }

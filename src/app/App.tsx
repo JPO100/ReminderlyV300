@@ -11,10 +11,9 @@ import TutorialOverlay from "./components/TutorialOverlay";
 import type { RepeatRule } from "./types/reminder";
 import type { NlcMode } from "./utils/nlc-interaction";
 import { renderReminderText, getDisplayTitle } from "./utils/render-text";
-import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel } from "./reminder-utils";
+import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow } from "./reminder-utils";
 import type { Reminder, ReminderCategory, ReminderSchedule, RepeatConfig, ViewMode, FiltersMenuVariant } from "./reminder-utils";
 import { formatTime12h } from "./utils/normalise-text";
-import { formatSelectedDate } from "../imports/NewReminderOverlay";
 import { scheduleEquality } from "./utils/schedule";
 import { PENDING_NOTIFICATION_REMINDER_ID_KEY, syncReminderNotifications } from "./notifications";
 import { useNotificationTapHandler } from "./useNotificationTapHandler";
@@ -3785,8 +3784,7 @@ export default function App() {
                                             if (label) return label;
                                           }
                                           if (item.schedule.kind === 'scheduled' && item.schedule.date) {
-                                            const [sy, sm, sd] = item.schedule.date.split('-').map(Number);
-                                            const dateLabel = formatSelectedDate(new Date(sy, sm - 1, sd), now);
+                                            const dateLabel = formatScheduledDateForRow(item.schedule.date, now);
                                             if (item.schedule.time) {
                                               return `${dateLabel} at ${formatTime12h(item.schedule.time)}`;
                                             }
@@ -3795,7 +3793,7 @@ export default function App() {
                                           return 'No date / time set';
                                         })()}</p>
                                         {(isSmartReminder || item.repeatRule) && (
-                                          <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
+                                          <div className="flex items-center gap-[6px] h-0 overflow-visible shrink-0 self-center pl-[6px]">
                                             {isSmartReminder && <SmartReminderReminderIndicator color={subtitleCol} />}
                                             {item.repeatRule && <RepeatReminderIndicator color={subtitleCol} />}
                                           </div>
@@ -3908,8 +3906,7 @@ export default function App() {
                                         if (label) return label;
                                       }
                                       if (reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
-                                        const [sy, sm, sd] = reminder.schedule.date.split('-').map(Number);
-                                        const dateLabel = formatSelectedDate(new Date(sy, sm - 1, sd), now);
+                                        const dateLabel = formatScheduledDateForRow(reminder.schedule.date, now);
                                         if (reminder.schedule.time) {
                                           return `${dateLabel} at ${formatTime12h(reminder.schedule.time)}`;
                                         }
@@ -3918,7 +3915,7 @@ export default function App() {
                                       return 'No date / time set';
                                     })()}</p>
                                     {(isSmartReminder || reminder.repeatRule) && (
-                                      <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
+                                      <div className="flex items-center gap-[6px] h-0 overflow-visible shrink-0 self-center pl-[6px]">
                                         {isSmartReminder && <SmartReminderReminderIndicator />}
                                         {reminder.repeatRule && <RepeatReminderIndicator />}
                                       </div>
