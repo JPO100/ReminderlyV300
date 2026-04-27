@@ -30,6 +30,7 @@ import {
   dateToStorageString,
   storageStringToDate,
   formatListDueDate,
+  formatListProgress,
   buildSmartReminderText,
   createSmartReminderForList,
   getCurrentListCategory,
@@ -3150,7 +3151,7 @@ export default function App() {
                                     </div>
                                     <div className={`flex items-center overflow-visible${isPendingRestore ? '' : ' line-through'}`} style={{ textDecorationColor: isPendingRestore ? '#BABABA' : listStatusColor }}>
                                       <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor }}>
-                                        {isSavedList ? `${list.items.length} ${list.items.length === 1 ? 'item' : 'items'}` : `${doneCount} of ${list.items.length} items completed`}
+                                        {isSavedList ? `${list.items.length} ${list.items.length === 1 ? 'item' : 'items'}` : formatListProgress(doneCount, list.items.length)}
                                       </p>
                                       {!isSavedList && isSmartRemindersEnabled && (list.smartReminders ?? true) && (
                                         <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
@@ -3364,7 +3365,7 @@ export default function App() {
                                   </div>
                                   <div className={`flex items-center overflow-visible cursor-pointer${isPendingAwayList ? ' line-through' : ''} min-w-0`} style={{ textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }} onClick={() => openListEditor(list)}>
                                     <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAwayList ? DELETED_GREY : '#BABABA', textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
-                                      {visibleCompletedCount} of {list.items.length} items
+                                      {formatListProgress(visibleCompletedCount, list.items.length)}
                                       {isSmartRemindersEnabled && (list.smartReminders ?? true) ? (
                                         <span style={{ color: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
                                           {`. Complete by ${formatListDueDate(list.smartReminderDueDate)}`}
@@ -4188,8 +4189,8 @@ export default function App() {
                       subtitleText={isSavedListCreateOverlay
                         ? `${listItems.length} ${listItems.length === 1 ? 'item' : 'items'}`
                         : listSmartReminders
-                        ? `${listItems.filter((item) => item.completed).length} of ${listItems.length} items. Complete by ${formatListDueDate(listSmartReminderDueDate)}`
-                        : `${listItems.filter((item) => item.completed).length} of ${listItems.length} items`}
+                        ? `${formatListProgress(listItems.filter((item) => item.completed).length, listItems.length)}. Complete by ${formatListDueDate(listSmartReminderDueDate)}`
+                        : formatListProgress(listItems.filter((item) => item.completed).length, listItems.length)}
                       showSavedListSubtitleIcon={isSavedListCreateOverlay}
                       showSmartRemindersSubtitle={!isSavedListCreateOverlay && isSmartRemindersEnabled && listSmartReminders}
                       reserveSmartRemindersSubtitleSpace={!isSavedListCreateOverlay && isSmartRemindersEnabled}

@@ -1,27 +1,11 @@
 import { useEffect, useRef } from "react";
 import svgPaths from "../../imports/svg-oxn8g14l6y";
 import type { Reminder } from "../reminder-utils";
-import { formatRepeatLabel, isOverdue } from "../reminder-utils";
+import { formatRepeatLabel, formatScheduledDateForRow, isOverdue } from "../reminder-utils";
 
 // ── Due line formatting ──────────────────────────────────────────────
 
-const WEEKDAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const WEEKDAY_DISPLAY_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const MONTH_SHORT = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
-function ordinalSuffix(n: number): string {
-  const mod100 = n % 100;
-  if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
-  switch (n % 10) {
-    case 1: return `${n}st`;
-    case 2: return `${n}nd`;
-    case 3: return `${n}rd`;
-    default: return `${n}th`;
-  }
-}
 
 function formatTime12h(time: string): string {
   const [hh, mm] = time.split(":").map(Number);
@@ -29,14 +13,6 @@ function formatTime12h(time: string): string {
   const h12 = hh === 0 ? 12 : hh > 12 ? hh - 12 : hh;
   if (mm === 0) return `${h12}${suffix}`;
   return `${h12}:${String(mm).padStart(2, "0")}${suffix}`;
-}
-
-function isSameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
 }
 
 export function formatDueLine(reminder: Reminder, now: Date = new Date()): string {
@@ -49,27 +25,10 @@ export function formatDueLine(reminder: Reminder, now: Date = new Date()): strin
 
   let datePart = "";
   if (hasDate) {
-    const [y, m, d] = (reminder.schedule as { date: string }).date
-      .split("-")
-      .map(Number);
-    const reminderDate = new Date(y, m - 1, d);
-
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    if (isSameDay(reminderDate, today)) {
-      datePart = "today";
-    } else if (isSameDay(reminderDate, tomorrow)) {
-      datePart = "tomorrow";
-    } else {
-      const wd = WEEKDAY_SHORT[reminderDate.getDay()];
-      const md = reminderDate.getDate();
-      const mn = MONTH_SHORT[reminderDate.getMonth()];
-      datePart = `${wd} ${ordinalSuffix(md)} ${mn}`;
-    }
+    datePart = formatScheduledDateForRow(
+      (reminder.schedule as { date: string }).date,
+      now
+    );
   }
 
   let timePart = "";
@@ -195,7 +154,7 @@ export default function ReminderInfoOverlay({
           </div>
 
           {smartReminderLine && (
-            <div className="content-stretch flex items-center justify-center gap-[16px] min-w-full relative shrink-0">
+            <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
               <div className="h-[21.5px] relative shrink-0 w-[24px] flex items-center justify-center" aria-hidden="true">
                 <svg className="block h-[21.5px] w-[24px]" fill="none" preserveAspectRatio="xMidYMid meet" viewBox="0 0 19.5002 21.5002">
                   <g>

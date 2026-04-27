@@ -65,7 +65,7 @@ export function getListChecks(): Check[] {
       name: 'List due date formatting: current-year dates omit year',
       run: () => {
         const formatted = formatListDueDate('2026-04-24', new Date(2026, 0, 1));
-        assert(formatted === 'Apr 24', `Expected Apr 24, got ${formatted}`);
+        assert(formatted === 'Apr 24th', `Expected Apr 24th, got ${formatted}`);
       },
     },
 
@@ -74,7 +74,7 @@ export function getListChecks(): Check[] {
       name: 'List due date formatting: cross-year dates include short year',
       run: () => {
         const formatted = formatListDueDate('2027-04-24', new Date(2026, 0, 1));
-        assert(formatted === "Apr 24 '27", `Expected Apr 24 '27, got ${formatted}`);
+        assert(formatted === "Apr 24th '27", `Expected Apr 24th '27, got ${formatted}`);
       },
     },
 

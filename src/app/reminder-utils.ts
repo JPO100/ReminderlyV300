@@ -1,5 +1,6 @@
 import type { RepeatRule } from "./types/reminder";
 import { formatTime12h } from "./utils/normalise-text";
+import { formatOrdinalDay, formatShortMonthDay } from "./utils/date-display";
 
 export type ReminderCategory = "today" | "this-week" | "later" | "sometime" | "other";
 
@@ -223,18 +224,7 @@ const DAY_ABBREV_ORDER: Record<string, number> = {
   mo: 0, tu: 1, we: 2, th: 3, fr: 4, sa: 5, su: 6,
 };
 
-function formatOrdinalDay(day: number): string {
-  if (day >= 11 && day <= 13) return `${day}th`;
-  switch (day % 10) {
-    case 1: return `${day}st`;
-    case 2: return `${day}nd`;
-    case 3: return `${day}rd`;
-    default: return `${day}th`;
-  }
-}
-
 const WEEKDAY_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export function formatScheduledDateForRow(date: string, now: Date): string {
   const [y, m, d] = date.split('-').map(Number);
@@ -251,11 +241,7 @@ export function formatScheduledDateForRow(date: string, now: Date): string {
   if (diffDays === 1) return 'Tomorrow';
   if (diffDays >= 2 && diffDays <= 5) return WEEKDAY_LONG[scheduledDate.getDay()];
 
-  const label = `${MONTH_SHORT[scheduledDate.getMonth()]} ${formatOrdinalDay(scheduledDate.getDate())}`;
-  if (scheduledDate.getFullYear() !== today.getFullYear()) {
-    return `${label}, ${scheduledDate.getFullYear()}`;
-  }
-  return label;
+  return formatShortMonthDay(scheduledDate, today);
 }
 
 export function formatReminderNextOccurrenceLabel(date: string | null | undefined, time?: string | null, now: Date = new Date()): string | null {

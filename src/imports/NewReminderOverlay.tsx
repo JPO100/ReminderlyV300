@@ -18,6 +18,7 @@ import type { RepeatConfig } from "../app/reminder-utils";
 import type { Reminder } from "../app/reminder-utils";
 import type { ReminderSchedule } from "../app/reminder-utils";
 import type { RepeatRule } from "../app/types/reminder";
+import { formatShortMonthDay } from "../app/utils/date-display";
 import { normaliseReminderText } from "../app/utils/normalise-text";
 
 // Day name → two-letter abbreviation mapping for RepeatRule.byDay
@@ -76,17 +77,6 @@ function isSameDate(a: Date | null, b: Date | null): boolean {
          a.getDate() === b.getDate();
 }
 
-// Date display formatting
-export function getOrdinalSuffix(day: number): string {
-  if (day >= 11 && day <= 13) return 'th';
-  switch (day % 10) {
-    case 1: return 'st';
-    case 2: return 'nd';
-    case 3: return 'rd';
-    default: return 'th';
-  }
-}
-
 export function formatSelectedDate(date: Date | null, now?: Date): string | null {
   if (!date) return null;
   
@@ -102,15 +92,7 @@ export function formatSelectedDate(date: Date | null, now?: Date): string | null
   if (compare.getTime() === today.getTime()) return 'Today';
   if (compare.getTime() === tomorrow.getTime()) return 'Tomorrow';
   
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const day = compare.getDate();
-  const label = `${monthNames[compare.getMonth()]} ${day}${getOrdinalSuffix(day)}`;
-  const nowYear = (now ?? new Date()).getFullYear();
-  if (compare.getFullYear() !== nowYear) {
-    return `${label}, ${compare.getFullYear()}`;
-  }
-  return label;
+  return formatShortMonthDay(compare, now ?? new Date());
 }
 
 // Time display formatting

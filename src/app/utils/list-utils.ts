@@ -1,4 +1,5 @@
 import type { Reminder } from "../reminder-utils";
+import { formatShortMonthDay } from "./date-display";
 
 export type ListItem = {
   id: string;
@@ -37,13 +38,12 @@ export function storageStringToDate(value: string | null | undefined): Date | nu
 
 export function formatListDueDate(value: string | null | undefined, now: Date = new Date()): string {
   const date = storageStringToDate(value);
-  if (!date) return 'Jan 1 2026';
-  const month = date.toLocaleString('en-US', { month: 'short' });
-  const currentYear = now.getFullYear();
-  if (date.getFullYear() === currentYear) {
-    return `${month} ${date.getDate()}`;
-  }
-  return `${month} ${date.getDate()} '${String(date.getFullYear()).slice(-2)}`;
+  if (!date) return 'Jan 1st 2026';
+  return formatShortMonthDay(date, now, { yearFormat: 'short' });
+}
+
+export function formatListProgress(doneCount: number, totalCount: number): string {
+  return `${doneCount} of ${totalCount}`;
 }
 
 export function buildSmartReminderText(list: CreatedList): string {

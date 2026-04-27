@@ -1,15 +1,11 @@
 import svgPaths from "./svg-oxn8g14l6y";
 import { useEffect, useRef, useState } from "react";
 import ListSmartReminderCalendar from "../app/components/ListSmartReminderCalendar";
+import { formatShortMonthDay } from "../app/utils/date-display";
 
 function formatOverlayDueDate(date: Date | null): string {
   if (!date) return "No completion date set";
-  const month = date.toLocaleString('en-US', { month: 'short' });
-  const currentYear = new Date().getFullYear();
-  if (date.getFullYear() === currentYear) {
-    return `Complete by ${month} ${date.getDate()}`;
-  }
-  return `Complete by ${month} ${date.getDate()} '${String(date.getFullYear()).slice(-2)}`;
+  return `Complete by ${formatShortMonthDay(date, new Date(), { yearFormat: 'short' })}`;
 }
 
 function SmartRemindersLabel({ active, smartReminderDueDate, highlightDueDate, animateFadeOut }: { active: boolean; smartReminderDueDate: Date | null; highlightDueDate: boolean; animateFadeOut: boolean }) {
