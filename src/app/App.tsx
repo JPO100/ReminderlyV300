@@ -709,17 +709,15 @@ export default function App() {
       } else {
         setListInfoOverlayListId(null);
       }
+      setActiveMainTab('reminders');
       smartReminderSetupTimerRef.current = window.setTimeout(() => {
-        setActiveMainTab('reminders');
-        smartReminderSetupTimerRef.current = window.setTimeout(() => {
-          smartReminderSetupTimerRef.current = null;
-          setRepeatConfig(null);
-          setEditingReminder(null);
-          setSmartReminderCreateListId(listId);
-          setIsOverlayOpen(true);
-        }, 100);
+        smartReminderSetupTimerRef.current = null;
+        setRepeatConfig(null);
+        setEditingReminder(null);
+        setSmartReminderCreateListId(listId);
+        setIsOverlayOpen(true);
       }, 100);
-    }, 100);
+    }, 150);
   }, [clearSmartReminderSetupTimer, createdLists]);
 
   const openSmartReminderEditFlow = useCallback((listId: string, source: 'list-info' | 'list-settings') => {
