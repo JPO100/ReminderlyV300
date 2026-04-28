@@ -81,19 +81,122 @@ const DEFAULT_TEMPLATE_SEED: Array<{ title: string; items: string[] }> = [
 // Category colours matching existing static component tick circles
 const CATEGORY_COLOURS: Record<string, string> = {
   today: "#00AFEE",
-  "this-week": "#DF4DFC",
-  later: "#FAA429",
+  "this-week": "#E466FD",
+  later: "#FDB146",
   sometime: "#939393",
-  other: "#FAA429",
+  other: "#FDB146",
 };
 
+function getReminderFilterPillStyle(filter: ReminderCategory, activeFilter: ReminderCategory | "all") {
+  const pillColor = CATEGORY_COLOURS[filter] || "#939393";
+  const isActive = activeFilter === filter;
+  const isDefault = activeFilter === "all";
+
+  if (isActive) {
+    return {
+      boxShadow: `inset 0 0 0 2px ${pillColor}`,
+      color: pillColor,
+    };
+  }
+
+  if (isDefault) {
+    return {
+      boxShadow: `inset 0 0 0 1px ${pillColor}`,
+      color: pillColor,
+    };
+  }
+
+  return {
+    boxShadow: "inset 0 0 0 1px #D9D9D9",
+    color: "#D9D9D9",
+  };
+}
+
+function getArchiveFilterPillStyle(filter: "done" | "deleted", activeFilter: "all" | "done" | "deleted") {
+  const pillColor = filter === "done" ? "#404040" : "#898989";
+  const isActive = activeFilter === filter;
+  const isDefault = activeFilter === "all";
+
+  if (isActive) {
+    return {
+      boxShadow: `inset 0 0 0 2px ${pillColor}`,
+      color: pillColor,
+    };
+  }
+
+  if (isDefault) {
+    return {
+      boxShadow: `inset 0 0 0 1px ${pillColor}`,
+      color: pillColor,
+    };
+  }
+
+  return {
+    boxShadow: "inset 0 0 0 1px #D9D9D9",
+    color: "#D9D9D9",
+  };
+}
+
 const LIST_CATEGORY_PILL_COLOURS: Record<string, string> = {
-  complete: "#0D45A0",
+  complete: "#005BE3",
   almost: "#9468D5",
-  started: "#00AFEE",
+  started: "#9468D5",
   todo: "#939393",
   "grouped-todo": "#939393",
 };
+
+function getListFilterPillStyle(
+  filter: "complete" | "almost" | "started" | "todo" | "grouped-todo",
+  activeFilter: "all" | "complete" | "almost" | "started" | "todo" | "grouped-todo"
+) {
+  const pillColor = LIST_CATEGORY_PILL_COLOURS[filter] || "#1C2C42";
+  const isActive = activeFilter === filter;
+  const isDefault = activeFilter === "all";
+
+  if (isActive) {
+    return {
+      boxShadow: `inset 0 0 0 2px ${pillColor}`,
+      color: pillColor,
+    };
+  }
+
+  if (isDefault) {
+    return {
+      boxShadow: `inset 0 0 0 1px ${pillColor}`,
+      color: pillColor,
+    };
+  }
+
+  return {
+    boxShadow: "inset 0 0 0 1px #D9D9D9",
+    color: "#D9D9D9",
+  };
+}
+
+function getListArchiveFilterPillStyle(filter: "done" | "deleted", activeFilter: "all" | "done" | "deleted") {
+  const pillColor = filter === "done" ? "#404040" : "#898989";
+  const isActive = activeFilter === filter;
+  const isDefault = activeFilter === "all";
+
+  if (isActive) {
+    return {
+      boxShadow: `inset 0 0 0 2px ${pillColor}`,
+      color: pillColor,
+    };
+  }
+
+  if (isDefault) {
+    return {
+      boxShadow: `inset 0 0 0 1px ${pillColor}`,
+      color: pillColor,
+    };
+  }
+
+  return {
+    boxShadow: "inset 0 0 0 1px #D9D9D9",
+    color: "#D9D9D9",
+  };
+}
 
 // Overdue colour for overdue reminders
 const OVERDUE_COLOUR = "#FF0000";
@@ -437,6 +540,7 @@ export default function App() {
   const [editingSavedListId, setEditingSavedListId] = useState<string | null>(null);
   const [listItems, setListItems] = useState<ListItem[]>([]);
   const [listTitle, setListTitle] = useState("");
+  const openListEditorTimerRef = useRef<number | null>(null);
   const [createdLists, setCreatedLists] = useState<CreatedList[]>(() => {
     try {
       const stored = localStorage.getItem('reminderly-created-lists');
@@ -1562,21 +1666,34 @@ export default function App() {
   };
 
   const openListEditor = (list: CreatedList) => {
+    if (openListEditorTimerRef.current !== null) {
+      window.clearTimeout(openListEditorTimerRef.current);
+      openListEditorTimerRef.current = null;
+    }
     setListInfoOverlayListId(null);
-    setRevealedDeleteListItemId(null);
-    setListItemReinsertedId(null);
-    setListItemHighlightId(null);
-    setAlphabeticalPinnedListItemId(null);
-    setAlphabeticalPinnedListItemIndex(0);
-    setListTitle(list.title);
-    setListItems(list.items.map((item) => ({ id: (item as any).id || crypto.randomUUID(), ...item })));
+    setListTitle("");
+    setListItems([]);
+    setListSortMode('insertion');
+    setListSmartReminders(false);
+    setListSmartReminderDueDate(null);
+    setListSmartReminderTime(null);
     setListOverlayMode('edit');
     setEditingListId(list.id);
-    setListSortMode(list.sortMode || 'insertion');
-    setListSmartReminders(list.smartReminders ?? true);
-    setListSmartReminderDueDate(list.smartReminderDueDate ?? null);
-    setListSmartReminderTime(list.smartReminderTime ?? null);
     setIsListsOverlayOpen(true);
+    openListEditorTimerRef.current = window.setTimeout(() => {
+      openListEditorTimerRef.current = null;
+      setRevealedDeleteListItemId(null);
+      setListItemReinsertedId(null);
+      setListItemHighlightId(null);
+      setAlphabeticalPinnedListItemId(null);
+      setAlphabeticalPinnedListItemIndex(0);
+      setListTitle(list.title);
+      setListItems(list.items.map((item) => ({ id: (item as any).id || crypto.randomUUID(), ...item })));
+      setListSortMode(list.sortMode || 'insertion');
+      setListSmartReminders(list.smartReminders ?? true);
+      setListSmartReminderDueDate(list.smartReminderDueDate ?? null);
+      setListSmartReminderTime(list.smartReminderTime ?? null);
+    }, 0);
   };
 
   const useSavedList = (list: SavedListTemplate) => {
@@ -2908,7 +3025,6 @@ export default function App() {
               <>
                 <div className="flex items-center gap-[12px]">
                   {(["today", "this-week", "other"] as ReminderCategory[]).map((filter) => {
-                    const pillColor = CATEGORY_COLOURS[filter] || "#4784f8";
                     const isActive = activeFilter === filter;
                     return (
                     <button
@@ -2923,7 +3039,7 @@ export default function App() {
                       } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                         filter === "other" ? "hidden min-[390px]:flex" : ""
                       }`}
-                      style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #FFFFFF` }}
+                      style={getReminderFilterPillStyle(filter, activeFilter)}
                     >
                       <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                         {getCategoryLabel(filter)}
@@ -2938,7 +3054,6 @@ export default function App() {
               </>
             ) : (
               (["today", "this-week", "later", "sometime"] as ReminderCategory[]).map((filter) => {
-                const pillColor = CATEGORY_COLOURS[filter] || "#4784f8";
                 const isActive = activeFilter === filter;
                 return (
                 <button
@@ -2953,7 +3068,7 @@ export default function App() {
                   } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                     filter === "sometime" ? "hidden min-[390px]:flex" : ""
                   }`}
-                  style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #FFFFFF` }}
+                  style={getReminderFilterPillStyle(filter, activeFilter)}
                 >
                   <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                     {getCategoryLabel(filter)}
@@ -3044,8 +3159,12 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setDoneDeletedFilter(doneDeletedFilter === 'done' ? 'all' : 'done')}
-                  className="text-[#1C2C42] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 border border-solid border-[#1C2C42] transition-colors cursor-pointer"
-                  style={doneDeletedFilter === 'done' ? { boxShadow: `inset 0 0 0 2px ${DONE_LIST_COLOUR}`, color: DONE_LIST_COLOUR, borderColor: DONE_LIST_COLOUR } : undefined}
+                  className={`${
+                    doneDeletedFilter === 'done'
+                      ? "bg-white"
+                      : "text-[#404040]"
+                  } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
+                  style={getListArchiveFilterPillStyle('done', doneDeletedFilter)}
                 >
                   <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                     Done
@@ -3053,8 +3172,12 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setDoneDeletedFilter(doneDeletedFilter === 'deleted' ? 'all' : 'deleted')}
-                  className="text-[#1C2C42] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 border border-solid border-[#1C2C42] transition-colors cursor-pointer"
-                  style={doneDeletedFilter === 'deleted' ? { boxShadow: `inset 0 0 0 2px ${DELETED_LIST_COLOUR}`, color: DELETED_LIST_COLOUR, borderColor: DELETED_LIST_COLOUR } : undefined}
+                  className={`${
+                    doneDeletedFilter === 'deleted'
+                      ? "bg-white"
+                      : "text-[#898989]"
+                  } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
+                  style={getListArchiveFilterPillStyle('deleted', doneDeletedFilter)}
                 >
                   <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                     Deleted
@@ -3224,7 +3347,6 @@ export default function App() {
                   <>
                     <div className="flex items-center gap-[8px]">
                       {(["complete", "started", "todo"] as const).map((filter) => {
-                        const pillColor = filter === "started" ? "#9468D5" : (LIST_CATEGORY_PILL_COLOURS[filter] || "#1C2C42");
                         const isActive = activeListFilter === filter;
                         return (
                         <button
@@ -3237,7 +3359,7 @@ export default function App() {
                               ? "bg-white"
                               : "text-[#1C2C42]"
                           } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
-                          style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #1C2C42` }}
+                          style={getListFilterPillStyle(filter, activeListFilter)}
                         >
                           <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                             {filter === "complete" ? "Done" : filter === "started" ? "Started" : "Todo"}
@@ -3265,7 +3387,6 @@ export default function App() {
                   <>
                     <div className="flex items-center gap-[12px]">
                       {(["complete", "almost", "grouped-todo"] as const).map((filter) => {
-                        const pillColor = LIST_CATEGORY_PILL_COLOURS[filter] || "#1C2C42";
                         const isActive = activeListFilter === filter;
                         return (
                         <button
@@ -3280,7 +3401,7 @@ export default function App() {
                           } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                             filter === "grouped-todo" ? "hidden min-[390px]:flex" : ""
                           }`}
-                          style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #1C2C42` }}
+                          style={getListFilterPillStyle(filter, activeListFilter)}
                         >
                           <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                             {filter === "complete" ? "Complete" : filter === "almost" ? "Almost" : "Todo"}
@@ -3295,7 +3416,6 @@ export default function App() {
                   </>
                 ) : (
                   (["complete", "almost", "started", "todo"] as const).map((filter) => {
-                    const pillColor = LIST_CATEGORY_PILL_COLOURS[filter] || "#1C2C42";
                     const isActive = activeListFilter === filter;
                     return (
                     <button
@@ -3310,7 +3430,7 @@ export default function App() {
                       } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                         filter === "started" ? "max-[389px]:hidden" : ""
                       }`}
-                      style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #1C2C42` }}
+                      style={getListFilterPillStyle(filter, activeListFilter)}
                     >
                       <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                         {filter === "complete" ? "Complete" : filter === "almost" ? "Almost" : filter === "started" ? "Started" : "Todo"}
@@ -3637,9 +3757,9 @@ export default function App() {
                 className={`${
                   doneDeletedFilter === 'done'
                     ? "bg-white"
-                    : "text-[#4784f8]"
+                    : "text-[#404040]"
                 } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
-                style={doneDeletedFilter === 'done' ? { boxShadow: `inset 0 0 0 2px ${DONE_BLUE}`, color: DONE_BLUE } : { boxShadow: 'inset 0 0 0 1px #4784f8', color: '#4784f8' }}
+                style={getArchiveFilterPillStyle('done', doneDeletedFilter)}
               >
                 <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                   Done
@@ -3652,9 +3772,9 @@ export default function App() {
                 className={`${
                   doneDeletedFilter === 'deleted'
                     ? "bg-white"
-                    : "text-[#4784f8]"
+                    : "text-[#898989]"
                 } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
-                style={doneDeletedFilter === 'deleted' ? { boxShadow: `inset 0 0 0 2px ${DELETED_GREY}`, color: DELETED_GREY } : { boxShadow: 'inset 0 0 0 1px #4784f8', color: '#4784f8' }}
+                style={getArchiveFilterPillStyle('deleted', doneDeletedFilter)}
               >
                 <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                   Deleted
@@ -3683,7 +3803,6 @@ export default function App() {
             <>
               <div className="flex items-center gap-[12px]">
                 {(["today", "this-week", "other"] as ReminderCategory[]).map((filter) => {
-                  const pillColor = CATEGORY_COLOURS[filter] || "#4784f8";
                   const isActive = activeFilter === filter;
                   return (
                   <button
@@ -3698,7 +3817,7 @@ export default function App() {
                     } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                       filter === "other" ? "hidden min-[390px]:flex" : ""
                     }`}
-                    style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #4784f8` }}
+                    style={getReminderFilterPillStyle(filter, activeFilter)}
                   >
                     <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                       {getCategoryLabel(filter)}
@@ -3713,7 +3832,6 @@ export default function App() {
             </>
           ) : (
             (["today", "this-week", "later", "sometime"] as ReminderCategory[]).map((filter) => {
-              const pillColor = CATEGORY_COLOURS[filter] || "#4784f8";
               const isActive = activeFilter === filter;
               return (
               <button
@@ -3728,7 +3846,7 @@ export default function App() {
                 } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                   filter === "sometime" ? "hidden min-[390px]:flex" : ""
                 }`}
-                style={isActive ? { boxShadow: `inset 0 0 0 2px ${pillColor}`, color: pillColor } : { boxShadow: `inset 0 0 0 1px #4784f8` }}
+                style={getReminderFilterPillStyle(filter, activeFilter)}
               >
                 <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                   {getCategoryLabel(filter)}
@@ -4212,16 +4330,15 @@ export default function App() {
                   if (!shouldCloseBottomSheetFromDrag(info.offset.y, info.velocity.y)) return;
                   persistOverlayListDraft({ closeAfterSave: true });
                 }}
-                className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[15px] rounded-tr-[15px] size-full"
+                className="bg-white relative rounded-tl-[15px] rounded-tr-[15px] size-full"
               >
                 <div
                   className="absolute left-0 right-0 top-0 h-[24px] z-[2] touch-pan-y"
                   onPointerDown={(event) => listsSheetDragControls.start(event)}
                 />
-                <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col">
+                <div className="relative w-full max-w-[768px] h-full flex flex-col mx-auto">
                   <div className="content-stretch flex flex-col gap-[30px] items-start pt-[31px] px-[24px] relative w-full shrink-0">
                     <ListsHeader
-                      key={isListsOverlayOpen || isSavedListsOverlayOpen ? 'open' : 'closed'}
                       value={listTitle}
                       onChange={setListTitle}
                       active={listItems.length > 0}
