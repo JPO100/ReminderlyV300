@@ -28,10 +28,14 @@ function ToggleButton({ active, onClick }: { active: boolean; onClick: () => voi
   );
 }
 
-function Frame3({ smartReminders, onSmartRemindersChange, displaySmartReminderDate, smartReminderTime, selectedSmartReminderDate, isDatePickerOpen, onDateSelect, onSetDate, onCloseDatePicker, onOpenDatePicker, highlightDueDate, animateFadeOut }: { smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; displaySmartReminderDate: Date | null; smartReminderTime: string | null | undefined; selectedSmartReminderDate: Date; isDatePickerOpen: boolean; onDateSelect: (date: Date) => void; onSetDate: () => void; onCloseDatePicker: () => void; onOpenDatePicker: () => void; highlightDueDate: boolean; animateFadeOut: boolean }) {
+function Frame3({ smartReminders, onSmartRemindersChange, displaySmartReminderDate, smartReminderTime, selectedSmartReminderDate, isDatePickerOpen, onDateSelect, onSetDate, onCloseDatePicker, onOpenDatePicker, onOpenSmartReminderEditor, highlightDueDate, animateFadeOut }: { smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; displaySmartReminderDate: Date | null; smartReminderTime: string | null | undefined; selectedSmartReminderDate: Date; isDatePickerOpen: boolean; onDateSelect: (date: Date) => void; onSetDate: () => void; onCloseDatePicker: () => void; onOpenDatePicker: () => void; onOpenSmartReminderEditor?: () => void; highlightDueDate: boolean; animateFadeOut: boolean }) {
 
   const handleSmartRemindersRowClick = () => {
     if (!smartReminders) return;
+    if (onOpenSmartReminderEditor) {
+      onOpenSmartReminderEditor();
+      return;
+    }
     if (!isDatePickerOpen) {
       onOpenDatePicker();
     }
@@ -182,7 +186,7 @@ function Buttons({ onMarkAsDone, onEdit, onCreateTemplate, createTemplateStage, 
   );
 }
 
-export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange, showSmartReminders, smartReminderDueDate, smartReminderTime, onSetSmartReminderDueDate, onMarkAsDone, onEdit, onCreateTemplate, createTemplateStage, onDelete }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; showSmartReminders: boolean; smartReminderDueDate: Date | null; smartReminderTime: string | null | undefined; onSetSmartReminderDueDate: (date: Date) => void; onMarkAsDone: () => void; onEdit: () => void; onCreateTemplate: () => void; createTemplateStage: 'idle' | 'fill' | 'copied' | 'blank' | 'go'; onDelete: () => void }) {
+export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange, showSmartReminders, smartReminderDueDate, smartReminderTime, onSetSmartReminderDueDate, onOpenSmartReminderEditor, onMarkAsDone, onEdit, onCreateTemplate, createTemplateStage, onDelete }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; showSmartReminders: boolean; smartReminderDueDate: Date | null; smartReminderTime: string | null | undefined; onSetSmartReminderDueDate: (date: Date) => void; onOpenSmartReminderEditor?: () => void; onMarkAsDone: () => void; onEdit: () => void; onCreateTemplate: () => void; createTemplateStage: 'idle' | 'fill' | 'copied' | 'blank' | 'go'; onDelete: () => void }) {
   const smartRemindersActive = showSmartReminders && smartReminders;
   const [draftSmartReminderDate, setDraftSmartReminderDate] = useState<Date>(smartReminderDueDate ?? new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(smartRemindersActive && smartReminderDueDate == null);
@@ -192,7 +196,7 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
   const dueDateHighlightTimerRef = useRef<number | null>(null);
   const displaySmartReminderDate = smartReminders
     ? (isDatePickerOpen ? draftSmartReminderDate : (pendingDisplaySmartReminderDate ?? smartReminderDueDate))
-    : null;
+    : smartReminderDueDate;
   const smartReminderDueDateTime = smartReminderDueDate?.getTime() ?? null;
 
   const startDueDateHighlight = () => {
@@ -233,7 +237,6 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
   const handleSmartRemindersChange = (nextValue: boolean) => {
     if (nextValue) {
       setDraftSmartReminderDate(smartReminderDueDate ?? new Date());
-      setIsDatePickerOpen(true);
     } else {
       setIsDatePickerOpen(false);
     }
@@ -268,7 +271,7 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
       </div>
       {showSmartReminders && (
         <div className="w-full mt-[10px]">
-          <Frame3 smartReminders={smartReminders} onSmartRemindersChange={handleSmartRemindersChange} displaySmartReminderDate={displaySmartReminderDate} smartReminderTime={smartReminderTime} selectedSmartReminderDate={draftSmartReminderDate} isDatePickerOpen={isDatePickerOpen} onDateSelect={setDraftSmartReminderDate} onSetDate={handleSetDate} onCloseDatePicker={handleCloseDatePicker} onOpenDatePicker={handleOpenDatePicker} highlightDueDate={dueDateHighlightPhase !== 'idle'} animateFadeOut={dueDateHighlightPhase === 'fade'} />
+          <Frame3 smartReminders={smartReminders} onSmartRemindersChange={handleSmartRemindersChange} displaySmartReminderDate={displaySmartReminderDate} smartReminderTime={smartReminderTime} selectedSmartReminderDate={draftSmartReminderDate} isDatePickerOpen={isDatePickerOpen} onDateSelect={setDraftSmartReminderDate} onSetDate={handleSetDate} onCloseDatePicker={handleCloseDatePicker} onOpenDatePicker={handleOpenDatePicker} onOpenSmartReminderEditor={onOpenSmartReminderEditor} highlightDueDate={dueDateHighlightPhase !== 'idle'} animateFadeOut={dueDateHighlightPhase === 'fade'} />
         </div>
       )}
       <Buttons onMarkAsDone={onMarkAsDone} onEdit={onEdit} onCreateTemplate={onCreateTemplate} createTemplateStage={createTemplateStage} onDelete={onDelete} showActionButtons={!smartRemindersActive || !isDatePickerOpen} />

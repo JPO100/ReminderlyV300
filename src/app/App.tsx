@@ -562,6 +562,7 @@ export default function App() {
             ) : [],
             status: list.status ?? (list.completedAt != null ? 'done' : 'active'),
             statusChangedAt: list.statusChangedAt ?? list.completedAt ?? null,
+            smartReminders: list.smartReminders ?? false,
             smartReminderDueDate: list.smartReminderDueDate ?? null,
             smartReminderTime: list.smartReminderTime ?? null,
           }));
@@ -610,6 +611,7 @@ export default function App() {
   const [listSmartReminders, setListSmartReminders] = useState(false);
   const [listSmartReminderDueDate, setListSmartReminderDueDate] = useState<string | null>(null);
   const [listSmartReminderTime, setListSmartReminderTime] = useState<string | null>(null);
+  const [pendingListInfoSmartReminderListId, setPendingListInfoSmartReminderListId] = useState<string | null>(null);
   const listSettingsSortApplyTimerRef = useRef<number | null>(null);
   const listSettingsUncheckAllTimerRef = useRef<number | null>(null);
   const handleSmartRemindersChange = (val: boolean) => {
@@ -643,7 +645,7 @@ export default function App() {
     setListOverlayMode('edit');
     setEditingListId(list.id);
     setListSortMode(list.sortMode || 'insertion');
-    setListSmartReminders(list.smartReminders ?? true);
+    setListSmartReminders(list.smartReminders ?? false);
     setListSmartReminderDueDate(list.smartReminderDueDate ?? null);
     setListSmartReminderTime(list.smartReminderTime ?? null);
     setIsListsOverlayOpen(true);
@@ -663,6 +665,88 @@ export default function App() {
       }, 100);
     }, 100);
   }, [openListOverlayForListId]);
+
+  const clearSmartReminderSetupTimer = useCallback(() => {
+    if (smartReminderSetupTimerRef.current !== null) {
+      window.clearTimeout(smartReminderSetupTimerRef.current);
+      smartReminderSetupTimerRef.current = null;
+    }
+  }, []);
+
+  const findActiveSmartReminderForListId = useCallback((listId: string) => (
+    reminders.find((reminder) =>
+      reminder.isSmartReminder === true &&
+      reminder.linkedListId === listId &&
+      reminder.completedAt == null &&
+      reminder.deletedAt == null
+    ) ?? null
+  ), [reminders]);
+
+  const openSmartReminderAddFlow = useCallback((listId: string, source: 'list-info' | 'list-settings') => {
+    const list = createdLists.find((entry) => entry.id === listId);
+    if (!list) return;
+
+    clearSmartReminderSetupTimer();
+    smartReminderCreateDidSaveRef.current = false;
+    pendingSmartReminderCreateRef.current = {
+      listId,
+      source,
+      previousSmartReminders: list.smartReminders ?? false,
+      previousDueDate: list.smartReminderDueDate ?? null,
+      previousTime: list.smartReminderTime ?? null,
+    };
+
+    if (source === 'list-settings') {
+      setListSmartReminders(true);
+    } else {
+      setPendingListInfoSmartReminderListId(listId);
+    }
+
+    smartReminderSetupTimerRef.current = window.setTimeout(() => {
+      if (source === 'list-settings') {
+        setIsListSettingsOpen(false);
+        setIsListsOverlayOpen(false);
+      } else {
+        setListInfoOverlayListId(null);
+      }
+      smartReminderSetupTimerRef.current = window.setTimeout(() => {
+        setActiveMainTab('reminders');
+        smartReminderSetupTimerRef.current = window.setTimeout(() => {
+          smartReminderSetupTimerRef.current = null;
+          setRepeatConfig(null);
+          setEditingReminder(null);
+          setSmartReminderCreateListId(listId);
+          setIsOverlayOpen(true);
+        }, 100);
+      }, 100);
+    }, 100);
+  }, [clearSmartReminderSetupTimer, createdLists]);
+
+  const openSmartReminderEditFlow = useCallback((listId: string, source: 'list-info' | 'list-settings') => {
+    const reminder = findActiveSmartReminderForListId(listId);
+    if (!reminder) return;
+
+    clearSmartReminderSetupTimer();
+    smartReminderCreateDidSaveRef.current = false;
+    setSmartReminderCreateListId(null);
+
+    if (source === 'list-settings') {
+      setIsListSettingsOpen(false);
+      setIsListsOverlayOpen(false);
+    } else {
+      setListInfoOverlayListId(null);
+    }
+
+    smartReminderSetupTimerRef.current = window.setTimeout(() => {
+      setActiveMainTab('reminders');
+      smartReminderSetupTimerRef.current = window.setTimeout(() => {
+        smartReminderSetupTimerRef.current = null;
+        setRepeatConfig(null);
+        setEditingReminder(reminder);
+        setIsOverlayOpen(true);
+      }, 100);
+    }, 100);
+  }, [clearSmartReminderSetupTimer, findActiveSmartReminderForListId]);
 
   // UI-only: list overlay mode tracking (create vs edit, kept separate from reminders)
   const [listOverlayMode, setListOverlayMode] = useState<'create' | 'edit'>('create');
@@ -1000,6 +1084,16 @@ export default function App() {
 
   // State: which reminder is being edited (null = create mode)
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
+  const [smartReminderCreateListId, setSmartReminderCreateListId] = useState<string | null>(null);
+  const pendingSmartReminderCreateRef = useRef<{
+    listId: string;
+    source: 'list-info' | 'list-settings';
+    previousSmartReminders: boolean;
+    previousDueDate: string | null;
+    previousTime: string | null;
+  } | null>(null);
+  const smartReminderCreateDidSaveRef = useRef(false);
+  const smartReminderSetupTimerRef = useRef<number | null>(null);
 
   // UI-only: id of reminder that just reinserted via repeat reschedule (drives fade-in)
   const [reinsertedId, setReinsertedId] = useState<string | null>(null);
@@ -1300,7 +1394,7 @@ export default function App() {
   useEffect(() => {
     setReminders((prev) => {
       const desiredLists = isSmartRemindersEnabled
-        ? createdLists.filter((list) => list.status === 'active' && list.smartReminderDueDate)
+        ? createdLists.filter((list) => list.status === 'active' && list.smartReminders === true && list.smartReminderDueDate)
         : [];
 
       const desiredByListId = new Map(desiredLists.map((list) => [list.id, list]));
@@ -1549,12 +1643,17 @@ export default function App() {
             : list
         )
       );
+      if (editingListId === updated.linkedListId) {
+        setListSmartReminders(true);
+        setListSmartReminderDueDate(updated.schedule.date);
+        setListSmartReminderTime(updated.schedule.time ?? getSmartReminderTime(listSmartReminderTime));
+      }
       return;
     }
     setReminders((prev) =>
       prev.map((r) => (r.id === updated.id ? updated : r))
     );
-  }, []);
+  }, [editingListId, listSmartReminderTime]);
 
   // Convert RepeatRule → RepeatConfig for edit mode initialisation
   const repeatRuleToConfig = (rule: RepeatRule | null | undefined): RepeatConfig => {
@@ -1576,12 +1675,63 @@ export default function App() {
     };
   };
 
+  const createSmartReminderFromPanel = useCallback(({ listId, date, time }: { listId: string; date: string; time: string | null }) => {
+    smartReminderCreateDidSaveRef.current = true;
+    setCreatedLists((prev) =>
+      prev.map((list) =>
+        list.id === listId
+          ? {
+              ...list,
+              smartReminders: true,
+              smartReminderDueDate: date,
+              smartReminderTime: time ?? getSmartReminderTime(list.smartReminderTime),
+            }
+          : list
+      )
+    );
+    if (editingListId === listId) {
+      setListSmartReminders(true);
+      setListSmartReminderDueDate(date);
+      setListSmartReminderTime(time ?? getSmartReminderTime(listSmartReminderTime));
+    }
+    setPendingListInfoSmartReminderListId(null);
+    pendingSmartReminderCreateRef.current = null;
+    setSmartReminderCreateListId(null);
+  }, [editingListId, listSmartReminderTime]);
+  const smartReminderCreateList = smartReminderCreateListId
+    ? (createdLists.find((list) => list.id === smartReminderCreateListId) ?? null)
+    : null;
+
   const handleOverlayClose = useCallback(() => {
+    const pendingSmartReminderCreate = pendingSmartReminderCreateRef.current;
+    if (pendingSmartReminderCreate && !smartReminderCreateDidSaveRef.current) {
+      setCreatedLists((prev) =>
+        prev.map((list) =>
+          list.id === pendingSmartReminderCreate.listId
+            ? {
+                ...list,
+                smartReminders: pendingSmartReminderCreate.previousSmartReminders,
+                smartReminderDueDate: pendingSmartReminderCreate.previousDueDate,
+                smartReminderTime: pendingSmartReminderCreate.previousTime,
+              }
+            : list
+        )
+      );
+      if (pendingSmartReminderCreate.source === 'list-settings' && editingListId === pendingSmartReminderCreate.listId) {
+        setListSmartReminders(pendingSmartReminderCreate.previousSmartReminders);
+        setListSmartReminderDueDate(pendingSmartReminderCreate.previousDueDate);
+        setListSmartReminderTime(pendingSmartReminderCreate.previousTime);
+      }
+      setPendingListInfoSmartReminderListId(null);
+    }
+    pendingSmartReminderCreateRef.current = null;
+    smartReminderCreateDidSaveRef.current = false;
+    setSmartReminderCreateListId(null);
     setIsOverlayOpen(false);
     setIsReminderOverlayFocusReady(false);
     setRepeatConfig(null);
     setEditingReminder(null);
-  }, []);
+  }, [editingListId]);
 
   useEffect(() => {
     if (isOverlayOpen) {
@@ -1690,7 +1840,7 @@ export default function App() {
       setListTitle(list.title);
       setListItems(list.items.map((item) => ({ id: (item as any).id || crypto.randomUUID(), ...item })));
       setListSortMode(list.sortMode || 'insertion');
-      setListSmartReminders(list.smartReminders ?? true);
+      setListSmartReminders(list.smartReminders ?? false);
       setListSmartReminderDueDate(list.smartReminderDueDate ?? null);
       setListSmartReminderTime(list.smartReminderTime ?? null);
     }, 0);
@@ -3318,7 +3468,7 @@ export default function App() {
                                       <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingRestore ? '#BABABA' : listStatusColor }}>
                                         {isSavedList ? `${list.items.length} ${list.items.length === 1 ? 'item' : 'items'}` : formatListProgress(doneCount, list.items.length)}
                                       </p>
-                                      {!isSavedList && isSmartRemindersEnabled && (list.smartReminders ?? true) && (
+                                      {!isSavedList && isSmartRemindersEnabled && (list.smartReminders ?? false) && (
                                         <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
                                           <SmartRemindersIndicator color={isPendingRestore ? '#BABABA' : listStatusColor} />
                                         </div>
@@ -3528,13 +3678,13 @@ export default function App() {
                                   <div className={`flex items-center overflow-visible cursor-pointer${isPendingAwayList ? ' line-through' : ''} min-w-0`} style={{ textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }} onClick={() => openListEditor(list)}>
                                     <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAwayList ? DELETED_GREY : '#BABABA', textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
                                       {formatListProgress(visibleCompletedCount, list.items.length)}
-                                      {isSmartRemindersEnabled && (list.smartReminders ?? true) ? (
+                                      {isSmartRemindersEnabled && (list.smartReminders ?? false) ? (
                                         <span style={{ color: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
                                           {`. ${formatSmartReminderDueBy(list.smartReminderDueDate, list.smartReminderTime)}`}
                                         </span>
                                       ) : null}
                                     </p>
-                                    {isSmartRemindersEnabled && (list.smartReminders ?? true) && (
+                                    {isSmartRemindersEnabled && (list.smartReminders ?? false) && (
                                       <div className="flex items-center gap-[8px] h-0 overflow-visible shrink-0 self-center pl-[8px]">
                                         <SmartRemindersIndicator />
                                       </div>
@@ -4198,11 +4348,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              onClick={() => {
-                setIsOverlayOpen(false);
-                setRepeatConfig(null);
-                setEditingReminder(null);
-              }}
+              onClick={handleOverlayClose}
               className="fixed inset-0 bg-black/0 z-40"
             />
             
@@ -4246,6 +4392,8 @@ export default function App() {
                   nlcEnabled={nlcEnabled}
                   editReminder={editingReminder}
                   updateReminder={updateReminder}
+                  smartReminderCreateList={smartReminderCreateList}
+                  onCreateSmartReminder={createSmartReminderFromPanel}
                   useOneMinuteIncrements={useOneMinuteTimeIncrements}
                   autoFocusReady={isReminderOverlayFocusReady}
                 />
@@ -4483,7 +4631,19 @@ export default function App() {
                 }, () => {
                   handleListDeleteClick(listId);
                 });
-              }} allUnchecked={listItems.every(i => !i.completed)} smartReminders={listSmartReminders} onSmartRemindersChange={handleSmartRemindersChange} showSmartReminders={isSmartRemindersEnabled} smartReminderDueDate={storageStringToDate(listSmartReminderDueDate)} smartReminderTime={listSmartReminderTime} onSetSmartReminderDueDate={(date) => { setListSmartReminderDueDate(dateToStorageString(date)); setListSmartReminderTime((current) => current ?? '12:00'); }} />
+              }} allUnchecked={listItems.every(i => !i.completed)} smartReminders={listSmartReminders} onSmartRemindersChange={(val) => {
+                if (!editingListId) return;
+                if (!val) {
+                  handleSmartRemindersChange(false);
+                  return;
+                }
+                if (listSmartReminderDueDate) {
+                  handleSmartRemindersChange(true);
+                  setListSmartReminderTime((current) => current ?? '12:00');
+                  return;
+                }
+                openSmartReminderAddFlow(editingListId, 'list-settings');
+              }} showSmartReminders={isSmartRemindersEnabled} smartReminderDueDate={storageStringToDate(listSmartReminderDueDate)} smartReminderTime={listSmartReminderTime} onSetSmartReminderDueDate={(date) => { setListSmartReminderDueDate(dateToStorageString(date)); setListSmartReminderTime((current) => current ?? '12:00'); }} onOpenSmartReminderEditor={editingListId ? () => openSmartReminderEditFlow(editingListId, 'list-settings') : undefined} />
             </div>
           </div>
         </>
@@ -4499,8 +4659,20 @@ export default function App() {
             <div className="pointer-events-auto w-full max-w-[400px]">
               <ListInfoOverlay
                 listTitle={listInfoOverlayList.title}
-                smartReminders={listInfoOverlayList.smartReminders ?? true}
+                smartReminders={(listInfoOverlayList.smartReminders ?? false) || pendingListInfoSmartReminderListId === listInfoOverlayList.id}
                 onSmartRemindersChange={(val) => {
+                  if (val) {
+                    if (listInfoOverlayList.smartReminderDueDate) {
+                      setCreatedLists((prev) => prev.map((list) => (
+                        list.id === listInfoOverlayList.id
+                          ? { ...list, smartReminders: true, smartReminderTime: list.smartReminderTime ?? '12:00' }
+                          : list
+                      )));
+                      return;
+                    }
+                    openSmartReminderAddFlow(listInfoOverlayList.id, 'list-info');
+                    return;
+                  }
                   setCreatedLists((prev) => prev.map((list) => (
                     list.id === listInfoOverlayList.id ? { ...list, smartReminders: val } : list
                   )));
@@ -4514,6 +4686,7 @@ export default function App() {
                     list.id === listInfoOverlayList.id ? { ...list, smartReminderDueDate: nextDate, smartReminderTime: list.smartReminderTime ?? '12:00' } : list
                   )));
                 }}
+                onOpenSmartReminderEditor={() => openSmartReminderEditFlow(listInfoOverlayList.id, 'list-info')}
                 onMarkAsDone={() => {
                   const listId = listInfoOverlayList.id;
                   setListInfoOverlayListId(null);
