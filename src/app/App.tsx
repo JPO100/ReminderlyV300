@@ -4089,6 +4089,14 @@ export default function App() {
                                     {showSubtitles && (
                                       <div className={`flex items-center overflow-visible${isPendingRestore ? '' : ' line-through'}`} style={{ textDecorationColor: subtitleCol }}>
                                         <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: subtitleCol }}>{(() => {
+                                          if (isSmartReminder && item.linkedListId && item.schedule.kind === 'scheduled' && item.schedule.date) {
+                                            const linkedList = createdLists.find((list) => list.id === item.linkedListId);
+                                            if (linkedList) {
+                                              const completedCount = linkedList.items.filter((listItem) => listItem.completed).length;
+                                              const itemLabel = linkedList.items.length === 1 ? 'item' : 'items';
+                                              return `${formatListProgress(completedCount, linkedList.items.length)} ${itemLabel}. ${formatSmartReminderDueBy(item.schedule.date, item.schedule.time)}`;
+                                            }
+                                          }
                                           if (item.repeatRule) {
                                             const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
                                             if (label) return label;
@@ -4207,6 +4215,14 @@ export default function App() {
                                 {showSubtitles && (
                                   <div className={`flex items-center overflow-visible${isPendingAway ? ' line-through' : ''}`} style={{ textDecorationColor: isPendingAway ? pendingColour : '#BABABA' }}>
                                     <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAway ? pendingColour : '#BABABA' }}>{(() => {
+                                      if (isSmartReminder && reminder.linkedListId && reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
+                                        const linkedList = createdLists.find((list) => list.id === reminder.linkedListId);
+                                        if (linkedList) {
+                                          const completedCount = linkedList.items.filter((listItem) => listItem.completed).length;
+                                          const itemLabel = linkedList.items.length === 1 ? 'item' : 'items';
+                                          return `${formatListProgress(completedCount, linkedList.items.length)} ${itemLabel}. ${formatSmartReminderDueBy(reminder.schedule.date, reminder.schedule.time)}`;
+                                        }
+                                      }
                                       if (reminder.repeatRule) {
                                         const label = formatRepeatLabel(reminder.repeatRule, reminder.schedule.kind === 'scheduled' ? reminder.schedule.time : undefined, reminder.schedule.kind === 'scheduled' ? reminder.schedule.date : undefined);
                                         if (label) return label;
