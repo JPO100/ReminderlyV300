@@ -56,7 +56,7 @@ export function getSmartReminderTime(value: string | null | undefined): string {
 }
 
 export function formatSmartReminderDueBy(dateValue: string | null | undefined, timeValue: string | null | undefined, now: Date = new Date()): string {
-  return `Due by ${formatListDueDate(dateValue, now)} at ${formatTime12h(getSmartReminderTime(timeValue))}`;
+  return `${formatListDueDate(dateValue, now)} at ${formatTime12h(getSmartReminderTime(timeValue))}`;
 }
 
 export function formatSmartReminderDueByFromDate(date: Date | null, timeValue: string | null | undefined, now: Date = new Date()): string {
