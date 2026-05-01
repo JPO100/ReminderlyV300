@@ -3494,7 +3494,7 @@ export default function App() {
                 {savedListsFeatureEnabled ? (
                   <>
                     <div className="flex items-center gap-[8px]">
-                      {(["complete", "started", "todo"] as const).map((filter) => {
+                      {(["todo", "started", "complete"] as const).map((filter) => {
                         const isActive = activeListFilter === filter;
                         return (
                         <button
@@ -3596,7 +3596,7 @@ export default function App() {
                   {/* Dynamic list cards */}
                   <AnimatePresence key={`lists-${activeListFilter}`}>
                   {(() => {
-                    const listCategoryOrder: Record<string, number> = { complete: 0, almost: 1, started: 2, todo: 3 };
+                    const listCategoryOrder: Record<string, number> = { todo: 0, started: 1, almost: 1, complete: 2 };
                     const categoriseList = (list: typeof createdLists[number]) => {
                       const total = list.items.length;
                       const checked = list.items.filter(i => i.completed).length;
