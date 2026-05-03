@@ -3285,7 +3285,7 @@ export default function App() {
       )}
 
       {/* Reminder list container */}
-      <div className={`bg-white content-stretch flex flex-col gap-[32px] items-center px-[20px] ${isListsEnabled ? 'pt-[24px]' : 'pt-[30px]'} relative ${isListsEnabled ? 'rounded-tl-[15px] rounded-tr-[15px]' : 'rounded-tl-[20px] rounded-tr-[20px]'} w-full flex-1 min-h-[350px]`}>
+      <div className={`bg-white content-stretch flex flex-col gap-[22px] items-center px-[20px] ${isListsEnabled ? 'pt-[24px]' : 'pt-[30px]'} relative ${isListsEnabled ? 'rounded-tl-[15px] rounded-tr-[15px]' : 'rounded-tl-[20px] rounded-tr-[20px]'} w-full flex-1 min-h-[350px]`}>
         {isListsEnabled && activeMainTab === 'lists' ? (
           <>
           {viewMode === 'lists-done' && (
@@ -3487,7 +3487,7 @@ export default function App() {
             })()
           ) : (
             <>
-            <div className="relative flex flex-col gap-[32px] w-full flex-1 min-h-0">
+            <div className="relative flex flex-col gap-[22px] w-full flex-1 min-h-0">
             {/* List filter pills */}
             {(
               <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
