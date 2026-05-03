@@ -13,6 +13,7 @@ export type CreatedList = {
   title: string;
   items: ListItem[];
   sortMode?: 'alphabetical' | 'insertion';
+  pinnedAt?: number | null;
   smartReminders?: boolean;
   smartReminderDueDate?: string | null;
   smartReminderTime?: string | null;

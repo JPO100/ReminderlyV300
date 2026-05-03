@@ -248,6 +248,15 @@ function RowMenuButton({ onClick }: { onClick?: () => void }) {
   );
 }
 
+function PinnedListIcon({ color = "#1C2C42" }: { color?: string }) {
+  return (
+    <svg className="block" width="13" height="13" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M0.875 13.8753L4.48541 10.2642" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8.28359 12.3377C5.58063 11.7239 3.02682 9.16957 2.41312 6.46609C2.31597 6.03813 2.2674 5.82415 2.40812 5.47699C2.54885 5.12983 2.72076 5.02241 3.06457 4.80757C3.84178 4.32192 4.68336 4.16753 5.55675 4.2448C6.78228 4.35321 7.39504 4.40742 7.70072 4.24813C8.0064 4.08883 8.21412 3.71635 8.62957 2.97139L9.15584 2.02769C9.50252 1.40603 9.67586 1.0952 10.0836 0.948678C10.4914 0.802151 10.7368 0.890883 11.2275 1.06835C12.3752 1.48337 13.2653 2.37365 13.6803 3.52158C13.8577 4.01246 13.9465 4.2579 13.8 4.66574C13.6535 5.07357 13.3427 5.24695 12.7211 5.5937L11.7559 6.1322C11.0125 6.54693 10.6408 6.7543 10.4816 7.06303C10.3224 7.37175 10.3802 7.97129 10.4958 9.17037C10.5809 10.0521 10.4343 10.8995 9.94223 11.6864C9.72722 12.0303 9.61971 12.2022 9.27272 12.3429C8.92572 12.4835 8.71168 12.4349 8.28359 12.3377Z" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function SavedListTemplateIcon({ color = "#1C2C42" }: { color?: string }) {
   return (
     <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="block size-full">
@@ -562,6 +571,7 @@ export default function App() {
             ) : [],
             status: list.status ?? (list.completedAt != null ? 'done' : 'active'),
             statusChangedAt: list.statusChangedAt ?? list.completedAt ?? null,
+            pinnedAt: typeof list.pinnedAt === 'number' ? list.pinnedAt : null,
             smartReminders: list.smartReminders ?? false,
             smartReminderDueDate: list.smartReminderDueDate ?? null,
             smartReminderTime: list.smartReminderTime ?? null,
@@ -1866,6 +1876,7 @@ export default function App() {
       title: list.title,
       items: list.items.map((item) => ({ ...item, id: crypto.randomUUID(), completed: false, completedAt: null })),
       sortMode: 'insertion',
+      pinnedAt: null,
       smartReminders: false,
       smartReminderDueDate: null,
       smartReminderTime: null,
@@ -1940,6 +1951,15 @@ export default function App() {
       ));
     }, 1550));
   }, [clearCreateTemplateFeedbackTimers, createTemplateFeedback, createTemplateFromListData, openCreatedTemplateFromFeedback]);
+
+  const handleToggleListPinned = useCallback((listId: string) => {
+    if (!pinnedListsFeatureEnabled) return;
+    setCreatedLists((prev) => prev.map((list) => (
+      list.id === listId
+        ? { ...list, pinnedAt: typeof list.pinnedAt === 'number' ? null : Date.now() }
+        : list
+    )));
+  }, [pinnedListsFeatureEnabled]);
 
   const handleCreateTemplateFromListSettingsFeedback = useCallback(() => {
     const key = editingListId ?? 'list-settings';
@@ -3621,19 +3641,24 @@ export default function App() {
                       return "todo";
                     };
                     const activeLists = createdLists.filter((list) => (list.status !== 'done' && list.status !== 'deleted') || pendingDoneListIds.has(list.id) || pendingDeletedListIds.has(list.id));
+                    const isListPinned = (list: typeof createdLists[number]) => pinnedListsFeatureEnabled && typeof list.pinnedAt === 'number';
+                    const unpinnedActiveLists = activeLists.filter((list) => !isListPinned(list));
+                    const pinnedLists = activeLists
+                      .filter((list) => isListPinned(list))
+                      .sort((a, b) => (b.pinnedAt ?? 0) - (a.pinnedAt ?? 0));
                     const filteredLists = activeListFilter === "all"
-                      ? activeLists
+                      ? unpinnedActiveLists
                       : savedListsFeatureEnabled && activeListFilter === "started"
-                        ? activeLists.filter(l => { const c = categoriseList(l); return c === "almost" || c === "started"; })
+                        ? unpinnedActiveLists.filter(l => { const c = categoriseList(l); return c === "almost" || c === "started"; })
                       : activeListFilter === "grouped-todo"
-                        ? activeLists.filter(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
-                        : activeLists.filter(l => categoriseList(l) === activeListFilter);
-                    const sortedLists = [...filteredLists].sort((a, b) => {
+                        ? unpinnedActiveLists.filter(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
+                        : unpinnedActiveLists.filter(l => categoriseList(l) === activeListFilter);
+                    const sortedLists = [...pinnedLists, ...[...filteredLists].sort((a, b) => {
                       const catA = listCategoryOrder[categoriseList(a)] ?? 3;
                       const catB = listCategoryOrder[categoriseList(b)] ?? 3;
                       if (catA !== catB) return catA - catB;
                       return createdLists.indexOf(a) - createdLists.indexOf(b);
-                    });
+                    })];
                     const listCategoryColor: Record<string, string> = {
                       complete: "#0D45A0",
                       almost: "#9468D5",
@@ -3646,9 +3671,10 @@ export default function App() {
                     const isPendingDoneList = pendingDoneListIds.has(list.id);
                     const isPendingDeletedList = pendingDeletedListIds.has(list.id);
                     const isPendingAwayList = isPendingDoneList || isPendingDeletedList;
+                    const isPinnedList = pinnedListsFeatureEnabled && typeof list.pinnedAt === 'number';
                     const pendingListColour = isPendingDeletedList ? DELETED_LIST_COLOUR : DONE_LIST_COLOUR;
                     const visibleCompletedCount = isPendingDoneList ? list.items.length : list.items.filter(i => i.completed).length;
-                    const catColor = listCategoryColor[categoriseList(list)] || "#BABABA";
+                    const catColor = isPinnedList ? DONE_BLUE : (listCategoryColor[categoriseList(list)] || "#BABABA");
                     return (
                       <motion.div
                         key={list.id}
@@ -3686,7 +3712,18 @@ export default function App() {
                                 </button>
                                 <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
                                   <div className={`overflow-hidden whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), height: '17px', maxWidth: '100%', minWidth: 0 }} onClick={() => openListEditor(list)}>
-                                    <p style={{ display: 'block', width: '100%', minWidth: 0, fontSize: '17px', fontWeight: 700, lineHeight: '17px', transform: 'translateY(-1px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingBottom: '2px', boxSizing: 'content-box' }}>{list.title}</p>
+                                    {isPinnedList ? (
+                                      <div className="flex h-full items-center min-w-0" style={{ gap: '8px' }}>
+                                        <div className="flex h-[13px] w-[13px] shrink-0 items-center justify-center">
+                                          <PinnedListIcon color="#1C2C42" />
+                                        </div>
+                                        <div className="min-w-0 overflow-hidden">
+                                          <p style={{ display: 'block', width: '100%', minWidth: 0, fontSize: '17px', fontWeight: 700, lineHeight: '17px', transform: 'translateY(-1px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingBottom: '2px', boxSizing: 'content-box' }}>{list.title}</p>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <p style={{ display: 'block', width: '100%', minWidth: 0, fontSize: '17px', fontWeight: 700, lineHeight: '17px', transform: 'translateY(-1px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingBottom: '2px', boxSizing: 'content-box' }}>{list.title}</p>
+                                    )}
                                   </div>
                                   <div className={`flex items-center overflow-visible cursor-pointer${isPendingAwayList ? ' line-through' : ''} min-w-0`} style={{ textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }} onClick={() => openListEditor(list)}>
                                     <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAwayList ? DELETED_GREY : '#BABABA', textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
@@ -4474,7 +4511,7 @@ export default function App() {
               setCreatedLists((prev) => prev.map((l) => l.id === targetId ? { ...l, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, smartReminderDueDate: listSmartReminderDueDate, smartReminderTime: listSmartReminderTime ?? (listSmartReminders && listSmartReminderDueDate ? '12:00' : null), status: l.status ?? 'active', statusChangedAt: l.statusChangedAt ?? null } : l));
             } else if (title.length > 0 && items.length > 0) {
               const newId = crypto.randomUUID();
-              setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, smartReminders: listSmartReminders, smartReminderDueDate: listSmartReminderDueDate, smartReminderTime: listSmartReminderTime ?? (listSmartReminders && listSmartReminderDueDate ? '12:00' : null), status: 'active', statusChangedAt: null }]);
+              setCreatedLists((prev) => [...prev, { id: newId, title, items, sortMode: listSortMode, pinnedAt: null, smartReminders: listSmartReminders, smartReminderDueDate: listSmartReminderDueDate, smartReminderTime: listSmartReminderTime ?? (listSmartReminders && listSmartReminderDueDate ? '12:00' : null), status: 'active', statusChangedAt: null }]);
               setEditingListId(newId);
               setListOverlayMode('edit');
             }
@@ -4737,6 +4774,8 @@ export default function App() {
                     openListEditor(listToEdit);
                   }, 100);
                 }}
+                onTogglePinned={() => handleToggleListPinned(listInfoOverlayList.id)}
+                isPinned={pinnedListsFeatureEnabled && typeof listInfoOverlayList.pinnedAt === 'number'}
                 showPinnedLists={pinnedListsFeatureEnabled}
                 onCreateTemplate={() => {
                   handleCreateTemplateFromListInfoFeedback(listInfoOverlayList);
@@ -5035,7 +5074,7 @@ export default function App() {
                     : [],
                 );
               }} onGenerateLists={({ lists, savedLists }) => {
-                setCreatedLists(lists.map((list) => ({ ...list, status: list.status ?? 'active', statusChangedAt: list.statusChangedAt ?? null, smartReminderDueDate: list.smartReminderDueDate ?? null, smartReminderTime: list.smartReminderTime ?? null })));
+                setCreatedLists(lists.map((list) => ({ ...list, status: list.status ?? 'active', statusChangedAt: list.statusChangedAt ?? null, pinnedAt: list.pinnedAt ?? null, smartReminderDueDate: list.smartReminderDueDate ?? null, smartReminderTime: list.smartReminderTime ?? null })));
                 setSavedLists(savedLists.map((list) => ({
                   id: list.id,
                   title: list.title,

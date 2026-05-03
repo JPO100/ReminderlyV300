@@ -124,13 +124,13 @@ function EditListBtn({ onClick }: { onClick: () => void }) {
   );
 }
 
-function PinToTopBtn() {
+function PinToTopBtn({ isPinned, onClick }: { isPinned: boolean; onClick: () => void }) {
   return (
-    <button className="bg-[#1c2c42] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="pin-to-top-btn" type="button">
+    <button className="bg-[#1c2c42] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="pin-to-top-btn" type="button" onClick={onClick}>
       <div className="flex flex-row items-center justify-center size-full">
         <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-            <p className="leading-[normal]">Pin to top</p>
+            <p className="leading-[normal]">{isPinned ? 'Unpin from top' : 'Pin to top'}</p>
           </div>
         </div>
       </div>
@@ -186,14 +186,14 @@ function DeleteBtn({ onClick }: { onClick: () => void }) {
   );
 }
 
-function Buttons({ onMarkAsDone, onEdit, onCreateTemplate, createTemplateStage, onDelete, showActionButtons, showPinnedLists }: { onMarkAsDone: () => void; onEdit: () => void; onCreateTemplate: () => void; createTemplateStage: 'idle' | 'fill' | 'copied' | 'blank' | 'go'; onDelete: () => void; showActionButtons: boolean; showPinnedLists: boolean }) {
+function Buttons({ onMarkAsDone, onEdit, onTogglePinned, isPinned, onCreateTemplate, createTemplateStage, onDelete, showActionButtons, showPinnedLists }: { onMarkAsDone: () => void; onEdit: () => void; onTogglePinned: () => void; isPinned: boolean; onCreateTemplate: () => void; createTemplateStage: 'idle' | 'fill' | 'copied' | 'blank' | 'go'; onDelete: () => void; showActionButtons: boolean; showPinnedLists: boolean }) {
   if (!showActionButtons) return null;
   return (
     <div className="content-stretch flex flex-col gap-[30px] items-start mt-[12px] relative shrink-0 w-full" data-name="buttons">
       <>
         <MarkAsDoneBtn onClick={onMarkAsDone} />
         <EditListBtn onClick={onEdit} />
-        {showPinnedLists && <PinToTopBtn />}
+        {showPinnedLists && <PinToTopBtn isPinned={isPinned} onClick={onTogglePinned} />}
         <CreateTemplateBtn onClick={onCreateTemplate} stage={createTemplateStage} />
         <DeleteBtn onClick={onDelete} />
       </>
@@ -201,7 +201,7 @@ function Buttons({ onMarkAsDone, onEdit, onCreateTemplate, createTemplateStage, 
   );
 }
 
-export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange, showSmartReminders, smartReminderDueDate, smartReminderTime, onSetSmartReminderDueDate, onOpenSmartReminderEditor, onMarkAsDone, onEdit, onCreateTemplate, createTemplateStage, onDelete, showPinnedLists }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; showSmartReminders: boolean; smartReminderDueDate: Date | null; smartReminderTime: string | null | undefined; onSetSmartReminderDueDate: (date: Date) => void; onOpenSmartReminderEditor?: () => void; onMarkAsDone: () => void; onEdit: () => void; onCreateTemplate: () => void; createTemplateStage: 'idle' | 'fill' | 'copied' | 'blank' | 'go'; onDelete: () => void; showPinnedLists: boolean }) {
+export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemindersChange, showSmartReminders, smartReminderDueDate, smartReminderTime, onSetSmartReminderDueDate, onOpenSmartReminderEditor, onMarkAsDone, onEdit, onTogglePinned, isPinned, onCreateTemplate, createTemplateStage, onDelete, showPinnedLists }: { listTitle: string; smartReminders: boolean; onSmartRemindersChange: (val: boolean) => void; showSmartReminders: boolean; smartReminderDueDate: Date | null; smartReminderTime: string | null | undefined; onSetSmartReminderDueDate: (date: Date) => void; onOpenSmartReminderEditor?: () => void; onMarkAsDone: () => void; onEdit: () => void; onTogglePinned: () => void; isPinned: boolean; onCreateTemplate: () => void; createTemplateStage: 'idle' | 'fill' | 'copied' | 'blank' | 'go'; onDelete: () => void; showPinnedLists: boolean }) {
   const smartRemindersActive = showSmartReminders && smartReminders;
   const [draftSmartReminderDate, setDraftSmartReminderDate] = useState<Date>(smartReminderDueDate ?? new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(smartRemindersActive && smartReminderDueDate == null);
@@ -289,7 +289,7 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
           <Frame3 smartReminders={smartReminders} onSmartRemindersChange={handleSmartRemindersChange} displaySmartReminderDate={displaySmartReminderDate} smartReminderTime={smartReminderTime} selectedSmartReminderDate={draftSmartReminderDate} isDatePickerOpen={isDatePickerOpen} onDateSelect={setDraftSmartReminderDate} onSetDate={handleSetDate} onCloseDatePicker={handleCloseDatePicker} onOpenDatePicker={handleOpenDatePicker} onOpenSmartReminderEditor={onOpenSmartReminderEditor} highlightDueDate={dueDateHighlightPhase !== 'idle'} animateFadeOut={dueDateHighlightPhase === 'fade'} />
         </div>
       )}
-      <Buttons onMarkAsDone={onMarkAsDone} onEdit={onEdit} onCreateTemplate={onCreateTemplate} createTemplateStage={createTemplateStage} onDelete={onDelete} showActionButtons={!smartRemindersActive || !isDatePickerOpen} showPinnedLists={showPinnedLists} />
+      <Buttons onMarkAsDone={onMarkAsDone} onEdit={onEdit} onTogglePinned={onTogglePinned} isPinned={isPinned} onCreateTemplate={onCreateTemplate} createTemplateStage={createTemplateStage} onDelete={onDelete} showActionButtons={!smartRemindersActive || !isDatePickerOpen} showPinnedLists={showPinnedLists} />
     </div>
   );
 }
