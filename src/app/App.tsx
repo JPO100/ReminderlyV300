@@ -4779,7 +4779,7 @@ export default function App() {
                   setListInfoOverlayListId(null);
                   window.setTimeout(() => {
                     handleToggleListPinned(listId);
-                  }, 100);
+                  }, 200);
                 }}
                 isPinned={pinnedListsFeatureEnabled && typeof listInfoOverlayList.pinnedAt === 'number'}
                 showPinnedLists={pinnedListsFeatureEnabled}
