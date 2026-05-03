@@ -3837,7 +3837,7 @@ export default function App() {
                         )}
                       </div>
                     </div>
-                    <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[32px] shrink-0">
+                    <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[24px] shrink-0">
                       <button
                         type="button"
                         className="bg-[#1C2C42] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full"
@@ -3863,7 +3863,7 @@ export default function App() {
                           </svg>
                         </div>
                         <div className="font-['Lato',sans-serif] font-bold text-[20px] text-white whitespace-nowrap">
-                          Create new template
+                          New template
                         </div>
                       </button>
                     </div>
