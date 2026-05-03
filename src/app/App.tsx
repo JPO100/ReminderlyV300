@@ -3785,7 +3785,7 @@ export default function App() {
                             </p>
                           </div>
                         ) : (
-                          <div className="flex flex-col gap-[23px] w-full pt-[2px]" style={{ position: 'relative', zIndex: 1 }}>
+                          <div className="flex flex-col gap-[23px] w-full" style={{ position: 'relative', zIndex: 1 }}>
                             <AnimatePresence initial={false}>
                             {savedLists.filter((list) => (list.status ?? 'active') !== 'deleted' || pendingDeletedSavedListIds.has(list.id)).map((list) => {
                               const isPendingDeletedSavedList = pendingDeletedSavedListIds.has(list.id);
@@ -3801,7 +3801,7 @@ export default function App() {
                                 <div className="flex-[1_0_0] min-h-px min-w-px relative">
                                   <div className="flex flex-row items-start size-full">
                                     <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full min-w-0">
-                                      <div className="relative shrink-0 size-[25px]" style={{ marginTop: '5px' }}>
+                                      <div className="relative shrink-0 size-[25px]" style={{ marginTop: '3px' }}>
                                         <SavedListTemplateIcon color={isPendingDeletedSavedList ? deletedSavedListColor : undefined} />
                                       </div>
                                       <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
