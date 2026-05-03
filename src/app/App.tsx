@@ -3775,7 +3775,7 @@ export default function App() {
                       all: "No lists here yet.. get busy!",
                       complete: "No fully checked off lists yet",
                       almost: "Nothing close to completion yet",
-                      started: "No started lists yet",
+                      started: "Nothing started here yet",
                       todo: "Nothing 'todo' here!",
                       "grouped-todo": "Nothing 'todo' here!",
                     };
