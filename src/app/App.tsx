@@ -3285,7 +3285,7 @@ export default function App() {
       )}
 
       {/* Reminder list container */}
-      <div className={`bg-white content-stretch flex flex-col gap-[22px] items-center px-[20px] ${isListsEnabled ? 'pt-[24px]' : 'pt-[30px]'} relative ${isListsEnabled ? 'rounded-tl-[15px] rounded-tr-[15px]' : 'rounded-tl-[20px] rounded-tr-[20px]'} w-full flex-1 min-h-[350px]`}>
+      <div className={`bg-white content-stretch flex flex-col gap-[24px] items-center px-[20px] pt-[24px] relative ${isListsEnabled ? 'rounded-tl-[15px] rounded-tr-[15px]' : 'rounded-tl-[20px] rounded-tr-[20px]'} w-full flex-1 min-h-[350px]`}>
         {isListsEnabled && activeMainTab === 'lists' ? (
           <>
           {viewMode === 'lists-done' && (
@@ -3487,7 +3487,7 @@ export default function App() {
             })()
           ) : (
             <>
-            <div className="relative flex flex-col gap-[22px] w-full flex-1 min-h-0">
+            <div className="relative flex flex-col gap-[24px] w-full flex-1 min-h-0">
             {/* List filter pills */}
             {(
               <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
@@ -3739,7 +3739,7 @@ export default function App() {
               </div>
             </div>
             {/* Add new list button */}
-            <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[26px] shrink-0 mt-[-10px]">
+            <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[24px] shrink-0">
               <button
                 className="bg-[#1C2C42] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
                 style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
@@ -4331,7 +4331,7 @@ export default function App() {
 
         {/* New reminder button - fixed at bottom */}
         {viewMode !== "done-deleted" && (
-        <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[26px] shrink-0 mt-[-10px]">
+        <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[24px] shrink-0">
           <button
             className="bg-[#4784f8] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
             style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
