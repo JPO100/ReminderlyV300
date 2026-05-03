@@ -3653,7 +3653,7 @@ export default function App() {
                       : activeListFilter === "grouped-todo"
                         ? unpinnedActiveLists.filter(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
                         : unpinnedActiveLists.filter(l => categoriseList(l) === activeListFilter);
-                    const sortedLists = [...pinnedLists, ...[...filteredLists].sort((a, b) => {
+                    const sortedLists = [...(activeListFilter === "all" ? pinnedLists : []), ...[...filteredLists].sort((a, b) => {
                       const catA = listCategoryOrder[categoriseList(a)] ?? 3;
                       const catB = listCategoryOrder[categoriseList(b)] ?? 3;
                       if (catA !== catB) return catA - catB;
