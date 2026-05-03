@@ -52,6 +52,7 @@ function stripTrailingTitleTime(displayText: string): string {
 
 interface ReminderInfoOverlayProps {
   reminder: Reminder;
+  smartReminderProgressLine?: string | null;
   onClose: () => void;
   onMarkAsDone: () => void;
   onEdit?: () => void;
@@ -62,6 +63,7 @@ interface ReminderInfoOverlayProps {
 
 export default function ReminderInfoOverlay({
   reminder,
+  smartReminderProgressLine,
   onClose,
   onMarkAsDone,
   onEdit,
@@ -134,21 +136,28 @@ export default function ReminderInfoOverlay({
 
           {/* Due line */}
           <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
-            {reminder.isSmartReminder ? (
-              <div className="h-[21.5px] relative shrink-0 w-[24px] flex items-center justify-center" aria-hidden="true">
-                <svg className="block h-[21.5px] w-[24px]" fill="none" preserveAspectRatio="xMidYMid meet" viewBox="0 0 19.5002 21.5002">
-                  <g>
-                    <path clipRule="evenodd" d={svgPaths.p23b20a00} fill={dueLineColour} fillRule="evenodd" />
-                    <path clipRule="evenodd" d={svgPaths.p15d6fbb2} fill={dueLineColour} fillRule="evenodd" />
-                    <path clipRule="evenodd" d={svgPaths.p1797f00} fill={dueLineColour} fillRule="evenodd" />
-                  </g>
-                </svg>
-              </div>
-            ) : null}
             <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[17px] text-center max-w-full" style={{ color: dueLineColour }}>
               <p className="leading-[normal] whitespace-nowrap" style={{ fontWeight: 700 }}>{dueLine}</p>
             </div>
           </div>
+
+          {/* Smart reminder progress line (optional) */}
+          {reminder.isSmartReminder && smartReminderProgressLine && (
+            <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
+              <div className="relative shrink-0 w-[19px] h-[21px] flex items-center justify-center" aria-hidden="true">
+                <svg className="block w-[19px] h-[21px]" fill="none" preserveAspectRatio="xMidYMid meet" viewBox="0 0 19.5002 21.5002">
+                  <g>
+                    <path clipRule="evenodd" d={svgPaths.p23b20a00} fill="#BABABA" fillRule="evenodd" />
+                    <path clipRule="evenodd" d={svgPaths.p15d6fbb2} fill="#BABABA" fillRule="evenodd" />
+                    <path clipRule="evenodd" d={svgPaths.p1797f00} fill="#BABABA" fillRule="evenodd" />
+                  </g>
+                </svg>
+              </div>
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#bababa] text-[17px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{smartReminderProgressLine}</p>
+              </div>
+            </div>
+          )}
 
           {/* Repeats line (optional) */}
           {repeatsLine && (

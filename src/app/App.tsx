@@ -4280,6 +4280,13 @@ export default function App() {
               {infoReminder && (
                 <ReminderInfoOverlay
                   reminder={infoReminder}
+                  smartReminderProgressLine={(() => {
+                    if (!infoReminder.isSmartReminder || !infoReminder.linkedListId) return null;
+                    const linkedList = createdLists.find((list) => list.id === infoReminder.linkedListId);
+                    if (!linkedList) return null;
+                    const completedCount = linkedList.items.filter((item) => item.completed).length;
+                    return `${completedCount} of ${linkedList.items.length} items`;
+                  })()}
                   onClose={() => setInfoReminder(null)}
                   onMarkAsDone={() => {
                     const reminderId = infoReminder.id;
