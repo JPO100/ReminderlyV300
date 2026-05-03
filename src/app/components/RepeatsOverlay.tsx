@@ -90,7 +90,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
   return (
     <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[15px] rounded-tr-[15px] size-full" data-name="repeats-overlay">
       <div className="flex flex-col h-full relative w-full max-w-[768px]" data-name="repeats-content">
-        <div className="flex flex-col items-start pt-[24px] px-[24px] pb-[24px] relative w-full flex-1 min-h-0">
+        <div className="flex flex-col items-start pt-[30px] px-[24px] pb-[24px] relative w-full flex-1 min-h-0">
           <div className="bg-white w-full flex-1 min-h-0 flex flex-col">
             <div className="relative flex items-center justify-center w-full shrink-0" style={{ height: 50 }}>
               <button

@@ -241,7 +241,7 @@ function SelfChecks({ onBack, onClose }: { onBack: () => void; onClose: () => vo
 function TestDataPage({ onBack, onClose, onNavigateDummyReminders, onNavigateDummyLists }: { onBack: () => void; onClose: () => void; onNavigateDummyReminders: () => void; onNavigateDummyLists: () => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="test-data-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Test data" onBack={onBack} onClose={onClose} />
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
@@ -302,7 +302,7 @@ function TestDataPage({ onBack, onClose, onNavigateDummyReminders, onNavigateDum
 function NlcPage({ onBack, onClose, nlcMode, onNlcModeChange }: { onBack: () => void; onClose: () => void; nlcMode: NlcMode; onNlcModeChange: (mode: NlcMode) => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="nlc-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Natural Language Capture" onBack={onBack} onClose={onClose} />
 
@@ -383,7 +383,7 @@ function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVar
   const displayVariant = isListsEnabled ? 'standard' : filtersMenuVariant;
   return (
     <div className="flex flex-col h-full relative w-full" data-name="filters-menu-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Filters menu" onBack={onBack} onClose={onClose} />
 
@@ -448,7 +448,7 @@ function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVar
 function OnboardingTutorialPage({ onBack, onClose, showTutorialOnFirstLaunch, onShowTutorialOnFirstLaunchChange, showTutorialOnEveryStart, onShowTutorialOnEveryStartChange }: { onBack: () => void; onClose: () => void; showTutorialOnFirstLaunch: boolean; onShowTutorialOnFirstLaunchChange: (value: boolean) => void; showTutorialOnEveryStart: boolean; onShowTutorialOnEveryStartChange: (value: boolean) => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="onboarding-tutorial-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Onboarding tutorial" onBack={onBack} onClose={onClose} />
 
@@ -526,7 +526,7 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
 
   return (
     <div className="flex flex-col h-full relative w-full" data-name="dev-tools-password-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Dev tools password" onBack={onBack} onClose={onClose} />
 
@@ -666,7 +666,7 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
 function ReminderSettingsPage({ onBack, onClose, useOneMinuteIncrements, onUseOneMinuteIncrementsChange }: { onBack: () => void; onClose: () => void; useOneMinuteIncrements: boolean; onUseOneMinuteIncrementsChange: (value: boolean) => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="reminder-settings-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Reminder settings" onBack={onBack} onClose={onClose} />
 
@@ -703,7 +703,7 @@ function ReminderSettingsPage({ onBack, onClose, useOneMinuteIncrements, onUseOn
 function ListSettingsPage({ onBack, onClose, useDefaultTemplatesInCleanState, onUseDefaultTemplatesInCleanStateChange }: { onBack: () => void; onClose: () => void; useDefaultTemplatesInCleanState: boolean; onUseDefaultTemplatesInCleanStateChange: (value: boolean) => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="list-settings-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="List settings" onBack={onBack} onClose={onClose} />
 
@@ -740,7 +740,7 @@ function ListSettingsPage({ onBack, onClose, useDefaultTemplatesInCleanState, on
 function ListsPage({ onBack, onClose, smartRemindersEnabled, onSmartRemindersEnabledChange, savedListsEnabled, onSavedListsEnabledChange }: { onBack: () => void; onClose: () => void; smartRemindersEnabled: boolean; onSmartRemindersEnabledChange: (value: boolean) => void; savedListsEnabled: boolean; onSavedListsEnabledChange: (value: boolean) => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="lists-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Lists" onBack={onBack} onClose={onClose} />
           <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
@@ -966,7 +966,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
   let content;
   if (!isDevToolsUnlocked) {
     content = (
-      <div className="flex flex-col items-start pt-[26px] px-[30px] pb-[30px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col items-start pt-[30px] px-[30px] pb-[30px] relative w-full flex-1 min-h-0">
         <LoginScreen onUnlock={onDevToolsUnlock} passwordRequired={isDevToolsPasswordRequired} />
       </div>
     );
@@ -1038,7 +1038,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else {
     content = (
-      <div className="flex flex-col gap-[32px] items-start pt-[26px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <SelfChecks onBack={() => setPage('home')} onClose={onClose} />
       </div>
     );

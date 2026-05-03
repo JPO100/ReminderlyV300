@@ -1185,7 +1185,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
 
   return (
     <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col" data-name="new-reminder-elements">
-      <div className="content-stretch flex flex-col gap-[22px] items-start pt-[24px] px-[24px] relative w-full shrink-0">
+      <div className="content-stretch flex flex-col gap-[22px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
         <Header isSubmitActive={isSubmitActive} onSubmit={handleSubmit} title={isSmartReminderCreate ? 'Add smart reminder' : isEditMode ? (isSmartReminderEdit ? 'Edit smart reminder' : 'Edit reminder') : 'New reminder'} />
         {/* NLC: Container wraps mirror layer + textarea for alignment */}
         {/* Mirror and hit layer must stay identical in text metrics (font, size, line-height, padding, whitespace). Any styling change must be applied to both. */}

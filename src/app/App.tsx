@@ -4499,7 +4499,7 @@ export default function App() {
                   onPointerDown={(event) => listsSheetDragControls.start(event)}
                 />
                 <div className="relative w-full max-w-[768px] h-full flex flex-col mx-auto">
-                  <div className="content-stretch flex flex-col gap-[30px] items-start pt-[31px] px-[24px] relative w-full shrink-0">
+                  <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
                     <ListsHeader
                       value={listTitle}
                       onChange={setListTitle}

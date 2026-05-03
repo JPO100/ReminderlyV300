@@ -33,7 +33,7 @@ export default function SettingsOverlay({ onClose, showDateAndTimeSubtitles, onS
   return (
     <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[20px] rounded-tr-[20px] size-full" data-name="settings-overlay">
       <div className="flex flex-col h-full relative w-full max-w-[768px]" data-name="settings-content">
-        <div className="flex flex-col gap-[32px] [@media(max-height:667px)]:gap-[20px] items-start pt-[26px] px-[20px] pb-0 relative w-full flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-col gap-[32px] [@media(max-height:667px)]:gap-[20px] items-start pt-[30px] px-[20px] pb-0 relative w-full flex-1 min-h-0 overflow-hidden">
           <div className="flex flex-col gap-[40px] [@media(max-height:667px)]:gap-[20px] w-full shrink-0">
             <Header onClose={onClose} />
 
