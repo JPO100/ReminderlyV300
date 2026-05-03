@@ -3762,13 +3762,14 @@ export default function App() {
                     return "todo";
                   };
                   const visibleActiveLists = createdLists.filter((list) => (list.status !== 'done' && list.status !== 'deleted') || pendingDoneListIds.has(list.id) || pendingDeletedListIds.has(list.id));
+                  const visibleUnpinnedActiveLists = visibleActiveLists.filter((list) => !(pinnedListsFeatureEnabled && typeof list.pinnedAt === 'number'));
                   const hasVisible = activeListFilter === "all"
                     ? visibleActiveLists.length > 0
                     : savedListsFeatureEnabled && activeListFilter === "started"
-                      ? visibleActiveLists.some(l => { const c = categoriseList(l); return c === "almost" || c === "started"; })
+                      ? visibleUnpinnedActiveLists.some(l => { const c = categoriseList(l); return c === "almost" || c === "started"; })
                     : activeListFilter === "grouped-todo"
-                      ? visibleActiveLists.some(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
-                      : visibleActiveLists.some(l => categoriseList(l) === activeListFilter);
+                      ? visibleUnpinnedActiveLists.some(l => { const c = categoriseList(l); return c === "started" || c === "todo"; })
+                      : visibleUnpinnedActiveLists.some(l => categoriseList(l) === activeListFilter);
                   if (!hasVisible) {
                     const emptyMessages: Record<string, string> = {
                       all: "No lists here yet.. get busy!",
