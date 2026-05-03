@@ -3458,7 +3458,7 @@ export default function App() {
                                       )}
                                     </button>
                                   )}
-                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
+                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
                                     <div className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ color: isPendingRestore ? '#BABABA' : listStatusColor, textDecorationColor: isPendingRestore ? '#BABABA' : listStatusColor, clipPath: 'inset(0 0 -4px 0)' }}>
                                       <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>{list.title}</p>
                                     </div>
@@ -3669,7 +3669,7 @@ export default function App() {
                                     </svg>
                                   )}
                                 </button>
-                                <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
+                                <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
                                   <div className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), clipPath: 'inset(0 0 -4px 0)' }} onClick={() => openListEditor(list)}>
                                     <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>{list.title}</p>
                                   </div>
@@ -3804,7 +3804,7 @@ export default function App() {
                                       <div className="relative shrink-0 size-[25px]">
                                         <SavedListTemplateIcon color={isPendingDeletedSavedList ? deletedSavedListColor : undefined} />
                                       </div>
-                                      <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
+                                      <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
                                         <div
                                           className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDeletedSavedList ? ' line-through' : ''}`}
                                           style={{ color: isPendingDeletedSavedList ? deletedSavedListColor : '#1c2c42', textDecorationColor: isPendingDeletedSavedList ? deletedSavedListColor : '#1c2c42', clipPath: 'inset(0 0 -4px 0)' }}
@@ -4082,7 +4082,7 @@ export default function App() {
                                 const textCol = isPendingRestore ? (overdue ? OVERDUE_COLOUR : (isListsEnabled ? '#3F3F3F' : "#1c2c42")) : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : "#1C2C42"));
                                 const subtitleCol = isPendingRestore ? '#BABABA' : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE));
                                 return (
-                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative" style={{ color: textCol, gap: '9px', minHeight: '38px' }}>
+                                  <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ color: textCol, gap: '9px', minHeight: '38px' }}>
                                     <div className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingRestore ? '' : ' line-through'}`} style={{ textDecorationColor: textCol, clipPath: 'inset(0 0 -4px 0)' }}>
                                       <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>{getDisplayTitle(item)}</p>
                                     </div>
@@ -4201,7 +4201,7 @@ export default function App() {
                                 )}
                               </button>
                               <div
-                                className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-px not-italic overflow-visible relative cursor-pointer`}
+                                className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative cursor-pointer`}
                                 style={{ transition: 'color 300ms', gap: '9px', minHeight: '38px' }}
                                 onClick={() => {
                                   setRepeatConfig(repeatRuleToConfig(reminder.repeatRule));
