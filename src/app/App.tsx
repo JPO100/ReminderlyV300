@@ -3760,7 +3760,7 @@ export default function App() {
                   className="absolute inset-0 bg-white"
                   style={{ zIndex: 2, pointerEvents: savedListsPanelOpen ? 'auto' : 'none' }}
                 >
-                  <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[24px]">
+                  <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[0px]">
                     <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
                       <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
                         List templates
