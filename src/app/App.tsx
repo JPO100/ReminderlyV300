@@ -4774,7 +4774,13 @@ export default function App() {
                     openListEditor(listToEdit);
                   }, 100);
                 }}
-                onTogglePinned={() => handleToggleListPinned(listInfoOverlayList.id)}
+                onTogglePinned={() => {
+                  const listId = listInfoOverlayList.id;
+                  setListInfoOverlayListId(null);
+                  window.setTimeout(() => {
+                    handleToggleListPinned(listId);
+                  }, 100);
+                }}
                 isPinned={pinnedListsFeatureEnabled && typeof listInfoOverlayList.pinnedAt === 'number'}
                 showPinnedLists={pinnedListsFeatureEnabled}
                 onCreateTemplate={() => {
