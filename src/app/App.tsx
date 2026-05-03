@@ -3670,8 +3670,8 @@ export default function App() {
                                   )}
                                 </button>
                                 <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
-                                  <div className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), height: '17px' }} onClick={() => openListEditor(list)}>
-                                    <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1 }}>{list.title}</p>
+                                  <div className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1c2c42'), height: '20px' }} onClick={() => openListEditor(list)}>
+                                    <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '17px', fontWeight: 700, lineHeight: '20px' }}>{list.title}</p>
                                   </div>
                                   <div className={`flex items-center overflow-visible cursor-pointer${isPendingAwayList ? ' line-through' : ''} min-w-0`} style={{ textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }} onClick={() => openListEditor(list)}>
                                     <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: isPendingAwayList ? DELETED_GREY : '#BABABA', textDecorationColor: isPendingAwayList ? DELETED_GREY : '#BABABA' }}>
@@ -4209,8 +4209,8 @@ export default function App() {
                                   setIsOverlayOpen(true);
                                 }}
                               >
-                                <div className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ color: isPendingAway ? pendingColour : textColour, textDecorationColor: isPendingAway ? pendingColour : textColour, height: '17px' }}>
-                                  <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1 }}>{getDisplayTitle(reminder)}</p>
+                                <div className={`overflow-hidden text-ellipsis whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ color: isPendingAway ? pendingColour : textColour, textDecorationColor: isPendingAway ? pendingColour : textColour, height: '20px' }}>
+                                  <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '17px', fontWeight: 700, lineHeight: '20px' }}>{getDisplayTitle(reminder)}</p>
                                 </div>
                                 {showSubtitles && (
                                   <div className={`flex items-center overflow-visible${isPendingAway ? ' line-through' : ''}`} style={{ textDecorationColor: isPendingAway ? pendingColour : '#BABABA' }}>
