@@ -44,6 +44,10 @@ export function formatDueLine(reminder: Reminder, now: Date = new Date()): strin
   return `${prefix} at ${timePart}`;
 }
 
+function stripTrailingTitleTime(displayText: string): string {
+  return displayText.replace(/\s+at\s+\d{1,2}(?::\d{2})?(?:am|pm)$/i, "");
+}
+
 // ── Component ────────────────────────────────────────────────────────
 
 interface ReminderInfoOverlayProps {
@@ -93,6 +97,7 @@ export default function ReminderInfoOverlay({
   }, []);
 
   const dueLine = formatDueLine(reminder);
+  const displayTitle = stripTrailingTitleTime(reminder.displayText);
   const repeatRuleText = formatRepeatRuleText(
     reminder.repeatRule,
     reminder.schedule.kind === "scheduled" ? reminder.schedule.date : undefined
@@ -124,7 +129,7 @@ export default function ReminderInfoOverlay({
         >
           {/* Reminder text in single quotes */}
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
-            <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{reminder.displayText}</p>
+            <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{displayTitle}</p>
           </div>
 
           {/* Due line */}
