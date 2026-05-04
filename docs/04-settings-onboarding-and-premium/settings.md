@@ -1,26 +1,39 @@
 # Settings
 
-See [Settings Overlay](../01-core-surfaces/settings-overlay.md) for complete settings documentation.
+See [Settings Overlay](../01-core-surfaces/settings-overlay.md) for the current surface structure.
 
-## Settings System
+## Current User-Facing Settings
 
-The settings system provides user-facing configuration options accessible from the Settings overlay.
+The current settings surface exposes one live user setting:
 
-### Current Settings
+### Show date and time subtitles
 
-**Show date and time subtitles**
-- Toggle visibility of subtitle line in reminder rows
-- Only effective in grouped filters mode
-- Default: true
-- Persisted to localStorage under `reminderly.showDateAndTimeSubtitles`
-- Auto-resets to true when leaving grouped filters mode
+- persistence key: `reminderly.showDateAndTimeSubtitles`
+- default: `true`
+- only changes reminder row subtitle visibility when grouped reminder filters are active
+- automatically resets to `true` when grouped filters are no longer active
 
-### Feature Flag System
+## Tutorial Access
 
-**Tutorial Access** (`isOnboardingTutorialEnabled`)
-- Controls visibility of "Reminderly tutorial" row
-- Feature flag in App.tsx
+The settings surface can also expose tutorial re-entry:
+
+- row label: `Reminderly tutorial`
+- shown only when the onboarding tutorial feature is enabled
+- opens the tutorial bottom sheet
+
+## Premium Presentation
+
+When lists are enabled, settings also shows the premium marketing section:
+
+- `Unlimited reminders`
+- `Natural Language Capture`
+- `Repeat reminders`
+- CTA button pricing copy
+
+These controls are currently presentation only and do not unlock product state.
 
 ## Related Documentation
 
-- [Settings Overlay](../01-core-surfaces/settings-overlay.md) - Complete settings UI documentation
+- [Settings Overlay](../01-core-surfaces/settings-overlay.md)
+- [Premium UI](./premium-ui.md)
+- [Onboarding and Tutorial](./onboarding-and-tutorial.md)

@@ -1,155 +1,230 @@
 # Dev Tools Overlay
 
-Consolidated from `/docs/dev-tools.md`.
-
 ## Overview
 
-Reminderly includes a built-in developer tools system accessible via triple-tapping the logo text in the header. Dev tools provide diagnostic and testing capabilities that do not affect the production user experience.
+Reminderly includes a built-in developer tools overlay opened by triple-tapping the text portion of the header logo. The overlay is a multi-page slide-up surface used for testing, data generation, feature-flag control, and tutorial/dev access settings.
 
 ## Access
 
-Triple-tap the text portion of the Reminderly logo (the right 75% of the logo area; the left 22% is the done/deleted view toggle). A 500ms timeout resets the click counter if taps are too slow.
+The logo hit area is split:
 
-Logo clickable areas:
-- Left 0-22%: tick circle click area (toggles done/deleted view)
-- Left 25%-100%: text click area (dev tools triple-tap counter)
+- left portion toggles the done/deleted reminder surface
+- text portion increments the dev tools tap counter
 
-### Password Protection
+Dev tools open after three taps on the text portion within the reset timeout window.
 
-Dev tools access can be optionally protected by password:
+## Password Gating
 
-**State**:
-- `isDevToolsPasswordRequired: boolean` - Toggle for password protection
-- `isDevToolsUnlocked: boolean` - Session-only unlock state (not persisted)
+Dev tools can require a password before the main content is shown.
 
-**Persistence**:
-- `isDevToolsPasswordRequired` persisted to `localStorage` key `'reminderly-dev-tools-password-required'`
-- Defaults to `true`
+### State
 
-**Behaviour**:
-- When password required AND not unlocked: DevToolsOverlay shows password entry screen
-- When password required AND unlocked: DevToolsOverlay shows normal content
-- When password not required: DevToolsOverlay shows normal content immediately
-- Unlock state resets on page refresh (session-only)
+- `isDevToolsPasswordRequired`: persisted setting
+- `isDevToolsUnlocked`: session-only unlock state
 
-Password toggle is configurable via DevTools settings (once unlocked).
+### Persistence
+
+- localStorage key: `reminderly-dev-tools-password-required`
+- default: `true`
+
+### Behaviour
+
+- when password protection is required and the session is locked, the overlay opens to the password screen
+- when protection is required and already unlocked in the current session, normal content is shown
+- when protection is disabled, normal content is shown immediately
+- unlock state resets on refresh/reload
+
+The current unlock password is implemented in `DevToolsOverlay.tsx`.
 
 ## Overlay Behaviour
 
-### Opening and Closing
-
-- Slide-up animation: `initial={{ y: "100%" }}` to `animate={{ y: 0 }}`, 250ms easeInOut
-- Uses `getOverlayTopPosition()` for viewport-aware positioning
-- Z-index: backdrop z-40, overlay z-50
-- Closes via:
-  - Backdrop tap (transparent backdrop, `bg-black/0`)
-  - Close button (top-right, rotated-plus "x" icon)
+- slide-up motion from the bottom of the viewport
+- backdrop tap closes the overlay
+- close button closes the overlay
+- internal navigation is page-based rather than route-based
 
 ## Navigation Structure
 
-Internal page state (`DevToolsPage`) with these pages:
+`DevToolsPage` currently supports:
 
-### Home Page
+- `home`
+- `tests`
+- `test-data`
+- `dummy-reminders`
+- `dummy-lists`
+- `nlc`
+- `filters-menu`
+- `onboarding-tutorial`
+- `dev-tools-password`
+- `reminder-settings`
+- `list-settings`
+- `paywall`
 
-Rendered by `/src/imports/DevTools.tsx`. Shows:
+## Home Page
 
-| Row | Label | Navigates to |
-|-----|-------|--------------|
-| 1 | Automated tests | `'tests'` page |
-| 2 | Dummy reminders | `'dummy-reminders'` page |
-| 3 | Natural Language Capture | `'nlc'` page |
-| 4 | Filters menu | `'filters-menu'` page |
-| 5 | Dummy lists | Dummy lists page |
+The home page is grouped into three sections.
 
-Plus "Clear reminders list" destructive button at bottom (red, 2-step confirmation: "Are you sure?" then "Cleared!").
+### Testing and QA
 
-### Automated Tests Page
+- `Automated tests`
+- `Test data`
 
-Runs the self-check suite (all check files aggregated). Displays:
-- Pass/fail count
-- Duration
-- Individual results (pass/fail with labels)
-- Copy-to-clipboard functionality
+### Developer settings
 
-Check suites included:
-- Schedule and reminder logic (`schedule-checks.ts`) - 37 checks
-- Persistence and hydration (`reminder-checks.ts`) - 77 checks
-- Natural language parsing (`nlc-parser-checks.ts`) - 53 checks
-- Natural language interaction (`nlc-interaction-checks.ts`) - 44 checks
-- Done, deleted, and completion (`done-deleted-checks.ts`) - 9 checks
-- Done, deleted, and completion (`completion-checks.ts`) - 14 checks
-- Dev tools and feature flags checks (`dev-tools-checks.ts`) - 46 checks
+- `Filters menu`
+- `Reminder settings`
+- `List settings`
+- `Dev tools password`
 
-Total: 280 checks.
+`List settings` is visually disabled unless the top-level lists feature flag is enabled.
 
-See [Self-Check System](../06-quality-and-dev/self-check-system.md) for full details.
+### Feature flags
 
-### Dummy Reminders Page
+- `Natural Language Capture`
+- `Repeat reminders`
+- `Onboarding tutorial`
+- `Lists`
+- `Premium`
 
-Rendered by `/src/imports/DummyReminders.tsx`. Generates test reminders across category buckets. Also contains the "Hide overdue reminders" toggle.
+The `Natural Language Capture`, `Onboarding tutorial`, and `Lists` rows each include both a toggle and page navigation.  
+The `Repeat reminders` row is currently a visual toggle on the home page only.  
+The `Premium` row navigates to the current `paywall` page, which presently renders the same `Lists` page component.
 
-### NLC Page
+## Page Behaviour
 
-A/B toggle between click-parsing mode and auto-parsing mode for NLC:
-- Click mode: tokens highlight but user must click to apply
-- Auto mode: tokens auto-apply after 200ms debounce
+### Automated Tests
 
-See [NLC documentation](../03-natural-language-and-scheduling/nlc.md) for details.
+Runs the full self-check suite and shows:
 
-### Filters Menu Page
+- run invocation id
+- pass/fail counts
+- duration
+- grouped per-check results
+- copy results action
+- reset action
 
-A/B toggle between standard and grouped filter variants. Changing variant resets `activeFilter` to `"all"`.
+The current suite contains 8 groups and 425 checks in total.
 
-See [Filter System](../02-reminder-behaviour/filters-and-sorting.md) for details.
+### Test Data
 
-## Dev-Only State
+Parent page for generated test content:
 
-All dev-only state lives in App.tsx:
+- `Dummy reminders`
+- `Dummy lists`
 
-| State | Type | Default | Persisted | Purpose |
-|-------|------|---------|-----------|---------|
-| `nlcMode` | `'click' \| 'auto'` | `'auto'` | No | NLC parsing mode |
-| `filtersMenuVariant` | `'standard' \| 'grouped'` | `'standard'` | No | Filter menu variant |
-| `hideOverdue` | `boolean` | `false` | No | Hides overdue reminders from all views |
+### Dummy Reminders
 
-### NLC Mode
+Used to generate reminder data for reminder-state testing. This page also includes the `Hide overdue reminders` toggle.
 
-Controls how NLC tokens are applied in the new reminder overlay:
-- `'click'`: tokens highlight but user must click to apply
-- `'auto'`: tokens auto-apply after 200ms debounce
+### Dummy Lists
 
-### Filters Menu Variant
+Used to generate list data for list-state testing. The page feeds generated list payloads back into app state rather than working as a read-only preview.
 
-Switches between standard (4 filter pills) and grouped (3 pills + settings button) layouts. Changing variant resets `activeFilter` to `"all"`.
+### Natural Language Capture
 
-### Hide Overdue Reminders
+Controls NLC application mode:
 
-When enabled, filters out all overdue reminders from both the active list and done/deleted list at render time:
+- `Auto-parsing`
+- `Click-parsing`
 
-```typescript
-const displayReminders = hideOverdue ? reminders.filter(r => !isOverdue(r, now)) : reminders;
-```
+This page is only practically useful when the NLC feature flag is enabled.
 
-Applied before any view-specific filtering.
+### Filters Menu
 
-## Clear Reminders List
+Controls the reminder filter menu experiment:
 
-Destructive action with 2-step confirmation:
-1. First click: "Are you sure?" (red button)
-2. Second click: "Cleared!" (executes clear, then resets)
+- `Grouped filters`
+- `Standard filters`
 
-Removes all reminders from localStorage and state.
+When lists are enabled, this page is visually disabled and the displayed variant is forced to `standard`.
+
+### Onboarding Tutorial
+
+Controls tutorial-related persisted state:
+
+- `Show tutorial on first launch`
+- `Show tutorial on every app start`
+
+Enabling one setting disables the other.
+
+### Dev Tools Password
+
+Controls dev-tools access requirements:
+
+- `Password required`
+- password reset inputs
+- confirm/reset flow UI
+
+### Reminder Settings
+
+Current reminder-specific dev setting:
+
+- `Display 1 minute time increments`
+
+Persistence key:
+
+- `reminderly-dev-one-minute-time-increments`
+
+### List Settings
+
+Current list-specific dev setting:
+
+- `Use default templates in clean state`
+
+This controls whether a clean lists state is repopulated with default templates.
+
+### Lists
+
+The current lists page inside dev tools controls:
+
+- `Smart reminders`
+- `List templates`
+- `Pinned lists`
+
+These are feature flags for the current lists system and are persisted by the app.
+
+## Dev-Only State and Flags
+
+The overlay currently controls a mix of in-memory state and persisted settings.
+
+### In-memory only
+
+- `nlcMode`
+- `filtersMenuVariant`
+- `hideOverdue`
+- `isDevToolsUnlocked`
+
+### Persisted
+
+- `reminderly-dev-tools-password-required`
+- `reminderly-dev-one-minute-time-increments`
+- `reminderly-ff-onboarding-tutorial`
+- `dev.listsEnabled`
+- `reminderly-ff-tutorial-first-launch`
+- `reminderly-ff-tutorial-every-start`
+- `reminderly-ff-smart-reminders`
+- `reminderly-ff-saved-lists`
+- `reminderly-ff-pinned-lists`
+
+## Destructive Actions
+
+The developer tools home screen still includes the `Clear reminders list` destructive control with two-step confirmation:
+
+1. `Clear reminders list`
+2. `Are you sure?`
+3. `Cleared!`
 
 ## File Locations
 
-- DevToolsOverlay: `/src/app/components/DevToolsOverlay.tsx`
-- DevTools home: `/src/imports/DevTools.tsx`
-- DummyReminders: `/src/imports/DummyReminders.tsx`
-- Check system: `/src/app/dev/check-system.ts`
-- Check suites: `/src/app/dev/*-checks.ts`
-- Dummy generator: `/src/app/utils/dummy-generator.ts`
+- `src/app/components/DevToolsOverlay.tsx`
+- `src/imports/DevTools.tsx`
+- `src/imports/DummyReminders.tsx`
+- `src/imports/DummyLists.tsx`
+- `src/app/dev/check-system.ts`
+- `src/app/dev/*.ts`
 
 ## Related Documentation
 
-- [Self-Check System](../06-quality-and-dev/self-check-system.md) - Automated test suite
-- [Dev Tools](../06-quality-and-dev/dev-tools.md) - Developer tools reference
+- [Dev Tools](../06-quality-and-dev/dev-tools.md)
+- [Self-Check System](../06-quality-and-dev/self-check-system.md)
+- [Tests and Baselines](../06-quality-and-dev/tests-and-baselines.md)

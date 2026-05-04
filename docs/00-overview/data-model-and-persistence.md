@@ -2,8 +2,10 @@
 
 ## Reminder Schema
 
-```typescript
-export type Reminder = {
+Current reminder shape from `src/app/reminder-utils.ts`:
+
+```ts
+type Reminder = {
   id: string;
   originalText: string;
   displayText: string;
@@ -12,194 +14,263 @@ export type Reminder = {
   repeatRule?: RepeatRule | null;
   completedAt?: number | null;
   deletedAt?: number | null;
+  linkedListId?: string | null;
+  isSmartReminder?: boolean;
 };
 ```
 
-### Fields
+### Reminder Fields
 
-**id**
-- Type: `string`
-- Generated via `crypto.randomUUID()` at creation time
-- Immutable
+- `id`: UUID string
+- `originalText`: raw reminder text
+- `displayText`: normalised/presentation text stored with the reminder
+- `createdAt`: epoch ms
+- `schedule`: either scheduled with `date` and optional `time`, or `sometime`
+- `repeatRule`: optional repeat configuration
+- `completedAt`: completion timestamp for archive membership
+- `deletedAt`: deletion timestamp for archive membership
+- `linkedListId`: optional list id for smart reminders generated from lists
+- `isSmartReminder`: optional boolean marker for list-linked smart reminders
 
-**originalText**
-- Type: `string`
-- The raw text as entered by the user
-- Persisted without modification
-- Used for edit-mode prepopulation and duplicate detection
+## Reminder Schedule
 
-**displayText**
-- Type: `string`
-- Normalised version of originalText
-- Relative date phrases ("today", "tomorrow") replaced with absolute equivalents ("Monday 3 March", "Tuesday 4 March") at save time
-- Rendered in the list view with optional today/tomorrow substitution applied at presentation time
+```ts
+type ReminderSchedule =
+  | { kind: "scheduled"; date: string; time?: string }
+  | { kind: "sometime" };
+```
 
-**createdAt**
-- Type: `number` (epoch timestamp)
-- Set to `Date.now()` at creation time
-- Used for tie-breaking in sort order
-- Immutable
+- `date` format: `YYYY-MM-DD`
+- `time` format: `HH:mm`
+- time can only exist on `scheduled` reminders
 
-**schedule**
-- Type: `ReminderSchedule` (discriminated union)
-- `{ kind: "scheduled"; date: string; time?: string }` or `{ kind: "sometime" }`
-- date format: `yyyy-mm-dd` (e.g. "2026-03-11")
-- time format: `HH:mm` (24-hour, e.g. "14:30")
-- time is optional; date-only scheduled reminders have no time field
+## Repeat Types
 
-**repeatRule**
-- Type: `RepeatRule | null | undefined`
-- Optional field
-- See RepeatRule schema below
+### Persisted repeat rule
 
-**completedAt**
-- Type: `number | null | undefined`
-- Epoch timestamp set when reminder is marked as done
-- `null` or `undefined` means not done
-- Non-null means done (visible in done/deleted view)
-
-**deletedAt**
-- Type: `number | null | undefined`
-- Epoch timestamp set when reminder is soft-deleted
-- `null` or `undefined` means not deleted
-- Non-null means deleted (visible in done/deleted view)
-
-## RepeatRule Schema
-
-```typescript
-export interface RepeatRule {
+```ts
+interface RepeatRule {
   frequency: 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly';
-  interval: number; // default 1
+  interval: number;
   byDay: Array<'mo' | 'tu' | 'we' | 'th' | 'fr' | 'sa' | 'su'> | null;
 }
 ```
 
-### Fields
+### UI repeat config
 
-**frequency**
-- One of: `'hourly'`, `'daily'`, `'weekly'`, `'monthly'`, `'yearly'`
-- Determines base repeat period
-
-**interval**
-- Type: `number`
-- Multiplier for frequency (e.g. interval=2, frequency=daily means "every 2 days")
-- Default: 1
-
-**byDay**
-- Type: `Array<string> | null`
-- Only relevant for weekly frequency
-- Specifies which days of the week the reminder repeats on
-- Day abbreviations: `'mo'`, `'tu'`, `'we'`, `'th'`, `'fr'`, `'sa'`, `'su'`
-- `null` for non-weekly frequencies or simple weekly repeats
-
-## ReminderCategory (Derived)
-
-```typescript
-export type ReminderCategory = "today" | "this-week" | "later" | "sometime" | "other";
+```ts
+type RepeatConfig = {
+  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom-days';
+  interval: number;
+  selectedDays?: string[];
+} | null;
 ```
 
-Categories are derived at render time from the reminder's schedule field:
+`RepeatConfig` is UI-facing state. `RepeatRule` is the persisted reminder field.
 
-- **today**: `schedule.kind === "scheduled"` and date equals today
-- **this-week**: `schedule.kind === "scheduled"` and date is within current Monday-Sunday week but not today
-- **later**: `schedule.kind === "scheduled"` and date is after the current week's Sunday
-- **sometime**: `schedule.kind === "sometime"`
-- **other**: virtual category used in grouped filters mode, maps to "later" OR "sometime"
+## Lists Schema
 
-## ViewMode
+Current list types from `src/app/utils/list-utils.ts` and `src/app/App.tsx`:
 
-```typescript
-export type ViewMode = "list" | "done-deleted";
+### List items
+
+```ts
+type ListItem = {
+  id: string;
+  text: string;
+  completed: boolean;
+  completedAt?: number | null;
+};
 ```
 
-- **list**: Standard active reminders view (where `completedAt == null` and `deletedAt == null`)
-- **done-deleted**: Archive view (where `completedAt != null` or `deletedAt != null`)
+### Created lists
 
-## Persistence
-
-### Storage Key
-
-```typescript
-export const STORAGE_KEY = "reminderly.reminders.v1";
+```ts
+type CreatedList = {
+  id: string;
+  title: string;
+  items: ListItem[];
+  sortMode?: 'alphabetical' | 'insertion';
+  pinnedAt?: number | null;
+  smartReminders?: boolean;
+  smartReminderDueDate?: string | null;
+  smartReminderTime?: string | null;
+  status?: 'active' | 'done' | 'deleted';
+  statusChangedAt?: number | null;
+};
 ```
 
-### Load Behaviour
+### Saved list templates
 
-`loadReminders()` function in `reminder-utils.ts`:
-
-1. Reads from `localStorage.getItem(STORAGE_KEY)`
-2. Parses JSON
-3. Validates each reminder:
-   - Must have valid `id` (non-empty string)
-   - Must have `originalText` or legacy `text` field
-   - Must have valid `schedule` shape
-   - `schedule.kind` must be "scheduled" or "sometime"
-   - If scheduled: date must match `yyyy-mm-dd` format
-   - If scheduled with time: time must match `HH:mm` format and be valid (hour 00-23, minute 00-59)
-4. Migrates legacy fields:
-   - `text` → `originalText` and `displayText`
-   - `schedule.kind === "inbox"` → `schedule.kind === "sometime"`
-   - Empty time string `""` → `undefined`
-5. Drops corrupt or invalid reminders
-6. Returns validated array
-
-### Save Behaviour
-
-On every reminder state change, App.tsx writes the full reminders array to localStorage:
-
-```typescript
-localStorage.setItem(STORAGE_KEY, JSON.stringify(reminders));
+```ts
+type SavedListTemplate = {
+  id: string;
+  title: string;
+  items: ListItem[];
+  status?: 'active' | 'deleted';
+  statusChangedAt?: number | null;
+};
 ```
 
-### Settings Persistence
+## Derived Types
 
-User settings are persisted under separate keys:
+### Reminder categories
 
-- `reminderly.showDateAndTimeSubtitles` (boolean, default true)
+```ts
+type ReminderCategory = "today" | "this-week" | "later" | "sometime" | "other";
+```
 
-### Migration Support
+These are derived from schedule state and current filter mode, not persisted directly.
 
-The loader supports two legacy formats:
+### View mode
 
-1. **Text field migration**: Old reminders with `text` field are migrated to `originalText` and `displayText`
-2. **Inbox schedule kind**: Old `schedule.kind === "inbox"` is migrated to `schedule.kind === "sometime"`
+```ts
+type ViewMode = "list" | "done-deleted";
+```
 
-## Data Invariants
+This is reminder-surface state only. Lists use the same `viewMode` state value with list-specific render branches in `App.tsx`.
 
-1. **id uniqueness**: All reminders must have unique IDs (enforced at creation via UUID)
-2. **Schedule validity**: Schedule must be either "scheduled" with valid date, or "sometime"
-3. **Time requires date**: Time can only exist on scheduled reminders (cannot have time without date)
-4. **Epoch timestamps**: All timestamps (createdAt, completedAt, deletedAt) are epoch milliseconds
-5. **No nullish schedule**: Every reminder must have a schedule object (never null/undefined)
-6. **RepeatRule optional**: repeatRule can be null, undefined, or a valid RepeatRule object
-7. **Legacy support**: Loader handles both current and legacy formats without data loss
+### List categories
 
-## Type Definitions
+```ts
+type ListCategory = 'complete' | 'almost' | 'started' | 'todo';
+```
 
-Core types are defined in:
+List categories are derived from the completion state of list items.
 
-- `/src/app/reminder-utils.ts`: Reminder, ReminderCategory, ReminderSchedule, ViewMode, FiltersMenuVariant, RepeatConfig
-- `/src/app/types/reminder.ts`: RepeatRule, Schedule, ScheduleSources (alternative schema, not currently used in main app)
+## Primary Storage Keys
 
-## Hydration Flow
+### Reminders
 
-1. App.tsx mounts
-2. `useState(() => loadReminders())` executes during initial render
-3. `loadReminders()` reads from localStorage
-4. Validation and migration applied
-5. State initialized with loaded reminders
-6. Component renders with hydrated data
-7. Any subsequent changes trigger localStorage write
-
-## Performance Considerations
-
-- Full array serialization on every change (acceptable for <1000 reminders)
-- No debouncing or batching on writes
-- Defensive parsing prevents corrupt data from breaking the app
-- Validation drops invalid entries rather than throwing errors
+- `reminderly.reminders.v1`
 
 ### Lists
 
-Lists are stored in localStorage.
-Lists use a separate data structure from reminders.
-No shared schema exists between lists and reminders.
+- `reminderly-created-lists`
+- `reminderly-saved-lists`
+
+### Notification tap state
+
+- `reminderly.pendingNotificationReminderId`
+
+### App/UI state
+
+- `reminderly-active-main-tab`
+- `reminderly-filters-menu-variant`
+- `reminderly.showDateAndTimeSubtitles`
+
+### Dev settings and feature flags
+
+- `reminderly-dev-tools-password-required`
+- `reminderly-dev-one-minute-time-increments`
+- `reminderly-ff-onboarding-tutorial`
+- `dev.listsEnabled`
+- `reminderly-ff-tutorial-first-launch`
+- `reminderly-ff-tutorial-every-start`
+- `reminderly-tutorial-first-launch-shown`
+- `reminderly-ff-smart-reminders`
+- `reminderly-ff-saved-lists`
+- `reminderly-ff-pinned-lists`
+- `reminderly-dev-default-templates-in-clean-state`
+
+## Reminder Loading and Migration
+
+`loadReminders()` in `src/app/reminder-utils.ts` currently:
+
+1. reads `reminderly.reminders.v1`
+2. parses JSON
+3. drops non-array payloads
+4. validates required fields
+5. validates schedule shape
+6. migrates legacy fields where supported
+7. sanitises output to the current `Reminder` shape
+
+### Current migrations / sanitisation
+
+- legacy `text` migrates to `originalText` and `displayText`
+- legacy `schedule.kind === "inbox"` migrates to `schedule.kind === "sometime"`
+- empty time string becomes `undefined`
+- invalid repeat data becomes `null`
+- valid `linkedListId` is preserved
+- `isSmartReminder` is only preserved when explicitly `true`
+
+Invalid reminders are dropped rather than partially hydrated.
+
+## Reminder Persistence
+
+`App.tsx` persists the entire reminders array whenever reminder state changes:
+
+```ts
+persistStringIfChanged(STORAGE_KEY, JSON.stringify(reminders));
+```
+
+Reminder notifications are then synchronised from the current reminder array when scheduling is relevant.
+
+## List Persistence
+
+`App.tsx` persists:
+
+- `createdLists` to `reminderly-created-lists`
+- `savedLists` to `reminderly-saved-lists`
+
+Persisted list data includes:
+
+- item completion state
+- list smart reminder fields
+- `pinnedAt`
+- list `status`
+- `statusChangedAt`
+
+## Notification Tracking
+
+### Scheduled notifications
+
+`src/app/notifications.ts` derives scheduled local notifications from reminders that are:
+
+- not completed
+- not deleted
+- `schedule.kind === "scheduled"`
+- have a `time`
+- still in the future
+
+Each notification stores:
+
+- deterministic numeric notification id derived from reminder id
+- title `Reminderly`
+- body from `reminder.displayText`
+- `extra.reminderId`
+
+### Notification tap handoff
+
+When a local notification is tapped:
+
+- the pending reminder id is stored under `reminderly.pendingNotificationReminderId`
+- a `reminderly:notification-tap` event is used for in-app handling
+- `useNotificationTapHandler` clears other overlays, switches to the reminders tab, resets filter/view state, and opens the tapped reminder after a short delay
+
+## Default Template Seed
+
+`App.tsx` contains a built-in `DEFAULT_TEMPLATE_SEED` used for saved list templates.  
+Whether these templates are reintroduced into a clean state is controlled by:
+
+- `reminderly-dev-default-templates-in-clean-state`
+
+## Current Data Invariants
+
+- reminder ids are unique
+- reminder schedules are always present and valid after hydration
+- time never exists without a scheduled date
+- reminder archive membership is derived from `completedAt` / `deletedAt`
+- smart reminders are still reminders and live in the same reminders collection
+- created lists and saved list templates are persisted separately
+- pinned list state is represented by `pinnedAt`, not by a separate collection
+- list archive membership is represented by `status` / `statusChangedAt`
+
+## File Locations
+
+- `src/app/reminder-utils.ts`
+- `src/app/types/reminder.ts`
+- `src/app/utils/list-utils.ts`
+- `src/app/App.tsx`
+- `src/app/notifications.ts`
+- `src/app/useNotificationTapHandler.ts`

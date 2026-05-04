@@ -2,160 +2,116 @@
 
 ## Overview
 
-The Reminder Info overlay displays the full details of a reminder and provides Edit, Mark as Done, and Delete actions. It opens when the user clicks the status icon on any reminder row in the active list.
+The reminder info overlay shows the selected reminder in a centered modal and exposes reminder actions such as done, edit, delete, list navigation for smart reminders, and overdue deferral.
 
 ## Access
 
-- Click status icon (clock, repeats, or no-time) on any active reminder row
-- Sets `infoReminder` to the clicked reminder
-- Overlay slides up from bottom
+- opens from the reminder status icon in the active reminders surface
+- is driven by `infoReminder` in `App.tsx`
+- is not used for reminders in the done/deleted archive
 
 ## Overlay Behaviour
 
-### Opening and Closing
+### Presentation
 
-- Slide-up animation: `initial={{ y: "100%" }}` to `animate={{ y: 0 }}`, 250ms easeInOut
-- Uses `getOverlayTopPosition()` for viewport-aware positioning
-- Z-index: backdrop z-40, overlay z-50
-- Closes via:
-  - Backdrop tap (transparent backdrop, `bg-black/0`)
-  - Close button (top-right, rotated-plus "x" icon)
-  - Any action button (Edit, Done, Delete)
+The component itself renders as a centered modal, not a bottom sheet:
 
-### Structure
+- fixed full-screen backdrop: `bg-black/50`
+- centered white modal panel
+- fixed width: `340px`
+- closes on backdrop click
+- closes on `Escape`
+- focuses the panel on mount
+- locks background scrolling while mounted
 
-```
-ReminderInfoOverlay
-  ├── Header (close button)
-  ├── Title display (reminder text)
-  ├── Schedule display (date, time, repeat label)
-  ├── Edit button
-  ├── Mark as done button
-  └── Delete button
-```
-
-## Content Display
+## Content
 
 ### Title
-- Displays `reminder.displayText`
-- Font: Lato Bold 17px, dark blue `#1c2c42`
-- Multi-line display (no truncation)
-- Wrapped in scrollable container if needed
 
-### Schedule Display
+- uses `reminder.displayText`
+- removes a trailing `at <time>` segment with `stripTrailingTitleTime()`
+- supports wrapped, multi-line text
 
-Displays date, time, and repeat information in a structured format:
+### Due Line
 
-**Scheduled Reminder (with date)**
-- Date: formatted as "Day DD Month YYYY" (e.g. "Monday 3 March 2026")
-- Time: formatted as 12-hour (e.g. "2:30 PM") if set
-- Repeat label: if repeatRule exists (e.g. "Every week", "Every 2 days")
+The primary subtitle is produced by `formatDueLine()`:
 
-**Sometime Reminder**
-- "No date / time set"
+- `No schedule set` for reminders without date and time
+- `Due <date>`
+- `Due <date> at <time>`
+- `Due at <time>`
+- `Was due ...` when the reminder is overdue
 
-**Visual Styling**
-- Font: Lato SemiBold 15px
-- Colour: `#939393` (grey)
-- Multi-line layout
+The due line switches to overdue red when `isOverdue()` returns true.
 
-### Date Formatting
+### Smart Reminder Progress
 
-Uses `formatSelectedDate()` function:
-- Full weekday name
-- Day number
-- Full month name
-- Year (if different from current year)
+When the reminder is a smart reminder and the linked list can be resolved:
 
-Examples:
-- "Monday 3 March" (same year)
-- "Tuesday 15 January 2027" (different year)
+- a grey progress line is shown under the due line
+- format: `<completedCount> of <totalCount> items`
 
-### Repeat Label
+### Repeats Line
 
-Uses `formatRepeatLabel()` function from `reminder-utils.ts`:
-- "Every hour" (hourly, interval 1)
-- "Every 3 hours" (hourly, interval 3)
-- "Every day" (daily, interval 1)
-- "Every 2 days" (daily, interval 2)
-- "Every week" (weekly, interval 1, no byDay)
-- "Mon, Wed, Fri" (weekly with byDay)
-- "Every month" (monthly, interval 1)
-- "Every 3 months" (monthly, interval 3)
-- "Every year" (yearly, interval 1)
+When a repeat rule exists:
 
-## Action Buttons
+- a separate grey repeats line is shown
+- text comes from `formatRepeatRuleText(...)`
+- the line is prefixed as `Repeats ...`
 
-### Edit Button
+## Actions
 
-- Label: "Edit"
-- Visual: Blue button, Lato Bold 17px
-- Click: closes info overlay, opens edit overlay after 200ms delay
-- Delay implemented via `overlayEditTimerRef` (guarded, cleared before rescheduling and on unmount)
-- Edit overlay prepopulates with reminder data
+Buttons are stacked vertically and rendered conditionally from the reminder state and supplied callbacks.
 
-See [New Reminder Overlay](./new-reminder-overlay.md) for edit mode behaviour.
+### Mark as done
 
-### Mark as Done Button
+- always shown
+- closes the overlay first
+- waits `200ms`
+- then runs the completion flow in `App.tsx`
 
-- Label: "Mark as done"
-- Visual: Blue button, Lato Bold 17px
-- Click: closes info overlay, triggers completion after 200ms delay
-- Completion flow:
-  1. Immediate visual commit: add to `pendingDoneIds`
-  2. 350ms delayed data commit: set `completedAt = Date.now()`
-  3. For repeating reminders: additional 1000ms delay, insert next occurrence
-  4. Exit animation via AnimatePresence
+### Move to tomorrow
 
-Total perceived delay: 200ms (overlay close) + 350ms (completion) = 550ms. Visual transition begins at 200ms mark.
+- shown only when the reminder is overdue and an `onMoveToTomorrow` handler is supplied
+- closes the overlay first
+- waits `200ms`
+- then updates the reminder to tomorrow via `handleMoveReminderToTomorrow(...)`
 
-See [Done/Deleted Archive](./done-deleted-archive.md) for completion behaviour.
+### Edit reminder
 
-### Delete Button
+- shown only when `onEdit` is supplied
+- closes the overlay first
+- waits `200ms`
+- then opens the reminder editor in edit mode
 
-- Label: "Delete"
-- Visual: Red button `#FF0000`, Lato Bold 17px
-- Click: triggers delete handler immediately (no 200ms delay)
-- Delete flow:
-  1. Cancel any pending completion, uncomplete, reschedule, or undelete timers
-  2. Clear from all other pending visual sets
-  3. Immediate visual commit: add to `pendingDeleteIds`
-  4. Close info overlay
-  5. 350ms delayed data commit: set `deletedAt = Date.now()`
-  6. Exit animation via AnimatePresence
+### Go to list
 
-See [Done/Deleted Archive](./done-deleted-archive.md) for deletion behaviour.
+- shown only for smart reminders with a `linkedListId` and an `onGoToList` handler
+- closes the overlay
+- navigates into the linked list flow
 
-## Button Layout
+### Delete reminder
 
-Buttons arranged vertically with spacing:
-- Edit button (top)
-- Mark as done button (middle)
-- Delete button (bottom, red colour)
+- always shown
+- uses a grey button in the current implementation
+- delegates directly to the delete flow supplied by `App.tsx`
 
-All buttons: full-width, 50-60px height, rounded, white text (or red for delete).
+## Current Action Order in App State
 
-## Responsive Behaviour
+The reminder overlay currently participates in these timed flows:
 
-- Uses `getOverlayTopPosition()` for viewport-aware positioning
-- Content max-width: 768px, centered
-- Padding: 26px top, 20px horizontal
-- Buttons stack vertically on all screen sizes
-- See [Content Overlay Responsive](../05-design-and-layout/content-overlay-responsive.md) for full pattern
+- done: overlay close → `200ms` delay → completion logic
+- edit: overlay close → `200ms` delay → open reminder editor
+- move to tomorrow: overlay close → `200ms` delay → reschedule
+- go to list: overlay close → immediate linked-list navigation
+- delete: immediate delete flow delegation
 
-## Interaction Constraints
+## File Locations
 
-- Info overlay does not open from done/deleted view (status icons not clickable in archive)
-- Info overlay does not reopen after Edit save (user returns to list view)
-- Cannot open info overlay while new reminder overlay or edit overlay is open
-- Timer guards prevent race conditions between Edit and Delete actions
+- `src/app/components/ReminderInfoOverlay.tsx`
+- action wiring in `src/app/App.tsx`
 
-## File Location
+## Related Documentation
 
-`/src/app/components/ReminderInfoOverlay.tsx`
-
-## Dependencies
-
-- formatSelectedDate: `/src/imports/NewReminderOverlay.tsx`
-- formatRepeatLabel: `/src/app/reminder-utils.ts`
-- getOverlayTopPosition: inline in overlay components
+- [New Reminder Overlay](./new-reminder-overlay.md)
+- [Done/Deleted Archive](./done-deleted-archive.md)
