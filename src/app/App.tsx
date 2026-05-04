@@ -4231,7 +4231,7 @@ export default function App() {
                                               const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(item.schedule.date, item.schedule.time, now);
                                               const repeatText = formatRepeatRuleText(item.repeatRule, item.schedule.date);
                                               if (nextOccurrenceLabel && repeatText) {
-                                                return `${nextOccurrenceLabel}, then ${repeatText.charAt(0).toLowerCase()}${repeatText.slice(1)}`;
+                                                return `${nextOccurrenceLabel}. ${repeatText}`;
                                               }
                                             }
                                             const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
@@ -4364,7 +4364,7 @@ export default function App() {
                                           const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(reminder.schedule.date, reminder.schedule.time, now);
                                           const repeatText = formatRepeatRuleText(reminder.repeatRule, reminder.schedule.date);
                                           if (nextOccurrenceLabel && repeatText) {
-                                            return `${nextOccurrenceLabel}, then ${repeatText.charAt(0).toLowerCase()}${repeatText.slice(1)}`;
+                                            return `${nextOccurrenceLabel}. ${repeatText}`;
                                           }
                                         }
                                         const label = formatRepeatLabel(reminder.repeatRule, reminder.schedule.kind === 'scheduled' ? reminder.schedule.time : undefined, reminder.schedule.kind === 'scheduled' ? reminder.schedule.date : undefined);
