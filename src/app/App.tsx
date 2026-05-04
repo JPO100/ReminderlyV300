@@ -5280,6 +5280,34 @@ export default function App() {
                         </svg>
                       </button>
                     </div>
+                    <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
+                      <div className="content-stretch flex gap-[16px] items-start justify-center relative shrink-0 w-full">
+                        <div className="h-[21.5px] relative self-start shrink-0 w-[19.5px] top-[1px]" data-name="Union">
+                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19.5002 21.5002">
+                            <g id="Union">
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p23b20a00} fill="#1C2C42" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p15d6fbb2} fill="#1C2C42" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p1797f00} fill="#1C2C42" fillRule="evenodd" />
+                            </g>
+                          </svg>
+                        </div>
+                        <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
+                          <div className="flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-[#1c2c42] text-ellipsis w-full whitespace-nowrap">
+                            <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>Setting title</p>
+                          </div>
+                          <div className="flex flex-col justify-start relative shrink-0 text-[14px] text-[#bababa] w-full">
+                            <p className="leading-[14px]" style={{ fontWeight: 700, color: '#BABABA' }}>Setting subtitle</p>
+                          </div>
+                        </div>
+                        <div className="bg-[#1c2c42] content-stretch flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] justify-end">
+                          <div className="relative shrink-0 size-[22.5px]">
+                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+                              <circle cx="11.25" cy="11.25" fill="var(--fill-0, white)" r="11.25" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
