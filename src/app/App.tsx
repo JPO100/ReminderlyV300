@@ -3060,8 +3060,13 @@ export default function App() {
         <div className="content-stretch flex flex-col gap-[17px] items-start relative w-full max-w-[768px] mx-auto" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }}>
           <div className="content-stretch flex items-center justify-center pb-[20px] pt-[50px] relative shrink-0 w-full">
             <div
-              className="pointer-events-none fixed flex items-center justify-center"
-              style={{ top: '77px', right: '20px', width: '17px', height: '35.653px' }}
+              className="pointer-events-none absolute flex items-center justify-center"
+              style={{
+                top: '57px',
+                right: 'calc((100vw - 100%) / -2 + 20px)',
+                width: '17px',
+                height: '35.653px',
+              }}
             >
               <HeaderMenuIcon />
             </div>
