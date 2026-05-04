@@ -11,7 +11,7 @@ import TutorialOverlay from "./components/TutorialOverlay";
 import type { RepeatRule } from "./types/reminder";
 import type { NlcMode } from "./utils/nlc-interaction";
 import { renderReminderText, getDisplayTitle } from "./utils/render-text";
-import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow } from "./reminder-utils";
+import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow, formatReminderNextOccurrenceLabel, formatRepeatRuleText } from "./reminder-utils";
 import type { Reminder, ReminderCategory, ReminderSchedule, RepeatConfig, ViewMode, FiltersMenuVariant } from "./reminder-utils";
 import { formatTime12h } from "./utils/normalise-text";
 import { scheduleEquality } from "./utils/schedule";
@@ -4227,13 +4227,15 @@ export default function App() {
                                             }
                                           }
                                           if (item.repeatRule) {
-                                            const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
-                                            if (label) {
-                                              if (item.schedule.kind === 'scheduled' && item.schedule.date) {
-                                                return `${formatScheduledDateForRow(item.schedule.date, now)}. ${label}`;
+                                            if (item.schedule.kind === 'scheduled' && item.schedule.date) {
+                                              const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(item.schedule.date, item.schedule.time, now);
+                                              const repeatText = formatRepeatRuleText(item.repeatRule, item.schedule.date);
+                                              if (nextOccurrenceLabel && repeatText) {
+                                                return `${nextOccurrenceLabel}, then ${repeatText.charAt(0).toLowerCase()}${repeatText.slice(1)}`;
                                               }
-                                              return label;
                                             }
+                                            const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
+                                            if (label) return label;
                                           }
                                           if (item.schedule.kind === 'scheduled' && item.schedule.date) {
                                             const dateLabel = formatScheduledDateForRow(item.schedule.date, now);
@@ -4358,13 +4360,15 @@ export default function App() {
                                         }
                                       }
                                       if (reminder.repeatRule) {
-                                        const label = formatRepeatLabel(reminder.repeatRule, reminder.schedule.kind === 'scheduled' ? reminder.schedule.time : undefined, reminder.schedule.kind === 'scheduled' ? reminder.schedule.date : undefined);
-                                        if (label) {
-                                          if (reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
-                                            return `${formatScheduledDateForRow(reminder.schedule.date, now)}. ${label}`;
+                                        if (reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
+                                          const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(reminder.schedule.date, reminder.schedule.time, now);
+                                          const repeatText = formatRepeatRuleText(reminder.repeatRule, reminder.schedule.date);
+                                          if (nextOccurrenceLabel && repeatText) {
+                                            return `${nextOccurrenceLabel}, then ${repeatText.charAt(0).toLowerCase()}${repeatText.slice(1)}`;
                                           }
-                                          return label;
                                         }
+                                        const label = formatRepeatLabel(reminder.repeatRule, reminder.schedule.kind === 'scheduled' ? reminder.schedule.time : undefined, reminder.schedule.kind === 'scheduled' ? reminder.schedule.date : undefined);
+                                        if (label) return label;
                                       }
                                       if (reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
                                         const dateLabel = formatScheduledDateForRow(reminder.schedule.date, now);
