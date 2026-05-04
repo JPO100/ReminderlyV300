@@ -737,7 +737,7 @@ function ListSettingsPage({ onBack, onClose, useDefaultTemplatesInCleanState, on
   );
 }
 
-function ListsPage({ onBack, onClose, smartRemindersEnabled, onSmartRemindersEnabledChange, savedListsEnabled, onSavedListsEnabledChange, pinnedListsEnabled, onPinnedListsEnabledChange, settingsMenuEnabled, onSettingsMenuEnabledChange }: { onBack: () => void; onClose: () => void; smartRemindersEnabled: boolean; onSmartRemindersEnabledChange: (value: boolean) => void; savedListsEnabled: boolean; onSavedListsEnabledChange: (value: boolean) => void; pinnedListsEnabled: boolean; onPinnedListsEnabledChange: (value: boolean) => void; settingsMenuEnabled: boolean; onSettingsMenuEnabledChange: (value: boolean) => void }) {
+function ListsPage({ onBack, onClose, smartRemindersEnabled, onSmartRemindersEnabledChange, savedListsEnabled, onSavedListsEnabledChange, pinnedListsEnabled, onPinnedListsEnabledChange }: { onBack: () => void; onClose: () => void; smartRemindersEnabled: boolean; onSmartRemindersEnabledChange: (value: boolean) => void; savedListsEnabled: boolean; onSavedListsEnabledChange: (value: boolean) => void; pinnedListsEnabled: boolean; onPinnedListsEnabledChange: (value: boolean) => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="lists-page">
       <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
@@ -813,28 +813,6 @@ function ListsPage({ onBack, onClose, smartRemindersEnabled, onSmartRemindersEna
               </div>
               <div
                 className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${pinnedListsEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="h-[20px] relative shrink-0 w-[20px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 17">
-                    <path d="M1.5 1.5H18.5M1.5 8.5H18.5M1.5 15.5H18.5" stroke={settingsMenuEnabled ? '#1C2C42' : '#C9C9C9'} strokeOpacity="0.5" strokeWidth="3" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: settingsMenuEnabled ? '#1C2C42' : '#C9C9C9' }}>Settings menu</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${settingsMenuEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
               >
                 <div className="relative shrink-0 size-[22.5px]">
                   <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
@@ -1028,6 +1006,8 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
         onNavigateReminderSettings={() => setPage('reminder-settings')}
         onNavigateListSettings={() => setPage('list-settings')}
         onNavigatePaywall={() => setPage('paywall')}
+        settingsMenuEnabled={settingsMenuEnabled}
+        onSettingsMenuEnabledChange={onSettingsMenuEnabledChange}
         nlcEnabled={nlcEnabled}
         onNlcEnabledChange={onNlcEnabledChange}
         isOnboardingTutorialEnabled={isOnboardingTutorialEnabled}
@@ -1079,7 +1059,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'paywall') {
     content = (
-      <ListsPage onBack={() => setPage('home')} onClose={onClose} smartRemindersEnabled={smartRemindersEnabled} onSmartRemindersEnabledChange={onSmartRemindersEnabledChange} savedListsEnabled={savedListsEnabled} onSavedListsEnabledChange={onSavedListsEnabledChange} pinnedListsEnabled={pinnedListsEnabled} onPinnedListsEnabledChange={onPinnedListsEnabledChange} settingsMenuEnabled={settingsMenuEnabled} onSettingsMenuEnabledChange={onSettingsMenuEnabledChange} />
+      <ListsPage onBack={() => setPage('home')} onClose={onClose} smartRemindersEnabled={smartRemindersEnabled} onSmartRemindersEnabledChange={onSmartRemindersEnabledChange} savedListsEnabled={savedListsEnabled} onSavedListsEnabledChange={onSavedListsEnabledChange} pinnedListsEnabled={pinnedListsEnabled} onPinnedListsEnabledChange={onPinnedListsEnabledChange} />
     );
   } else {
     content = (

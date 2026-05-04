@@ -130,6 +130,8 @@ export default function DevTools({
   onNavigateReminderSettings,
   onNavigateListSettings,
   onNavigatePaywall,
+  settingsMenuEnabled,
+  onSettingsMenuEnabledChange,
   nlcEnabled,
   onNlcEnabledChange,
   isOnboardingTutorialEnabled,
@@ -147,6 +149,8 @@ export default function DevTools({
   onNavigateReminderSettings: () => void;
   onNavigateListSettings: () => void;
   onNavigatePaywall: () => void;
+  settingsMenuEnabled: boolean;
+  onSettingsMenuEnabledChange: (enabled: boolean) => void;
   nlcEnabled: boolean;
   onNlcEnabledChange: (enabled: boolean) => void;
   isOnboardingTutorialEnabled: boolean;
@@ -305,6 +309,20 @@ export default function DevTools({
                   </div>
                 </div>
               </button>
+              <div
+                className="h-[60px] relative shrink-0 w-full"
+              >
+                <div className="flex flex-row items-center size-full">
+                  <div className="content-stretch flex items-center py-[15px] relative size-full">
+                    <div className="flex items-center gap-[16px]">
+                      <ToggleBtn isOn={settingsMenuEnabled} onToggle={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)} />
+                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: settingsMenuEnabled ? '#1c2c42' : '#C9C9C9' }}>
+                        <p className="leading-[normal] truncate">Settings menu</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div />
             </div>
           </div>
