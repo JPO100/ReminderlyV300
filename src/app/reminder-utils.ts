@@ -305,8 +305,41 @@ export function formatRepeatRuleText(repeatRule: RepeatRule | null | undefined, 
 }
 
 export function formatRepeatLabel(repeatRule: RepeatRule | null | undefined, time?: string | null, scheduleDate?: string | null): string | null {
-  const ruleText = formatRepeatRuleText(repeatRule, scheduleDate);
-  if (!ruleText) return null;
-  const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(scheduleDate, time);
-  return nextOccurrenceLabel ? `${nextOccurrenceLabel}. ${ruleText}` : ruleText;
+  if (repeatRule == null) return null;
+
+  const { frequency, interval, byDay } = repeatRule;
+
+  const units: Record<string, { singular: string; plural: string }> = {
+    hourly: { singular: 'hour', plural: 'hours' },
+    daily: { singular: 'day', plural: 'days' },
+    weekly: { singular: 'week', plural: 'weeks' },
+    monthly: { singular: 'month', plural: 'months' },
+    yearly: { singular: 'year', plural: 'years' },
+  };
+
+  const unit = units[frequency];
+  if (!unit) return null;
+
+  let label = interval === 1
+    ? `Repeats every ${unit.singular}`
+    : `Repeats every ${interval} ${unit.plural}`;
+
+  if (frequency === 'weekly' && byDay && byDay.length > 0) {
+    const days = [...byDay]
+      .sort((a, b) => (DAY_ABBREV_ORDER[a] ?? Number.MAX_SAFE_INTEGER) - (DAY_ABBREV_ORDER[b] ?? Number.MAX_SAFE_INTEGER))
+      .map((d) => DAY_ABBREV_TO_SHORT[d] ?? d)
+      .join(', ');
+    label = `${label} (${days})`;
+  }
+
+  if (frequency === 'monthly' && scheduleDate) {
+    const dayNum = parseInt(scheduleDate.split('-')[2], 10);
+    label = `${label} on ${formatOrdinalDay(dayNum)}`;
+  }
+
+  if (time) {
+    label = `${label} at ${formatTime12h(time)}`;
+  }
+
+  return label;
 }
