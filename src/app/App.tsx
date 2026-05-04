@@ -3061,7 +3061,7 @@ export default function App() {
           <div className="content-stretch flex items-center justify-center pb-[20px] pt-[50px] relative shrink-0 w-full">
             <div
               className="pointer-events-none fixed flex items-center justify-center"
-              style={{ top: 'calc(50px + 7px)', right: '20px', width: '17px', height: '35.653px' }}
+              style={{ top: '77px', right: '20px', width: '17px', height: '35.653px' }}
             >
               <HeaderMenuIcon />
             </div>
