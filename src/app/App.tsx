@@ -212,7 +212,15 @@ const DELETED_LIST_COLOUR = "#898989";
 
 function HeaderMenuIcon() {
   return (
-    <svg width="17" height="14" viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg
+      className="block h-[14px] w-[17px] shrink-0"
+      width="17"
+      height="14"
+      viewBox="0 0 20 17"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
       <path d="M1.5 1.5H18.5M1.5 8.5H18.5M1.5 15.5H18.5" stroke="white" strokeOpacity="0.5" strokeWidth="3" strokeLinecap="round" />
     </svg>
   );
