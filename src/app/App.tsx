@@ -1046,6 +1046,14 @@ export default function App() {
       return true;
     }
   });
+  const [settingsMenuFeatureEnabled, setSettingsMenuFeatureEnabled] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-ff-settings-menu');
+      return stored == null ? true : stored === 'true';
+    } catch {
+      return true;
+    }
+  });
   const [useDefaultTemplatesInCleanState, setUseDefaultTemplatesInCleanState] = useState<boolean>(() => {
     try {
       return localStorage.getItem(DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY) === 'true';
@@ -1344,6 +1352,13 @@ export default function App() {
       // Fail silently
     }
   }, [pinnedListsFeatureEnabled]);
+  useEffect(() => {
+    try {
+      persistStringIfChanged('reminderly-ff-settings-menu', String(settingsMenuFeatureEnabled));
+    } catch {
+      // Fail silently
+    }
+  }, [settingsMenuFeatureEnabled]);
 
   useEffect(() => {
     try {
@@ -3059,17 +3074,19 @@ export default function App() {
       <div className="app-header relative shrink-0 w-full p-[20px]">
         <div className="content-stretch flex flex-col gap-[17px] items-start relative w-full max-w-[768px] mx-auto" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }}>
           <div className="content-stretch flex items-center justify-center pb-[20px] pt-[50px] relative shrink-0 w-full">
-            <div
-              className="pointer-events-none absolute flex items-center justify-center"
-              style={{
-                top: '57px',
-                right: 'calc((100vw - 100%) / -2 + 20px)',
-                width: '17px',
-                height: '35.653px',
-              }}
-            >
-              <HeaderMenuIcon />
-            </div>
+            {settingsMenuFeatureEnabled && (
+              <div
+                className="pointer-events-none absolute flex items-center justify-center"
+                style={{
+                  top: '57px',
+                  right: 'calc((100vw - 100%) / -2 + 20px)',
+                  width: '17px',
+                  height: '35.653px',
+                }}
+              >
+                <HeaderMenuIcon />
+              </div>
+            )}
             <div className="h-[35.653px] relative shrink-0 w-[209.653px]" style={{ top: '7px' }}>
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
                 <g>
@@ -5088,7 +5105,7 @@ export default function App() {
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
-              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} savedListsEnabled={savedListsFeatureEnabled} onSavedListsEnabledChange={handleSavedListsFeatureEnabledChange} pinnedListsEnabled={pinnedListsFeatureEnabled} onPinnedListsEnabledChange={setPinnedListsFeatureEnabled} useDefaultTemplatesInCleanState={useDefaultTemplatesInCleanState} onUseDefaultTemplatesInCleanStateChange={setUseDefaultTemplatesInCleanState} onClearLists={(useDefaultTemplatesInCleanState) => {
+              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} savedListsEnabled={savedListsFeatureEnabled} onSavedListsEnabledChange={handleSavedListsFeatureEnabledChange} pinnedListsEnabled={pinnedListsFeatureEnabled} onPinnedListsEnabledChange={setPinnedListsFeatureEnabled} settingsMenuEnabled={settingsMenuFeatureEnabled} onSettingsMenuEnabledChange={setSettingsMenuFeatureEnabled} useDefaultTemplatesInCleanState={useDefaultTemplatesInCleanState} onUseDefaultTemplatesInCleanStateChange={setUseDefaultTemplatesInCleanState} onClearLists={(useDefaultTemplatesInCleanState) => {
                 setCreatedLists([]);
                 setSavedLists(
                   useDefaultTemplatesInCleanState
