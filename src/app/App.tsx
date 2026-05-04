@@ -545,10 +545,6 @@ export default function App() {
   const [savedListsPanelOpen, setSavedListsPanelOpen] = useState(false);
   const [restoreSavedListsPanelAfterOverlayClose, setRestoreSavedListsPanelAfterOverlayClose] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode | 'lists-done'>("list");
-  const headerLogoRowRef = useRef<HTMLDivElement | null>(null);
-  const headerLogoRef = useRef<HTMLDivElement | null>(null);
-  const [headerMenuIconCenterY, setHeaderMenuIconCenterY] = useState<number | null>(null);
-
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [isReminderOverlayFocusReady, setIsReminderOverlayFocusReady] = useState(false);
   const [isListsOverlayOpen, setIsListsOverlayOpen] = useState(false);
@@ -621,28 +617,6 @@ export default function App() {
       return [];
     }
   });
-
-  useEffect(() => {
-    let animationFrameId: number | null = null;
-
-    const measureHeaderLogo = () => {
-      if (!headerLogoRowRef.current || !headerLogoRef.current) return;
-      const rowRect = headerLogoRowRef.current.getBoundingClientRect();
-      const logoRect = headerLogoRef.current.getBoundingClientRect();
-      setHeaderMenuIconCenterY((logoRect.top - rowRect.top) + (logoRect.height / 2));
-    };
-
-    measureHeaderLogo();
-    animationFrameId = window.requestAnimationFrame(measureHeaderLogo);
-    window.addEventListener('resize', measureHeaderLogo);
-
-    return () => {
-      window.removeEventListener('resize', measureHeaderLogo);
-      if (animationFrameId !== null) {
-        window.cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, [viewMode, activeMainTab, isListsEnabled]);
 
   // UI-only: list settings overlay (cog button in overlay header)
   const [isListSettingsOpen, setIsListSettingsOpen] = useState(false);
@@ -3076,14 +3050,14 @@ export default function App() {
       {/* Header */}
       <div className="app-header relative shrink-0 w-full p-[20px]">
         <div className="content-stretch flex flex-col gap-[17px] items-start relative w-full max-w-[768px] mx-auto" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }}>
-          <div ref={headerLogoRowRef} className="content-stretch flex items-center justify-center pb-[20px] pt-[50px] relative shrink-0 w-full">
+          <div className="content-stretch flex items-center justify-center pb-[20px] pt-[50px] relative shrink-0 w-full">
             <div
-              className="pointer-events-none absolute right-0 -translate-y-1/2 flex items-center justify-center"
-              style={{ top: headerMenuIconCenterY ?? '50%', width: '17px', height: '14px' }}
+              className="pointer-events-none absolute right-0 flex items-center justify-center"
+              style={{ top: '7px', width: '17px', height: '35.653px' }}
             >
               <HeaderMenuIcon />
             </div>
-            <div ref={headerLogoRef} className="h-[35.653px] relative shrink-0 w-[209.653px]" style={{ top: '7px' }}>
+            <div className="h-[35.653px] relative shrink-0 w-[209.653px]" style={{ top: '7px' }}>
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
                 <g>
                   {/* Text portion */}
