@@ -18,6 +18,7 @@ import { scheduleEquality } from "./utils/schedule";
 import { PENDING_NOTIFICATION_REMINDER_ID_KEY, syncReminderNotifications } from "./notifications";
 import { useNotificationTapHandler } from "./useNotificationTapHandler";
 import laterBtnPaths from "../imports/svg-0tntgsesap";
+import listInfoOverlayPaths from "../imports/svg-oxn8g14l6y";
 import LaterBtn from "../imports/LaterBtn-146-39";
 import ListsHeader from "../imports/Header";
 import InfoOverlay from "../imports/InfoOverlay";
@@ -918,6 +919,8 @@ export default function App() {
   const [isRepeatsOverlayOpen, setIsRepeatsOverlayOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isRemindersSettingsPanelOpen, setIsRemindersSettingsPanelOpen] = useState(false);
+  const [isListsSettingsPanelOpen, setIsListsSettingsPanelOpen] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 0);
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<number | null>(null);
@@ -1834,6 +1837,8 @@ export default function App() {
   const repeatsSheetDragControls = useDragControls();
   const settingsSheetDragControls = useDragControls();
   const tutorialSheetDragControls = useDragControls();
+  const remindersSettingsSheetDragControls = useDragControls();
+  const listsSettingsSheetDragControls = useDragControls();
 
   const shouldCloseBottomSheetFromDrag = (offsetY: number, velocityY: number) => {
     return offsetY > 120 || velocityY > 600;
@@ -1843,6 +1848,14 @@ export default function App() {
     setIsTutorialOpen(true);
     setTimeout(() => setIsSettingsOpen(false), 250);
   };
+
+  const handleHeaderMenuClick = useCallback(() => {
+    if (isListsEnabled && activeMainTab === 'lists') {
+      setIsListsSettingsPanelOpen(true);
+      return;
+    }
+    setIsRemindersSettingsPanelOpen(true);
+  }, [activeMainTab, isListsEnabled]);
 
   const openSavedListEditor = (list: SavedListTemplate) => {
     setListTitle(list.title);
@@ -3081,17 +3094,31 @@ export default function App() {
         <div className="content-stretch flex flex-col gap-[17px] items-start relative w-full max-w-[768px] mx-auto" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }}>
           <div className="content-stretch flex items-center justify-center pb-[20px] pt-[50px] relative shrink-0 w-full">
             {settingsMenuFeatureEnabled && (
-              <div
-                className="pointer-events-none absolute flex items-center justify-center"
-                style={{
-                  top: '57px',
-                  right: 'calc((100vw - 100%) / -2 + 20px)',
-                  width: '17px',
-                  height: '35.653px',
-                }}
-              >
-                <HeaderMenuIcon />
-              </div>
+              <>
+                <button
+                  className="absolute flex items-center justify-center cursor-pointer p-0 m-0 border-none bg-transparent"
+                  type="button"
+                  onClick={handleHeaderMenuClick}
+                  aria-label={isListsEnabled && activeMainTab === 'lists' ? 'Open lists settings' : 'Open reminders settings'}
+                  style={{
+                    top: '57px',
+                    right: 'calc((100vw - 100%) / -2 + 20px)',
+                    width: '17px',
+                    height: '35.653px',
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute flex items-center justify-center"
+                  style={{
+                    top: '57px',
+                    right: 'calc((100vw - 100%) / -2 + 20px)',
+                    width: '17px',
+                    height: '35.653px',
+                  }}
+                >
+                  <HeaderMenuIcon />
+                </div>
+              </>
             )}
             <div className="h-[35.653px] relative shrink-0 w-[209.653px]" style={{ top: '7px' }}>
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
@@ -5199,6 +5226,158 @@ export default function App() {
       </AnimatePresence>
 
       {/* Settings Overlay */}
+      <AnimatePresence>
+        {isRemindersSettingsPanelOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setIsRemindersSettingsPanelOpen(false)}
+              className="fixed inset-0 bg-black/0 z-40"
+            />
+
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0, top: getBottomSheetTopPosition() }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="fixed left-0 right-0 z-50 mx-auto w-full"
+              style={{ bottom: 0 }}
+            >
+              <motion.div
+                drag="y"
+                dragControls={remindersSettingsSheetDragControls}
+                dragListener={false}
+                dragConstraints={{ top: 0, bottom: viewportHeight }}
+                dragElastic={0}
+                dragMomentum={false}
+                onDragEnd={(_, info) => {
+                  if (!shouldCloseBottomSheetFromDrag(info.offset.y, info.velocity.y)) return;
+                  setIsRemindersSettingsPanelOpen(false);
+                }}
+                className="bg-white relative rounded-tl-[15px] rounded-tr-[15px] size-full"
+              >
+                <div
+                  className="absolute left-0 right-0 top-0 h-[24px] z-[2] touch-pan-y"
+                  onPointerDown={(event) => remindersSettingsSheetDragControls.start(event)}
+                />
+                <div className="relative w-full max-w-[768px] h-full flex flex-col mx-auto">
+                  <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
+                    <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
+                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
+                        Reminders settings
+                      </div>
+                      <button
+                        className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center cursor-pointer w-[30px] h-[30px]"
+                        type="button"
+                        onClick={() => setIsRemindersSettingsPanelOpen(false)}
+                        aria-label="Close reminders settings"
+                      >
+                        <svg className="block shrink-0" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M11.7528 0.439116C12.3385 -0.146356 13.2882 -0.146389 13.8739 0.439116C14.4596 1.02493 14.4596 1.97537 13.8739 2.56119L9.27819 7.15787L13.8739 11.7536C14.4596 12.3394 14.4596 13.2898 13.8739 13.8756C13.2882 14.4612 12.3385 14.4611 11.7528 13.8756L7.15709 9.27896L2.56041 13.8756C1.97466 14.461 1.02496 14.4612 0.439319 13.8756C-0.14644 13.2898 -0.146439 12.3394 0.439319 11.7536L5.03502 7.15787L0.439319 2.56119C-0.146439 1.97537 -0.14644 1.02493 0.439319 0.439116C1.02496 -0.146462 1.97466 -0.146282 2.56041 0.439116L7.15709 5.0358L11.7528 0.439116Z" fill="#BABABA"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isListsSettingsPanelOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setIsListsSettingsPanelOpen(false)}
+              className="fixed inset-0 bg-black/0 z-40"
+            />
+
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0, top: getBottomSheetTopPosition() }}
+              exit={{ y: "100%" }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="fixed left-0 right-0 z-50 mx-auto w-full"
+              style={{ bottom: 0 }}
+            >
+              <motion.div
+                drag="y"
+                dragControls={listsSettingsSheetDragControls}
+                dragListener={false}
+                dragConstraints={{ top: 0, bottom: viewportHeight }}
+                dragElastic={0}
+                dragMomentum={false}
+                onDragEnd={(_, info) => {
+                  if (!shouldCloseBottomSheetFromDrag(info.offset.y, info.velocity.y)) return;
+                  setIsListsSettingsPanelOpen(false);
+                }}
+                className="bg-white relative rounded-tl-[15px] rounded-tr-[15px] size-full"
+              >
+                <div
+                  className="absolute left-0 right-0 top-0 h-[24px] z-[2] touch-pan-y"
+                  onPointerDown={(event) => listsSettingsSheetDragControls.start(event)}
+                />
+                <div className="relative w-full max-w-[768px] h-full flex flex-col mx-auto">
+                  <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
+                    <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
+                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
+                        Lists settings
+                      </div>
+                      <button
+                        className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center cursor-pointer w-[30px] h-[30px]"
+                        type="button"
+                        onClick={() => setIsListsSettingsPanelOpen(false)}
+                        aria-label="Close lists settings"
+                      >
+                        <svg className="block shrink-0" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M11.7528 0.439116C12.3385 -0.146356 13.2882 -0.146389 13.8739 0.439116C14.4596 1.02493 14.4596 1.97537 13.8739 2.56119L9.27819 7.15787L13.8739 11.7536C14.4596 12.3394 14.4596 13.2898 13.8739 13.8756C13.2882 14.4612 12.3385 14.4611 11.7528 13.8756L7.15709 9.27896L2.56041 13.8756C1.97466 14.461 1.02496 14.4612 0.439319 13.8756C-0.14644 13.2898 -0.146439 12.3394 0.439319 11.7536L5.03502 7.15787L0.439319 2.56119C-0.146439 1.97537 -0.14644 1.02493 0.439319 0.439116C1.02496 -0.146462 1.97466 -0.146282 2.56041 0.439116L7.15709 5.0358L11.7528 0.439116Z" fill="#BABABA"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
+                      <div className="content-stretch flex gap-[16px] items-start justify-center relative shrink-0 w-full">
+                        <div className="h-[21.5px] relative self-start shrink-0 w-[19.5px] top-[1px]" data-name="Union">
+                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19.5002 21.5002">
+                            <g id="Union">
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p23b20a00} fill="#1C2C42" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p15d6fbb2} fill="#1C2C42" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p1797f00} fill="#1C2C42" fillRule="evenodd" />
+                            </g>
+                          </svg>
+                        </div>
+                        <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
+                          <div className="flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-[#1c2c42] text-ellipsis w-full whitespace-nowrap">
+                            <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>Setting title</p>
+                          </div>
+                          <div className="flex flex-col justify-start relative shrink-0 text-[14px] text-[#bababa] w-full">
+                            <p className="leading-[14px]" style={{ fontWeight: 700, color: '#BABABA' }}>Setting subtitle</p>
+                          </div>
+                        </div>
+                        <div className="bg-[#1c2c42] content-stretch flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] justify-end">
+                          <div className="relative shrink-0 size-[22.5px]">
+                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+                              <circle cx="11.25" cy="11.25" fill="var(--fill-0, white)" r="11.25" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {isSettingsOpen && (
           <>
