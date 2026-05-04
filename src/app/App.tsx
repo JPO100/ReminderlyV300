@@ -5292,8 +5292,8 @@ export default function App() {
                           </svg>
                         </div>
                         <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
-                          <div className="flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-[#1c2c42] text-ellipsis w-full whitespace-nowrap">
-                            <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>Setting title</p>
+                          <div className="flex flex-col justify-start max-w-full min-w-0 overflow-visible relative shrink-0 text-[17px] text-[#1c2c42] w-full whitespace-nowrap">
+                            <p className="block leading-[17px] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap w-full" style={{ boxSizing: 'content-box', fontSize: 17, fontWeight: 700, lineHeight: '17px', margin: 0, paddingBottom: 2, transform: 'translateY(-1px)' }}>Setting title</p>
                           </div>
                           <div className="flex flex-col justify-start relative shrink-0 text-[14px] text-[#bababa] w-full">
                             <p className="leading-[14px]" style={{ fontWeight: 700, color: '#BABABA' }}>Setting subtitle</p>
@@ -5382,8 +5382,8 @@ export default function App() {
                           </svg>
                         </div>
                         <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
-                          <div className="flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-[#1c2c42] text-ellipsis w-full whitespace-nowrap">
-                            <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>Setting title</p>
+                          <div className="flex flex-col justify-start max-w-full min-w-0 overflow-visible relative shrink-0 text-[17px] text-[#1c2c42] w-full whitespace-nowrap">
+                            <p className="block leading-[17px] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap w-full" style={{ boxSizing: 'content-box', fontSize: 17, fontWeight: 700, lineHeight: '17px', margin: 0, paddingBottom: 2, transform: 'translateY(-1px)' }}>Setting title</p>
                           </div>
                           <div className="flex flex-col justify-start relative shrink-0 text-[14px] text-[#bababa] w-full">
                             <p className="leading-[14px]" style={{ fontWeight: 700, color: '#BABABA' }}>Setting subtitle</p>
