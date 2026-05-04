@@ -4228,7 +4228,12 @@ export default function App() {
                                           }
                                           if (item.repeatRule) {
                                             const label = formatRepeatLabel(item.repeatRule, item.schedule.kind === 'scheduled' ? item.schedule.time : undefined, item.schedule.kind === 'scheduled' ? item.schedule.date : undefined);
-                                            if (label) return label;
+                                            if (label) {
+                                              if (item.schedule.kind === 'scheduled' && item.schedule.date) {
+                                                return `${formatScheduledDateForRow(item.schedule.date, now)}. ${label}`;
+                                              }
+                                              return label;
+                                            }
                                           }
                                           if (item.schedule.kind === 'scheduled' && item.schedule.date) {
                                             const dateLabel = formatScheduledDateForRow(item.schedule.date, now);
@@ -4354,7 +4359,12 @@ export default function App() {
                                       }
                                       if (reminder.repeatRule) {
                                         const label = formatRepeatLabel(reminder.repeatRule, reminder.schedule.kind === 'scheduled' ? reminder.schedule.time : undefined, reminder.schedule.kind === 'scheduled' ? reminder.schedule.date : undefined);
-                                        if (label) return label;
+                                        if (label) {
+                                          if (reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
+                                            return `${formatScheduledDateForRow(reminder.schedule.date, now)}. ${label}`;
+                                          }
+                                          return label;
+                                        }
                                       }
                                       if (reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
                                         const dateLabel = formatScheduledDateForRow(reminder.schedule.date, now);
