@@ -5500,7 +5500,7 @@ export default function App() {
                   if (!shouldCloseBottomSheetFromDrag(info.offset.y, info.velocity.y)) return;
                   setIsTutorialOpen(false);
                 }}
-                className="relative"
+                className="relative size-full"
               >
                 <div
                   className="absolute left-0 right-0 top-0 h-[24px] z-[2] touch-pan-y"
