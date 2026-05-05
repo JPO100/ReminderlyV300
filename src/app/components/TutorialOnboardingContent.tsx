@@ -21,12 +21,19 @@ const TOTAL_PAGES = 8;
 
 function ListsTutorialPlaceholderPage() {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-[16px]">
-      <div className={TUTORIAL_TITLE_CLASSNAME}>
-        <p className="block leading-[normal] whitespace-pre-wrap">Setting title</p>
+    <div className="content-stretch flex h-full w-full flex-col items-center justify-between min-h-0 pb-[45px]">
+      <div className="flex w-full flex-col items-center gap-[16px]">
+        <div className={TUTORIAL_TITLE_CLASSNAME}>
+          <p className="block leading-[normal] whitespace-pre-wrap">Setting title</p>
+        </div>
+        <div className={TUTORIAL_BODY_CLASSNAME}>
+          <p className="block leading-[normal]">Setting subtitle</p>
+        </div>
       </div>
-      <div className={TUTORIAL_BODY_CLASSNAME}>
-        <p className="block leading-[normal]">Setting subtitle</p>
+      <div className="h-[361px] relative shrink-0 w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]">
+        <div className="bg-[#1c2c42] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+          <div className="bg-white overflow-hidden relative rounded-tl-[26px] rounded-tr-[26px] h-[calc(100%+2px)] w-full border border-[#e6e6e6]" />
+        </div>
       </div>
     </div>
   );
