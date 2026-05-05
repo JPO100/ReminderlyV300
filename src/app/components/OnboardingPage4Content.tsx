@@ -16,7 +16,7 @@ function Frame3() {
 
 function Frame8() {
   return (
-    <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] [@media(max-height:570px)]:!min-h-0 items-center relative shrink-0" style={{ minHeight: '157px' }}>
+    <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] [@media(max-height:570px)]:!min-h-0 items-center relative shrink-0">
       <Frame3 />
       <div className={TUTORIAL_BODY_CLASSNAME}>
         <p className="css-4hzbpn leading-[30px]">Reminderly even recognises repeat events</p>
