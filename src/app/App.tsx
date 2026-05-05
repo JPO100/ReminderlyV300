@@ -1571,14 +1571,6 @@ export default function App() {
     variant === 'lists' ? 'reminderly-tutorial-lists-shown' : 'reminderly-tutorial-reminders-shown'
   );
 
-  const hasSeenTutorial = (variant: TutorialVariant) => {
-    try {
-      return localStorage.getItem(getTutorialSeenStorageKey(variant)) === 'true';
-    } catch {
-      return false;
-    }
-  };
-
   const markTutorialSeen = (variant: TutorialVariant) => {
     try {
       localStorage.setItem(getTutorialSeenStorageKey(variant), 'true');
@@ -1587,7 +1579,10 @@ export default function App() {
     }
   };
 
+  const tutorialVariantsShownThisSessionRef = useRef<Set<TutorialVariant>>(new Set());
+
   const openTutorial = useCallback((variant: TutorialVariant) => {
+    tutorialVariantsShownThisSessionRef.current.add(variant);
     setTutorialVariant(variant);
     setIsTutorialOpen(true);
   }, []);
@@ -1602,16 +1597,9 @@ export default function App() {
     const pendingTappedReminderId = localStorage.getItem(PENDING_NOTIFICATION_REMINDER_ID_KEY);
     if (pendingTappedReminderId) return;
     if (!isOnboardingTutorialEnabled) return;
+    if (!showTutorialOnFirstLaunch && !showTutorialOnEveryStart) return;
     const initialTutorialVariant: TutorialVariant = activeMainTab === 'lists' && isListsEnabled ? 'lists' : 'reminders';
-    if (showTutorialOnEveryStart) {
-      openTutorial(initialTutorialVariant);
-      return;
-    }
-    if (showTutorialOnFirstLaunch) {
-      if (!hasSeenTutorial(initialTutorialVariant)) {
-        openTutorial(initialTutorialVariant);
-      }
-    }
+    openTutorial(initialTutorialVariant);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1626,7 +1614,7 @@ export default function App() {
     if (!showTutorialOnFirstLaunch && !showTutorialOnEveryStart) return;
     if (isTutorialOpen) return;
     const nextTutorialVariant: TutorialVariant = activeMainTab === 'lists' && isListsEnabled ? 'lists' : 'reminders';
-    if (!hasSeenTutorial(nextTutorialVariant)) {
+    if (!tutorialVariantsShownThisSessionRef.current.has(nextTutorialVariant)) {
       openTutorial(nextTutorialVariant);
     }
   }, [activeMainTab, isListsEnabled, isOnboardingTutorialEnabled, isTutorialOpen, openTutorial, showTutorialOnEveryStart, showTutorialOnFirstLaunch]);
