@@ -3601,10 +3601,10 @@ export default function App() {
             <div className="relative flex flex-col gap-[24px] w-full flex-1 min-h-0">
             {/* List filter pills */}
             {(
-              <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
+              <div className="filters-menu flex items-center gap-[18px] relative shrink-0 w-full">
                 {savedListsFeatureEnabled ? (
                   <>
-                    <div className="flex items-center gap-[8px]">
+                    <div className="flex items-center justify-between flex-1 min-w-0">
                       {(["todo", "started", "complete"] as const).map((filter) => {
                         const isActive = activeListFilter === filter;
                         return (
@@ -3628,7 +3628,7 @@ export default function App() {
                       })}
                     </div>
                     <button
-                      className="bg-[#1C2C42] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ml-auto"
+                      className="bg-[#1C2C42] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer"
                       type="button"
                       onClick={() => setSavedListsPanelOpen(true)}
                     >
