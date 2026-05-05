@@ -334,7 +334,7 @@ function Frame9({ filtersMenuVariant }: { filtersMenuVariant: FiltersMenuVariant
   }, [filtersMenuVariant]);
 
   return (
-    <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0">
+    <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[30px]">
       <Frame8 />
       <ReminderColours activeFilter={activeFilter} filtersMenuVariant={filtersMenuVariant} />
     </div>
