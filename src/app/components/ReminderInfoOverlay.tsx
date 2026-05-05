@@ -13,6 +13,12 @@ function formatTime12h(time: string): string {
   return `${h12}:${String(mm).padStart(2, "0")}${suffix}`;
 }
 
+function formatOverlayDatePart(dateLabel: string): string {
+  if (dateLabel === "Today") return "today";
+  if (dateLabel === "Tomorrow") return "tomorrow";
+  return dateLabel;
+}
+
 export function formatDueLine(reminder: Reminder, now: Date = new Date()): string {
   const hasDate =
     reminder.schedule.kind === "scheduled" && !!reminder.schedule.date;
@@ -23,10 +29,10 @@ export function formatDueLine(reminder: Reminder, now: Date = new Date()): strin
 
   let datePart = "";
   if (hasDate) {
-    datePart = formatScheduledDateForRow(
+    datePart = formatOverlayDatePart(formatScheduledDateForRow(
       (reminder.schedule as { date: string }).date,
       now
-    );
+    ));
   }
 
   let timePart = "";
