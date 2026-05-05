@@ -50,7 +50,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         borderTopRightRadius: '30px',
         paddingLeft: 'clamp(16px, 5vw, 40px)',
         paddingRight: 'clamp(16px, 5vw, 40px)',
-        paddingTop: '24px',
+        paddingTop: '34px',
         paddingBottom: '30px',
       }}
     >
