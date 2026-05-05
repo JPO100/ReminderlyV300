@@ -319,7 +319,7 @@ function ReminderColours({ showDone, tickDone, backHighlighted, tickFlash }: { s
 
 function Frame9({ showDone, tickDone, backHighlighted, tickFlash }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean }) {
   return (
-    <div className="content-stretch flex flex-col gap-[25px] items-center relative shrink-0">
+    <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0">
       <Frame8 />
       <ReminderColours showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} />
     </div>
