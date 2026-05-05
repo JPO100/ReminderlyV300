@@ -7,28 +7,9 @@ import { motion } from "motion/react";
 import type { FiltersMenuVariant } from "../reminder-utils";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 
-function Group1() {
-  return (
-    <div className="relative shrink-0 size-[62px]">
-      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 62 62">
-        <g id="Group 22">
-          <path d={svgPaths.p1540b980} fill="var(--fill-0, #4784F8)" id="Ellipse 74 (Stroke)" />
-          <g id="Group 11">
-            <path d={svgPaths.p487a380} fill="var(--fill-0, #4784F8)" id="Line 39 (Stroke)" />
-            <path d={svgPaths.p1804bd80} fill="var(--fill-0, #4784F8)" id="Line 40 (Stroke)" />
-          </g>
-        </g>
-      </svg>
-    </div>
-  );
-}
-
 function Frame3() {
   return (
-    <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
-      <div className="[@media(max-height:570px)]:hidden">
-        <Group1 />
-      </div>
+    <div className="content-stretch flex flex-col items-center relative shrink-0">
       <div className={TUTORIAL_TITLE_CLASSNAME}>
         <p className="css-ew64yg leading-[normal]">Mark reminders as 'done'</p>
       </div>
