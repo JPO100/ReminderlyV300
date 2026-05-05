@@ -1,7 +1,17 @@
 import TutorialOnboardingContent from "@/app/components/TutorialOnboardingContent";
 import type { FiltersMenuVariant } from "../reminder-utils";
 
-export default function TutorialOverlay({ onClose, isEnabled, filtersMenuVariant }: { onClose: () => void; isEnabled: boolean; filtersMenuVariant: FiltersMenuVariant }) {
+export default function TutorialOverlay({
+  onClose,
+  isEnabled,
+  filtersMenuVariant,
+  variant,
+}: {
+  onClose: () => void;
+  isEnabled: boolean;
+  filtersMenuVariant: FiltersMenuVariant;
+  variant: 'reminders' | 'lists';
+}) {
   if (!isEnabled) return null;
 
   return (
@@ -10,7 +20,7 @@ export default function TutorialOverlay({ onClose, isEnabled, filtersMenuVariant
           <div className="flex flex-col gap-[40px] w-full flex-1 min-h-0">
             {/* Tutorial body - empty scroll container */}
             <div className="flex-1 min-h-0 overflow-y-auto w-full">
-              <TutorialOnboardingContent onComplete={onClose} filtersMenuVariant={filtersMenuVariant} />
+              <TutorialOnboardingContent onComplete={onClose} filtersMenuVariant={filtersMenuVariant} variant={variant} />
             </div>
           </div>
       </div>

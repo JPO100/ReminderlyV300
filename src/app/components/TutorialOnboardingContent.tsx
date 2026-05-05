@@ -8,16 +8,31 @@ import OnboardingPage5Content from '@/app/components/OnboardingPage5Content';
 import OnboardingPage6Content from '@/app/components/OnboardingPage6Content';
 import OnboardingPage7Content from '@/app/components/OnboardingPage7Content';
 import OnboardingPage8Content from '@/app/components/OnboardingPage8Content';
+import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import type { FiltersMenuVariant } from '../reminder-utils';
 
 interface TutorialOnboardingContentProps {
   onComplete: () => void;
   filtersMenuVariant: FiltersMenuVariant;
+  variant: 'reminders' | 'lists';
 }
 
 const TOTAL_PAGES = 8;
 
-export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant }: TutorialOnboardingContentProps) {
+function ListsTutorialPlaceholderPage() {
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center gap-[16px]">
+      <div className={TUTORIAL_TITLE_CLASSNAME}>
+        <p className="block leading-[normal] whitespace-pre-wrap">Setting title</p>
+      </div>
+      <div className={TUTORIAL_BODY_CLASSNAME}>
+        <p className="block leading-[normal]">Setting subtitle</p>
+      </div>
+    </div>
+  );
+}
+
+export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant, variant }: TutorialOnboardingContentProps) {
   const [currentPage, setCurrentPage] = useState(0);
 
   const handleNext = () => {
@@ -40,6 +55,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
 
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === TOTAL_PAGES - 1;
+  const isListsTutorial = variant === 'lists';
 
   return (
     <div
@@ -55,37 +71,39 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
       }}
     >
       <div className="flex-1 [@media(max-height:570px)]:flex-none relative overflow-hidden">
-        {currentPage === 0 && (
+        {!isListsTutorial && currentPage === 0 && (
           <OnboardingPage1Content filtersMenuVariant={filtersMenuVariant} />
         )}
         
-        {currentPage === 1 && (
+        {!isListsTutorial && currentPage === 1 && (
           <OnboardingPage2Content filtersMenuVariant={filtersMenuVariant} />
         )}
         
-        {currentPage === 2 && (
+        {!isListsTutorial && currentPage === 2 && (
           <OnboardingPage3Content filtersMenuVariant={filtersMenuVariant} />
         )}
         
-        {currentPage === 3 && (
+        {!isListsTutorial && currentPage === 3 && (
           <OnboardingPage4Content filtersMenuVariant={filtersMenuVariant} />
         )}
         
-        {currentPage === 4 && (
+        {!isListsTutorial && currentPage === 4 && (
           <OnboardingPage5Content filtersMenuVariant={filtersMenuVariant} />
         )}
         
-        {currentPage === 5 && (
+        {!isListsTutorial && currentPage === 5 && (
           <OnboardingPage6Content filtersMenuVariant={filtersMenuVariant} />
         )}
         
-        {currentPage === 6 && (
+        {!isListsTutorial && currentPage === 6 && (
           <OnboardingPage7Content filtersMenuVariant={filtersMenuVariant} />
         )}
         
-        {currentPage === 7 && (
+        {!isListsTutorial && currentPage === 7 && (
           <OnboardingPage8Content />
         )}
+
+        {isListsTutorial && <ListsTutorialPlaceholderPage />}
       </div>
       
       <div className="flex flex-col items-center gap-[36px] [@media(max-height:570px)]:pt-[30px] [@media(max-height:570px)]:pb-[30px]">

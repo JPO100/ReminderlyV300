@@ -206,6 +206,7 @@ const OVERDUE_COLOUR = "#FF0000";
 const DONE_BLUE = "#1C2C42";
 const DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY = 'reminderly-dev-default-templates-in-clean-state';
 const DONE_LIST_COLOUR = "#404040";
+type TutorialVariant = 'reminders' | 'lists';
 
 // Deleted grey constant for deleted styling
 const DELETED_GREY = "#939393";
@@ -919,6 +920,7 @@ export default function App() {
   const [isRepeatsOverlayOpen, setIsRepeatsOverlayOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [tutorialVariant, setTutorialVariant] = useState<TutorialVariant>('reminders');
   const [isRemindersSettingsPanelOpen, setIsRemindersSettingsPanelOpen] = useState(false);
   const [isListsSettingsPanelOpen, setIsListsSettingsPanelOpen] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(typeof window !== "undefined" ? window.innerHeight : 0);
@@ -1565,28 +1567,69 @@ export default function App() {
     setInfoReminder,
   });
 
+  const getTutorialSeenStorageKey = (variant: TutorialVariant) => (
+    variant === 'lists' ? 'reminderly-tutorial-lists-shown' : 'reminderly-tutorial-reminders-shown'
+  );
+
+  const hasSeenTutorial = (variant: TutorialVariant) => {
+    try {
+      return localStorage.getItem(getTutorialSeenStorageKey(variant)) === 'true';
+    } catch {
+      return false;
+    }
+  };
+
+  const markTutorialSeen = (variant: TutorialVariant) => {
+    try {
+      localStorage.setItem(getTutorialSeenStorageKey(variant), 'true');
+    } catch {
+      // Fail silently
+    }
+  };
+
+  const openTutorial = useCallback((variant: TutorialVariant) => {
+    setTutorialVariant(variant);
+    setIsTutorialOpen(true);
+  }, []);
+
+  const closeTutorial = useCallback(() => {
+    markTutorialSeen(tutorialVariant);
+    setIsTutorialOpen(false);
+  }, [tutorialVariant]);
+
   // Auto-launch tutorial on mount based on toggle states
   useEffect(() => {
     const pendingTappedReminderId = localStorage.getItem(PENDING_NOTIFICATION_REMINDER_ID_KEY);
     if (pendingTappedReminderId) return;
     if (!isOnboardingTutorialEnabled) return;
+    const initialTutorialVariant: TutorialVariant = activeMainTab === 'lists' && isListsEnabled ? 'lists' : 'reminders';
     if (showTutorialOnEveryStart) {
-      setIsTutorialOpen(true);
+      openTutorial(initialTutorialVariant);
       return;
     }
     if (showTutorialOnFirstLaunch) {
-      try {
-        const alreadyShown = localStorage.getItem('reminderly-tutorial-first-launch-shown');
-        if (alreadyShown !== 'true') {
-          localStorage.setItem('reminderly-tutorial-first-launch-shown', 'true');
-          setIsTutorialOpen(true);
-        }
-      } catch {
-        // Fail silently
+      if (!hasSeenTutorial(initialTutorialVariant)) {
+        openTutorial(initialTutorialVariant);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const hasHandledTutorialTabTransitionRef = useRef(false);
+
+  useEffect(() => {
+    if (!hasHandledTutorialTabTransitionRef.current) {
+      hasHandledTutorialTabTransitionRef.current = true;
+      return;
+    }
+    if (!isOnboardingTutorialEnabled) return;
+    if (!showTutorialOnFirstLaunch && !showTutorialOnEveryStart) return;
+    if (isTutorialOpen) return;
+    const nextTutorialVariant: TutorialVariant = activeMainTab === 'lists' && isListsEnabled ? 'lists' : 'reminders';
+    if (!hasSeenTutorial(nextTutorialVariant)) {
+      openTutorial(nextTutorialVariant);
+    }
+  }, [activeMainTab, isListsEnabled, isOnboardingTutorialEnabled, isTutorialOpen, openTutorial, showTutorialOnEveryStart, showTutorialOnFirstLaunch]);
 
   // Auto-reset: when leaving grouped filters with subtitles off, reset to on
   useEffect(() => {
@@ -1845,7 +1888,7 @@ export default function App() {
   };
 
   const handleTutorialOpen = () => {
-    setIsTutorialOpen(true);
+    openTutorial(activeMainTab === 'lists' && isListsEnabled ? 'lists' : 'reminders');
     setTimeout(() => setIsSettingsOpen(false), 250);
   };
 
@@ -5476,7 +5519,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              onClick={() => setIsTutorialOpen(false)}
+              onClick={closeTutorial}
               className="fixed inset-0 bg-black/0 z-40"
             />
 
@@ -5498,7 +5541,7 @@ export default function App() {
                 dragMomentum={false}
                 onDragEnd={(_, info) => {
                   if (!shouldCloseBottomSheetFromDrag(info.offset.y, info.velocity.y)) return;
-                  setIsTutorialOpen(false);
+                  closeTutorial();
                 }}
                 className="relative size-full"
               >
@@ -5506,7 +5549,7 @@ export default function App() {
                   className="absolute left-0 right-0 top-0 h-[24px] z-[2] touch-pan-y"
                   onPointerDown={(event) => tutorialSheetDragControls.start(event)}
                 />
-                <TutorialOverlay onClose={() => setIsTutorialOpen(false)} isEnabled={isOnboardingTutorialEnabled} filtersMenuVariant={filtersMenuVariant} />
+                <TutorialOverlay onClose={closeTutorial} isEnabled={isOnboardingTutorialEnabled} filtersMenuVariant={filtersMenuVariant} variant={tutorialVariant} />
               </motion.div>
             </motion.div>
           </>

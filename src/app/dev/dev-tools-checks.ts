@@ -387,55 +387,53 @@ export function getDevToolsChecks(): Check[] {
     },
 
     // ========================================================================
-    // 6. First-launch tutorial sentinel
+    // 6. First-launch tutorial sentinels
     // ========================================================================
 
     {
-      id: 'tutorial-sentinel-default-absent',
-      name: 'Tutorial sentinel: absent by default (no value persisted)',
+      id: 'tutorial-reminders-sentinel-default-absent',
+      name: 'Tutorial reminders sentinel: absent by default (no value persisted)',
       run: () => {
-        withIsolatedKey('reminderly-tutorial-first-launch-shown', () => {
-          localStorage.removeItem('reminderly-tutorial-first-launch-shown');
-          const stored = localStorage.getItem('reminderly-tutorial-first-launch-shown');
+        withIsolatedKey('reminderly-tutorial-reminders-shown', () => {
+          localStorage.removeItem('reminderly-tutorial-reminders-shown');
+          const stored = localStorage.getItem('reminderly-tutorial-reminders-shown');
           assert(stored === null, 'Expected no stored value');
         });
       },
     },
 
     {
-      id: 'tutorial-sentinel-written',
-      name: 'Tutorial sentinel: can be written to localStorage',
+      id: 'tutorial-reminders-sentinel-written',
+      name: 'Tutorial reminders sentinel: can be written to localStorage',
       run: () => {
-        withIsolatedKey('reminderly-tutorial-first-launch-shown', () => {
-          localStorage.setItem('reminderly-tutorial-first-launch-shown', 'true');
-          const stored = localStorage.getItem('reminderly-tutorial-first-launch-shown');
+        withIsolatedKey('reminderly-tutorial-reminders-shown', () => {
+          localStorage.setItem('reminderly-tutorial-reminders-shown', 'true');
+          const stored = localStorage.getItem('reminderly-tutorial-reminders-shown');
           assert(stored === 'true', `Expected 'true', got '${stored}'`);
         });
       },
     },
 
     {
-      id: 'tutorial-sentinel-check-absent',
-      name: 'Tutorial sentinel: check returns false when sentinel absent',
+      id: 'tutorial-lists-sentinel-default-absent',
+      name: 'Tutorial lists sentinel: absent by default (no value persisted)',
       run: () => {
-        withIsolatedKey('reminderly-tutorial-first-launch-shown', () => {
-          localStorage.removeItem('reminderly-tutorial-first-launch-shown');
-          const alreadyShown = localStorage.getItem('reminderly-tutorial-first-launch-shown');
-          const shouldShow = alreadyShown !== 'true';
-          assert(shouldShow === true, `Expected shouldShow true, got ${shouldShow}`);
+        withIsolatedKey('reminderly-tutorial-lists-shown', () => {
+          localStorage.removeItem('reminderly-tutorial-lists-shown');
+          const stored = localStorage.getItem('reminderly-tutorial-lists-shown');
+          assert(stored === null, 'Expected no stored value');
         });
       },
     },
 
     {
-      id: 'tutorial-sentinel-check-present',
-      name: 'Tutorial sentinel: check returns false when sentinel present',
+      id: 'tutorial-lists-sentinel-written',
+      name: 'Tutorial lists sentinel: can be written to localStorage',
       run: () => {
-        withIsolatedKey('reminderly-tutorial-first-launch-shown', () => {
-          localStorage.setItem('reminderly-tutorial-first-launch-shown', 'true');
-          const alreadyShown = localStorage.getItem('reminderly-tutorial-first-launch-shown');
-          const shouldShow = alreadyShown !== 'true';
-          assert(shouldShow === false, `Expected shouldShow false, got ${shouldShow}`);
+        withIsolatedKey('reminderly-tutorial-lists-shown', () => {
+          localStorage.setItem('reminderly-tutorial-lists-shown', 'true');
+          const stored = localStorage.getItem('reminderly-tutorial-lists-shown');
+          assert(stored === 'true', `Expected 'true', got '${stored}'`);
         });
       },
     },
