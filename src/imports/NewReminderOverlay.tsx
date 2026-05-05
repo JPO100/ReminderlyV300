@@ -835,6 +835,10 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
         if (date) {
           applyToggleStateSilently('date', true);
           setSelectedDate(date);
+          if (!isTimeOnRef.current) {
+            applyToggleStateSilently('time', true);
+            setSelectedTime({ hour: 12, minute: 0 });
+          }
         }
         break;
       }
@@ -875,6 +879,9 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
               applyToggleStateSilently('time', true);
               setSelectedTime(result.impliedTime);
             }
+          } else if (!isTimeOnRef.current) {
+            applyToggleStateSilently('time', true);
+            setSelectedTime({ hour: 12, minute: 0 });
           }
         }
         break;
@@ -998,12 +1005,16 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
         if (openDrawer === 'time') setOpenDrawer(null);
       }
     } else {
-      // Turning ON: set toggle, open drawer, reset to today
+      // Turning ON: date requires a companion time, so enable both.
       setIsDateOn(true);
       setOpenDrawer('date');
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       setSelectedDate(today);
+      if (!isTimeOn) {
+        setIsTimeOn(true);
+        setSelectedTime({ hour: 12, minute: 0 });
+      }
     }
   };
 
@@ -1089,14 +1100,17 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
   const handleSubmit = () => {
     const text = reminderText.trim();
     if (!text) return;
+    const requiresScheduledReminder = !isEditMode && !isSmartReminderMode;
+    if (requiresScheduledReminder && (!isDateOn || !selectedDate)) return;
+    if (requiresScheduledReminder && (!isTimeOn || !selectedTime)) return;
 
     // Build schedule
     let schedule: Reminder['schedule'];
-    if (isDateOn && selectedDate) {
+    if (isDateOn && selectedDate && isTimeOn && selectedTime) {
       schedule = {
         kind: 'scheduled',
         date: toYyyyMmDd(selectedDate),
-        ...(isTimeOn && selectedTime ? { time: toHhMm(selectedTime.hour, selectedTime.minute) } : {}),
+        time: toHhMm(selectedTime.hour, selectedTime.minute),
       };
     } else {
       schedule = { kind: 'sometime' };
@@ -1127,6 +1141,9 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     // If no date token was parsed from the text, skip injecting a date label into displayText.
     const hasDateToken = parsedTokens.some(t => t.category === 'date');
     const normaliseOptions = hasDateToken ? undefined : { skipDateInjection: true };
+    const displayText = schedule.kind === 'scheduled' && nlcEnabled
+      ? normaliseReminderText(text, schedule, repeatRule, now, normaliseOptions)
+      : text;
 
     if (isSmartReminderCreate && smartReminderCreateList && onCreateSmartReminder) {
       if (schedule.kind !== 'scheduled' || !schedule.time) return;
@@ -1140,9 +1157,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       const updated: Reminder = {
         ...editReminder,
         originalText: text,
-        displayText: schedule.kind === 'scheduled'
-          ? normaliseReminderText(text, schedule, repeatRule, now, normaliseOptions)
-          : text,
+        displayText,
         schedule,
         repeatRule,
       };
@@ -1152,9 +1167,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       const reminder: Reminder = {
         id: generateId(),
         originalText: text,
-        displayText: schedule.kind === 'scheduled'
-          ? normaliseReminderText(text, schedule, repeatRule, now, normaliseOptions)
-          : text,
+        displayText,
         createdAt: Date.now(),
         schedule,
         repeatRule,
@@ -1181,7 +1194,8 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     return DEFAULT_HEIGHT;
   };
 
-  const isSubmitActive = reminderText.trim().length > 0;
+  const requiresScheduledReminder = !isEditMode && !isSmartReminderMode;
+  const isSubmitActive = reminderText.trim().length > 0 && (!requiresScheduledReminder || (isDateOn && selectedDate !== null && isTimeOn && selectedTime !== null));
 
   return (
     <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col" data-name="new-reminder-elements">
