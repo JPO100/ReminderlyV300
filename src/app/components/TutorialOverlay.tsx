@@ -5,7 +5,7 @@ export default function TutorialOverlay({ onClose, isEnabled, filtersMenuVariant
   if (!isEnabled) return null;
 
   return (
-    <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[20px] rounded-tr-[20px] size-full" data-name="tutorial-overlay">
+    <div className="absolute inset-0 bg-white content-stretch flex flex-col items-center rounded-tl-[20px] rounded-tr-[20px] overflow-hidden" data-name="tutorial-overlay">
       <div className="flex flex-col h-full relative w-full max-w-[768px]" data-name="tutorial-content">
           <div className="flex flex-col gap-[40px] w-full flex-1 min-h-0">
             {/* Tutorial body - empty scroll container */}
