@@ -44,9 +44,8 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   return (
     <div
       data-testid="onboarding-root"
-      className="bg-white flex flex-col [@media(max-height:570px)]:!h-auto [@media(max-height:570px)]:!pb-0"
+      className="bg-white flex flex-col h-full [@media(max-height:570px)]:!h-full [@media(max-height:570px)]:!pb-0"
       style={{
-        height: '808px',
         borderTopLeftRadius: '30px',
         borderTopRightRadius: '30px',
         paddingLeft: 'clamp(16px, 5vw, 40px)',
