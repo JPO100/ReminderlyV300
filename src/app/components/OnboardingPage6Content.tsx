@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import type { FiltersMenuVariant } from "../reminder-utils";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialMainTabBar from "./TutorialMainTabBar";
+import TutorialPhoneShell from "./TutorialPhoneShell";
 import TutorialReminderFilters, { GROUPED_TUTORIAL_FILTER_ITEMS, UNGROUPED_TUTORIAL_FILTER_ITEMS } from "./TutorialReminderFilters";
 
 function TutorialReminderInfoMock() {
@@ -338,6 +339,32 @@ function ReminderColours({ filtersMenuVariant, isListsEnabled }: { filtersMenuVa
 
     runAnimation();
   }, []);
+
+  if (isListsEnabled) {
+    return (
+      <TutorialPhoneShell
+        activeMainTab="reminders"
+        filterRow={
+          <TutorialReminderFilters
+            items={filtersMenuVariant === "grouped" ? GROUPED_TUTORIAL_FILTER_ITEMS : UNGROUPED_TUTORIAL_FILTER_ITEMS}
+            showSettings={filtersMenuVariant === "grouped"}
+          />
+        }
+      >
+        <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
+          <ReminderList />
+          <NewReminderBtn />
+          {showOverlay && (
+            <div className="absolute inset-0 flex items-end" style={{ backgroundColor: 'rgba(0, 0, 0, 0.15)' }}>
+              <div className="w-full px-[14px] pb-[14px]" style={{ marginBottom: '-50px' }}>
+                <TutorialReminderInfoMock />
+              </div>
+            </div>
+          )}
+        </div>
+      </TutorialPhoneShell>
+    );
+  }
 
   return (
     <div className="h-[361px] relative shrink-0 w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]" data-name="Reminder colours">

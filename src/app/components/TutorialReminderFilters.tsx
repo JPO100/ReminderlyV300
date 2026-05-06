@@ -1,34 +1,56 @@
 import type { ReactNode } from "react";
 import SettingsBtnSml from "@/imports/SettingsBtnSml";
 
-export type TutorialReminderFilterKey = "today" | "thisWeek" | "later" | "sometime";
+export type TutorialFilterKey =
+  | "today"
+  | "thisWeek"
+  | "later"
+  | "sometime"
+  | "complete"
+  | "almost"
+  | "started"
+  | "todo"
+  | "grouped-todo";
 
-export interface TutorialReminderFilterItem {
-  key: TutorialReminderFilterKey;
+export interface TutorialFilterItem {
+  key: TutorialFilterKey;
   label: string;
   color: string;
   hideOnNarrow?: boolean;
 }
 
-export const GROUPED_TUTORIAL_FILTER_ITEMS: TutorialReminderFilterItem[] = [
+export const GROUPED_TUTORIAL_FILTER_ITEMS: TutorialFilterItem[] = [
   { key: "today", label: "Today", color: "#00AFEE" },
   { key: "thisWeek", label: "This week", color: "#E466FD" },
   { key: "later", label: "Other", color: "#FDB146", hideOnNarrow: true },
 ];
 
-export const UNGROUPED_TUTORIAL_FILTER_ITEMS: TutorialReminderFilterItem[] = [
+export const UNGROUPED_TUTORIAL_FILTER_ITEMS: TutorialFilterItem[] = [
   { key: "today", label: "Today", color: "#00AFEE" },
   { key: "thisWeek", label: "This week", color: "#E466FD" },
   { key: "later", label: "Later", color: "#FDB146" },
   { key: "sometime", label: "Sometime", color: "#939393", hideOnNarrow: true },
 ];
 
+export const GROUPED_TUTORIAL_LIST_FILTER_ITEMS: TutorialFilterItem[] = [
+  { key: "complete", label: "Complete", color: "#005BE3" },
+  { key: "almost", label: "Almost", color: "#9468D5" },
+  { key: "grouped-todo", label: "Todo", color: "#939393", hideOnNarrow: true },
+];
+
+export const UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS: TutorialFilterItem[] = [
+  { key: "complete", label: "Complete", color: "#005BE3" },
+  { key: "almost", label: "Almost", color: "#9468D5" },
+  { key: "started", label: "Started", color: "#00AFEE", hideOnNarrow: true },
+  { key: "todo", label: "Todo", color: "#939393" },
+];
+
 function TutorialReminderFilterPill({
   item,
   activeKey,
 }: {
-  item: TutorialReminderFilterItem;
-  activeKey?: TutorialReminderFilterKey;
+  item: TutorialFilterItem;
+  activeKey?: TutorialFilterKey;
 }) {
   const isActive = activeKey === item.key;
   const isDefault = activeKey == null;
@@ -36,7 +58,7 @@ function TutorialReminderFilterPill({
 
   return (
     <div
-      className={`content-stretch flex items-center justify-center px-[11.144px] py-[10.448px] relative rounded-[69.652px] shrink-0 h-[28px] ${item.hideOnNarrow ? "hidden min-[390px]:flex" : ""} ${isActive ? "bg-white" : "bg-transparent"}`}
+      className={`content-stretch flex items-center justify-center px-[11.144px] py-[10.448px] relative rounded-[69.652px] shrink-0 h-[28px] ${isActive ? "bg-white" : "bg-transparent"}`}
       style={{ boxShadow: `inset 0 0 0 ${isActive ? "2px" : "1px"} ${color}` }}
     >
       <div
@@ -54,17 +76,27 @@ export default function TutorialReminderFilters({
   activeKey,
   showSettings = false,
   trailing,
+  layout = "between",
+  rowGapClassName = "gap-[10px]",
+  groupGapClassName = "gap-[8px]",
 }: {
-  items: TutorialReminderFilterItem[];
-  activeKey?: TutorialReminderFilterKey;
+  items: TutorialFilterItem[];
+  activeKey?: TutorialFilterKey;
   showSettings?: boolean;
   trailing?: ReactNode;
+  layout?: "between" | "inline";
+  rowGapClassName?: string;
+  groupGapClassName?: string;
 }) {
+  const visibleItems = items.filter((item) => !item.hideOnNarrow);
+
   return (
     <div className="relative shrink-0 w-full px-[14px] pt-[14px] pb-[8px]">
-      <div className="flex items-center justify-between gap-[10px]">
-        <div className="flex items-center gap-[8px]">
-          {items.map((item) => (
+      <div
+        className={`flex items-center ${layout === "between" ? "justify-between" : ""} ${rowGapClassName}`}
+      >
+        <div className={`flex items-center ${groupGapClassName}`}>
+          {visibleItems.map((item) => (
             <TutorialReminderFilterPill key={item.key} item={item} activeKey={activeKey} />
           ))}
         </div>

@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "motion/react";
 import type { FiltersMenuVariant } from "../reminder-utils";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialMainTabBar from "./TutorialMainTabBar";
+import TutorialPhoneShell from "./TutorialPhoneShell";
 import TutorialReminderFilters, { GROUPED_TUTORIAL_FILTER_ITEMS, UNGROUPED_TUTORIAL_FILTER_ITEMS } from "./TutorialReminderFilters";
 
 function Frame3() {
@@ -301,6 +302,26 @@ function NusBlank({ activeFilter, filtersMenuVariant, isListsEnabled }: { active
 }
 
 function ReminderColours({ activeFilter, filtersMenuVariant, isListsEnabled }: { activeFilter?: 'today' | 'thisWeek' | 'later' | 'sometime'; filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean }) {
+  if (isListsEnabled) {
+    return (
+      <TutorialPhoneShell
+        activeMainTab="reminders"
+        filterRow={
+          <TutorialReminderFilters
+            items={filtersMenuVariant === "grouped" ? GROUPED_TUTORIAL_FILTER_ITEMS : UNGROUPED_TUTORIAL_FILTER_ITEMS}
+            activeKey={activeFilter}
+            showSettings={filtersMenuVariant === "grouped"}
+          />
+        }
+      >
+        <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
+          <ReminderList activeFilter={activeFilter} filtersMenuVariant={filtersMenuVariant} />
+          <NewReminderBtn />
+        </div>
+      </TutorialPhoneShell>
+    );
+  }
+
   return (
     <div className="h-[361px] relative shrink-0 w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]" data-name="Reminder colours">
       <div className="bg-[#1c2c42] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>

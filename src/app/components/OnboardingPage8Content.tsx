@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialMainTabBar from "./TutorialMainTabBar";
+import TutorialPhoneShell from "./TutorialPhoneShell";
 import TutorialReminderFilters, { GROUPED_TUTORIAL_FILTER_ITEMS } from "./TutorialReminderFilters";
 
 function Frame3() {
@@ -329,6 +330,30 @@ function NusBlank({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabl
 }
 
 function ReminderColours({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabled }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean; isListsEnabled: boolean }) {
+  if (isListsEnabled) {
+    return (
+      <TutorialPhoneShell
+        activeMainTab="reminders"
+        shellColor={showDone ? "#1C2C42" : "#4784f8"}
+        bezelColor={showDone ? "#000000" : "#1c2c42"}
+        filterRow={
+          showDone ? (
+            <div className="relative shrink-0 w-full px-[14px] pt-[14px] pb-[8px]">
+              <FiltersMenu showDone={showDone} backHighlighted={backHighlighted} />
+            </div>
+          ) : (
+            <TutorialReminderFilters items={GROUPED_TUTORIAL_FILTER_ITEMS} showSettings />
+          )
+        }
+      >
+        <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
+          <ReminderList showDone={showDone} />
+          <NewReminderBtn />
+        </div>
+      </TutorialPhoneShell>
+    );
+  }
+
   return (
     <div className="h-[361px] relative shrink-0 w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]" data-name="Reminder colours">
       <div className="bg-[#000000] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>

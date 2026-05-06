@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import svgPaths from '@/imports/svg-go2phgsyt4';
-import SettingsBtnSml from '@/imports/SettingsBtnSml';
 import OnboardingPage1Content from '@/app/components/OnboardingPage1Content';
 import OnboardingPage2Content from '@/app/components/OnboardingPage2Content';
 import OnboardingPage3Content from '@/app/components/OnboardingPage3Content';
@@ -10,6 +9,11 @@ import OnboardingPage6Content from '@/app/components/OnboardingPage6Content';
 import OnboardingPage7Content from '@/app/components/OnboardingPage7Content';
 import OnboardingPage8Content from '@/app/components/OnboardingPage8Content';
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
+import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
+import TutorialReminderFilters, {
+  GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
+  UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS,
+} from '@/app/components/TutorialReminderFilters';
 import type { FiltersMenuVariant } from '../reminder-utils';
 
 interface TutorialOnboardingContentProps {
@@ -21,114 +25,12 @@ interface TutorialOnboardingContentProps {
 
 const TOTAL_PAGES = 8;
 
-function ListsTutorialSensorBar() {
-  return (
-    <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#1c2c42] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#1c2c42] rounded-[10px] shrink-0 size-[7px]" />
-    </div>
-  );
-}
-
-function ListsTutorialHeaderLogo() {
-  return (
-    <div className="bg-[#4784f8] content-stretch flex flex-col items-center justify-center pb-[9.93px] pt-[16px] px-0 relative shrink-0">
-      <div className="content-stretch flex flex-col gap-[22px] items-center relative shrink-0">
-        <ListsTutorialSensorBar />
-        <div className="content-stretch flex items-center justify-between relative shrink-0 w-[146.027px]">
-          <div className="relative shrink-0 size-[24.833px]">
-            <div aria-hidden="true" className="absolute inset-0 rounded-full border-[2px] border-white" />
-            <div aria-hidden="true" className="absolute left-[7px] top-[11px] h-[2px] w-[10px] bg-white" />
-            <div aria-hidden="true" className="absolute left-[11px] top-[7px] h-[10px] w-[2px] bg-white" />
-          </div>
-          <div className="content-stretch flex flex-col items-start pb-[2.786px] pt-0 px-0 relative shrink-0">
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[23.682px] text-white">
-              <p className="leading-[normal]">reminderly</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ListsTutorialFilterPill({ label }: { label: string }) {
-  return (
-    <div className="bg-[rgba(255,255,255,0.15)] content-stretch flex items-center justify-center px-[11.144px] py-[10.448px] relative rounded-[69.652px] shrink-0 h-[28px]">
-      <div aria-hidden="true" className="absolute border-[0.697px] border-solid border-white inset-0 pointer-events-none rounded-[69.652px]" />
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[9.751px] text-white">
-        <p className="leading-[normal]">{label}</p>
-      </div>
-    </div>
-  );
-}
-
-function ListsTutorialFiltersMenu({ filtersMenuVariant }: { filtersMenuVariant: FiltersMenuVariant }) {
-  return (
-    <div className="bg-[#4784f8] relative shrink-0 w-full">
-      <div className="flex flex-row items-center size-full">
-        <div className="content-stretch flex items-center justify-between p-[13.93px] relative w-full">
-          <div className="flex items-center gap-[8px]">
-            <ListsTutorialFilterPill label="Today" />
-            <ListsTutorialFilterPill label="This week" />
-            {filtersMenuVariant === 'grouped' ? (
-              <ListsTutorialFilterPill label="Other" />
-            ) : (
-              <>
-                <ListsTutorialFilterPill label="Later" />
-                <ListsTutorialFilterPill label="Sometime" />
-              </>
-            )}
-          </div>
-          {filtersMenuVariant === 'grouped' && (
-            <div className="shrink-0" style={{ width: '35px', height: '28px' }}>
-              <SettingsBtnSml />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ListsTutorialNewReminderButton() {
-  return (
-    <div className="bg-[#4784f8] content-stretch flex gap-[11.167px] h-[41.876px] items-center justify-center px-[20.938px] py-[15.355px] relative rounded-[69.794px] shrink-0 w-[252.654px]">
-      <div className="relative shrink-0 size-[10.469px]">
-        <div aria-hidden="true" className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 rounded-full bg-white" />
-        <div aria-hidden="true" className="absolute left-0 top-1/2 h-[2px] w-full -translate-y-1/2 rounded-full bg-white" />
-      </div>
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[13.959px] text-white">
-        <p className="leading-[normal]">New reminder</p>
-      </div>
-    </div>
-  );
-}
-
-function ListsTutorialPhoneState({ filtersMenuVariant }: { filtersMenuVariant: FiltersMenuVariant }) {
-  return (
-    <div className="h-[361px] relative shrink-0 w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]">
-      <div className="bg-[#1c2c42] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
-        <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-[calc(100%+2px)] w-full">
-          <div className="absolute bg-[#4784f8] content-stretch flex flex-col h-[615px] items-center justify-between gap-[4px] left-0 rounded-tl-[30px] rounded-tr-[30px] top-0 w-full">
-            <ListsTutorialHeaderLogo />
-            <ListsTutorialFiltersMenu filtersMenuVariant={filtersMenuVariant} />
-            <div className="bg-white flex-[1_0_0] min-h-px min-w-px relative rounded-[13.96px] w-full -mt-[6px]">
-              <div className="flex flex-col items-center size-full">
-                <div className="content-stretch flex flex-col gap-[22.334px] items-center pb-[28.334px] pt-[24px] px-[14px] relative size-full">
-                  <div className="flex-1 w-full rounded-[10px] bg-white" />
-                  <ListsTutorialNewReminderButton />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ListsTutorialPlaceholderPage({ filtersMenuVariant }: { filtersMenuVariant: FiltersMenuVariant }) {
+  const listFilterItems =
+    filtersMenuVariant === 'grouped'
+      ? GROUPED_TUTORIAL_LIST_FILTER_ITEMS
+      : UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS;
+
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center justify-between min-h-0 pb-[45px]">
       <div className="flex w-full flex-col items-center gap-[16px]">
@@ -139,7 +41,19 @@ function ListsTutorialPlaceholderPage({ filtersMenuVariant }: { filtersMenuVaria
           <p className="block leading-[normal]">Setting subtitle</p>
         </div>
       </div>
-      <ListsTutorialPhoneState filtersMenuVariant={filtersMenuVariant} />
+      <TutorialPhoneShell
+        activeMainTab="lists"
+        filterRow={
+          <TutorialReminderFilters
+            items={listFilterItems}
+            showSettings={filtersMenuVariant === 'grouped'}
+            layout={filtersMenuVariant === 'grouped' ? 'inline' : 'between'}
+            rowGapClassName={filtersMenuVariant === 'grouped' ? 'gap-[12.923px]' : 'gap-[10px]'}
+            groupGapClassName="gap-[8.615px]"
+          />
+        }
+        blankBody
+      />
     </div>
   );
 }
