@@ -5537,7 +5537,7 @@ export default function App() {
                   className="absolute left-0 right-0 top-0 h-[24px] z-[2] touch-pan-y"
                   onPointerDown={(event) => tutorialSheetDragControls.start(event)}
                 />
-                <TutorialOverlay onClose={closeTutorial} isEnabled={isOnboardingTutorialEnabled} filtersMenuVariant={filtersMenuVariant} variant={tutorialVariant} />
+                <TutorialOverlay onClose={closeTutorial} isEnabled={isOnboardingTutorialEnabled} filtersMenuVariant={filtersMenuVariant} variant={tutorialVariant} isListsEnabled={isListsEnabled} />
               </motion.div>
             </motion.div>
           </>

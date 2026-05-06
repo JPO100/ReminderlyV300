@@ -7,6 +7,7 @@ import SettingsBtnSml from "@/imports/SettingsBtnSml";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
+import TutorialMainTabBar from "./TutorialMainTabBar";
 
 function Frame3() {
   return (
@@ -282,9 +283,9 @@ function NewReminderBtn() {
   );
 }
 
-function Frame1({ showDone }: { showDone?: boolean }) {
+function Frame1({ showDone, isListsEnabled }: { showDone?: boolean; isListsEnabled: boolean }) {
   return (
-    <div className="bg-white flex-[1_0_0] min-h-px min-w-px relative rounded-[13.96px] w-full -mt-[6px]">
+    <div className={`bg-white flex-[1_0_0] min-h-px min-w-px relative w-full ${isListsEnabled ? 'rounded-tl-[15px] rounded-tr-[15px]' : 'rounded-[13.96px] -mt-[6px]'}`}>
       <div className="flex flex-col items-center size-full">
         <div className="content-stretch flex flex-col gap-[22.334px] items-center pb-[28.334px] pt-[24px] px-[14px] relative size-full">
           <ReminderList showDone={showDone} />
@@ -295,38 +296,39 @@ function Frame1({ showDone }: { showDone?: boolean }) {
   );
 }
 
-function NusBlank({ showDone, tickDone, backHighlighted, tickFlash }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean }) {
+function NusBlank({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabled }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean; isListsEnabled: boolean }) {
   return (
     <div className={`absolute ${showDone ? 'bg-[#1C2C42]' : 'bg-[#4784f8]'} content-stretch flex flex-col h-[615px] items-center justify-between gap-[4px] left-0 rounded-tl-[20px] rounded-tr-[20px] top-0 w-full`} data-name="NUS - Blank">
       <HeaderLogo showDone={showDone} tickDone={tickDone} tickFlash={tickFlash} />
       <FiltersMenu showDone={showDone} backHighlighted={backHighlighted} />
-      <Frame1 showDone={showDone} />
+      {isListsEnabled && <TutorialMainTabBar />}
+      <Frame1 showDone={showDone} isListsEnabled={isListsEnabled} />
     </div>
   );
 }
 
-function ReminderColours({ showDone, tickDone, backHighlighted, tickFlash }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean }) {
+function ReminderColours({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabled }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean; isListsEnabled: boolean }) {
   return (
     <div className="h-[361px] relative shrink-0 w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]" data-name="Reminder colours">
       <div className="bg-[#000000] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-[calc(100%+2px)] w-full">
-          <NusBlank showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} />
+          <NusBlank showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} isListsEnabled={isListsEnabled} />
         </div>
       </div>
     </div>
   );
 }
 
-function Frame9({ showDone, tickDone, backHighlighted, tickFlash }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean }) {
+function Frame9({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabled }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean; isListsEnabled: boolean }) {
   return (
     <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
       <Frame8 />
-      <ReminderColours showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} />
+      <ReminderColours showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} isListsEnabled={isListsEnabled} />
     </div>
   );
 }
 
-export default function OnboardingPage8Content() {
+export default function OnboardingPage8Content({ isListsEnabled = false }: { isListsEnabled?: boolean }) {
   const [tickDone, setTickDone] = useState(false);
   const [showDone, setShowDone] = useState(false);
   const [backHighlighted, setBackHighlighted] = useState(false);
@@ -388,5 +390,5 @@ export default function OnboardingPage8Content() {
     };
   }, []);
 
-  return <Frame9 showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} />;
+  return <Frame9 showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} isListsEnabled={isListsEnabled} />;
 }

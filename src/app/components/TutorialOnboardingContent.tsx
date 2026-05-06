@@ -16,6 +16,7 @@ interface TutorialOnboardingContentProps {
   onComplete: () => void;
   filtersMenuVariant: FiltersMenuVariant;
   variant: 'reminders' | 'lists';
+  isListsEnabled: boolean;
 }
 
 const TOTAL_PAGES = 8;
@@ -143,7 +144,7 @@ function ListsTutorialPlaceholderPage({ filtersMenuVariant }: { filtersMenuVaria
   );
 }
 
-export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant, variant }: TutorialOnboardingContentProps) {
+export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant, variant, isListsEnabled }: TutorialOnboardingContentProps) {
   const [currentPage, setCurrentPage] = useState(0);
 
   const handleNext = () => {
@@ -183,35 +184,35 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
     >
       <div className="flex-1 [@media(max-height:570px)]:flex-none relative overflow-hidden">
         {!isListsTutorial && currentPage === 0 && (
-          <OnboardingPage1Content filtersMenuVariant={filtersMenuVariant} />
+          <OnboardingPage1Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
         )}
         
         {!isListsTutorial && currentPage === 1 && (
-          <OnboardingPage2Content filtersMenuVariant={filtersMenuVariant} />
+          <OnboardingPage2Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
         )}
         
         {!isListsTutorial && currentPage === 2 && (
-          <OnboardingPage3Content filtersMenuVariant={filtersMenuVariant} />
+          <OnboardingPage3Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
         )}
         
         {!isListsTutorial && currentPage === 3 && (
-          <OnboardingPage4Content filtersMenuVariant={filtersMenuVariant} />
+          <OnboardingPage4Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
         )}
         
         {!isListsTutorial && currentPage === 4 && (
-          <OnboardingPage5Content filtersMenuVariant={filtersMenuVariant} />
+          <OnboardingPage5Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
         )}
         
         {!isListsTutorial && currentPage === 5 && (
-          <OnboardingPage6Content filtersMenuVariant={filtersMenuVariant} />
+          <OnboardingPage6Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
         )}
         
         {!isListsTutorial && currentPage === 6 && (
-          <OnboardingPage7Content filtersMenuVariant={filtersMenuVariant} />
+          <OnboardingPage7Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
         )}
         
         {!isListsTutorial && currentPage === 7 && (
-          <OnboardingPage8Content />
+          <OnboardingPage8Content isListsEnabled={isListsEnabled} />
         )}
 
         {isListsTutorial && <ListsTutorialPlaceholderPage filtersMenuVariant={filtersMenuVariant} />}
