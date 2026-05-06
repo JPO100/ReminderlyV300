@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialMainTabBar from "./TutorialMainTabBar";
 import TutorialPhoneShell from "./TutorialPhoneShell";
-import TutorialReminderFilters, { GROUPED_TUTORIAL_FILTER_ITEMS } from "./TutorialReminderFilters";
+import TutorialReminderFilters, { UNGROUPED_TUTORIAL_FILTER_ITEMS } from "./TutorialReminderFilters";
 
 function Frame3() {
   return (
@@ -343,7 +343,7 @@ function ReminderColours({ showDone, tickDone, backHighlighted, tickFlash, isLis
               <FiltersMenu showDone={showDone} backHighlighted={backHighlighted} />
             </div>
           ) : (
-            <TutorialReminderFilters items={GROUPED_TUTORIAL_FILTER_ITEMS} showSettings />
+            <TutorialReminderFilters items={UNGROUPED_TUTORIAL_FILTER_ITEMS} showHiddenItems />
           )
         }
       >

@@ -265,10 +265,9 @@ function Frame1({ activeFilter, filtersMenuVariant, isListsEnabled }: { activeFi
       <div className="bg-white flex-[1_0_0] min-h-px min-w-px relative w-full rounded-tl-[14px] rounded-tr-[14px]">
         <div className="flex flex-col items-center size-full">
           <TutorialReminderFilters
-            items={filtersMenuVariant === "grouped" ? GROUPED_TUTORIAL_FILTER_ITEMS : UNGROUPED_TUTORIAL_FILTER_ITEMS}
+            items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
             activeKey={activeFilter}
-            showSettings={filtersMenuVariant === "grouped"}
-            showHiddenItems={filtersMenuVariant !== "grouped"}
+            showHiddenItems
           />
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
             <ReminderList activeFilter={activeFilter} filtersMenuVariant={filtersMenuVariant} />

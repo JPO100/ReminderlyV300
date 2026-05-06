@@ -1,6 +1,6 @@
 import svgPaths from "@/imports/svg-tzdfx9foxi";
 
-const TUTORIAL_HEADER_SCALE = 280 / 350;
+const TUTORIAL_HEADER_SCALE = (280 - (14.359 * 2)) / 350;
 const LOGO_WIDTH = 209.653 * TUTORIAL_HEADER_SCALE;
 const LOGO_HEIGHT = 35.653 * TUTORIAL_HEADER_SCALE;
 const LOGO_TOP_OFFSET = 7 * TUTORIAL_HEADER_SCALE;
