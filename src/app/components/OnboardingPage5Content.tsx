@@ -4,6 +4,7 @@ import SettingsBtnSml from "@/imports/SettingsBtnSml";
 import type { FiltersMenuVariant } from "../reminder-utils";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialMainTabBar from "./TutorialMainTabBar";
+import TutorialReminderFilters, { GROUPED_TUTORIAL_FILTER_ITEMS, UNGROUPED_TUTORIAL_FILTER_ITEMS } from "./TutorialReminderFilters";
 
 function Frame3() {
   return (
@@ -197,9 +198,26 @@ function NewReminderBtn() {
   );
 }
 
-function Frame1({ isListsEnabled }: { isListsEnabled: boolean }) {
+function Frame1({ filtersMenuVariant, isListsEnabled }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean }) {
+  if (isListsEnabled) {
+    return (
+      <div className="bg-white flex-[1_0_0] min-h-px min-w-px relative w-full rounded-tl-[14px] rounded-tr-[14px]">
+        <div className="flex flex-col items-center size-full">
+          <TutorialReminderFilters
+            items={filtersMenuVariant === "grouped" ? GROUPED_TUTORIAL_FILTER_ITEMS : UNGROUPED_TUTORIAL_FILTER_ITEMS}
+            showSettings={filtersMenuVariant === "grouped"}
+          />
+          <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
+            <ReminderList />
+            <NewReminderBtn />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`bg-white flex-[1_0_0] min-h-px min-w-px relative w-full ${isListsEnabled ? 'rounded-tl-[15px] rounded-tr-[15px]' : 'rounded-[13.96px] -mt-[6px]'}`}>
+    <div className="bg-white flex-[1_0_0] min-h-px min-w-px relative w-full rounded-[13.96px] -mt-[6px]">
       <div className="flex flex-col items-center size-full">
         <div className="content-stretch flex flex-col gap-[22.334px] items-center pb-[28.334px] pt-[24px] px-[14px] relative size-full">
           <ReminderList />
@@ -212,11 +230,11 @@ function Frame1({ isListsEnabled }: { isListsEnabled: boolean }) {
 
 function NusBlank({ filtersMenuVariant, isListsEnabled }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean }) {
   return (
-    <div className="absolute bg-[#4784f8] content-stretch flex flex-col h-[615px] items-center justify-between gap-[4px] left-0 rounded-tl-[30px] rounded-tr-[30px] top-0 w-full" data-name="NUS - Blank">
+    <div className={`absolute bg-[#4784f8] content-stretch flex flex-col h-[615px] items-center left-0 rounded-tl-[30px] rounded-tr-[30px] top-0 w-full ${isListsEnabled ? "justify-start gap-0" : "justify-between gap-[4px]"}`} data-name="NUS - Blank">
       <HeaderLogo />
-      <FiltersMenu filtersMenuVariant={filtersMenuVariant} />
+      {!isListsEnabled && <FiltersMenu filtersMenuVariant={filtersMenuVariant} />}
       {isListsEnabled && <TutorialMainTabBar />}
-      <Frame1 isListsEnabled={isListsEnabled} />
+      <Frame1 filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
     </div>
   );
 }
