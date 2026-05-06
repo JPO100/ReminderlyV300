@@ -1,5 +1,14 @@
 import svgPaths from "@/imports/svg-tzdfx9foxi";
 
+const TUTORIAL_HEADER_SCALE = 280 / 350;
+const LOGO_WIDTH = 209.653 * TUTORIAL_HEADER_SCALE;
+const LOGO_HEIGHT = 35.653 * TUTORIAL_HEADER_SCALE;
+const LOGO_TOP_OFFSET = 7 * TUTORIAL_HEADER_SCALE;
+const MENU_ICON_WIDTH = 22 * TUTORIAL_HEADER_SCALE;
+const MENU_ICON_HEIGHT = 20 * TUTORIAL_HEADER_SCALE;
+const MENU_WRAPPER_WIDTH = 17 * TUTORIAL_HEADER_SCALE;
+const MENU_WRAPPER_HEIGHT = 35.653 * TUTORIAL_HEADER_SCALE;
+
 function TutorialSensorBar() {
   return (
     <div className="content-stretch flex gap-[2.872px] items-center relative shrink-0">
@@ -12,7 +21,8 @@ function TutorialSensorBar() {
 function TutorialHeaderMenuIcon() {
   return (
     <svg
-      className="block h-[14.359px] w-[15.795px] shrink-0"
+      className="block shrink-0"
+      style={{ width: `${MENU_ICON_WIDTH}px`, height: `${MENU_ICON_HEIGHT}px` }}
       viewBox="0 0 22 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +41,10 @@ function TutorialHeaderMenuIcon() {
 
 function TutorialWordmark() {
   return (
-    <div className="relative shrink-0 h-[25.579px] w-[150.505px]">
+    <div
+      className="relative shrink-0"
+      style={{ width: `${LOGO_WIDTH}px`, height: `${LOGO_HEIGHT}px`, top: `${LOGO_TOP_OFFSET}px` }}
+    >
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
         <g>
           <g>
@@ -75,7 +88,10 @@ export default function TutorialPhoneHeader({
       <div className="relative flex items-center justify-center w-full mt-[10px] mb-[10px]">
         <TutorialWordmark />
         {showMenuIcon && (
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-[12.205px] h-[25.579px]">
+          <div
+            className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center"
+            style={{ width: `${MENU_WRAPPER_WIDTH}px`, height: `${MENU_WRAPPER_HEIGHT}px` }}
+          >
             <TutorialHeaderMenuIcon />
           </div>
         )}

@@ -200,6 +200,7 @@ function Frame1({ animationKey, filtersMenuVariant, isListsEnabled }: { animatio
           <TutorialReminderFilters
             items={filtersMenuVariant === "grouped" ? GROUPED_TUTORIAL_FILTER_ITEMS : UNGROUPED_TUTORIAL_FILTER_ITEMS}
             showSettings={filtersMenuVariant === "grouped"}
+            showHiddenItems={filtersMenuVariant !== "grouped"}
           />
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
             <ImportedReminderList key={animationKey} />

@@ -85,6 +85,7 @@ export default function TutorialReminderFilters({
   layout = "between",
   rowGapClassName = "gap-[10px]",
   groupGapClassName = "gap-[8px]",
+  showHiddenItems = false,
 }: {
   items: TutorialFilterItem[];
   activeKey?: TutorialFilterKey;
@@ -93,8 +94,9 @@ export default function TutorialReminderFilters({
   layout?: "between" | "inline";
   rowGapClassName?: string;
   groupGapClassName?: string;
+  showHiddenItems?: boolean;
 }) {
-  const visibleItems = items.filter((item) => !item.hideOnNarrow);
+  const visibleItems = items.filter((item) => showHiddenItems || !item.hideOnNarrow);
 
   return (
     <div className="relative shrink-0 w-full px-[14px] pt-[14px] pb-[8px]">
