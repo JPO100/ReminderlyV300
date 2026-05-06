@@ -1,3 +1,5 @@
+import svgPaths from "@/imports/svg-tzdfx9foxi";
+
 function TutorialSensorBar() {
   return (
     <div className="content-stretch flex gap-[2.872px] items-center relative shrink-0">
@@ -19,6 +21,7 @@ function TutorialHeaderMenuIcon() {
       <path
         d="M1.5 1.5H20.5M1.5 10H20.5M1.5 18.5H20.5"
         stroke="white"
+        strokeOpacity="0.5"
         strokeWidth="3"
         strokeLinecap="round"
       />
@@ -28,15 +31,26 @@ function TutorialHeaderMenuIcon() {
 
 function TutorialWordmark() {
   return (
-    <div className="flex items-center justify-center gap-[7.179px]">
-      <div className="relative shrink-0 size-[17.949px]">
-        <div aria-hidden="true" className="absolute inset-0 rounded-full border-[1.436px] border-white" />
-        <div aria-hidden="true" className="absolute left-[5.026px] top-[7.897px] h-[1.436px] w-[7.179px] bg-white" />
-        <div aria-hidden="true" className="absolute left-[7.897px] top-[5.026px] h-[7.179px] w-[1.436px] bg-white" />
-      </div>
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white">
-        <p className="leading-[normal]">reminderly</p>
-      </div>
+    <div className="relative shrink-0 h-[25.579px] w-[150.505px]">
+      <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
+        <g>
+          <g>
+            <path d={svgPaths.p2e09d80} fill="white" />
+            <path d={svgPaths.p3b133a00} fill="white" />
+            <path d={svgPaths.p11840600} fill="white" />
+            <path d={svgPaths.p170f9700} fill="white" />
+            <path d={svgPaths.pf876500} fill="white" />
+            <path d={svgPaths.pc9c4a00} fill="white" />
+            <path d={svgPaths.p6114100} fill="white" />
+            <path d={svgPaths.pb9f8400} fill="white" />
+            <path d={svgPaths.pe461c40} fill="white" />
+            <path d={svgPaths.p38e87300} fill="white" />
+            <path d={svgPaths.p26dc1e00} fill="white" />
+            <path d={svgPaths.p82ca600} fill="white" />
+          </g>
+          <path d={svgPaths.p3babd700} fill="white" />
+        </g>
+      </svg>
     </div>
   );
 }
@@ -44,23 +58,27 @@ function TutorialWordmark() {
 export default function TutorialPhoneHeader({
   activeMainTab,
   backgroundColor,
+  showMenuIcon = true,
 }: {
   activeMainTab: "reminders" | "lists";
   backgroundColor?: string;
+  showMenuIcon?: boolean;
 }) {
   const resolvedBackgroundColor = backgroundColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
 
   return (
     <div
-      className="content-stretch flex flex-col items-center relative shrink-0 w-full px-[14.359px] pt-[11px] pb-[14.359px]"
+      className="content-stretch flex flex-col items-center relative shrink-0 w-full px-[14.359px] pt-[11px]"
       style={{ backgroundColor: resolvedBackgroundColor }}
     >
       <TutorialSensorBar />
-      <div className="relative flex items-center justify-center w-full mt-[12.205px]">
+      <div className="relative flex items-center justify-center w-full mt-[10px] mb-[10px]">
         <TutorialWordmark />
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-[12.205px] h-[25.579px]">
-          <TutorialHeaderMenuIcon />
-        </div>
+        {showMenuIcon && (
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center w-[12.205px] h-[25.579px]">
+            <TutorialHeaderMenuIcon />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -329,11 +329,12 @@ function NusBlank({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabl
   );
 }
 
-function ReminderColours({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabled }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean; isListsEnabled: boolean }) {
+function ReminderColours({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabled, settingsMenuEnabled }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean; isListsEnabled: boolean; settingsMenuEnabled: boolean }) {
   if (isListsEnabled) {
     return (
       <TutorialPhoneShell
         activeMainTab="reminders"
+        showHeaderMenu={settingsMenuEnabled}
         shellColor={showDone ? "#1C2C42" : "#4784f8"}
         bezelColor={showDone ? "#000000" : "#1c2c42"}
         filterRow={
@@ -365,16 +366,16 @@ function ReminderColours({ showDone, tickDone, backHighlighted, tickFlash, isLis
   );
 }
 
-function Frame9({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabled }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean; isListsEnabled: boolean }) {
+function Frame9({ showDone, tickDone, backHighlighted, tickFlash, isListsEnabled, settingsMenuEnabled }: { showDone?: boolean; tickDone?: boolean; backHighlighted?: boolean; tickFlash?: boolean; isListsEnabled: boolean; settingsMenuEnabled: boolean }) {
   return (
     <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
       <Frame8 />
-      <ReminderColours showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} isListsEnabled={isListsEnabled} />
+      <ReminderColours showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} isListsEnabled={isListsEnabled} settingsMenuEnabled={settingsMenuEnabled} />
     </div>
   );
 }
 
-export default function OnboardingPage8Content({ isListsEnabled = false }: { isListsEnabled?: boolean }) {
+export default function OnboardingPage8Content({ isListsEnabled = false, settingsMenuEnabled = true }: { isListsEnabled?: boolean; settingsMenuEnabled?: boolean }) {
   const [tickDone, setTickDone] = useState(false);
   const [showDone, setShowDone] = useState(false);
   const [backHighlighted, setBackHighlighted] = useState(false);
@@ -436,5 +437,5 @@ export default function OnboardingPage8Content({ isListsEnabled = false }: { isL
     };
   }, []);
 
-  return <Frame9 showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} isListsEnabled={isListsEnabled} />;
+  return <Frame9 showDone={showDone} tickDone={tickDone} backHighlighted={backHighlighted} tickFlash={tickFlash} isListsEnabled={isListsEnabled} settingsMenuEnabled={settingsMenuEnabled} />;
 }

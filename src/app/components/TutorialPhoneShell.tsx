@@ -9,6 +9,7 @@ export default function TutorialPhoneShell({
   blankBody = false,
   shellColor,
   bezelColor = "#1c2c42",
+  showHeaderMenu = true,
 }: {
   activeMainTab: "reminders" | "lists";
   filterRow: ReactNode;
@@ -16,6 +17,7 @@ export default function TutorialPhoneShell({
   blankBody?: boolean;
   shellColor?: string;
   bezelColor?: string;
+  showHeaderMenu?: boolean;
 }) {
   const resolvedShellColor = shellColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
 
@@ -33,7 +35,7 @@ export default function TutorialPhoneShell({
             className="absolute content-stretch flex flex-col h-[615px] items-center justify-start gap-0 left-0 rounded-tl-[30px] rounded-tr-[30px] top-0 w-full"
             style={{ backgroundColor: resolvedShellColor }}
           >
-            <TutorialPhoneHeader activeMainTab={activeMainTab} backgroundColor={resolvedShellColor} />
+            <TutorialPhoneHeader activeMainTab={activeMainTab} backgroundColor={resolvedShellColor} showMenuIcon={showHeaderMenu} />
             <TutorialMainTabBar activeMainTab={activeMainTab} />
             <div className="bg-white flex-[1_0_0] min-h-px min-w-px relative w-full rounded-tl-[10.769px] rounded-tr-[10.769px]">
               <div className="flex flex-col items-center size-full">

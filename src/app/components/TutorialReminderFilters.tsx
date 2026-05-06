@@ -45,6 +45,12 @@ export const UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS: TutorialFilterItem[] = [
   { key: "todo", label: "Todo", color: "#939393" },
 ];
 
+export const SAVED_LISTS_TUTORIAL_FILTER_ITEMS: TutorialFilterItem[] = [
+  { key: "todo", label: "Todo", color: "#939393" },
+  { key: "started", label: "Started", color: "#9468D5" },
+  { key: "complete", label: "Done", color: "#005BE3" },
+];
+
 function TutorialReminderFilterPill({
   item,
   activeKey,

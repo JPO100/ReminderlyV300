@@ -316,7 +316,7 @@ function NusBlank({ filtersMenuVariant, isListsEnabled }: { filtersMenuVariant: 
   );
 }
 
-function ReminderColours({ filtersMenuVariant, isListsEnabled }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean }) {
+function ReminderColours({ filtersMenuVariant, isListsEnabled, settingsMenuEnabled }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean; settingsMenuEnabled: boolean }) {
   const [showOverlay, setShowOverlay] = useState(false);
 
   useEffect(() => {
@@ -344,6 +344,7 @@ function ReminderColours({ filtersMenuVariant, isListsEnabled }: { filtersMenuVa
     return (
       <TutorialPhoneShell
         activeMainTab="reminders"
+        showHeaderMenu={settingsMenuEnabled}
         filterRow={
           <TutorialReminderFilters
             items={filtersMenuVariant === "grouped" ? GROUPED_TUTORIAL_FILTER_ITEMS : UNGROUPED_TUTORIAL_FILTER_ITEMS}
@@ -384,15 +385,15 @@ function ReminderColours({ filtersMenuVariant, isListsEnabled }: { filtersMenuVa
   );
 }
 
-function Frame9({ filtersMenuVariant, isListsEnabled }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean }) {
+function Frame9({ filtersMenuVariant, isListsEnabled, settingsMenuEnabled }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean; settingsMenuEnabled: boolean }) {
   return (
     <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
       <Frame8 />
-      <ReminderColours filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
+      <ReminderColours filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} settingsMenuEnabled={settingsMenuEnabled} />
     </div>
   );
 }
 
-export default function OnboardingPage6Content({ filtersMenuVariant, isListsEnabled = false }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled?: boolean }) {
-  return <Frame9 filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />;
+export default function OnboardingPage6Content({ filtersMenuVariant, isListsEnabled = false, settingsMenuEnabled = true }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled?: boolean; settingsMenuEnabled?: boolean }) {
+  return <Frame9 filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} settingsMenuEnabled={settingsMenuEnabled} />;
 }

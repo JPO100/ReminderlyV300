@@ -301,11 +301,12 @@ function NusBlank({ activeFilter, filtersMenuVariant, isListsEnabled }: { active
   );
 }
 
-function ReminderColours({ activeFilter, filtersMenuVariant, isListsEnabled }: { activeFilter?: 'today' | 'thisWeek' | 'later' | 'sometime'; filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean }) {
+function ReminderColours({ activeFilter, filtersMenuVariant, isListsEnabled, settingsMenuEnabled }: { activeFilter?: 'today' | 'thisWeek' | 'later' | 'sometime'; filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean; settingsMenuEnabled: boolean }) {
   if (isListsEnabled) {
     return (
       <TutorialPhoneShell
         activeMainTab="reminders"
+        showHeaderMenu={settingsMenuEnabled}
         filterRow={
           <TutorialReminderFilters
             items={filtersMenuVariant === "grouped" ? GROUPED_TUTORIAL_FILTER_ITEMS : UNGROUPED_TUTORIAL_FILTER_ITEMS}
@@ -333,7 +334,7 @@ function ReminderColours({ activeFilter, filtersMenuVariant, isListsEnabled }: {
   );
 }
 
-function Frame9({ filtersMenuVariant, isListsEnabled }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean }) {
+function Frame9({ filtersMenuVariant, isListsEnabled, settingsMenuEnabled }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled: boolean; settingsMenuEnabled: boolean }) {
   const [activeFilter, setActiveFilter] = useState<'today' | 'thisWeek' | 'later' | 'sometime' | undefined>(undefined);
 
   useEffect(() => {
@@ -378,11 +379,11 @@ function Frame9({ filtersMenuVariant, isListsEnabled }: { filtersMenuVariant: Fi
   return (
     <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
       <Frame8 />
-      <ReminderColours activeFilter={activeFilter} filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />
+      <ReminderColours activeFilter={activeFilter} filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} settingsMenuEnabled={settingsMenuEnabled} />
     </div>
   );
 }
 
-export default function OnboardingPage7Content({ filtersMenuVariant, isListsEnabled = false }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled?: boolean }) {
-  return <Frame9 filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} />;
+export default function OnboardingPage7Content({ filtersMenuVariant, isListsEnabled = false, settingsMenuEnabled = true }: { filtersMenuVariant: FiltersMenuVariant; isListsEnabled?: boolean; settingsMenuEnabled?: boolean }) {
+  return <Frame9 filtersMenuVariant={filtersMenuVariant} isListsEnabled={isListsEnabled} settingsMenuEnabled={settingsMenuEnabled} />;
 }
