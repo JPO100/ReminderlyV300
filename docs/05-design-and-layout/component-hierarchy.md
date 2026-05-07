@@ -1,55 +1,68 @@
 # Component Hierarchy
 
-Content from `/docs/component-hierarchy.md`.
+## Root
 
-## Visual Component Breakdown
+- `src/app/App.tsx`
 
-Comprehensive component hierarchy diagram showing all visual components, their relationships, and file locations.
+## Main Surface Groups
 
-See original `/docs/component-hierarchy.md` for full visual breakdown.
+### Reminder surfaces
 
-## Key Component Groups
+- reminder header and filters
+- active reminder list
+- done/deleted reminder archive
+- new reminder button
 
-### Core App
-- App.tsx (root component)
-- Header (inline)
-- Active list view
-- Done/deleted view
-- New reminder button
+### List surfaces
 
-### Overlays
-- NewReminderOverlay
-- ReminderInfoOverlay
-- RepeatsOverlay
-- SettingsOverlay
-- TutorialOverlay
-- DevToolsOverlay
+- reminder/list main-tab switch
+- active lists surface
+- list done/deleted surface
+- saved templates panel
 
-### Onboarding
-- TutorialOnboardingContent (controller)
-- OnboardingPage[1-8]Content (individual pages)
+## Overlay / Modal Surfaces
 
-### Imported Components
-- DevTools (home page)
-- DummyReminders
-- TimePicker
-- LaterBtn / LaterBtn-146-39
+- `NewReminderOverlay`
+- `ReminderInfoOverlay`
+- `RepeatsOverlay`
+- `SettingsOverlay`
+- `TutorialOverlay`
+- `DevToolsOverlay`
+- list info overlay
+- deleted info overlay
 
-### Protected
-- /ui folder (intentionally unused, platform-managed)
+### Tutorial hierarchy
 
-## Component Locations
+- `App.tsx`
+- `TutorialOverlay.tsx`
+- `TutorialOnboardingContent.tsx`
+- `TutorialPhoneShell.tsx`
+- `TutorialPhoneHeader.tsx`
+- `TutorialMainTabBar.tsx`
+- `TutorialReminderFilters.tsx`
+- `OnboardingPage1Content.tsx` through `OnboardingPage8Content.tsx` as content-only page bodies
 
-See [Architecture](../../00-overview/architecture.md) for complete file structure.
+## List-Specific Building Blocks
+
+- `AddListItemInput`
+- `EditableListItem`
+- list header/imported list shell components
+
+## Developer/Test Surfaces
+
+- DevTools home
+- Dummy reminders
+- Dummy lists
+- self-check runner UI
+
+## Notes
+
+- not all overlays share the same presentation pattern
+- the app now contains both reminder and list product trees inside the same root component
+- the reminders tutorial uses one shared shell/header/tabs/filter path; page components do not own full phone UI structure
 
 ## Related Documentation
 
-- [Architecture](../../00-overview/architecture.md) - System architecture and file structure
-- [Active List](../../01-core-surfaces/active-list.md) - Main list component
-- [All overlay documentation](../../01-core-surfaces/) - Individual overlay details
-
-### Lists
-
-* ListsTab
-* ListRow
-* ListsOverlay
+- [Architecture](../../00-overview/architecture.md)
+- [Lists Overview](../../07-lists/lists-overview.md)
+- [Active reminder list](../../01-core-surfaces/active-list.md)

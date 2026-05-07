@@ -35,6 +35,17 @@ Reminderly uses a systematic spacing scale based on multiples of 4px and specifi
 - **Border-radius**: 100px (pill shape)
 - **Gap**: `justify-between` (auto-calculated)
 
+### Tutorial Phone
+
+- **Owner**: `TutorialPhoneShell.tsx`
+- **Phone max-width**: 308px
+- **Phone height**: 361px
+- **Bezel padding**: 14px top/left/right
+- **Shell / bezel colours**: controlled centrally by `TutorialPhoneShell.tsx`
+- **Header sizing and logo/menu placement**: controlled centrally by `TutorialPhoneHeader.tsx`
+- **Filter row spacing and pill layout**: controlled centrally by `TutorialReminderFilters.tsx`
+- **Page files do not own tutorial phone shell sizing or frame spacing**
+
 ### Overlays
 
 - **Top padding**: 26px

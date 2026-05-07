@@ -1,65 +1,61 @@
 # Responsive Layout
 
-Content from `/docs/responsive-design.md`.
+## Overview
 
-## Design Philosophy
+Reminderly uses a mobile-first layout with constrained centered content on larger screens. The current app is still largely web-layout driven, but the shipped iOS wrapper is portrait-only.
 
-Reminderly follows a **mobile-first approach**, designed initially for iPhone 16 Pro (402px × 874px) but scales seamlessly to all device sizes.
+## Width Behaviour
 
-## Breakpoints
+### Narrow widths
 
-| Breakpoint | Width | Behavior |
-|------------|-------|----------|
-| Mobile Small | < 390px | "Sometime" filter button hidden; done/deleted back arrow hidden |
-| Mobile | 390px - 767px | All filters visible, single column layout |
-| Tablet | 768px - 1023px | Content max-width enforced (768px) |
-| Desktop | 1024px+ | Content max-width enforced (768px), centered |
+- below `390px`, some controls hide or compress
+- the reminder `Sometime` filter can be hidden on narrow reminder layouts
+- some archive controls also reduce
 
-## iPhone SE Threshold (667px Height)
+### Max width
 
-At 667px viewport height or below, specific responsive behaviours activate:
+The main app content commonly caps at:
 
-### Settings Overlay
-- Left icons hidden on setting rows
-- Row alignment changes to center
-- Subtitle text hidden
-- Feature row bullets hidden
+- `max-w-[768px]`
 
-### Tutorial Overlay
-- Container height becomes auto
-- Padding bottom removed
-- Content area becomes flex-none
-- Page indicator dots hidden
-- Navigation controls get special padding
+This is used across major reminder, list, and overlay surfaces to avoid overly wide layouts.
 
-See [Content Overlay Responsive](./content-overlay-responsive.md) for full pattern.
+## Height-Based Adjustments
 
-## Max-Width Strategy
+The most consistent current height breakpoint is around `667px`.
 
-The app uses a **768px max-width** for main content to ensure:
-1. Optimal reading width on large screens
-2. Consistent layout across device sizes
-3. Content doesn't stretch uncomfortably wide
-4. Maintains mobile app aesthetic even on desktop
+At shorter heights, the app currently reduces or removes:
 
-### Where Max-Width is Applied
-- Header blue container: `max-w-[768px]`
-- Scrollable list area: `max-w-[768px]`
-- New reminder button: `max-w-[768px]`
+- settings row icons
+- settings/tutorial helper text
+- premium bullet content
+- some tutorial layout spacing
 
-All max-width elements are centered with `mx-auto` when space allows.
+Tutorial-specific responsive behaviour is now centred in the shared tutorial path:
 
-## Touch Targets
+- `TutorialOnboardingContent.tsx` owns tutorial container spacing and pagination visibility changes
+- `TutorialPhoneShell.tsx` owns tutorial phone scaling at short heights
+- page files only adjust body-content spacing where needed; they do not own responsive phone shell structure
 
-All interactive elements meet minimum touch target sizes:
-- **Filter buttons**: 40px height (meets minimum)
-- **Checkbox buttons**: 25px × 25px (acceptable for careful tap)
-- **New reminder button**: 60px height (generous)
+## Overlay Behaviour
+
+Most major surfaces are rendered as bottom sheets by `App.tsx`, with:
+
+- transparent backdrop
+- slide-up motion
+- viewport-aware top positioning
+- drag-to-close support
+
+Current exceptions exist:
+
+- `ReminderInfoOverlay` is a centered modal with a dark backdrop
+- `RepeatsOverlay` uses a different full-height overlay structure from the reminder/settings/tutorial bottom sheets
+
+## iOS Constraint
+
+The current iOS wrapper is portrait-only. That constraint is configured in the native iOS project and overrides any broader landscape assumptions the web layout might otherwise suggest.
 
 ## Related Documentation
 
-- [Content Overlay Responsive](./content-overlay-responsive.md) - Overlay responsive pattern
-- [Component Hierarchy](./component-hierarchy.md) - Component structure
-- [Sizing and Spacing](./sizing-spacing.md) - Spacing system
-
-For full responsive details, see original `/docs/responsive-design.md`.
+- [Content Overlay Responsive](./content-overlay-responsive.md)
+- [Sizing and Spacing](./sizing-spacing.md)
