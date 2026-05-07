@@ -3,18 +3,17 @@ import page8Paths from "@/imports/svg-b2700o3wr8";
 import tickPaths from "@/imports/svg-jngdeg2tc1";
 
 const TUTORIAL_HEADER_WIDTH = 280;
-const APP_HEADER_WIDTH = 350;
-const TUTORIAL_HEADER_SCALE = TUTORIAL_HEADER_WIDTH / APP_HEADER_WIDTH;
 const LOGO_ASSET_WIDTH = 209.653;
 const LOGO_ASSET_HEIGHT = 35.653;
-const LOGO_WIDTH = LOGO_ASSET_WIDTH * TUTORIAL_HEADER_SCALE;
-const LOGO_HEIGHT = LOGO_ASSET_HEIGHT * TUTORIAL_HEADER_SCALE;
+const LOGO_WIDTH = 146;
+const LOGO_HEIGHT = 25;
 const LOGO_VERTICAL_SPACING = 10;
-const MENU_ICON_WIDTH = 22 * TUTORIAL_HEADER_SCALE;
-const MENU_ICON_HEIGHT = 20 * TUTORIAL_HEADER_SCALE;
-const MENU_WRAPPER_WIDTH = 17 * TUTORIAL_HEADER_SCALE;
-const MENU_WRAPPER_HEIGHT = 35.653 * TUTORIAL_HEADER_SCALE;
-const MENU_RIGHT_OFFSET = 20 * TUTORIAL_HEADER_SCALE;
+const LOGO_ROW_HEIGHT = LOGO_HEIGHT + LOGO_VERTICAL_SPACING * 2;
+const MENU_ICON_WIDTH = 17.6;
+const MENU_ICON_HEIGHT = 16;
+const MENU_WRAPPER_WIDTH = 13.6;
+const MENU_WRAPPER_HEIGHT = 28.5224;
+const MENU_RIGHT_OFFSET = 16;
 
 function TutorialSensorBar() {
   return (
@@ -195,7 +194,7 @@ export default function TutorialPhoneHeader({
         className="relative flex items-center justify-center"
         style={{
           width: `${TUTORIAL_HEADER_WIDTH}px`,
-          minHeight: `${LOGO_HEIGHT}px`,
+          height: `${LOGO_ROW_HEIGHT}px`,
           paddingTop: `${LOGO_VERTICAL_SPACING}px`,
           paddingBottom: `${LOGO_VERTICAL_SPACING}px`,
         }}
