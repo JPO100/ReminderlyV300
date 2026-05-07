@@ -1,13 +1,15 @@
 import svgPaths from "@/imports/svg-tzdfx9foxi";
 
-const TUTORIAL_HEADER_SCALE = (280 - (14.359 * 2)) / 350;
+const TUTORIAL_HEADER_WIDTH = 280;
+const APP_HEADER_WIDTH = 350;
+const TUTORIAL_HEADER_SCALE = TUTORIAL_HEADER_WIDTH / APP_HEADER_WIDTH;
 const LOGO_WIDTH = 209.653 * TUTORIAL_HEADER_SCALE;
 const LOGO_HEIGHT = 35.653 * TUTORIAL_HEADER_SCALE;
-const LOGO_TOP_OFFSET = 7 * TUTORIAL_HEADER_SCALE;
 const MENU_ICON_WIDTH = 22 * TUTORIAL_HEADER_SCALE;
 const MENU_ICON_HEIGHT = 20 * TUTORIAL_HEADER_SCALE;
 const MENU_WRAPPER_WIDTH = 17 * TUTORIAL_HEADER_SCALE;
 const MENU_WRAPPER_HEIGHT = 35.653 * TUTORIAL_HEADER_SCALE;
+const MENU_RIGHT_OFFSET = 20 * TUTORIAL_HEADER_SCALE;
 
 function TutorialSensorBar() {
   return (
@@ -43,7 +45,7 @@ function TutorialWordmark() {
   return (
     <div
       className="relative shrink-0"
-      style={{ width: `${LOGO_WIDTH}px`, height: `${LOGO_HEIGHT}px`, top: `${LOGO_TOP_OFFSET}px` }}
+      style={{ width: `${LOGO_WIDTH}px`, height: `${LOGO_HEIGHT}px` }}
     >
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
         <g>
@@ -81,16 +83,23 @@ export default function TutorialPhoneHeader({
 
   return (
     <div
-      className="content-stretch flex flex-col items-center relative shrink-0 w-full px-[14.359px] pt-[11px]"
+      className="content-stretch flex flex-col items-center relative shrink-0 w-full pt-[11px]"
       style={{ backgroundColor: resolvedBackgroundColor }}
     >
       <TutorialSensorBar />
-      <div className="relative flex items-center justify-center w-full mt-[10px] mb-[10px]">
+      <div
+        className="relative flex items-center justify-center mt-[10px] mb-[10px]"
+        style={{ width: `${TUTORIAL_HEADER_WIDTH}px`, minHeight: `${LOGO_HEIGHT}px` }}
+      >
         <TutorialWordmark />
         {showMenuIcon && (
           <div
-            className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center justify-center"
-            style={{ width: `${MENU_WRAPPER_WIDTH}px`, height: `${MENU_WRAPPER_HEIGHT}px` }}
+            className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center"
+            style={{
+              right: `${MENU_RIGHT_OFFSET}px`,
+              width: `${MENU_WRAPPER_WIDTH}px`,
+              height: `${MENU_WRAPPER_HEIGHT}px`,
+            }}
           >
             <TutorialHeaderMenuIcon />
           </div>

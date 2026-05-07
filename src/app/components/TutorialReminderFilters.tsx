@@ -22,7 +22,7 @@ export interface TutorialFilterItem {
 export const GROUPED_TUTORIAL_FILTER_ITEMS: TutorialFilterItem[] = [
   { key: "today", label: "Today", color: "#00AFEE" },
   { key: "thisWeek", label: "This week", color: "#E466FD" },
-  { key: "later", label: "Other", color: "#FDB146", hideOnNarrow: true },
+  { key: "later", label: "Other", color: "#FDB146" },
 ];
 
 export const UNGROUPED_TUTORIAL_FILTER_ITEMS: TutorialFilterItem[] = [
@@ -96,18 +96,26 @@ export default function TutorialReminderFilters({
   groupGapClassName?: string;
   showHiddenItems?: boolean;
 }) {
-  const visibleItems = items.filter((item) => showHiddenItems || !item.hideOnNarrow);
+  const hasTrailingControl = trailing != null || showSettings;
+  const isFullWidthBetweenLayout = layout === "between" && !hasTrailingControl;
+  const visibleItems = items.filter((item) => showHiddenItems || isFullWidthBetweenLayout || !item.hideOnNarrow);
 
   return (
     <div className="relative shrink-0 w-full px-[14px] pt-[14px] pb-[8px]">
       <div
         className={`flex items-center ${layout === "between" ? "justify-between" : ""} ${rowGapClassName}`}
       >
-        <div className={`flex items-center ${groupGapClassName}`}>
-          {visibleItems.map((item) => (
+        {isFullWidthBetweenLayout ? (
+          visibleItems.map((item) => (
             <TutorialReminderFilterPill key={item.key} item={item} activeKey={activeKey} />
-          ))}
-        </div>
+          ))
+        ) : (
+          <div className={`flex items-center ${groupGapClassName}`}>
+            {visibleItems.map((item) => (
+              <TutorialReminderFilterPill key={item.key} item={item} activeKey={activeKey} />
+            ))}
+          </div>
+        )}
         {trailing ? (
           <div className="shrink-0">{trailing}</div>
         ) : showSettings ? (
