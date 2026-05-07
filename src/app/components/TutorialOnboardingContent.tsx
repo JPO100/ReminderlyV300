@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import svgPaths from '@/imports/svg-go2phgsyt4';
 import OnboardingPage1Content, { OnboardingPage1Text } from '@/app/components/OnboardingPage1Content';
-import OnboardingPage2Content from '@/app/components/OnboardingPage2Content';
-import OnboardingPage3Content from '@/app/components/OnboardingPage3Content';
-import OnboardingPage4Content from '@/app/components/OnboardingPage4Content';
-import OnboardingPage5Content from '@/app/components/OnboardingPage5Content';
+import OnboardingPage2Content, { OnboardingPage2Text } from '@/app/components/OnboardingPage2Content';
+import OnboardingPage3Content, { OnboardingPage3Text } from '@/app/components/OnboardingPage3Content';
+import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
+import OnboardingPage5Content, { OnboardingPage5Text } from '@/app/components/OnboardingPage5Content';
 import OnboardingPage6Content from '@/app/components/OnboardingPage6Content';
 import OnboardingPage7Content from '@/app/components/OnboardingPage7Content';
 import OnboardingPage8Content from '@/app/components/OnboardingPage8Content';
@@ -147,19 +147,75 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         )}
         
         {!isListsTutorial && currentPage === 1 && (
-          <OnboardingPage2Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={true} settingsMenuEnabled={settingsMenuEnabled} />
+          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+            <OnboardingPage2Text />
+            <TutorialPhoneShell
+              activeMainTab="reminders"
+              showHeaderMenu={settingsMenuEnabled}
+              filterRow={
+                <TutorialReminderFilters
+                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                  showHiddenItems
+                />
+              }
+            >
+              <OnboardingPage2Content />
+            </TutorialPhoneShell>
+          </div>
         )}
         
         {!isListsTutorial && currentPage === 2 && (
-          <OnboardingPage3Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={true} settingsMenuEnabled={settingsMenuEnabled} />
+          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+            <OnboardingPage3Text />
+            <TutorialPhoneShell
+              activeMainTab="reminders"
+              showHeaderMenu={settingsMenuEnabled}
+              filterRow={
+                <TutorialReminderFilters
+                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                  showHiddenItems
+                />
+              }
+            >
+              <OnboardingPage3Content />
+            </TutorialPhoneShell>
+          </div>
         )}
         
         {!isListsTutorial && currentPage === 3 && (
-          <OnboardingPage4Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={true} settingsMenuEnabled={settingsMenuEnabled} />
+          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+            <OnboardingPage4Text />
+            <TutorialPhoneShell
+              activeMainTab="reminders"
+              showHeaderMenu={settingsMenuEnabled}
+              filterRow={
+                <TutorialReminderFilters
+                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                  showHiddenItems
+                />
+              }
+            >
+              <OnboardingPage4Content />
+            </TutorialPhoneShell>
+          </div>
         )}
         
         {!isListsTutorial && currentPage === 4 && (
-          <OnboardingPage5Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={true} settingsMenuEnabled={settingsMenuEnabled} />
+          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+            <OnboardingPage5Text />
+            <TutorialPhoneShell
+              activeMainTab="reminders"
+              showHeaderMenu={settingsMenuEnabled}
+              filterRow={
+                <TutorialReminderFilters
+                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                  showHiddenItems
+                />
+              }
+            >
+              <OnboardingPage5Content />
+            </TutorialPhoneShell>
+          </div>
         )}
         
         {!isListsTutorial && currentPage === 5 && (
