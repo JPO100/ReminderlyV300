@@ -5,8 +5,11 @@ import OnboardingPage2Content, { OnboardingPage2Text } from '@/app/components/On
 import OnboardingPage3Content, { OnboardingPage3Text } from '@/app/components/OnboardingPage3Content';
 import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
 import OnboardingPage5Content, { OnboardingPage5Text } from '@/app/components/OnboardingPage5Content';
-import OnboardingPage6Content from '@/app/components/OnboardingPage6Content';
-import OnboardingPage7Content from '@/app/components/OnboardingPage7Content';
+import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/OnboardingPage6Content';
+import OnboardingPage7Content, {
+  OnboardingPage7Text,
+  useOnboardingPage7ActiveFilter,
+} from '@/app/components/OnboardingPage7Content';
 import OnboardingPage8Content from '@/app/components/OnboardingPage8Content';
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
@@ -91,6 +94,7 @@ function ListsTutorialPlaceholderPage({
 
 export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant, variant, isListsEnabled: _isListsEnabled, settingsMenuEnabled, savedListsEnabled }: TutorialOnboardingContentProps) {
   const [currentPage, setCurrentPage] = useState(0);
+  const page7ActiveFilter = useOnboardingPage7ActiveFilter(filtersMenuVariant);
 
   const handleNext = () => {
     if (currentPage < TOTAL_PAGES - 1) {
@@ -219,11 +223,43 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         )}
         
         {!isListsTutorial && currentPage === 5 && (
-          <OnboardingPage6Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={true} settingsMenuEnabled={settingsMenuEnabled} />
+          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+            <OnboardingPage6Text />
+            <TutorialPhoneShell
+              activeMainTab="reminders"
+              showHeaderMenu={settingsMenuEnabled}
+              filterRow={
+                <TutorialReminderFilters
+                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                  showHiddenItems
+                />
+              }
+            >
+              <OnboardingPage6Content />
+            </TutorialPhoneShell>
+          </div>
         )}
         
         {!isListsTutorial && currentPage === 6 && (
-          <OnboardingPage7Content filtersMenuVariant={filtersMenuVariant} isListsEnabled={true} settingsMenuEnabled={settingsMenuEnabled} />
+          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+            <OnboardingPage7Text />
+            <TutorialPhoneShell
+              activeMainTab="reminders"
+              showHeaderMenu={settingsMenuEnabled}
+              filterRow={
+                <TutorialReminderFilters
+                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                  activeKey={page7ActiveFilter}
+                  showHiddenItems
+                />
+              }
+            >
+              <OnboardingPage7Content
+                activeFilter={page7ActiveFilter}
+                filtersMenuVariant={filtersMenuVariant}
+              />
+            </TutorialPhoneShell>
+          </div>
         )}
         
         {!isListsTutorial && currentPage === 7 && (
