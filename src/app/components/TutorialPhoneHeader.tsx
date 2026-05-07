@@ -1,4 +1,6 @@
 import svgPaths from "@/imports/svg-tzdfx9foxi";
+import page8Paths from "@/imports/svg-b2700o3wr8";
+import tickPaths from "@/imports/svg-jngdeg2tc1";
 
 const TUTORIAL_HEADER_WIDTH = 280;
 const APP_HEADER_WIDTH = 350;
@@ -16,6 +18,15 @@ function TutorialSensorBar() {
     <div className="content-stretch flex gap-[2.872px] items-center relative shrink-0">
       <div className="bg-[#1c2c42] h-[5.026px] rounded-[7.179px] shrink-0 w-[17.231px]" />
       <div className="bg-[#1c2c42] rounded-[7.179px] shrink-0 size-[5.026px]" />
+    </div>
+  );
+}
+
+function Page8SensorBar({ color }: { color: string }) {
+  return (
+    <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
+      <div className="h-[7px] rounded-[10px] shrink-0 w-[24px]" style={{ backgroundColor: color }} />
+      <div className="rounded-[10px] shrink-0 size-[7px]" style={{ backgroundColor: color }} />
     </div>
   );
 }
@@ -70,16 +81,106 @@ function TutorialWordmark() {
   );
 }
 
+function Page8HeaderWordmark() {
+  return (
+    <div className="content-stretch flex flex-col items-start pb-[2.786px] pt-0 px-0 relative shrink-0">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[23.682px] text-white">
+        <p className="css-ew64yg leading-[normal]">reminderly</p>
+      </div>
+    </div>
+  );
+}
+
+function Page8DefaultTick({ tickFlash }: { tickFlash?: boolean }) {
+  return (
+    <div className="relative shrink-0 size-[24.833px]" style={{ opacity: tickFlash ? 0 : 1 }}>
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24.8332 24.8332">
+        <g id="Group 14">
+          <path d={page8Paths.p3bc9a000} fill="white" id="Ellipse 74 (Stroke)" />
+          <g id="Group 11">
+            <path d={page8Paths.p8e6bc00} fill="white" id="Line 39 (Stroke)" />
+            <path d={page8Paths.p2b1f0800} fill="white" id="Line 40 (Stroke)" />
+          </g>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+function Page8DoneTick() {
+  return (
+    <div className="relative shrink-0 size-[24.833px]">
+      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24.8332 24.8332">
+        <g clipPath="url(#clip0_page8_header)" id="Group 14">
+          <path d={tickPaths.p9b9c500} fill="#FFFFFF" id="Ellipse 74 (Stroke)" />
+          <g id="Group 11">
+            <path d={tickPaths.p1d837f80} fill="#1C2C42" id="Line 39 (Stroke)" />
+            <path d={tickPaths.p1d2e7380} fill="#1C2C42" id="Line 40 (Stroke)" />
+          </g>
+        </g>
+        <defs>
+          <clipPath id="clip0_page8_header">
+            <rect fill="white" height="24.8332" width="24.8332" />
+          </clipPath>
+        </defs>
+      </svg>
+    </div>
+  );
+}
+
+function Page8HeaderLogo({
+  showDone,
+  tickDone,
+  tickFlash,
+}: {
+  showDone?: boolean;
+  tickDone?: boolean;
+  tickFlash?: boolean;
+}) {
+  return (
+    <div className="content-stretch flex items-center justify-between relative shrink-0 w-[146.027px]">
+      {tickDone ? <Page8DoneTick /> : <Page8DefaultTick tickFlash={tickFlash} />}
+      <Page8HeaderWordmark />
+    </div>
+  );
+}
+
+export interface TutorialPhoneHeaderProps {
+  activeMainTab: "reminders" | "lists";
+  backgroundColor?: string;
+  showMenuIcon?: boolean;
+  variant?: "default" | "page8";
+  indicatorColor?: string;
+  tickDone?: boolean;
+  tickFlash?: boolean;
+  showDone?: boolean;
+}
+
 export default function TutorialPhoneHeader({
   activeMainTab,
   backgroundColor,
   showMenuIcon = true,
-}: {
-  activeMainTab: "reminders" | "lists";
-  backgroundColor?: string;
-  showMenuIcon?: boolean;
-}) {
+  variant = "default",
+  indicatorColor = "#1c2c42",
+  tickDone = false,
+  tickFlash = false,
+  showDone = false,
+}: TutorialPhoneHeaderProps) {
   const resolvedBackgroundColor = backgroundColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
+
+  if (variant === "page8") {
+    return (
+      <div
+        className="content-stretch flex flex-col items-center relative shrink-0 w-full pb-[9.93px] pt-[16px]"
+        style={{ backgroundColor: resolvedBackgroundColor }}
+      >
+        <div className="content-stretch flex flex-col gap-[22px] items-center relative shrink-0">
+          <Page8SensorBar color={indicatorColor} />
+          <Page8HeaderLogo showDone={showDone} tickDone={tickDone} tickFlash={tickFlash} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

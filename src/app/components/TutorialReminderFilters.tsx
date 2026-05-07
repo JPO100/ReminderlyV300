@@ -6,6 +6,8 @@ export type TutorialFilterKey =
   | "thisWeek"
   | "later"
   | "sometime"
+  | "done"
+  | "deleted"
   | "complete"
   | "almost"
   | "started"
@@ -51,25 +53,33 @@ export const SAVED_LISTS_TUTORIAL_FILTER_ITEMS: TutorialFilterItem[] = [
   { key: "complete", label: "Done", color: "#005BE3" },
 ];
 
+export const PAGE8_DONE_FILTER_ITEMS: TutorialFilterItem[] = [
+  { key: "done", label: "Done", color: "#FFFFFF" },
+  { key: "deleted", label: "Deleted", color: "#FFFFFF" },
+];
+
 function TutorialReminderFilterPill({
   item,
   activeKey,
+  variant = "default",
 }: {
   item: TutorialFilterItem;
   activeKey?: TutorialFilterKey;
+  variant?: "default" | "ghost";
 }) {
   const isActive = activeKey === item.key;
   const isDefault = activeKey == null;
   const color = isActive || isDefault ? item.color : "#D9D9D9";
+  const isGhost = variant === "ghost";
 
   return (
     <div
-      className={`content-stretch flex items-center justify-center px-[11.144px] py-[10.448px] relative rounded-[69.652px] shrink-0 h-[28px] ${isActive ? "bg-white" : "bg-transparent"}`}
-      style={{ boxShadow: `inset 0 0 0 ${isActive ? "2px" : "1px"} ${color}` }}
+      className={`content-stretch flex items-center justify-center px-[11.144px] py-[10.448px] relative rounded-[69.652px] shrink-0 h-[28px] ${isGhost ? "bg-[rgba(255,255,255,0.15)]" : isActive ? "bg-white" : "bg-transparent"}`}
+      style={{ boxShadow: `inset 0 0 0 ${isGhost ? "1px" : isActive ? "2px" : "1px"} ${isGhost ? "#FFFFFF" : color}` }}
     >
       <div
         className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[9.751px]"
-        style={{ color }}
+        style={{ color: isGhost ? "#FFFFFF" : color }}
       >
         <p className="leading-[normal]">{item.label}</p>
       </div>
@@ -81,20 +91,24 @@ export default function TutorialReminderFilters({
   items,
   activeKey,
   showSettings = false,
+  leading,
   trailing,
   layout = "between",
   rowGapClassName = "gap-[10px]",
   groupGapClassName = "gap-[8px]",
   showHiddenItems = false,
+  pillVariant = "default",
 }: {
   items: TutorialFilterItem[];
   activeKey?: TutorialFilterKey;
   showSettings?: boolean;
+  leading?: ReactNode;
   trailing?: ReactNode;
   layout?: "between" | "inline";
   rowGapClassName?: string;
   groupGapClassName?: string;
   showHiddenItems?: boolean;
+  pillVariant?: "default" | "ghost";
 }) {
   const hasTrailingControl = trailing != null || showSettings;
   const isFullWidthBetweenLayout = layout === "between" && !hasTrailingControl;
@@ -111,8 +125,9 @@ export default function TutorialReminderFilters({
           ))
         ) : (
           <div className={`flex items-center ${groupGapClassName}`}>
+            {leading ? <div className="shrink-0">{leading}</div> : null}
             {visibleItems.map((item) => (
-              <TutorialReminderFilterPill key={item.key} item={item} activeKey={activeKey} />
+              <TutorialReminderFilterPill key={item.key} item={item} activeKey={activeKey} variant={pillVariant} />
             ))}
           </div>
         )}

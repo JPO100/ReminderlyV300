@@ -10,11 +10,18 @@ import OnboardingPage7Content, {
   OnboardingPage7Text,
   useOnboardingPage7ActiveFilter,
 } from '@/app/components/OnboardingPage7Content';
-import OnboardingPage8Content from '@/app/components/OnboardingPage8Content';
+import OnboardingPage8Content, {
+  OnboardingPage8BackButton,
+  OnboardingPage8ClearAllButton,
+  OnboardingPage8Text,
+  useOnboardingPage8State,
+} from '@/app/components/OnboardingPage8Content';
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
 import TutorialReminderFilters, {
+  GROUPED_TUTORIAL_FILTER_ITEMS,
   GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
+  PAGE8_DONE_FILTER_ITEMS,
   SAVED_LISTS_TUTORIAL_FILTER_ITEMS,
   UNGROUPED_TUTORIAL_FILTER_ITEMS,
   UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS,
@@ -95,6 +102,7 @@ function ListsTutorialPlaceholderPage({
 export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant, variant, isListsEnabled: _isListsEnabled, settingsMenuEnabled, savedListsEnabled }: TutorialOnboardingContentProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const page7ActiveFilter = useOnboardingPage7ActiveFilter(filtersMenuVariant);
+  const page8State = useOnboardingPage8State();
 
   const handleNext = () => {
     if (currentPage < TOTAL_PAGES - 1) {
@@ -263,7 +271,40 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         )}
         
         {!isListsTutorial && currentPage === 7 && (
-          <OnboardingPage8Content isListsEnabled={true} settingsMenuEnabled={settingsMenuEnabled} />
+          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+            <OnboardingPage8Text />
+            <TutorialPhoneShell
+              activeMainTab="reminders"
+              showHeaderMenu={settingsMenuEnabled}
+              shellColor={page8State.showDone ? "#1C2C42" : "#4784f8"}
+              bezelColor={page8State.showDone ? "#000000" : "#1c2c42"}
+              headerProps={{
+                variant: "page8",
+                indicatorColor: page8State.showDone ? "#000000" : "#1c2c42",
+                tickDone: page8State.tickDone,
+                tickFlash: page8State.tickFlash,
+                showDone: page8State.showDone,
+              }}
+              filterRow={
+                page8State.showDone ? (
+                  <TutorialReminderFilters
+                    items={PAGE8_DONE_FILTER_ITEMS}
+                    leading={<OnboardingPage8BackButton highlighted={page8State.backHighlighted} />}
+                    trailing={<OnboardingPage8ClearAllButton />}
+                    layout="inline"
+                    pillVariant="ghost"
+                  />
+                ) : (
+                  <TutorialReminderFilters
+                    items={GROUPED_TUTORIAL_FILTER_ITEMS}
+                    showSettings
+                  />
+                )
+              }
+            >
+              <OnboardingPage8Content showDone={page8State.showDone} />
+            </TutorialPhoneShell>
+          </div>
         )}
 
         {isListsTutorial && <ListsTutorialPlaceholderPage filtersMenuVariant={filtersMenuVariant} settingsMenuEnabled={settingsMenuEnabled} savedListsEnabled={savedListsEnabled} />}
