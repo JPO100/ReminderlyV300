@@ -38,6 +38,8 @@ interface TutorialOnboardingContentProps {
 }
 
 const TOTAL_PAGES = 8;
+const REMINDERLY_DARK_BLUE = "#1C2C42";
+const REMINDERLY_LIGHT_BLUE = "#4784F8";
 
 function TemplatesTutorialButton() {
   return (
@@ -125,6 +127,8 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === TOTAL_PAGES - 1;
   const isListsTutorial = variant === 'lists';
+  const activePaginationColor = isListsTutorial ? REMINDERLY_DARK_BLUE : REMINDERLY_LIGHT_BLUE;
+  const nextButtonColor = isListsTutorial ? REMINDERLY_DARK_BLUE : "#4784f8";
 
   return (
     <div
@@ -314,14 +318,14 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         <div className="h-[7.935px] w-[133.476px] [@media(max-height:570px)]:hidden">
           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 133.476 7.93457">
             <g>
-              <circle cx="3.96729" cy="3.96729" fill={currentPage === 0 ? "#4784F8" : "#D9D9D9"} r="3.96729" />
-              <circle cx="21.9019" cy="3.96729" fill={currentPage === 1 ? "#4784F8" : "#D9D9D9"} r="3.96729" />
-              <circle cx="39.8364" cy="3.96729" fill={currentPage === 2 ? "#4784F8" : "#D9D9D9"} r="3.96729" />
-              <circle cx="57.771" cy="3.96729" fill={currentPage === 3 ? "#4784F8" : "#D9D9D9"} r="3.96729" />
-              <circle cx="75.7056" cy="3.96729" fill={currentPage === 4 ? "#4784F8" : "#D9D9D9"} r="3.96729" />
-              <circle cx="93.6401" cy="3.96729" fill={currentPage === 5 ? "#4784F8" : "#D9D9D9"} r="3.96729" />
-              <circle cx="111.575" cy="3.96729" fill={currentPage === 6 ? "#4784F8" : "#D9D9D9"} r="3.96729" />
-              <circle cx="129.509" cy="3.96729" fill={currentPage === 7 ? "#4784F8" : "#D9D9D9"} r="3.96729" />
+              <circle cx="3.96729" cy="3.96729" fill={currentPage === 0 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
+              <circle cx="21.9019" cy="3.96729" fill={currentPage === 1 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
+              <circle cx="39.8364" cy="3.96729" fill={currentPage === 2 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
+              <circle cx="57.771" cy="3.96729" fill={currentPage === 3 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
+              <circle cx="75.7056" cy="3.96729" fill={currentPage === 4 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
+              <circle cx="93.6401" cy="3.96729" fill={currentPage === 5 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
+              <circle cx="111.575" cy="3.96729" fill={currentPage === 6 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
+              <circle cx="129.509" cy="3.96729" fill={currentPage === 7 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
             </g>
           </svg>
         </div>
@@ -343,9 +347,9 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           )}
           
           <button 
-            className="bg-[#4784f8] w-[180px] rounded-[100px] flex items-center justify-center cursor-pointer"
+            className="w-[180px] rounded-[100px] flex items-center justify-center cursor-pointer"
             onClick={handleNext}
-            style={{ height: 'clamp(40px, calc(20vh - 73.6px), 54px)' }}
+            style={{ height: 'clamp(40px, calc(20vh - 73.6px), 54px)', backgroundColor: nextButtonColor }}
           >
             <span className="font-['Lato',sans-serif] font-bold text-[17px] text-white leading-[normal]">
               {isLastPage ? 'Okay, got it!' : 'Next'}
