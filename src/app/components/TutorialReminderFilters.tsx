@@ -25,6 +25,7 @@ export const GROUPED_TUTORIAL_FILTER_ITEMS: TutorialFilterItem[] = [
   { key: "today", label: "Today", color: "#00AFEE" },
   { key: "thisWeek", label: "This week", color: "#E466FD" },
   { key: "later", label: "Other", color: "#FDB146" },
+  { key: "sometime", label: "Sometime", color: "#939393", hideOnNarrow: true },
 ];
 
 export const UNGROUPED_TUTORIAL_FILTER_ITEMS: TutorialFilterItem[] = [

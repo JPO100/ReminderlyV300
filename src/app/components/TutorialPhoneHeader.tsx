@@ -5,8 +5,11 @@ import tickPaths from "@/imports/svg-jngdeg2tc1";
 const TUTORIAL_HEADER_WIDTH = 280;
 const APP_HEADER_WIDTH = 350;
 const TUTORIAL_HEADER_SCALE = TUTORIAL_HEADER_WIDTH / APP_HEADER_WIDTH;
-const LOGO_WIDTH = 209.653 * TUTORIAL_HEADER_SCALE;
-const LOGO_HEIGHT = 35.653 * TUTORIAL_HEADER_SCALE;
+const LOGO_ASSET_WIDTH = 209.653;
+const LOGO_ASSET_HEIGHT = 35.653;
+const LOGO_WIDTH = LOGO_ASSET_WIDTH * TUTORIAL_HEADER_SCALE;
+const LOGO_HEIGHT = LOGO_ASSET_HEIGHT * TUTORIAL_HEADER_SCALE;
+const LOGO_VERTICAL_SPACING = 10;
 const MENU_ICON_WIDTH = 22 * TUTORIAL_HEADER_SCALE;
 const MENU_ICON_HEIGHT = 20 * TUTORIAL_HEADER_SCALE;
 const MENU_WRAPPER_WIDTH = 17 * TUTORIAL_HEADER_SCALE;
@@ -189,8 +192,13 @@ export default function TutorialPhoneHeader({
     >
       <TutorialSensorBar />
       <div
-        className="relative flex items-center justify-center mt-[10px] mb-[10px]"
-        style={{ width: `${TUTORIAL_HEADER_WIDTH}px`, minHeight: `${LOGO_HEIGHT}px` }}
+        className="relative flex items-center justify-center"
+        style={{
+          width: `${TUTORIAL_HEADER_WIDTH}px`,
+          minHeight: `${LOGO_HEIGHT}px`,
+          paddingTop: `${LOGO_VERTICAL_SPACING}px`,
+          paddingBottom: `${LOGO_VERTICAL_SPACING}px`,
+        }}
       >
         <TutorialWordmark />
         {showMenuIcon && (
