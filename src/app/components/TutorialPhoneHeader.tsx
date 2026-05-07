@@ -16,11 +16,11 @@ const MENU_WRAPPER_WIDTH = 13.6;
 const MENU_WRAPPER_HEIGHT = 28.5224;
 const MENU_RIGHT_OFFSET = 16;
 
-function TutorialSensorBar() {
+function TutorialSensorBar({ color }: { color: string }) {
   return (
     <div className="content-stretch flex gap-[2.872px] items-center relative shrink-0">
-      <div className="bg-[#1c2c42] h-[5.026px] rounded-[7.179px] shrink-0 w-[17.231px]" />
-      <div className="bg-[#1c2c42] rounded-[7.179px] shrink-0 size-[5.026px]" />
+      <div className="h-[5.026px] rounded-[7.179px] shrink-0 w-[17.231px]" style={{ backgroundColor: color }} />
+      <div className="rounded-[7.179px] shrink-0 size-[5.026px]" style={{ backgroundColor: color }} />
     </div>
   );
 }
@@ -170,6 +170,7 @@ export default function TutorialPhoneHeader({
   showDone = false,
 }: TutorialPhoneHeaderProps) {
   const resolvedBackgroundColor = backgroundColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
+  const defaultSensorColor = activeMainTab === "lists" ? "#000000" : "#1c2c42";
 
   if (variant === "page8") {
     return (
@@ -190,7 +191,7 @@ export default function TutorialPhoneHeader({
       className="content-stretch flex flex-col items-center relative shrink-0 w-full pt-[11px]"
       style={{ backgroundColor: resolvedBackgroundColor }}
     >
-      <TutorialSensorBar />
+      <TutorialSensorBar color={defaultSensorColor} />
       <div
         className="relative flex items-center justify-center"
         style={{
