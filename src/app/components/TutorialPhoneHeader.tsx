@@ -9,6 +9,7 @@ const LOGO_WIDTH = 146;
 const LOGO_HEIGHT = 25;
 const LOGO_VERTICAL_SPACING = 10;
 const LOGO_ROW_HEIGHT = LOGO_HEIGHT + LOGO_VERTICAL_SPACING * 2;
+const LOGO_MENU_ROW_HEIGHT = LOGO_ROW_HEIGHT + LOGO_VERTICAL_SPACING * 2;
 const MENU_ICON_WIDTH = 17.6;
 const MENU_ICON_HEIGHT = 16;
 const MENU_WRAPPER_WIDTH = 13.6;
@@ -194,12 +195,15 @@ export default function TutorialPhoneHeader({
         className="relative flex items-center justify-center"
         style={{
           width: `${TUTORIAL_HEADER_WIDTH}px`,
-          height: `${LOGO_ROW_HEIGHT}px`,
-          paddingTop: `${LOGO_VERTICAL_SPACING}px`,
-          paddingBottom: `${LOGO_VERTICAL_SPACING}px`,
+          height: `${LOGO_MENU_ROW_HEIGHT}px`,
         }}
       >
-        <TutorialWordmark />
+        <div
+          className="flex items-center justify-center shrink-0"
+          style={{ height: `${LOGO_ROW_HEIGHT}px` }}
+        >
+          <TutorialWordmark />
+        </div>
         {showMenuIcon && (
           <div
             className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center"
