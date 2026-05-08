@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { registerPlugin } from "@capacitor/core";
 import { motion, AnimatePresence, useDragControls } from "motion/react";
 import svgPaths from "../imports/svg-tzdfx9foxi";
 import doneTickPaths from "../imports/svg-c9judk5sbu";
@@ -207,6 +208,7 @@ const DONE_BLUE = "#1C2C42";
 const DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY = 'reminderly-dev-default-templates-in-clean-state';
 const DONE_LIST_COLOUR = "#404040";
 type TutorialVariant = 'reminders' | 'lists';
+const CapacitorApp = registerPlugin("App");
 
 // Deleted grey constant for deleted styling
 const DELETED_GREY = "#939393";
@@ -556,6 +558,7 @@ function DelayedEmptyState({ message }: { message: string }) {
 
 export default function App() {
   const [reminders, setReminders] = useState<Reminder[]>(() => loadReminders());
+  const [, setTimeRefreshTick] = useState(0);
   const [activeFilter, setActiveFilter] = useState<ReminderCategory | "all">("all");
   const [activeListFilter, setActiveListFilter] = useState<"all" | "complete" | "almost" | "started" | "todo" | "grouped-todo">("all");
   const [savedListsPanelOpen, setSavedListsPanelOpen] = useState(false);
@@ -1413,6 +1416,18 @@ export default function App() {
   useEffect(() => () => {
     clearCreateTemplateFeedbackTimers();
   }, [clearCreateTemplateFeedbackTimers]);
+
+  useEffect(() => {
+    const listener = CapacitorApp.addListener('appStateChange', (state: { isActive: boolean }) => {
+      if (state.isActive) {
+        setTimeRefreshTick((tick) => tick + 1);
+      }
+    });
+
+    return () => {
+      void listener.then((handle) => handle.remove());
+    };
+  }, []);
 
   useEffect(() => {
     if (!isListsEnabled) {
