@@ -1,6 +1,27 @@
-import { formatRepeatLabel } from "../reminder-utils";
+import { formatReminderNextOccurrenceLabel, formatRepeatRuleText } from "../reminder-utils";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
+const TUTORIAL_REPEAT_SCHEDULE_DATE = "2025-03-27";
+const TUTORIAL_REPEAT_SCHEDULE_TIME = "19:00";
+const TUTORIAL_REPEAT_NOW = new Date(2025, 2, 24, 12, 0, 0, 0);
+const TUTORIAL_REPEAT_SUBTITLE =
+  (() => {
+    const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(
+      TUTORIAL_REPEAT_SCHEDULE_DATE,
+      TUTORIAL_REPEAT_SCHEDULE_TIME,
+      TUTORIAL_REPEAT_NOW
+    );
+    const repeatText = formatRepeatRuleText(
+      { frequency: "weekly", interval: 1, byDay: ["th"] },
+      TUTORIAL_REPEAT_SCHEDULE_DATE
+    );
+
+    if (nextOccurrenceLabel && repeatText) {
+      return `${nextOccurrenceLabel}. ${repeatText}`;
+    }
+
+    return "Thursday at 7:00 PM. Every week (Thu)";
+  })();
 
 const STATIC_REMINDERS = [
   {
@@ -18,7 +39,7 @@ const STATIC_REMINDERS = [
   {
     id: "this-week",
     title: "Put the bins out",
-    subtitle: formatRepeatLabel({ frequency: "weekly", interval: 1, byDay: ["th"] }, "19:00") ?? "Every Thursday at 7:00 PM",
+    subtitle: TUTORIAL_REPEAT_SUBTITLE,
     circleColor: "#E466FD",
     showRepeatIcon: true,
   },
