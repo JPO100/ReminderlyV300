@@ -25,6 +25,24 @@ const STATIC_REMINDERS = [
     subtitle: "No date / time set",
     circleColor: "#939393",
   },
+  {
+    id: "today-2",
+    title: "Call the dentist",
+    subtitle: "Today at 4:30 PM",
+    circleColor: "#00AFEE",
+  },
+  {
+    id: "this-week-2",
+    title: "Gym induction",
+    subtitle: "Saturday",
+    circleColor: "#E466FD",
+  },
+  {
+    id: "later-2",
+    title: "Renew passport",
+    subtitle: "12th April",
+    circleColor: "#FDB146",
+  },
 ] as const;
 
 function TutorialStaticReminderRow({
