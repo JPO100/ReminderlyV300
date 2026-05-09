@@ -155,7 +155,6 @@ export default function OnboardingPage7Content({
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
       <ReminderList activeFilter={activeFilter} filtersMenuVariant={filtersMenuVariant} />
-      <NewReminderBtn />
     </div>
   );
 }
