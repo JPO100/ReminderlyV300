@@ -134,7 +134,7 @@ export default function OnboardingPage6Content() {
   }, []);
 
   return (
-    <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
+    <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
       <TutorialStaticReminderList />
     </div>
   );
