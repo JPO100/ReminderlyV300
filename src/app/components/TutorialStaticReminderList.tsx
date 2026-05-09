@@ -38,19 +38,19 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
     id: "this-week-2",
     title: "Gym induction",
     circleColor: "#E466FD",
-    schedule: { kind: "scheduled", date: "2025-08-16" },
+    schedule: { kind: "scheduled", date: "2025-08-16", time: "09:30" },
   },
   {
     id: "later",
     title: "Water house plants",
     circleColor: "#FDB146",
-    schedule: { kind: "scheduled", date: "2025-08-28" },
+    schedule: { kind: "scheduled", date: "2025-08-28", time: "08:00" },
   },
   {
     id: "later-2",
     title: "Renew passport",
     circleColor: "#FDB146",
-    schedule: { kind: "scheduled", date: "2025-09-12" },
+    schedule: { kind: "scheduled", date: "2025-09-12", time: "13:15" },
   },
   {
     id: "sometime",
