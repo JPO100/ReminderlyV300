@@ -14,18 +14,6 @@ const STATIC_REMINDERS = [
     circleColor: "#E466FD",
   },
   {
-    id: "later",
-    title: "Water house plants",
-    subtitle: "25th March",
-    circleColor: "#FDB146",
-  },
-  {
-    id: "sometime",
-    title: "Organise family photos",
-    subtitle: "No date / time set",
-    circleColor: "#939393",
-  },
-  {
     id: "today-2",
     title: "Call the dentist",
     subtitle: "Today at 4:30 PM",
@@ -38,10 +26,22 @@ const STATIC_REMINDERS = [
     circleColor: "#E466FD",
   },
   {
+    id: "later",
+    title: "Water house plants",
+    subtitle: "25th March",
+    circleColor: "#FDB146",
+  },
+  {
     id: "later-2",
     title: "Renew passport",
     subtitle: "12th April",
     circleColor: "#FDB146",
+  },
+  {
+    id: "sometime",
+    title: "Organise family photos",
+    subtitle: "No date / time set",
+    circleColor: "#939393",
   },
 ] as const;
 
