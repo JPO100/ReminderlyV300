@@ -5,6 +5,7 @@ import ImportedReminderListDone from "@/imports/ReminderList-1198-346";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
+import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 export interface OnboardingPage8State {
   tickDone: boolean;
@@ -168,7 +169,7 @@ function NewReminderBtn() {
 export default function OnboardingPage8Content({ showDone }: { showDone?: boolean }) {
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
-      <ReminderList showDone={showDone} />
+      <TutorialStaticReminderList />
     </div>
   );
 }

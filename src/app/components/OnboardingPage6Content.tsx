@@ -2,6 +2,7 @@ import svgPaths from "@/imports/svg-b2700o3wr8";
 import ReminderListImport from "@/imports/ReminderList-1192-272";
 import { useEffect, useState } from "react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
+import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 function TutorialReminderInfoMock() {
   return (
@@ -134,14 +135,7 @@ export default function OnboardingPage6Content() {
 
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
-      <ReminderList />
-      {showOverlay && (
-        <div className="absolute inset-0 flex items-end" style={{ backgroundColor: 'rgba(0, 0, 0, 0.15)' }}>
-          <div className="w-full px-[14px] pb-[14px]" style={{ marginBottom: '-50px' }}>
-            <TutorialReminderInfoMock />
-          </div>
-        </div>
-      )}
+      <TutorialStaticReminderList />
     </div>
   );
 }

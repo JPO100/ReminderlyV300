@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import type { FiltersMenuVariant } from "../reminder-utils";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
+import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 export type OnboardingPage7ActiveFilter = 'today' | 'thisWeek' | 'later' | 'sometime' | undefined;
 
@@ -154,7 +155,7 @@ export default function OnboardingPage7Content({
 }) {
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
-      <ReminderList activeFilter={activeFilter} filtersMenuVariant={filtersMenuVariant} />
+      <TutorialStaticReminderList />
     </div>
   );
 }

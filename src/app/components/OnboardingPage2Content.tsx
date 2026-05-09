@@ -3,6 +3,7 @@ import doneSvgPaths from "@/imports/svg-d69hgq55o6";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
+import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 function Frame3() {
   return (
@@ -310,7 +311,7 @@ export default function OnboardingPage2Content() {
 
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pb-[28.334px] pt-[10px] px-[14px] relative w-full">
-      <ReminderList animationKey={animationKey} />
+      <TutorialStaticReminderList />
     </div>
   );
 }
