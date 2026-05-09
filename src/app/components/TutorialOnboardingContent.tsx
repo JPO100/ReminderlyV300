@@ -40,7 +40,7 @@ interface TutorialOnboardingContentProps {
 const TOTAL_PAGES = 8;
 const REMINDERLY_DARK_BLUE = "#1C2C42";
 const REMINDERLY_LIGHT_BLUE = "#4784F8";
-const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[16px]";
+const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[45px]";
 const TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME = "pb-[45px]";
 
 function TemplatesTutorialButton() {
