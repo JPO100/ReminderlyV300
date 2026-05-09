@@ -1,73 +1,92 @@
-import { formatReminderNextOccurrenceLabel, formatRepeatRuleText } from "../reminder-utils";
+import { formatReminderNextOccurrenceLabel, formatRepeatLabel, formatRepeatRuleText, formatScheduledDateForRow } from "../reminder-utils";
+import { formatTime12h } from "../utils/normalise-text";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
-const TUTORIAL_REPEAT_SCHEDULE_DATE = "2025-03-27";
-const TUTORIAL_REPEAT_SCHEDULE_TIME = "19:00";
-const TUTORIAL_REPEAT_NOW = new Date(2025, 2, 24, 12, 0, 0, 0);
-const TUTORIAL_REPEAT_SUBTITLE =
-  (() => {
-    const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(
-      TUTORIAL_REPEAT_SCHEDULE_DATE,
-      TUTORIAL_REPEAT_SCHEDULE_TIME,
-      TUTORIAL_REPEAT_NOW
-    );
-    const repeatText = formatRepeatRuleText(
-      { frequency: "weekly", interval: 1, byDay: ["th"] },
-      TUTORIAL_REPEAT_SCHEDULE_DATE
-    );
+const TUTORIAL_NOW = new Date(2025, 2, 24, 12, 0, 0, 0);
 
-    if (nextOccurrenceLabel && repeatText) {
-      return `${nextOccurrenceLabel}. ${repeatText}`;
-    }
+type TutorialReminder = {
+  id: string;
+  title: string;
+  circleColor: string;
+  schedule:
+    | { kind: "scheduled"; date: string; time?: string }
+    | { kind: "sometime" };
+  repeatRule?: { frequency: "weekly"; interval: number; byDay: string[] } | null;
+};
 
-    return "Thursday at 7:00 PM. Every week (Thu)";
-  })();
-
-const STATIC_REMINDERS = [
+const STATIC_REMINDERS: readonly TutorialReminder[] = [
   {
     id: "today",
     title: "Pick the milk up",
-    subtitle: "Today at 2:00 PM",
     circleColor: "#00AFEE",
+    schedule: { kind: "scheduled", date: "2025-03-24", time: "14:00" },
   },
   {
     id: "today-2",
     title: "Call the dentist",
-    subtitle: "Today at 4:30 PM",
     circleColor: "#00AFEE",
+    schedule: { kind: "scheduled", date: "2025-03-24", time: "16:30" },
   },
   {
     id: "this-week",
     title: "Put the bins out",
-    subtitle: TUTORIAL_REPEAT_SUBTITLE,
     circleColor: "#E466FD",
-    showRepeatIcon: true,
+    schedule: { kind: "scheduled", date: "2025-03-27", time: "19:00" },
+    repeatRule: { frequency: "weekly", interval: 1, byDay: ["th"] },
   },
   {
     id: "this-week-2",
     title: "Gym induction",
-    subtitle: "Saturday",
     circleColor: "#E466FD",
+    schedule: { kind: "scheduled", date: "2025-03-29" },
   },
   {
     id: "later",
     title: "Water house plants",
-    subtitle: "25th March",
     circleColor: "#FDB146",
+    schedule: { kind: "scheduled", date: "2025-04-08" },
   },
   {
     id: "later-2",
     title: "Renew passport",
-    subtitle: "12th April",
     circleColor: "#FDB146",
+    schedule: { kind: "scheduled", date: "2025-04-12" },
   },
   {
     id: "sometime",
     title: "Organise family photos",
-    subtitle: "No date / time set",
     circleColor: "#939393",
+    schedule: { kind: "sometime" },
   },
 ] as const;
+
+function getTutorialReminderSubtitle(reminder: TutorialReminder): string {
+  if (reminder.repeatRule) {
+    if (reminder.schedule.kind === "scheduled" && reminder.schedule.date) {
+      const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(reminder.schedule.date, reminder.schedule.time, TUTORIAL_NOW);
+      const repeatText = formatRepeatRuleText(reminder.repeatRule, reminder.schedule.date);
+      if (nextOccurrenceLabel && repeatText) {
+        return `${nextOccurrenceLabel}. ${repeatText}`;
+      }
+    }
+    const label = formatRepeatLabel(
+      reminder.repeatRule,
+      reminder.schedule.kind === "scheduled" ? reminder.schedule.time : undefined,
+      reminder.schedule.kind === "scheduled" ? reminder.schedule.date : undefined
+    );
+    if (label) return label;
+  }
+
+  if (reminder.schedule.kind === "scheduled" && reminder.schedule.date) {
+    const dateLabel = formatScheduledDateForRow(reminder.schedule.date, TUTORIAL_NOW);
+    if (reminder.schedule.time) {
+      return `${dateLabel} at ${formatTime12h(reminder.schedule.time)}`;
+    }
+    return dateLabel;
+  }
+
+  return "No date / time set";
+}
 
 function RepeatReminderIndicator({ color = "#BABABA" }: { color?: string }) {
   return (
@@ -184,9 +203,9 @@ export default function TutorialStaticReminderList() {
             <TutorialStaticReminderRow
               key={reminder.id}
               title={reminder.title}
-              subtitle={reminder.subtitle}
+              subtitle={getTutorialReminderSubtitle(reminder)}
               circleColor={reminder.circleColor}
-              showRepeatIcon={"showRepeatIcon" in reminder ? reminder.showRepeatIcon : false}
+              showRepeatIcon={Boolean(reminder.repeatRule)}
             />
           ))}
         </div>
