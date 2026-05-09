@@ -8,16 +8,16 @@ const STATIC_REMINDERS = [
     circleColor: "#00AFEE",
   },
   {
-    id: "this-week",
-    title: "Put the bins out",
-    subtitle: "Thursday",
-    circleColor: "#E466FD",
-  },
-  {
     id: "today-2",
     title: "Call the dentist",
     subtitle: "Today at 4:30 PM",
     circleColor: "#00AFEE",
+  },
+  {
+    id: "this-week",
+    title: "Put the bins out",
+    subtitle: "Thursday",
+    circleColor: "#E466FD",
   },
   {
     id: "this-week-2",
