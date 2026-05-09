@@ -2,7 +2,7 @@ import { formatReminderNextOccurrenceLabel, formatRepeatLabel, formatRepeatRuleT
 import { formatTime12h } from "../utils/normalise-text";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
-const TUTORIAL_NOW = new Date(2025, 2, 24, 12, 0, 0, 0);
+const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
 
 type TutorialReminder = {
   id: string;
@@ -11,7 +11,7 @@ type TutorialReminder = {
   schedule:
     | { kind: "scheduled"; date: string; time?: string }
     | { kind: "sometime" };
-  repeatRule?: { frequency: "weekly"; interval: number; byDay: string[] } | null;
+  repeatRule?: { frequency: "weekly" | "monthly"; interval: number; byDay: string[] | null } | null;
 };
 
 const STATIC_REMINDERS: readonly TutorialReminder[] = [
@@ -19,38 +19,38 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
     id: "today",
     title: "Pick the milk up",
     circleColor: "#00AFEE",
-    schedule: { kind: "scheduled", date: "2025-03-24", time: "14:00" },
+    schedule: { kind: "scheduled", date: "2025-08-11", time: "14:00" },
   },
   {
     id: "today-2",
     title: "Call the dentist",
     circleColor: "#00AFEE",
-    schedule: { kind: "scheduled", date: "2025-03-24", time: "16:30" },
+    schedule: { kind: "scheduled", date: "2025-08-11", time: "16:30" },
   },
   {
     id: "this-week",
-    title: "Put the bins out",
+    title: "Pay credit card",
     circleColor: "#E466FD",
-    schedule: { kind: "scheduled", date: "2025-03-27", time: "19:00" },
-    repeatRule: { frequency: "weekly", interval: 1, byDay: ["th"] },
+    schedule: { kind: "scheduled", date: "2025-08-12", time: "11:00" },
+    repeatRule: { frequency: "monthly", interval: 1, byDay: null },
   },
   {
     id: "this-week-2",
     title: "Gym induction",
     circleColor: "#E466FD",
-    schedule: { kind: "scheduled", date: "2025-03-29" },
+    schedule: { kind: "scheduled", date: "2025-08-16" },
   },
   {
     id: "later",
     title: "Water house plants",
     circleColor: "#FDB146",
-    schedule: { kind: "scheduled", date: "2025-04-08" },
+    schedule: { kind: "scheduled", date: "2025-08-28" },
   },
   {
     id: "later-2",
     title: "Renew passport",
     circleColor: "#FDB146",
-    schedule: { kind: "scheduled", date: "2025-04-12" },
+    schedule: { kind: "scheduled", date: "2025-09-12" },
   },
   {
     id: "sometime",
