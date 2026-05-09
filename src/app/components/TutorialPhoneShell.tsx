@@ -24,7 +24,7 @@ export default function TutorialPhoneShell({
   const resolvedShellColor = shellColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
 
   return (
-    <div className="h-[361px] relative shrink-0 w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]">
+    <div className="relative shrink-0 h-full w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]">
       <div
         className="h-full w-full rounded-tl-[40px] rounded-tr-[40px]"
         style={{ backgroundColor: "#000000", paddingTop: "14px", paddingLeft: "14px", paddingRight: "14px", boxSizing: "border-box" }}
@@ -34,7 +34,7 @@ export default function TutorialPhoneShell({
           style={{ backgroundColor: resolvedShellColor }}
         >
           <div
-            className="absolute content-stretch flex flex-col h-[615px] items-center justify-start gap-0 left-0 rounded-tl-[30px] rounded-tr-[30px] top-0 w-full"
+            className="absolute content-stretch flex flex-col h-full items-center justify-start gap-0 left-0 rounded-tl-[30px] rounded-tr-[30px] top-0 w-full"
             style={{ backgroundColor: resolvedShellColor }}
           >
             <TutorialPhoneHeader

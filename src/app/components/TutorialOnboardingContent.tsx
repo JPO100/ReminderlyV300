@@ -40,6 +40,8 @@ interface TutorialOnboardingContentProps {
 const TOTAL_PAGES = 8;
 const REMINDERLY_DARK_BLUE = "#1C2C42";
 const REMINDERLY_LIGHT_BLUE = "#4784F8";
+const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[16px]";
+const TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME = "pb-[45px]";
 
 function TemplatesTutorialButton() {
   return (
@@ -73,7 +75,7 @@ function ListsTutorialPlaceholderPage({
       : UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS;
 
   return (
-    <div className="content-stretch flex h-full w-full flex-col items-center justify-between min-h-0 pb-[45px]">
+    <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
       <div className="flex w-full flex-col items-center gap-[16px]">
         <div className={TUTORIAL_TITLE_CLASSNAME}>
           <p className="block leading-[normal] whitespace-pre-wrap">Setting title</p>
@@ -82,21 +84,23 @@ function ListsTutorialPlaceholderPage({
           <p className="block leading-[normal]">Setting subtitle</p>
         </div>
       </div>
-      <TutorialPhoneShell
-        activeMainTab="lists"
-        showHeaderMenu={settingsMenuEnabled}
-        filterRow={
-          <TutorialReminderFilters
-            items={listFilterItems}
-            showSettings={!savedListsEnabled && filtersMenuVariant === 'grouped'}
-            trailing={savedListsEnabled ? <TemplatesTutorialButton /> : undefined}
-            layout={savedListsEnabled || filtersMenuVariant === 'grouped' ? 'inline' : 'between'}
-            rowGapClassName={savedListsEnabled || filtersMenuVariant === 'grouped' ? 'gap-[12.923px]' : 'gap-[10px]'}
-            groupGapClassName="gap-[8.615px]"
-          />
-        }
-        blankBody
-      />
+      <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+        <TutorialPhoneShell
+          activeMainTab="lists"
+          showHeaderMenu={settingsMenuEnabled}
+          filterRow={
+            <TutorialReminderFilters
+              items={listFilterItems}
+              showSettings={!savedListsEnabled && filtersMenuVariant === 'grouped'}
+              trailing={savedListsEnabled ? <TemplatesTutorialButton /> : undefined}
+              layout={savedListsEnabled || filtersMenuVariant === 'grouped' ? 'inline' : 'between'}
+              rowGapClassName={savedListsEnabled || filtersMenuVariant === 'grouped' ? 'gap-[12.923px]' : 'gap-[10px]'}
+              groupGapClassName="gap-[8.615px]"
+            />
+          }
+          blankBody
+        />
+      </div>
     </div>
   );
 }
@@ -145,169 +149,185 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
     >
       <div className="flex-1 [@media(max-height:570px)]:flex-none relative overflow-hidden">
         {!isListsTutorial && currentPage === 0 && (
-          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage1Text />
-            <TutorialPhoneShell
-              activeMainTab="reminders"
-              showHeaderMenu={settingsMenuEnabled}
-              filterRow={
-                <TutorialReminderFilters
-                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                  showHiddenItems
-                />
-              }
-            >
-              <OnboardingPage1Content />
-            </TutorialPhoneShell>
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                filterRow={
+                  <TutorialReminderFilters
+                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    showHiddenItems
+                  />
+                }
+              >
+                <OnboardingPage1Content />
+              </TutorialPhoneShell>
+            </div>
           </div>
         )}
         
         {!isListsTutorial && currentPage === 1 && (
-          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage2Text />
-            <TutorialPhoneShell
-              activeMainTab="reminders"
-              showHeaderMenu={settingsMenuEnabled}
-              filterRow={
-                <TutorialReminderFilters
-                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                  showHiddenItems
-                />
-              }
-            >
-              <OnboardingPage2Content />
-            </TutorialPhoneShell>
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                filterRow={
+                  <TutorialReminderFilters
+                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    showHiddenItems
+                  />
+                }
+              >
+                <OnboardingPage2Content />
+              </TutorialPhoneShell>
+            </div>
           </div>
         )}
         
         {!isListsTutorial && currentPage === 2 && (
-          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage3Text />
-            <TutorialPhoneShell
-              activeMainTab="reminders"
-              showHeaderMenu={settingsMenuEnabled}
-              filterRow={
-                <TutorialReminderFilters
-                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                  showHiddenItems
-                />
-              }
-            >
-              <OnboardingPage3Content />
-            </TutorialPhoneShell>
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                filterRow={
+                  <TutorialReminderFilters
+                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    showHiddenItems
+                  />
+                }
+              >
+                <OnboardingPage3Content />
+              </TutorialPhoneShell>
+            </div>
           </div>
         )}
         
         {!isListsTutorial && currentPage === 3 && (
-          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage4Text />
-            <TutorialPhoneShell
-              activeMainTab="reminders"
-              showHeaderMenu={settingsMenuEnabled}
-              filterRow={
-                <TutorialReminderFilters
-                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                  showHiddenItems
-                />
-              }
-            >
-              <OnboardingPage4Content />
-            </TutorialPhoneShell>
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                filterRow={
+                  <TutorialReminderFilters
+                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    showHiddenItems
+                  />
+                }
+              >
+                <OnboardingPage4Content />
+              </TutorialPhoneShell>
+            </div>
           </div>
         )}
         
         {!isListsTutorial && currentPage === 4 && (
-          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage5Text />
-            <TutorialPhoneShell
-              activeMainTab="reminders"
-              showHeaderMenu={settingsMenuEnabled}
-              filterRow={
-                <TutorialReminderFilters
-                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                  showHiddenItems
-                />
-              }
-            >
-              <OnboardingPage5Content />
-            </TutorialPhoneShell>
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                filterRow={
+                  <TutorialReminderFilters
+                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    showHiddenItems
+                  />
+                }
+              >
+                <OnboardingPage5Content />
+              </TutorialPhoneShell>
+            </div>
           </div>
         )}
         
         {!isListsTutorial && currentPage === 5 && (
-          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage6Text />
-            <TutorialPhoneShell
-              activeMainTab="reminders"
-              showHeaderMenu={settingsMenuEnabled}
-              filterRow={
-                <TutorialReminderFilters
-                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                  showHiddenItems
-                />
-              }
-            >
-              <OnboardingPage6Content />
-            </TutorialPhoneShell>
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                filterRow={
+                  <TutorialReminderFilters
+                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    showHiddenItems
+                  />
+                }
+              >
+                <OnboardingPage6Content />
+              </TutorialPhoneShell>
+            </div>
           </div>
         )}
         
         {!isListsTutorial && currentPage === 6 && (
-          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage7Text />
-            <TutorialPhoneShell
-              activeMainTab="reminders"
-              showHeaderMenu={settingsMenuEnabled}
-              filterRow={
-                <TutorialReminderFilters
-                  items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                  activeKey={page7ActiveFilter}
-                  showHiddenItems
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                filterRow={
+                  <TutorialReminderFilters
+                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    activeKey={page7ActiveFilter}
+                    showHiddenItems
+                  />
+                }
+              >
+                <OnboardingPage7Content
+                  activeFilter={page7ActiveFilter}
+                  filtersMenuVariant={filtersMenuVariant}
                 />
-              }
-            >
-              <OnboardingPage7Content
-                activeFilter={page7ActiveFilter}
-                filtersMenuVariant={filtersMenuVariant}
-              />
-            </TutorialPhoneShell>
+              </TutorialPhoneShell>
+            </div>
           </div>
         )}
         
         {!isListsTutorial && currentPage === 7 && (
-          <div className="content-stretch flex flex-col justify-between items-center relative w-full h-full min-h-0 pb-[45px]">
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage8Text />
-            <TutorialPhoneShell
-              activeMainTab="reminders"
-              showHeaderMenu={settingsMenuEnabled}
-              shellColor={page8State.showDone ? "#1C2C42" : "#4784f8"}
-              bezelColor={page8State.showDone ? "#000000" : "#1c2c42"}
-              headerProps={{
-                variant: "page8",
-                indicatorColor: page8State.showDone ? "#000000" : "#1c2c42",
-                tickDone: page8State.tickDone,
-                tickFlash: page8State.tickFlash,
-                showDone: page8State.showDone,
-              }}
-              filterRow={
-                page8State.showDone ? (
-                  <TutorialReminderFilters
-                    items={PAGE8_DONE_FILTER_ITEMS}
-                    leading={<OnboardingPage8BackButton highlighted={page8State.backHighlighted} />}
-                    trailing={<OnboardingPage8ClearAllButton />}
-                    layout="inline"
-                    pillVariant="ghost"
-                  />
-                ) : (
-                  <TutorialReminderFilters
-                    items={GROUPED_TUTORIAL_FILTER_ITEMS}
-                    showSettings
-                  />
-                )
-              }
-            >
-              <OnboardingPage8Content showDone={page8State.showDone} />
-            </TutorialPhoneShell>
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                shellColor={page8State.showDone ? "#1C2C42" : "#4784f8"}
+                bezelColor={page8State.showDone ? "#000000" : "#1c2c42"}
+                headerProps={{
+                  variant: "page8",
+                  indicatorColor: page8State.showDone ? "#000000" : "#1c2c42",
+                  tickDone: page8State.tickDone,
+                  tickFlash: page8State.tickFlash,
+                  showDone: page8State.showDone,
+                }}
+                filterRow={
+                  page8State.showDone ? (
+                    <TutorialReminderFilters
+                      items={PAGE8_DONE_FILTER_ITEMS}
+                      leading={<OnboardingPage8BackButton highlighted={page8State.backHighlighted} />}
+                      trailing={<OnboardingPage8ClearAllButton />}
+                      layout="inline"
+                      pillVariant="ghost"
+                    />
+                  ) : (
+                    <TutorialReminderFilters
+                      items={GROUPED_TUTORIAL_FILTER_ITEMS}
+                      showSettings
+                    />
+                  )
+                }
+              >
+                <OnboardingPage8Content showDone={page8State.showDone} />
+              </TutorialPhoneShell>
+            </div>
           </div>
         )}
 
