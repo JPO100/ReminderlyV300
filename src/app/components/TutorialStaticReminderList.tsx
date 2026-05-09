@@ -35,14 +35,8 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
     repeatRule: { frequency: "monthly", interval: 1, byDay: null },
   },
   {
-    id: "this-week-2",
-    title: "Gym induction",
-    circleColor: "#E466FD",
-    schedule: { kind: "scheduled", date: "2025-08-16", time: "09:30" },
-  },
-  {
     id: "later",
-    title: "Water house plants",
+    title: "Renew passport",
     circleColor: "#FDB146",
     schedule: { kind: "scheduled", date: "2025-08-28", time: "08:00" },
   },
