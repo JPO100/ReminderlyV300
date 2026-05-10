@@ -5,7 +5,7 @@ import { formatTime12h } from "../utils/normalise-text";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
 const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
-const PAGE_1_INSERT_START_GAP = 1000;
+const PAGE_1_INSERT_START_GAP = 600;
 const NEW_REMINDER_INSERT_DELAY = 500;
 const INSERT_HIGHLIGHT_MS = 1000;
 const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
