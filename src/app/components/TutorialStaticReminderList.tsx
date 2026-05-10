@@ -3,6 +3,7 @@ import { formatReminderNextOccurrenceLabel, formatRepeatLabel, formatRepeatRuleT
 import { useEffect, useRef, useState } from "react";
 import { formatTime12h } from "../utils/normalise-text";
 import type { TutorialFilterKey } from "./TutorialReminderFilters";
+import { CompletedCircleIcon } from "./icons/ReminderStateIcons";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
 const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
@@ -10,6 +11,8 @@ const PAGE_1_INITIAL_INSERT_DELAY = 200;
 const PAGE_1_INSERT_START_GAP = 500;
 const NEW_REMINDER_INSERT_DELAY = 500;
 const INSERT_HIGHLIGHT_MS = 1000;
+const COMPLETION_DELAY = 350;
+const DONE_BLUE = "#1C2C42";
 const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
 
 type TutorialReminder = {
@@ -120,13 +123,21 @@ function TutorialStaticReminderRow({
   subtitle,
   circleColor,
   showRepeatIcon = false,
+  isDone = false,
+  isPendingDone = false,
 }: {
   titleColor?: string;
   title: string;
   subtitle: string;
   circleColor: string;
   showRepeatIcon?: boolean;
+  isDone?: boolean;
+  isPendingDone?: boolean;
 }) {
+  const isPendingAway = isDone || isPendingDone;
+  const effectiveTitleColor = isPendingAway ? DONE_BLUE : titleColor;
+  const subtitleColor = isPendingAway ? DONE_BLUE : "#BABABA";
+
   return (
     <div className="content-stretch flex items-start justify-between px-px relative w-full">
       <div className="flex-[1_0_0] min-h-px min-w-px relative">
@@ -136,17 +147,21 @@ function TutorialStaticReminderRow({
               className="relative shrink-0 size-[25px] flex items-center justify-center"
               style={{ padding: 0, lineHeight: 0, marginTop: "3px" }}
             >
-              <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
-                <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={circleColor} strokeWidth="2" />
-              </svg>
+              {isPendingAway ? (
+                <CompletedCircleIcon className="absolute block size-full" color={DONE_BLUE} />
+              ) : (
+                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
+                  <circle cx="12.5" cy="12.5" fill="white" r="11.5" stroke={circleColor} strokeWidth="2" />
+                </svg>
+              )}
             </div>
             <div
               className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative"
               style={{ gap: "9px", minHeight: "38px" }}
             >
               <div
-                className="overflow-hidden whitespace-nowrap"
-                style={{ color: titleColor, textDecorationColor: titleColor, height: "17px", maxWidth: "100%", minWidth: 0 }}
+                className={`overflow-hidden whitespace-nowrap${isPendingAway ? " line-through" : ""}`}
+                style={{ color: effectiveTitleColor, textDecorationColor: effectiveTitleColor, height: "17px", maxWidth: "100%", minWidth: 0 }}
               >
                 <p
                   style={{
@@ -167,16 +182,16 @@ function TutorialStaticReminderRow({
                   {title}
                 </p>
               </div>
-              <div className="flex items-center overflow-visible" style={{ textDecorationColor: "#BABABA" }}>
+              <div className={`flex items-center overflow-visible${isPendingAway ? " line-through" : ""}`} style={{ textDecorationColor: subtitleColor }}>
                 <p
                   className="overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ fontSize: "14px", fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: "#BABABA" }}
+                  style={{ fontSize: "14px", fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: subtitleColor }}
                 >
                   {subtitle}
                 </p>
                 {showRepeatIcon && (
                   <div className="flex items-center gap-[6px] h-0 overflow-visible shrink-0 self-center pl-[6px]">
-                    <RepeatReminderIndicator />
+                    <RepeatReminderIndicator color={subtitleColor} />
                   </div>
                 )}
               </div>
@@ -201,9 +216,11 @@ function TutorialStaticReminderRow({
 
 export default function TutorialStaticReminderList({
   page1BuildSequence = false,
+  page3DoneSequence = false,
   activeFilter,
 }: {
   page1BuildSequence?: boolean;
+  page3DoneSequence?: boolean;
   activeFilter?: TutorialFilterKey;
 }) {
   const [visibleIds, setVisibleIds] = useState<string[]>(
@@ -211,6 +228,8 @@ export default function TutorialStaticReminderList({
   );
   const [reinsertedId, setReinsertedId] = useState<string | null>(null);
   const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
+  const [pendingDoneIds, setPendingDoneIds] = useState<Set<string>>(new Set());
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const timeoutsRef = useRef<number[]>([]);
   const insertHighlightTimerRef = useRef<number | null>(null);
 
@@ -276,6 +295,83 @@ export default function TutorialStaticReminderList({
     };
   }, [page1BuildSequence]);
 
+  useEffect(() => {
+    if (!page3DoneSequence) {
+      setPendingDoneIds(new Set());
+      setCompletedIds(new Set());
+      return;
+    }
+
+    setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
+    setPendingDoneIds(new Set());
+    setCompletedIds(new Set());
+
+    const sequenceIds = STATIC_REMINDERS.map((reminder) => reminder.id);
+    const timers: number[] = [];
+    let cancelled = false;
+
+    const startCycle = () => {
+      if (cancelled) {
+        return;
+      }
+
+      setPendingDoneIds(new Set());
+      setCompletedIds(new Set());
+
+      sequenceIds.forEach((id, index) => {
+        const startTimer = window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
+
+          setPendingDoneIds((prev) => {
+            const next = new Set(prev);
+            next.add(id);
+            return next;
+          });
+
+          const commitTimer = window.setTimeout(() => {
+            if (cancelled) {
+              return;
+            }
+            setPendingDoneIds((prev) => {
+              const next = new Set(prev);
+              next.delete(id);
+              return next;
+            });
+            setCompletedIds((prev) => {
+              const next = new Set(prev);
+              next.add(id);
+              return next;
+            });
+          }, COMPLETION_DELAY);
+
+          timers.push(commitTimer);
+        }, 500 * (index + 1));
+
+        timers.push(startTimer);
+      });
+
+      const resetTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+        setPendingDoneIds(new Set());
+        setCompletedIds(new Set());
+        startCycle();
+      }, 500 * (sequenceIds.length + 1));
+
+      timers.push(resetTimer);
+    };
+
+    startCycle();
+
+    return () => {
+      cancelled = true;
+      timers.forEach((timeoutId) => clearTimeout(timeoutId));
+    };
+  }, [page3DoneSequence]);
+
   const visibleReminders = visibleIds
     .map((id) => STATIC_REMINDERS.find((reminder) => reminder.id === id))
     .filter((reminder): reminder is (typeof STATIC_REMINDERS)[number] => reminder != null)
@@ -304,6 +400,8 @@ export default function TutorialStaticReminderList({
             {visibleReminders.map((reminder) => {
               const isReinserted = reinsertedId === reminder.id;
               const isHighlighted = insertHighlightId === reminder.id;
+              const isPendingDone = pendingDoneIds.has(reminder.id);
+              const isDone = completedIds.has(reminder.id);
               return (
                 <motion.div
                   key={reminder.id}
@@ -324,6 +422,8 @@ export default function TutorialStaticReminderList({
                     circleColor={reminder.circleColor}
                     showRepeatIcon={Boolean(reminder.repeatRule)}
                     titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
+                    isPendingDone={isPendingDone}
+                    isDone={isDone}
                   />
                 </motion.div>
               );

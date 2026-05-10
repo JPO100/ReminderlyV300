@@ -1,6 +1,7 @@
 import svgPaths from "@/imports/svg-b2700o3wr8";
 import ImportedNewReminderPop from "@/imports/NewReminderPop";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
+import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 function Frame3() {
   return (
@@ -28,9 +29,7 @@ export function OnboardingPage3Text() {
 function ReminderList() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full" data-name="Reminder list">
-      <div className="px-[14px] w-full">
-        <ImportedNewReminderPop />
-      </div>
+      <TutorialStaticReminderList page3DoneSequence />
     </div>
   );
 }
