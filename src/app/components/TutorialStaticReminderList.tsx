@@ -421,7 +421,7 @@ export default function TutorialStaticReminderList({
       return reminder.category === activeFilter;
     });
 
-  const animatePresenceKey = `tutorial-${doneReminderIds != null ? "done-reminders" : page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
+  const animatePresenceKey = `tutorial-${visibleReminderIds != null ? "controlled-sequence" : doneReminderIds != null ? "done-reminders" : page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
 
   return (
     <div className="flex flex-[1_0_0] min-h-px w-full items-start justify-center overflow-hidden">
