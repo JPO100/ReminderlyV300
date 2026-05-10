@@ -97,22 +97,12 @@ export default function OnboardingPage5Content({
 
         onLogoHighlightChange(false);
         onDoneRemindersChange(true);
-        setVisibleReminderIds([]);
+        setVisibleReminderIds(PAGE_5_DONE_REMINDER_IDS);
         setFadeReminderIds([]);
-
-        const doneInsertTimer = window.setTimeout(() => {
-          if (cancelled) {
-            return;
-          }
-
-          setVisibleReminderIds(PAGE_5_DONE_REMINDER_IDS);
-          setFadeReminderIds(PAGE_5_DONE_REMINDER_IDS);
-        }, PAGE_5_INSERT_DELAY);
-        timers.push(doneInsertTimer);
 
         const recycleTimer = window.setTimeout(() => {
           startCycle();
-        }, PAGE_5_INSERT_DELAY + PAGE_5_RECYCLE_DELAY);
+        }, PAGE_5_RECYCLE_DELAY);
         timers.push(recycleTimer);
       }, PAGE_5_SEQUENCE_DELAY);
       timers.push(doneTimer);
