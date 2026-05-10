@@ -109,18 +109,28 @@ function ReminderList({
   useEffect(() => {
     onOverlayOpenChange?.(false);
 
-    const circleTimer = window.setTimeout(() => {
-      setShowCircle(true);
-    }, 400);
+    const throbSequence = [
+      { delay: 600, visible: true },
+      { delay: 1200, visible: false },
+      { delay: 1800, visible: true },
+      { delay: 2400, visible: false },
+      { delay: 3000, visible: true },
+    ];
 
-    const overlayTimer = window.setTimeout(() => {
-      setShowCircle(false);
+    const timers: number[] = [];
+
+    throbSequence.forEach(({ delay, visible }) => {
+      timers.push(window.setTimeout(() => {
+        setShowCircle(visible);
+      }, delay));
+    });
+
+    timers.push(window.setTimeout(() => {
       onOverlayOpenChange?.(true);
-    }, 550);
+    }, 3200));
 
     return () => {
-      clearTimeout(circleTimer);
-      clearTimeout(overlayTimer);
+      timers.forEach(clearTimeout);
       onOverlayOpenChange?.(false);
     };
   }, [onOverlayOpenChange]);
