@@ -78,7 +78,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0">
       <div className={TUTORIAL_TITLE_CLASSNAME}>
-        <p className="css-ew64yg leading-[normal]">Even smarter reminders!</p>
+        <p className="css-ew64yg leading-[normal]">Manage your reminders</p>
       </div>
     </div>
   );
@@ -89,7 +89,7 @@ export function OnboardingPage3Text() {
     <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] [@media(max-height:570px)]:!min-h-0 items-center relative shrink-0">
       <Frame3 />
       <div className={TUTORIAL_BODY_CLASSNAME}>
-        <p className="css-4hzbpn leading-[30px]">Reminderly even recognises repeat events</p>
+        <p className="css-4hzbpn leading-[30px]">Tap the three dot menu<br />to view more reminder options</p>
       </div>
     </div>
   );
