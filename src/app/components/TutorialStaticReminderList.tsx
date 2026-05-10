@@ -237,6 +237,7 @@ export default function TutorialStaticReminderList({
   const [reinsertedId, setReinsertedId] = useState<string | null>(null);
   const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
   const [pendingDoneIds, setPendingDoneIds] = useState<Set<string>>(new Set());
+  const [page3ResetFadeIds, setPage3ResetFadeIds] = useState<Set<string>>(new Set());
   const [suppressPage3ResetAnimation, setSuppressPage3ResetAnimation] = useState(false);
   const timeoutsRef = useRef<number[]>([]);
   const insertHighlightTimerRef = useRef<number | null>(null);
@@ -314,12 +315,14 @@ export default function TutorialStaticReminderList({
   useEffect(() => {
     if (!page3DoneSequence) {
       setPendingDoneIds(new Set());
+      setPage3ResetFadeIds(new Set());
       setSuppressPage3ResetAnimation(false);
       return;
     }
 
     setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
     setPendingDoneIds(new Set());
+    setPage3ResetFadeIds(new Set());
     setSuppressPage3ResetAnimation(false);
 
     const sequenceIds = STATIC_REMINDERS
@@ -333,9 +336,21 @@ export default function TutorialStaticReminderList({
         return;
       }
 
-      setSuppressPage3ResetAnimation(true);
+      setSuppressPage3ResetAnimation(false);
       setPendingDoneIds(new Set());
-      setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
+      setPage3ResetFadeIds(new Set());
+      setVisibleIds([]);
+
+      const resetTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        const resetIds = STATIC_REMINDERS.map((reminder) => reminder.id);
+        setPage3ResetFadeIds(new Set(resetIds));
+        setVisibleIds(resetIds);
+      }, NEW_REMINDER_INSERT_DELAY);
+      timers.push(resetTimer);
 
       sequenceIds.forEach((id, index) => {
         const startTimer = window.setTimeout(() => {
@@ -366,14 +381,14 @@ export default function TutorialStaticReminderList({
           }, COMPLETION_DELAY);
 
           timers.push(commitTimer);
-        }, 500 * (index + 1));
+        }, NEW_REMINDER_INSERT_DELAY + 500 * (index + 1));
 
         timers.push(startTimer);
       });
 
       const recycleTimer = window.setTimeout(() => {
         startCycle();
-      }, 500 * sequenceIds.length + COMPLETION_DELAY + TUTORIAL_RECYCLE_DELAY);
+      }, NEW_REMINDER_INSERT_DELAY + 500 * sequenceIds.length + COMPLETION_DELAY + TUTORIAL_RECYCLE_DELAY);
       timers.push(recycleTimer);
     };
 
@@ -412,6 +427,7 @@ export default function TutorialStaticReminderList({
           <AnimatePresence key={animatePresenceKey}>
             {visibleReminders.map((reminder) => {
               const isReinserted = reinsertedId === reminder.id;
+              const isPage3ResetFade = page3ResetFadeIds.has(reminder.id);
               const isHighlighted = insertHighlightId === reminder.id;
               const isPendingDone = pendingDoneIds.has(reminder.id);
               if (suppressPage3ResetAnimation) {
@@ -434,13 +450,20 @@ export default function TutorialStaticReminderList({
                 <motion.div
                   key={reminder.id}
                   layout
-                  initial={isReinserted ? { opacity: 0 } : false}
+                  initial={isReinserted || isPage3ResetFade ? { opacity: 0 } : false}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={isReinserted ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } }}
+                  transition={isReinserted || isPage3ResetFade ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } }}
                   onAnimationComplete={() => {
                     if (isReinserted) {
                       setReinsertedId(null);
+                    }
+                    if (isPage3ResetFade) {
+                      setPage3ResetFadeIds((prev) => {
+                        const next = new Set(prev);
+                        next.delete(reminder.id);
+                        return next;
+                      });
                     }
                   }}
                 >
