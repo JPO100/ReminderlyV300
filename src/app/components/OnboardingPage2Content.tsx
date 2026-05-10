@@ -10,7 +10,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0">
       <div className={TUTORIAL_TITLE_CLASSNAME}>
-        <p className="css-ew64yg leading-[normal]">Mark reminders as 'done'</p>
+        <p className="css-ew64yg leading-[normal]">Filter your reminders</p>
       </div>
     </div>
   );
@@ -21,7 +21,7 @@ export function OnboardingPage2Text() {
     <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] items-center relative shrink-0">
       <Frame3 />
       <div className={TUTORIAL_BODY_CLASSNAME}>
-        <p className="css-4hzbpn leading-[30px]">Click the coloured circle on your<br />reminder to mark it as 'done'</p>
+        <p className="css-4hzbpn leading-[30px]">Tap a filter to narrow things down.<br />De-select it to bring them all back</p>
       </div>
     </div>
   );
@@ -55,7 +55,7 @@ export function useOnboardingPage2ActiveFilter(enabled: boolean) {
         sequenceIndex = (sequenceIndex + 1) % PAGE_2_FILTER_LOOP_SEQUENCE.length;
         setActiveFilter(PAGE_2_FILTER_LOOP_SEQUENCE[sequenceIndex]);
         scheduleNext();
-      }, 800);
+      }, 1000);
     };
 
     scheduleNext();
