@@ -407,14 +407,29 @@ export default function TutorialStaticReminderList({
               const isReinserted = reinsertedId === reminder.id;
               const isHighlighted = insertHighlightId === reminder.id;
               const isPendingDone = pendingDoneIds.has(reminder.id);
+              if (suppressPage3ResetAnimation) {
+                return (
+                  <div key={reminder.id}>
+                    <TutorialStaticReminderRow
+                      title={reminder.title}
+                      subtitle={getTutorialReminderSubtitle(reminder)}
+                      circleColor={reminder.circleColor}
+                      showRepeatIcon={Boolean(reminder.repeatRule)}
+                      titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
+                      isPendingDone={isPendingDone}
+                    />
+                  </div>
+                );
+              }
+
               return (
                 <motion.div
                   key={reminder.id}
-                  layout={!suppressPage3ResetAnimation}
-                  initial={suppressPage3ResetAnimation ? false : (isReinserted ? { opacity: 0 } : false)}
-                  animate={suppressPage3ResetAnimation ? undefined : { opacity: 1 }}
+                  layout
+                  initial={isReinserted ? { opacity: 0 } : false}
+                  animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={suppressPage3ResetAnimation ? undefined : (isReinserted ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } })}
+                  transition={isReinserted ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } }}
                   onAnimationComplete={() => {
                     if (isReinserted) {
                       setReinsertedId(null);
