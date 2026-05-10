@@ -76,7 +76,7 @@ function TutorialReminderFilterPill({
   return (
     <div
       className={`content-stretch flex items-center justify-center px-[11.144px] py-[10.448px] relative rounded-[69.652px] shrink-0 h-[28px] ${isGhost ? "bg-[rgba(255,255,255,0.15)]" : isActive ? "bg-white" : "bg-transparent"}`}
-      style={{ boxShadow: `inset 0 0 0 ${isGhost ? "1px" : isActive ? "2px" : "1px"} ${isGhost ? "#FFFFFF" : color}` }}
+      style={{ boxShadow: `inset 0 0 0 ${isGhost ? "1px" : isActive ? "1.5px" : "1px"} ${isGhost ? "#FFFFFF" : color}` }}
     >
       <div
         className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[9.751px]"
