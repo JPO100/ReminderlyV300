@@ -7,7 +7,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0">
       <div className={TUTORIAL_TITLE_CLASSNAME}>
-        <p className="css-ew64yg leading-[normal]">Smart reminders!</p>
+        <p className="css-ew64yg leading-[normal]">Mark items as ‘done’</p>
       </div>
     </div>
   );
@@ -19,7 +19,8 @@ export function OnboardingPage3Text() {
       <Frame3 />
       <div className={TUTORIAL_BODY_CLASSNAME}>
         <p className="css-4hzbpn leading-[30px]">
-          When Reminderly spots a time or date, it automatically sets things up.
+          Tap the reminder check circle<br />
+          to mark reminders as ‘done’
         </p>
       </div>
     </div>
