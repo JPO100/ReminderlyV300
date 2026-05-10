@@ -411,10 +411,10 @@ export default function TutorialStaticReminderList({
                 <motion.div
                   key={reminder.id}
                   layout={!suppressPage3ResetAnimation}
-                  initial={isReinserted ? { opacity: 0 } : false}
-                  animate={{ opacity: 1 }}
+                  initial={suppressPage3ResetAnimation ? false : (isReinserted ? { opacity: 0 } : false)}
+                  animate={suppressPage3ResetAnimation ? undefined : { opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={isReinserted ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } }}
+                  transition={suppressPage3ResetAnimation ? undefined : (isReinserted ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } })}
                   onAnimationComplete={() => {
                     if (isReinserted) {
                       setReinsertedId(null);
