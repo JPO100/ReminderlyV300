@@ -229,7 +229,6 @@ export default function TutorialStaticReminderList({
   const [reinsertedId, setReinsertedId] = useState<string | null>(null);
   const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
   const [pendingDoneIds, setPendingDoneIds] = useState<Set<string>>(new Set());
-  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const timeoutsRef = useRef<number[]>([]);
   const insertHighlightTimerRef = useRef<number | null>(null);
 
@@ -298,15 +297,15 @@ export default function TutorialStaticReminderList({
   useEffect(() => {
     if (!page3DoneSequence) {
       setPendingDoneIds(new Set());
-      setCompletedIds(new Set());
       return;
     }
 
     setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
     setPendingDoneIds(new Set());
-    setCompletedIds(new Set());
 
-    const sequenceIds = STATIC_REMINDERS.map((reminder) => reminder.id);
+    const sequenceIds = STATIC_REMINDERS
+      .map((reminder) => reminder.id)
+      .filter((id) => id !== "sometime");
     const timers: number[] = [];
     let cancelled = false;
 
@@ -316,7 +315,7 @@ export default function TutorialStaticReminderList({
       }
 
       setPendingDoneIds(new Set());
-      setCompletedIds(new Set());
+      setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
 
       sequenceIds.forEach((id, index) => {
         const startTimer = window.setTimeout(() => {
@@ -339,11 +338,7 @@ export default function TutorialStaticReminderList({
               next.delete(id);
               return next;
             });
-            setCompletedIds((prev) => {
-              const next = new Set(prev);
-              next.add(id);
-              return next;
-            });
+            setVisibleIds((prev) => prev.filter((visibleId) => visibleId !== id));
           }, COMPLETION_DELAY);
 
           timers.push(commitTimer);
@@ -357,9 +352,8 @@ export default function TutorialStaticReminderList({
           return;
         }
         setPendingDoneIds(new Set());
-        setCompletedIds(new Set());
         startCycle();
-      }, 500 * (sequenceIds.length + 1));
+      }, 500 * (sequenceIds.length + 2));
 
       timers.push(resetTimer);
     };
@@ -401,7 +395,6 @@ export default function TutorialStaticReminderList({
               const isReinserted = reinsertedId === reminder.id;
               const isHighlighted = insertHighlightId === reminder.id;
               const isPendingDone = pendingDoneIds.has(reminder.id);
-              const isDone = completedIds.has(reminder.id);
               return (
                 <motion.div
                   key={reminder.id}
@@ -423,7 +416,6 @@ export default function TutorialStaticReminderList({
                     showRepeatIcon={Boolean(reminder.repeatRule)}
                     titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
                     isPendingDone={isPendingDone}
-                    isDone={isDone}
                   />
                 </motion.div>
               );
