@@ -1,8 +1,12 @@
+import { AnimatePresence, motion } from "motion/react";
 import { formatReminderNextOccurrenceLabel, formatRepeatLabel, formatRepeatRuleText, formatScheduledDateForRow } from "../reminder-utils";
+import { useEffect, useRef, useState } from "react";
 import { formatTime12h } from "../utils/normalise-text";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
 const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
+const INSERT_HIGHLIGHT_MS = 1000;
+const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
 
 type TutorialReminder = {
   id: string;
@@ -100,11 +104,13 @@ function RepeatReminderIndicator({ color = "#BABABA" }: { color?: string }) {
 }
 
 function TutorialStaticReminderRow({
+  titleColor = "#1c2c42",
   title,
   subtitle,
   circleColor,
   showRepeatIcon = false,
 }: {
+  titleColor?: string;
   title: string;
   subtitle: string;
   circleColor: string;
@@ -129,7 +135,7 @@ function TutorialStaticReminderRow({
             >
               <div
                 className="overflow-hidden whitespace-nowrap"
-                style={{ color: "#1c2c42", textDecorationColor: "#1c2c42", height: "17px", maxWidth: "100%", minWidth: 0 }}
+                style={{ color: titleColor, textDecorationColor: titleColor, height: "17px", maxWidth: "100%", minWidth: 0 }}
               >
                 <p
                   style={{
@@ -182,7 +188,51 @@ function TutorialStaticReminderRow({
   );
 }
 
-export default function TutorialStaticReminderList() {
+export default function TutorialStaticReminderList({ page1BuildSequence = false }: { page1BuildSequence?: boolean }) {
+  const [visibleIds, setVisibleIds] = useState<string[]>(
+    page1BuildSequence ? [PAGE_1_BUILD_SEQUENCE_IDS[0]] : STATIC_REMINDERS.map((reminder) => reminder.id)
+  );
+  const [reinsertedId, setReinsertedId] = useState<string | null>(null);
+  const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
+  const timeoutsRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    if (!page1BuildSequence) {
+      setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
+      setReinsertedId(null);
+      setInsertHighlightId(null);
+      return;
+    }
+
+    setVisibleIds([PAGE_1_BUILD_SEQUENCE_IDS[0]]);
+    setReinsertedId(null);
+    setInsertHighlightId(null);
+
+    const timers = PAGE_1_BUILD_SEQUENCE_IDS.slice(1).map((id, index) =>
+      window.setTimeout(() => {
+        setVisibleIds((prev) => [id, ...prev]);
+        setReinsertedId(id);
+        setInsertHighlightId(id);
+
+        const highlightTimer = window.setTimeout(() => {
+          setInsertHighlightId((current) => (current === id ? null : current));
+        }, INSERT_HIGHLIGHT_MS);
+        timeoutsRef.current.push(highlightTimer);
+      }, (index + 1) * 100)
+    );
+
+    timeoutsRef.current = timers;
+
+    return () => {
+      timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
+      timeoutsRef.current = [];
+    };
+  }, [page1BuildSequence]);
+
+  const visibleReminders = visibleIds
+    .map((id) => STATIC_REMINDERS.find((reminder) => reminder.id === id))
+    .filter((reminder): reminder is (typeof STATIC_REMINDERS)[number] => reminder != null);
+
   return (
     <div className="flex flex-[1_0_0] min-h-px w-full items-start justify-center overflow-hidden">
       <div
@@ -194,15 +244,35 @@ export default function TutorialStaticReminderList() {
         }}
       >
         <div className="flex flex-col gap-[23px] w-full" style={{ position: "relative", zIndex: 1 }}>
-          {STATIC_REMINDERS.map((reminder) => (
-            <TutorialStaticReminderRow
-              key={reminder.id}
-              title={reminder.title}
-              subtitle={getTutorialReminderSubtitle(reminder)}
-              circleColor={reminder.circleColor}
-              showRepeatIcon={Boolean(reminder.repeatRule)}
-            />
-          ))}
+          <AnimatePresence initial={false}>
+            {visibleReminders.map((reminder) => {
+              const isReinserted = reinsertedId === reminder.id;
+              const isHighlighted = insertHighlightId === reminder.id;
+              return (
+                <motion.div
+                  key={reminder.id}
+                  layout
+                  initial={isReinserted ? { opacity: 0 } : false}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={isReinserted ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } }}
+                  onAnimationComplete={() => {
+                    if (isReinserted) {
+                      setReinsertedId(null);
+                    }
+                  }}
+                >
+                  <TutorialStaticReminderRow
+                    title={reminder.title}
+                    subtitle={getTutorialReminderSubtitle(reminder)}
+                    circleColor={reminder.circleColor}
+                    showRepeatIcon={Boolean(reminder.repeatRule)}
+                    titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
+                  />
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       </div>
     </div>

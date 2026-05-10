@@ -1,6 +1,5 @@
 import svgPaths from "@/imports/svg-b2700o3wr8";
 import ImportedReminderList from "@/imports/ReminderList-1189-377";
-import { useEffect, useState } from "react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
@@ -41,19 +40,9 @@ function NewReminderBtn() {
 }
 
 export default function OnboardingPage1Content() {
-  const [animationKey, setAnimationKey] = useState(0);
-
-  useEffect(() => {
-    const loopTimer = setTimeout(() => {
-      setAnimationKey((prev) => prev + 1);
-    }, 6000);
-
-    return () => clearTimeout(loopTimer);
-  }, [animationKey]);
-
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
-      <TutorialStaticReminderList />
+      <TutorialStaticReminderList page1BuildSequence />
     </div>
   );
 }
