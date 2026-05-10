@@ -126,6 +126,7 @@ function TutorialStaticReminderRow({
   showRepeatIcon = false,
   isDone = false,
   isPendingDone = false,
+  showMenuButton = true,
   menuButtonRef,
 }: {
   titleColor?: string;
@@ -135,6 +136,7 @@ function TutorialStaticReminderRow({
   showRepeatIcon?: boolean;
   isDone?: boolean;
   isPendingDone?: boolean;
+  showMenuButton?: boolean;
   menuButtonRef?: ((node: HTMLDivElement | null) => void) | null;
 }) {
   const isPendingAway = isDone || isPendingDone;
@@ -202,18 +204,20 @@ function TutorialStaticReminderRow({
           </div>
         </div>
       </div>
-      <div
-        className="relative shrink-0 self-stretch w-[20px] flex items-center justify-center"
-        style={{ padding: 0, lineHeight: 0 }}
-        aria-hidden="true"
-        ref={menuButtonRef ?? undefined}
-      >
-        <div className="flex flex-row items-center justify-center gap-[3px]">
-          <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
-          <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
-          <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
+      {showMenuButton && (
+        <div
+          className="relative shrink-0 self-stretch w-[20px] flex items-center justify-center"
+          style={{ padding: 0, lineHeight: 0 }}
+          aria-hidden="true"
+          ref={menuButtonRef ?? undefined}
+        >
+          <div className="flex flex-row items-center justify-center gap-[3px]">
+            <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
+            <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
+            <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -446,6 +450,7 @@ export default function TutorialStaticReminderList({
                     titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
                     isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
+                    showMenuButton={!isDoneReminder}
                     menuButtonRef={reminder.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
                   />
                 </div>
@@ -481,6 +486,7 @@ export default function TutorialStaticReminderList({
                     titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
                     isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
+                    showMenuButton={!isDoneReminder}
                     menuButtonRef={reminder.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
                   />
                 </motion.div>
