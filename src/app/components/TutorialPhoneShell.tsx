@@ -6,6 +6,7 @@ export default function TutorialPhoneShell({
   activeMainTab,
   filterRow,
   children,
+  overlay,
   blankBody = false,
   shellColor,
   bezelColor = "#1c2c42",
@@ -15,6 +16,7 @@ export default function TutorialPhoneShell({
   activeMainTab: "reminders" | "lists";
   filterRow: ReactNode;
   children?: ReactNode;
+  overlay?: ReactNode;
   blankBody?: boolean;
   shellColor?: string;
   bezelColor?: string;
@@ -54,6 +56,7 @@ export default function TutorialPhoneShell({
                 )}
               </div>
             </div>
+            {overlay}
           </div>
         </div>
       </div>

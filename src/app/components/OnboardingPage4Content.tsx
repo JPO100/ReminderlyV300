@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Reminder } from "../reminder-utils";
 import { formatDueLine } from "./ReminderInfoOverlay";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
@@ -8,11 +8,20 @@ import TutorialStaticReminderList from "./TutorialStaticReminderList";
 const TUTORIAL_OVERLAY_SCALE = 0.764;
 const TARGET_CIRCLE_SIZE = 35;
 
-function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }) {
+export const CALL_DENTIST_TUTORIAL_REMINDER: Reminder = {
+  id: "today-2",
+  originalText: "Call the dentist",
+  displayText: "Call the dentist",
+  createdAt: 0,
+  schedule: { kind: "scheduled", date: "2025-08-11", time: "16:30" },
+  completedAt: null,
+};
+
+export function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }) {
   const dueLine = formatDueLine(reminder, new Date(2025, 7, 11, 12, 0, 0, 0));
 
   return (
-    <div className="absolute z-20 flex items-center justify-center bg-black/50 left-[-14px] right-[-14px] top-[-50px] bottom-0">
+    <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50">
       <div
         className="pointer-events-none"
         style={{
@@ -87,15 +96,34 @@ export function OnboardingPage4Text() {
 }
 
 function ReminderList({
-  menuTargetElement,
-  showCircle,
   setMenuTargetElement,
+  onOverlayOpenChange,
 }: {
-  menuTargetElement: HTMLDivElement | null;
-  showCircle: boolean;
   setMenuTargetElement: (element: HTMLDivElement | null) => void;
+  onOverlayOpenChange?: (open: boolean) => void;
 }) {
+  const [menuTargetElement, setLocalMenuTargetElement] = useState<HTMLDivElement | null>(null);
   const [menuTargetRect, setMenuTargetRect] = useState<{ left: number; top: number } | null>(null);
+  const [showCircle, setShowCircle] = useState(false);
+
+  useEffect(() => {
+    onOverlayOpenChange?.(false);
+
+    const circleTimer = window.setTimeout(() => {
+      setShowCircle(true);
+    }, 400);
+
+    const overlayTimer = window.setTimeout(() => {
+      setShowCircle(false);
+      onOverlayOpenChange?.(true);
+    }, 550);
+
+    return () => {
+      clearTimeout(circleTimer);
+      clearTimeout(overlayTimer);
+      onOverlayOpenChange?.(false);
+    };
+  }, [onOverlayOpenChange]);
 
   useEffect(() => {
     if (!menuTargetElement) {
@@ -129,7 +157,10 @@ function ReminderList({
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full relative" data-name="Reminder list">
       <TutorialStaticReminderList
         menuTargetReminderId="today-2"
-        onMenuTargetElementChange={setMenuTargetElement}
+        onMenuTargetElementChange={(element) => {
+          setLocalMenuTargetElement(element);
+          setMenuTargetElement(element);
+        }}
       />
       {showCircle && menuTargetRect && (
         <motion.div
@@ -152,44 +183,17 @@ function ReminderList({
   );
 }
 
-export default function OnboardingPage4Content() {
-  const [menuTargetElement, setMenuTargetElement] = useState<HTMLDivElement | null>(null);
-  const [showCircle, setShowCircle] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(false);
-
-  const callDentistReminder = useMemo<Reminder>(() => ({
-    id: "today-2",
-    originalText: "Call the dentist",
-    displayText: "Call the dentist",
-    createdAt: 0,
-    schedule: { kind: "scheduled", date: "2025-08-11", time: "16:30" },
-    completedAt: null,
-  }), []);
-
-  useEffect(() => {
-    const circleTimer = window.setTimeout(() => {
-      setShowCircle(true);
-    }, 400);
-
-    const overlayTimer = window.setTimeout(() => {
-      setShowCircle(false);
-      setShowOverlay(true);
-    }, 550);
-
-    return () => {
-      clearTimeout(circleTimer);
-      clearTimeout(overlayTimer);
-    };
-  }, []);
-
+export default function OnboardingPage4Content({
+  onOverlayOpenChange,
+}: {
+  onOverlayOpenChange?: (open: boolean) => void;
+}) {
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
       <ReminderList
-        menuTargetElement={menuTargetElement}
-        showCircle={showCircle}
-        setMenuTargetElement={setMenuTargetElement}
+        setMenuTargetElement={() => {}}
+        onOverlayOpenChange={onOverlayOpenChange}
       />
-      {showOverlay && <TutorialReminderInfoOverlay reminder={callDentistReminder} />}
     </div>
   );
 }

@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import svgPaths from '@/imports/svg-go2phgsyt4';
 import OnboardingPage1Content, { OnboardingPage1Text } from '@/app/components/OnboardingPage1Content';
 import OnboardingPage2Content, { OnboardingPage2Text } from '@/app/components/OnboardingPage2Content';
 import { useOnboardingPage2ActiveFilter } from '@/app/components/OnboardingPage2Content';
 import OnboardingPage3Content, { OnboardingPage3Text } from '@/app/components/OnboardingPage3Content';
-import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
+import OnboardingPage4Content, { CALL_DENTIST_TUTORIAL_REMINDER, OnboardingPage4Text, TutorialReminderInfoOverlay } from '@/app/components/OnboardingPage4Content';
 import OnboardingPage5Content, { OnboardingPage5Text } from '@/app/components/OnboardingPage5Content';
 import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/OnboardingPage6Content';
 import OnboardingPage7Content, {
@@ -103,6 +103,13 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const isListsTutorial = variant === 'lists';
   const page2ActiveFilter = useOnboardingPage2ActiveFilter(!isListsTutorial && currentPage === 1);
   const page7ActiveFilter = useOnboardingPage7ActiveFilter(filtersMenuVariant);
+  const [page3ShowOverlay, setPage3ShowOverlay] = useState(false);
+
+  useEffect(() => {
+    if (isListsTutorial || currentPage !== 2) {
+      setPage3ShowOverlay(false);
+    }
+  }, [currentPage, isListsTutorial]);
 
   const handleNext = () => {
     if (currentPage < TOTAL_PAGES - 1) {
@@ -189,6 +196,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
               <TutorialPhoneShell
                 activeMainTab="reminders"
                 showHeaderMenu={settingsMenuEnabled}
+                overlay={page3ShowOverlay ? <TutorialReminderInfoOverlay reminder={CALL_DENTIST_TUTORIAL_REMINDER} /> : undefined}
                 filterRow={
                   <TutorialReminderFilters
                     items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
@@ -196,7 +204,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
                   />
                 }
               >
-                <OnboardingPage4Content />
+                <OnboardingPage4Content onOverlayOpenChange={setPage3ShowOverlay} />
               </TutorialPhoneShell>
             </div>
           </div>
