@@ -70,12 +70,12 @@ function AttentionCircle({ isVisible }: AttentionCircleProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
           className="absolute pointer-events-none"
           style={{
             top: '50%',
-            right: '14px',
-            transform: 'translateY(-50%)',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
             width: '32px',
             height: '32px',
             borderRadius: '50%',
@@ -101,20 +101,20 @@ export default function OnboardingPage4Content({
     setCircleVisible(false);
     setThrobCount(0);
 
-    // Start the throb sequence
+    // Start the throb sequence - much slower for visibility
     const throbSequence = [
       // First appearance
       { delay: 600, visible: true, count: 1 },
       // First disappearance
-      { delay: 1200, visible: false, count: 1 },
+      { delay: 1800, visible: false, count: 1 },
       // Second appearance
-      { delay: 1800, visible: true, count: 2 },
+      { delay: 3000, visible: true, count: 2 },
       // Second disappearance
-      { delay: 2400, visible: false, count: 2 },
+      { delay: 4200, visible: false, count: 2 },
       // Third appearance
-      { delay: 3000, visible: true, count: 3 },
+      { delay: 5400, visible: true, count: 3 },
       // Final disappearance before overlay
-      { delay: 3600, visible: false, count: 3 },
+      { delay: 6600, visible: false, count: 3 },
     ];
 
     const timeouts: NodeJS.Timeout[] = [];
@@ -130,7 +130,7 @@ export default function OnboardingPage4Content({
     // Open overlay 200ms after final disappearance
     const overlayTimeout = setTimeout(() => {
       onOverlayOpenChange(true);
-    }, 3800); // 3600ms (last disappearance) + 200ms delay
+    }, 6800); // 6600ms (last disappearance) + 200ms delay
 
     timeouts.push(overlayTimeout);
 
