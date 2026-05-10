@@ -1,5 +1,69 @@
+import { motion } from "motion/react";
+import { useEffect, useMemo, useState } from "react";
+import type { Reminder } from "../reminder-utils";
+import { formatDueLine } from "./ReminderInfoOverlay";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
+
+const TUTORIAL_OVERLAY_SCALE = 0.696;
+const TARGET_CIRCLE_SIZE = 35;
+
+function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }) {
+  const dueLine = formatDueLine(reminder, new Date(2025, 7, 11, 12, 0, 0, 0));
+
+  return (
+    <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50">
+      <div
+        className="pointer-events-none"
+        style={{
+          width: 340,
+          transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
+          transformOrigin: "center center",
+        }}
+      >
+        <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
+            <p className="leading-[normal]" style={{ fontWeight: 700 }}>Call the dentist</p>
+          </div>
+          <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[17px] text-center max-w-full text-[#1c2c42]">
+              <p className="leading-[normal] whitespace-nowrap" style={{ fontWeight: 700 }}>{dueLine}</p>
+            </div>
+          </div>
+          <div className="content-stretch flex flex-col gap-[30px] items-start mt-[7px] relative shrink-0 w-full">
+            <div className="bg-[#4784f8] h-[50px] relative rounded-[100px] shrink-0 w-full">
+              <div className="flex flex-row items-center justify-center size-full">
+                <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-left text-white whitespace-nowrap">
+                    <p className="leading-[normal]">Mark as done</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-[#4784f8] h-[50px] relative rounded-[100px] shrink-0 w-full">
+              <div className="flex flex-row items-center justify-center size-full">
+                <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                    <p className="leading-[normal]">Edit reminder</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-[#939393] h-[50px] relative rounded-[100px] shrink-0 w-full">
+              <div className="flex flex-row items-center justify-center size-full">
+                <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                    <p className="leading-[normal]">Delete reminder</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Frame3() {
   return (
@@ -23,9 +87,88 @@ export function OnboardingPage4Text() {
 }
 
 function ReminderList() {
+  const [menuTargetElement, setMenuTargetElement] = useState<HTMLDivElement | null>(null);
+  const [menuTargetRect, setMenuTargetRect] = useState<{ left: number; top: number } | null>(null);
+  const [showCircle, setShowCircle] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  const callDentistReminder = useMemo<Reminder>(() => ({
+    id: "today-2",
+    originalText: "Call the dentist",
+    displayText: "Call the dentist",
+    createdAt: 0,
+    schedule: { kind: "scheduled", date: "2025-08-11", time: "16:30" },
+    completedAt: null,
+  }), []);
+
+  useEffect(() => {
+    const circleTimer = window.setTimeout(() => {
+      setShowCircle(true);
+    }, 400);
+
+    const overlayTimer = window.setTimeout(() => {
+      setShowCircle(false);
+      setShowOverlay(true);
+    }, 550);
+
+    return () => {
+      clearTimeout(circleTimer);
+      clearTimeout(overlayTimer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!menuTargetElement) {
+      setMenuTargetRect(null);
+      return;
+    }
+
+    const updateRect = () => {
+      const parent = menuTargetElement.offsetParent;
+      if (!(parent instanceof HTMLElement)) {
+        setMenuTargetRect(null);
+        return;
+      }
+
+      const targetRect = menuTargetElement.getBoundingClientRect();
+      const parentRect = parent.getBoundingClientRect();
+      setMenuTargetRect({
+        left: targetRect.left - parentRect.left + (targetRect.width / 2) - (TARGET_CIRCLE_SIZE / 2),
+        top: targetRect.top - parentRect.top + (targetRect.height / 2) - (TARGET_CIRCLE_SIZE / 2),
+      });
+    };
+
+    updateRect();
+    window.addEventListener("resize", updateRect);
+    return () => {
+      window.removeEventListener("resize", updateRect);
+    };
+  }, [menuTargetElement]);
+
   return (
-    <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full" data-name="Reminder list">
-      <TutorialStaticReminderList />
+    <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full relative" data-name="Reminder list">
+      <TutorialStaticReminderList
+        menuTargetReminderId="today-2"
+        onMenuTargetElementChange={setMenuTargetElement}
+      />
+      {showCircle && menuTargetRect && (
+        <motion.div
+          className="absolute z-10 pointer-events-none"
+          style={{
+            left: menuTargetRect.left,
+            top: menuTargetRect.top,
+            width: TARGET_CIRCLE_SIZE,
+            height: TARGET_CIRCLE_SIZE,
+          }}
+          animate={{ opacity: [1, 0.2, 1] }}
+          transition={{ duration: 0.45, repeat: Infinity, ease: "linear" }}
+        >
+          <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
+            <circle cx="17.5" cy="17.5" r="16" stroke="#4784F8" strokeWidth="3" />
+          </svg>
+        </motion.div>
+      )}
+      {showOverlay && <TutorialReminderInfoOverlay reminder={callDentistReminder} />}
     </div>
   );
 }

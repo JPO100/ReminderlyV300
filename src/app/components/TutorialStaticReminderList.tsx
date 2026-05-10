@@ -125,6 +125,7 @@ function TutorialStaticReminderRow({
   showRepeatIcon = false,
   isDone = false,
   isPendingDone = false,
+  menuButtonRef,
 }: {
   titleColor?: string;
   title: string;
@@ -133,6 +134,7 @@ function TutorialStaticReminderRow({
   showRepeatIcon?: boolean;
   isDone?: boolean;
   isPendingDone?: boolean;
+  menuButtonRef?: ((node: HTMLDivElement | null) => void) | null;
 }) {
   const isPendingAway = isDone || isPendingDone;
   const effectiveTitleColor = isPendingAway ? DONE_BLUE : titleColor;
@@ -203,6 +205,7 @@ function TutorialStaticReminderRow({
         className="relative shrink-0 self-stretch w-[20px] flex items-center justify-center"
         style={{ padding: 0, lineHeight: 0 }}
         aria-hidden="true"
+        ref={menuButtonRef ?? undefined}
       >
         <div className="flex flex-row items-center justify-center gap-[3px]">
           <span className="block w-[3.5px] h-[3.5px] rounded-full bg-[#BABABA]" />
@@ -218,10 +221,14 @@ export default function TutorialStaticReminderList({
   page1BuildSequence = false,
   page3DoneSequence = false,
   activeFilter,
+  menuTargetReminderId,
+  onMenuTargetElementChange,
 }: {
   page1BuildSequence?: boolean;
   page3DoneSequence?: boolean;
   activeFilter?: TutorialFilterKey;
+  menuTargetReminderId?: string;
+  onMenuTargetElementChange?: (element: HTMLDivElement | null) => void;
 }) {
   const [visibleIds, setVisibleIds] = useState<string[]>(
     page1BuildSequence ? [] : STATIC_REMINDERS.map((reminder) => reminder.id)
@@ -400,14 +407,15 @@ export default function TutorialStaticReminderList({
                     <TutorialStaticReminderRow
                       title={reminder.title}
                       subtitle={getTutorialReminderSubtitle(reminder)}
-                      circleColor={reminder.circleColor}
-                      showRepeatIcon={Boolean(reminder.repeatRule)}
-                      titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
-                      isPendingDone={isPendingDone}
-                    />
-                  </div>
-                );
-              }
+                    circleColor={reminder.circleColor}
+                    showRepeatIcon={Boolean(reminder.repeatRule)}
+                    titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
+                    isPendingDone={isPendingDone}
+                    menuButtonRef={reminder.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
+                  />
+                </div>
+              );
+            }
 
               return (
                 <motion.div
@@ -430,6 +438,7 @@ export default function TutorialStaticReminderList({
                     showRepeatIcon={Boolean(reminder.repeatRule)}
                     titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
                     isPendingDone={isPendingDone}
+                    menuButtonRef={reminder.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
                   />
                 </motion.div>
               );
