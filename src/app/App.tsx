@@ -3914,7 +3914,7 @@ export default function App() {
               </div>
             </div>
             {/* Add new list button */}
-            <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[24px] shrink-0">
+            <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[34px] shrink-0">
               <button
                 className="bg-[#1C2C42] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
                 style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
@@ -4012,7 +4012,7 @@ export default function App() {
                         )}
                       </div>
                     </div>
-                    <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[24px] shrink-0">
+                    <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[34px] shrink-0">
                       <button
                         type="button"
                         className="bg-[#1C2C42] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full"
@@ -4527,7 +4527,7 @@ export default function App() {
 
         {/* New reminder button - fixed at bottom */}
         {viewMode !== "done-deleted" && (
-        <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[24px] shrink-0">
+        <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[34px] shrink-0">
           <button
             className="bg-[#4784f8] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
             style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}

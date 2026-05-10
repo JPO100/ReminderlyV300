@@ -144,7 +144,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         paddingLeft: 'clamp(16px, 5vw, 40px)',
         paddingRight: 'clamp(16px, 5vw, 40px)',
         paddingTop: '34px',
-        paddingBottom: '30px',
+        paddingBottom: '34px',
       }}
     >
       <div className="flex-1 [@media(max-height:570px)]:flex-none relative overflow-hidden">
