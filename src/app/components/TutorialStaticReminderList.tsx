@@ -321,18 +321,14 @@ export default function TutorialStaticReminderList({
       setPendingDoneIds(new Set());
       setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
 
-      const clearSuppressTimer = window.setTimeout(() => {
-        if (cancelled) {
-          return;
-        }
-        setSuppressPage3ResetAnimation(false);
-      }, 0);
-      timers.push(clearSuppressTimer);
-
       sequenceIds.forEach((id, index) => {
         const startTimer = window.setTimeout(() => {
           if (cancelled) {
             return;
+          }
+
+          if (index === 0) {
+            setSuppressPage3ResetAnimation(false);
           }
 
           setPendingDoneIds((prev) => {
@@ -359,15 +355,6 @@ export default function TutorialStaticReminderList({
         timers.push(startTimer);
       });
 
-      const resetTimer = window.setTimeout(() => {
-        if (cancelled) {
-          return;
-        }
-        setPendingDoneIds(new Set());
-        startCycle();
-      }, (sequenceIds.length * 500) + COMPLETION_DELAY + 1000);
-
-      timers.push(resetTimer);
     };
 
     startCycle();
