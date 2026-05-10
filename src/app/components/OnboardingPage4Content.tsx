@@ -5,7 +5,7 @@ import { formatDueLine } from "./ReminderInfoOverlay";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
-const TUTORIAL_OVERLAY_SCALE = 0.696;
+const TUTORIAL_OVERLAY_SCALE = 0.764;
 const TARGET_CIRCLE_SIZE = 35;
 
 function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }) {
@@ -86,36 +86,16 @@ export function OnboardingPage4Text() {
   );
 }
 
-function ReminderList() {
-  const [menuTargetElement, setMenuTargetElement] = useState<HTMLDivElement | null>(null);
+function ReminderList({
+  menuTargetElement,
+  showCircle,
+  setMenuTargetElement,
+}: {
+  menuTargetElement: HTMLDivElement | null;
+  showCircle: boolean;
+  setMenuTargetElement: (element: HTMLDivElement | null) => void;
+}) {
   const [menuTargetRect, setMenuTargetRect] = useState<{ left: number; top: number } | null>(null);
-  const [showCircle, setShowCircle] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(false);
-
-  const callDentistReminder = useMemo<Reminder>(() => ({
-    id: "today-2",
-    originalText: "Call the dentist",
-    displayText: "Call the dentist",
-    createdAt: 0,
-    schedule: { kind: "scheduled", date: "2025-08-11", time: "16:30" },
-    completedAt: null,
-  }), []);
-
-  useEffect(() => {
-    const circleTimer = window.setTimeout(() => {
-      setShowCircle(true);
-    }, 400);
-
-    const overlayTimer = window.setTimeout(() => {
-      setShowCircle(false);
-      setShowOverlay(true);
-    }, 550);
-
-    return () => {
-      clearTimeout(circleTimer);
-      clearTimeout(overlayTimer);
-    };
-  }, []);
 
   useEffect(() => {
     if (!menuTargetElement) {
@@ -168,15 +148,48 @@ function ReminderList() {
           </svg>
         </motion.div>
       )}
-      {showOverlay && <TutorialReminderInfoOverlay reminder={callDentistReminder} />}
     </div>
   );
 }
 
 export default function OnboardingPage4Content() {
+  const [menuTargetElement, setMenuTargetElement] = useState<HTMLDivElement | null>(null);
+  const [showCircle, setShowCircle] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  const callDentistReminder = useMemo<Reminder>(() => ({
+    id: "today-2",
+    originalText: "Call the dentist",
+    displayText: "Call the dentist",
+    createdAt: 0,
+    schedule: { kind: "scheduled", date: "2025-08-11", time: "16:30" },
+    completedAt: null,
+  }), []);
+
+  useEffect(() => {
+    const circleTimer = window.setTimeout(() => {
+      setShowCircle(true);
+    }, 400);
+
+    const overlayTimer = window.setTimeout(() => {
+      setShowCircle(false);
+      setShowOverlay(true);
+    }, 550);
+
+    return () => {
+      clearTimeout(circleTimer);
+      clearTimeout(overlayTimer);
+    };
+  }, []);
+
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
-      <ReminderList />
+      <ReminderList
+        menuTargetElement={menuTargetElement}
+        showCircle={showCircle}
+        setMenuTargetElement={setMenuTargetElement}
+      />
+      {showOverlay && <TutorialReminderInfoOverlay reminder={callDentistReminder} />}
     </div>
   );
 }
