@@ -297,7 +297,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         {isListsTutorial && <ListsTutorialPlaceholderPage filtersMenuVariant={filtersMenuVariant} settingsMenuEnabled={settingsMenuEnabled} savedListsEnabled={savedListsEnabled} />}
       </div>
       
-      <div className="flex flex-col items-center gap-[36px] [@media(max-height:570px)]:pt-[30px] [@media(max-height:570px)]:pb-[30px]">
+      <div className="shrink-0 flex flex-col items-center gap-[36px] [@media(max-height:570px)]:pt-[30px] [@media(max-height:570px)]:pb-[30px]">
         <div className="h-[7.935px] w-[115.542px] [@media(max-height:570px)]:hidden">
           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 115.542 7.93457">
             <g>
