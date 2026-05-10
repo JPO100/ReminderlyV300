@@ -304,10 +304,10 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </svg>
         </div>
         
-        <div className="grid grid-cols-[35px_180px_35px] items-center justify-center w-full max-w-[250px]">
+        <div className="relative flex items-center justify-center w-full max-w-[322px] h-[45px]">
           {!isFirstPage ? (
             <button 
-              className="h-[45px] w-[35px] cursor-pointer"
+              className="absolute left-0 h-[45px] w-[35px] cursor-pointer"
               onClick={handleBack}
             >
               <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 35 45">
@@ -317,7 +317,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
               </svg>
             </button>
           ) : (
-            <div className="h-[45px] w-[35px]" />
+            <div className="absolute left-0 h-[45px] w-[35px]" />
           )}
           
           <button 
@@ -331,7 +331,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </button>
           
           {isLastPage ? (
-            <div className="flex h-[45px] w-[35px] items-center justify-center">
+            <div className="absolute right-0 flex h-[45px] w-[35px] items-center justify-center">
               <button 
                 className="h-[28.321px] w-[34.741px] cursor-pointer"
                 onClick={handleRestart}
@@ -344,7 +344,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
               </button>
             </div>
           ) : (
-            <div className="h-[45px] w-[35px]" />
+            <div className="absolute right-0 h-[45px] w-[35px]" />
           )}
         </div>
       </div>
