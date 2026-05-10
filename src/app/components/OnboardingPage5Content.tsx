@@ -4,7 +4,7 @@ import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 const PAGE_5_DONE_REMINDER_IDS = ["later-2", "later", "this-week", "today-2", "today"] as const;
 const PAGE_5_HIGHLIGHT_SEQUENCE_DELAY = 2750;
-const PAGE_5_DONE_LIST_DELAY = 2000;
+const PAGE_5_STATE_PAUSE_DELAY = 2000;
 
 function Frame3() {
   return (
@@ -51,49 +51,54 @@ export default function OnboardingPage5Content({
     const timers: number[] = [];
     let cancelled = false;
 
-    const startCycle = () => {
+    const showMainList = () => {
       if (cancelled) {
         return;
       }
 
       onDoneRemindersChange(false);
-      onLogoHighlightChange(true);
+      onLogoHighlightChange(false);
 
-      const openDoneTimer = window.setTimeout(() => {
+      const mainPauseTimer = window.setTimeout(() => {
         if (cancelled) {
           return;
         }
 
-        onLogoHighlightChange(false);
-        onDoneRemindersChange(true);
+        onLogoHighlightChange(true);
 
-        const doneDelayTimer = window.setTimeout(() => {
+        const openDoneTimer = window.setTimeout(() => {
           if (cancelled) {
             return;
           }
 
-          onLogoHighlightChange(true);
+          onLogoHighlightChange(false);
+          onDoneRemindersChange(true);
 
-          const closeDoneTimer = window.setTimeout(() => {
+          const donePauseTimer = window.setTimeout(() => {
             if (cancelled) {
               return;
             }
 
-            onLogoHighlightChange(false);
-            onDoneRemindersChange(false);
-            const restartTimer = window.setTimeout(() => {
-              startCycle();
-            }, 0);
-            timers.push(restartTimer);
-          }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
-          timers.push(closeDoneTimer);
-        }, PAGE_5_DONE_LIST_DELAY);
-        timers.push(doneDelayTimer);
-      }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
-      timers.push(openDoneTimer);
+            onLogoHighlightChange(true);
+
+            const closeDoneTimer = window.setTimeout(() => {
+              if (cancelled) {
+                return;
+              }
+
+              onLogoHighlightChange(false);
+              showMainList();
+            }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
+            timers.push(closeDoneTimer);
+          }, PAGE_5_STATE_PAUSE_DELAY);
+          timers.push(donePauseTimer);
+        }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
+        timers.push(openDoneTimer);
+      }, PAGE_5_STATE_PAUSE_DELAY);
+      timers.push(mainPauseTimer);
     };
 
-    startCycle();
+    showMainList();
 
     return () => {
       cancelled = true;
