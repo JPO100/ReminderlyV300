@@ -337,7 +337,7 @@ export default function TutorialStaticReminderList({
     const timers: number[] = [];
     let cancelled = false;
 
-    const startCycle = () => {
+    const startCycle = ({ fadeReset }: { fadeReset: boolean }) => {
       if (cancelled) {
         return;
       }
@@ -345,18 +345,23 @@ export default function TutorialStaticReminderList({
       setSuppressPage3ResetAnimation(false);
       setPendingDoneIds(new Set());
       setPage3ResetFadeIds(new Set());
-      setVisibleIds([]);
 
-      const resetTimer = window.setTimeout(() => {
-        if (cancelled) {
-          return;
-        }
+      const resetIds = STATIC_REMINDERS.map((reminder) => reminder.id);
+      if (fadeReset) {
+        setVisibleIds([]);
+        const resetTimer = window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
 
-        const resetIds = STATIC_REMINDERS.map((reminder) => reminder.id);
+          setPage3ResetFadeIds(new Set(resetIds));
+          setVisibleIds(resetIds);
+        }, NEW_REMINDER_INSERT_DELAY);
+        timers.push(resetTimer);
+      } else {
         setPage3ResetFadeIds(new Set(resetIds));
         setVisibleIds(resetIds);
-      }, NEW_REMINDER_INSERT_DELAY);
-      timers.push(resetTimer);
+      }
 
       sequenceIds.forEach((id, index) => {
         const startTimer = window.setTimeout(() => {
@@ -393,12 +398,12 @@ export default function TutorialStaticReminderList({
       });
 
       const recycleTimer = window.setTimeout(() => {
-        startCycle();
+        startCycle({ fadeReset: true });
       }, NEW_REMINDER_INSERT_DELAY + 500 * sequenceIds.length + COMPLETION_DELAY + TUTORIAL_RECYCLE_DELAY);
       timers.push(recycleTimer);
     };
 
-    startCycle();
+    startCycle({ fadeReset: false });
 
     return () => {
       cancelled = true;
