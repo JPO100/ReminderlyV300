@@ -287,6 +287,8 @@ export default function TutorialStaticReminderList({
       return reminder.category === activeFilter;
     });
 
+  const animatePresenceKey = `tutorial-${page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
+
   return (
     <div className="flex flex-[1_0_0] min-h-px w-full items-start justify-center overflow-hidden">
       <div
@@ -298,7 +300,7 @@ export default function TutorialStaticReminderList({
         }}
       >
         <div className="flex flex-col gap-[23px] w-full" style={{ position: "relative", zIndex: 1 }}>
-          <AnimatePresence initial={false}>
+          <AnimatePresence key={animatePresenceKey}>
             {visibleReminders.map((reminder) => {
               const isReinserted = reinsertedId === reminder.id;
               const isHighlighted = insertHighlightId === reminder.id;
