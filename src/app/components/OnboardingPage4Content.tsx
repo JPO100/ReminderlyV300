@@ -108,29 +108,15 @@ function ReminderList({
 
   useEffect(() => {
     onOverlayOpenChange?.(false);
+    setShowCircle(true);
 
-    const throbSequence = [
-      { delay: 600, visible: true },
-      { delay: 1200, visible: false },
-      { delay: 1800, visible: true },
-      { delay: 2400, visible: false },
-      { delay: 3000, visible: true },
-    ];
-
-    const timers: number[] = [];
-
-    throbSequence.forEach(({ delay, visible }) => {
-      timers.push(window.setTimeout(() => {
-        setShowCircle(visible);
-      }, delay));
-    });
-
-    timers.push(window.setTimeout(() => {
+    const overlayTimer = window.setTimeout(() => {
+      setShowCircle(false);
       onOverlayOpenChange?.(true);
-    }, 3200));
+    }, 3400);
 
     return () => {
-      timers.forEach(clearTimeout);
+      clearTimeout(overlayTimer);
       onOverlayOpenChange?.(false);
     };
   }, [onOverlayOpenChange]);
@@ -181,8 +167,16 @@ function ReminderList({
             width: TARGET_CIRCLE_SIZE,
             height: TARGET_CIRCLE_SIZE,
           }}
-          animate={{ opacity: [1, 0.2, 1] }}
-          transition={{ duration: 0.45, repeat: Infinity, ease: "linear" }}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
+          }}
+          transition={{
+            duration: 3,
+            delay: 0.4,
+            times: [0, 0.083, 0.167, 0.25, 0.333, 0.417, 0.5, 0.583, 0.667, 0.75, 0.833, 0.917, 1],
+            ease: "easeInOut",
+          }}
         >
           <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
             <circle cx="17.5" cy="17.5" r="16" stroke="#4784F8" strokeWidth="3" />
