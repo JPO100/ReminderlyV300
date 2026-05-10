@@ -3,8 +3,8 @@ import svgPaths from '@/imports/svg-go2phgsyt4';
 import OnboardingPage1Content, { OnboardingPage1Text } from '@/app/components/OnboardingPage1Content';
 import OnboardingPage2Content, { OnboardingPage2Text } from '@/app/components/OnboardingPage2Content';
 import { useOnboardingPage2ActiveFilter } from '@/app/components/OnboardingPage2Content';
-import OnboardingPage3Content, { OnboardingPage3Text } from '@/app/components/OnboardingPage3Content';
-import OnboardingPage4Content, { CALL_DENTIST_TUTORIAL_REMINDER, OnboardingPage4Text, TutorialReminderInfoOverlay } from '@/app/components/OnboardingPage4Content';
+import OnboardingPage3Content, { CALL_DENTIST_TUTORIAL_REMINDER, OnboardingPage3Text, TutorialReminderInfoOverlay } from '@/app/components/OnboardingPage3Content';
+import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
 import OnboardingPage5Content, { OnboardingPage5Text } from '@/app/components/OnboardingPage5Content';
 import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/OnboardingPage6Content';
 import OnboardingPage7Content, {
@@ -191,7 +191,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         
         {!isListsTutorial && currentPage === 2 && (
           <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
-            <OnboardingPage4Text />
+            <OnboardingPage3Text />
             <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
               <TutorialPhoneShell
                 activeMainTab="reminders"
@@ -204,15 +204,15 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
                   />
                 }
               >
-                <OnboardingPage4Content onOverlayOpenChange={setPage3ShowOverlay} />
+                <OnboardingPage3Content onOverlayOpenChange={setPage3ShowOverlay} />
               </TutorialPhoneShell>
             </div>
           </div>
         )}
-        
+
         {!isListsTutorial && currentPage === 3 && (
           <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
-            <OnboardingPage3Text />
+            <OnboardingPage4Text />
             <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
               <TutorialPhoneShell
                 activeMainTab="reminders"
@@ -224,7 +224,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
                   />
                 }
               >
-                <OnboardingPage3Content />
+                <OnboardingPage4Content />
               </TutorialPhoneShell>
             </div>
           </div>
