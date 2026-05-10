@@ -55,7 +55,7 @@ export function useOnboardingPage2ActiveFilter(enabled: boolean) {
         sequenceIndex = (sequenceIndex + 1) % PAGE_2_FILTER_LOOP_SEQUENCE.length;
         setActiveFilter(PAGE_2_FILTER_LOOP_SEQUENCE[sequenceIndex]);
         scheduleNext();
-      }, 1000);
+      }, 800);
     };
 
     scheduleNext();
