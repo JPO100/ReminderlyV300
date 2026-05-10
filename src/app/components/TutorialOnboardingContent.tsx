@@ -100,6 +100,7 @@ function ListsTutorialPlaceholderPage({
 
 export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant, variant, isListsEnabled: _isListsEnabled, settingsMenuEnabled, savedListsEnabled }: TutorialOnboardingContentProps) {
   const [currentPage, setCurrentPage] = useState(0);
+  const isListsTutorial = variant === 'lists';
   const page2ActiveFilter = useOnboardingPage2ActiveFilter(!isListsTutorial && currentPage === 1);
   const page7ActiveFilter = useOnboardingPage7ActiveFilter(filtersMenuVariant);
 
@@ -123,7 +124,6 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
 
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === TOTAL_PAGES - 1;
-  const isListsTutorial = variant === 'lists';
   const activePaginationColor = isListsTutorial ? REMINDERLY_DARK_BLUE : REMINDERLY_LIGHT_BLUE;
   const nextButtonColor = isListsTutorial ? REMINDERLY_DARK_BLUE : "#4784f8";
 
