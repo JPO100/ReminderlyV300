@@ -182,6 +182,11 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const isLastPage = currentPage === totalPages - 1;
   const activePaginationColor = isListsTutorial ? REMINDERLY_DARK_BLUE : REMINDERLY_LIGHT_BLUE;
   const nextButtonColor = isListsTutorial ? REMINDERLY_DARK_BLUE : "#4784f8";
+  const paginationWidth = 115.542;
+  const paginationDotRadius = 3.96729;
+  const paginationDotSpacing = 17.93461;
+  const paginationDotsWidth = (totalPages - 1) * paginationDotSpacing + paginationDotRadius * 2;
+  const paginationStartX = (paginationWidth - paginationDotsWidth) / 2 + paginationDotRadius;
 
   return (
     <div
@@ -340,10 +345,10 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
               {Array.from({ length: totalPages }, (_, index) => (
                 <circle
                   key={index}
-                  cx={3.96729 + index * 17.93461}
+                  cx={paginationStartX + index * paginationDotSpacing}
                   cy="3.96729"
                   fill={currentPage === index ? activePaginationColor : "#D9D9D9"}
-                  r="3.96729"
+                  r={paginationDotRadius}
                 />
               ))}
             </g>
