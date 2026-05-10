@@ -3,6 +3,8 @@ import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTok
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 const PAGE_5_DONE_REMINDER_IDS = ["later-2", "later", "this-week", "today-2", "today"] as const;
+const PAGE_5_HIGHLIGHT_SEQUENCE_DELAY = 2750;
+const PAGE_5_DONE_LIST_DELAY = 2000;
 
 function Frame3() {
   return (
@@ -46,16 +48,53 @@ export default function OnboardingPage5Content({
   showDoneReminders: boolean;
 }) {
   useEffect(() => {
-    onDoneRemindersChange(false);
-    onLogoHighlightChange(true);
+    const timers: number[] = [];
+    let cancelled = false;
 
-    const timer = window.setTimeout(() => {
-      onLogoHighlightChange(false);
-      onDoneRemindersChange(true);
-    }, 2750);
+    const startCycle = () => {
+      if (cancelled) {
+        return;
+      }
+
+      onDoneRemindersChange(false);
+      onLogoHighlightChange(true);
+
+      const openDoneTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        onLogoHighlightChange(false);
+        onDoneRemindersChange(true);
+
+        const doneDelayTimer = window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
+
+          onLogoHighlightChange(true);
+
+          const closeDoneTimer = window.setTimeout(() => {
+            if (cancelled) {
+              return;
+            }
+
+            onLogoHighlightChange(false);
+            onDoneRemindersChange(false);
+            startCycle();
+          }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
+          timers.push(closeDoneTimer);
+        }, PAGE_5_DONE_LIST_DELAY);
+        timers.push(doneDelayTimer);
+      }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
+      timers.push(openDoneTimer);
+    };
+
+    startCycle();
 
     return () => {
-      clearTimeout(timer);
+      cancelled = true;
+      timers.forEach((timer) => clearTimeout(timer));
       onLogoHighlightChange(false);
       onDoneRemindersChange(false);
     };
