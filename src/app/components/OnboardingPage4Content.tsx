@@ -5,7 +5,7 @@ import { formatDueLine } from "./ReminderInfoOverlay";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
-const TUTORIAL_OVERLAY_SCALE = 0.764;
+const TUTORIAL_OVERLAY_SCALE = 280 / 340;
 const TARGET_CIRCLE_SIZE = 35;
 
 export const CALL_DENTIST_TUTORIAL_REMINDER: Reminder = {
