@@ -17,7 +17,7 @@ type TutorialReminder = {
 const STATIC_REMINDERS: readonly TutorialReminder[] = [
   {
     id: "today",
-    title: "Pick the milk up",
+    title: "Pick up milk",
     circleColor: "#00AFEE",
     schedule: { kind: "scheduled", date: "2025-08-11", time: "14:00" },
   },
@@ -42,9 +42,10 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
   },
   {
     id: "later-2",
-    title: "Renew passport",
+    title: "Put the bins out",
     circleColor: "#FDB146",
-    schedule: { kind: "scheduled", date: "2025-09-12", time: "13:15" },
+    schedule: { kind: "scheduled", date: "2025-09-18", time: "19:00" },
+    repeatRule: { frequency: "weekly", interval: 1, byDay: ["th"] },
   },
   {
     id: "sometime",
