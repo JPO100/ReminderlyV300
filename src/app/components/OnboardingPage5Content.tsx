@@ -8,7 +8,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0">
       <div className={TUTORIAL_TITLE_CLASSNAME}>
-        <p className="css-ew64yg leading-[normal]">Reminder status at a glance</p>
+        <p className="css-ew64yg leading-[normal]">See what you’ve done</p>
       </div>
     </div>
   );
@@ -19,7 +19,7 @@ export function OnboardingPage5Text() {
     <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] items-center relative shrink-0">
       <Frame3 />
       <div className={TUTORIAL_BODY_CLASSNAME}>
-        <p className="css-4hzbpn leading-[30px]">Reminders show different status icons based on their date and time setup</p>
+        <p className="css-4hzbpn leading-[30px]">Tap the Reminderly logo ‘tick’ to see<br />what you’ve already done</p>
       </div>
     </div>
   );
@@ -28,7 +28,10 @@ export function OnboardingPage5Text() {
 function ReminderList({ showDoneReminders }: { showDoneReminders: boolean }) {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full" data-name="Reminder list">
-      <TutorialStaticReminderList doneReminderIds={showDoneReminders ? PAGE_5_DONE_REMINDER_IDS : undefined} />
+      <TutorialStaticReminderList
+        activeFilter={showDoneReminders ? undefined : "sometime"}
+        doneReminderIds={showDoneReminders ? PAGE_5_DONE_REMINDER_IDS : undefined}
+      />
     </div>
   );
 }
