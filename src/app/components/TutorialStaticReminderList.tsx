@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { formatReminderNextOccurrenceLabel, formatRepeatLabel, formatRepeatRuleText, formatScheduledDateForRow } from "../reminder-utils";
 import { useEffect, useRef, useState } from "react";
 import { formatTime12h } from "../utils/normalise-text";
+import type { TutorialFilterKey } from "./TutorialReminderFilters";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
 const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
@@ -14,6 +15,7 @@ const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", 
 type TutorialReminder = {
   id: string;
   title: string;
+  category: "today" | "thisWeek" | "later" | "sometime";
   circleColor: string;
   schedule:
     | { kind: "scheduled"; date: string; time?: string }
@@ -25,18 +27,21 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
   {
     id: "today",
     title: "Pick up milk",
+    category: "today",
     circleColor: "#00AFEE",
     schedule: { kind: "scheduled", date: "2025-08-11", time: "14:00" },
   },
   {
     id: "today-2",
     title: "Call the dentist",
+    category: "today",
     circleColor: "#00AFEE",
     schedule: { kind: "scheduled", date: "2025-08-11", time: "16:30" },
   },
   {
     id: "this-week",
     title: "Pay credit card",
+    category: "thisWeek",
     circleColor: "#E466FD",
     schedule: { kind: "scheduled", date: "2025-08-12", time: "11:00" },
     repeatRule: { frequency: "monthly", interval: 1, byDay: null },
@@ -44,12 +49,14 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
   {
     id: "later",
     title: "Submit expenses",
+    category: "later",
     circleColor: "#FDB146",
     schedule: { kind: "scheduled", date: "2025-08-28", time: "08:00" },
   },
   {
     id: "later-2",
     title: "Put the bins out",
+    category: "later",
     circleColor: "#FDB146",
     schedule: { kind: "scheduled", date: "2025-09-18", time: "19:00" },
     repeatRule: { frequency: "weekly", interval: 1, byDay: ["th"] },
@@ -57,6 +64,7 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
   {
     id: "sometime",
     title: "Organise family photo",
+    category: "sometime",
     circleColor: "#939393",
     schedule: { kind: "sometime" },
   },
@@ -191,7 +199,13 @@ function TutorialStaticReminderRow({
   );
 }
 
-export default function TutorialStaticReminderList({ page1BuildSequence = false }: { page1BuildSequence?: boolean }) {
+export default function TutorialStaticReminderList({
+  page1BuildSequence = false,
+  activeFilter,
+}: {
+  page1BuildSequence?: boolean;
+  activeFilter?: TutorialFilterKey;
+}) {
   const [visibleIds, setVisibleIds] = useState<string[]>(
     page1BuildSequence ? [] : STATIC_REMINDERS.map((reminder) => reminder.id)
   );
@@ -264,7 +278,14 @@ export default function TutorialStaticReminderList({ page1BuildSequence = false 
 
   const visibleReminders = visibleIds
     .map((id) => STATIC_REMINDERS.find((reminder) => reminder.id === id))
-    .filter((reminder): reminder is (typeof STATIC_REMINDERS)[number] => reminder != null);
+    .filter((reminder): reminder is (typeof STATIC_REMINDERS)[number] => reminder != null)
+    .filter((reminder) => {
+      if (activeFilter == null) return true;
+      if (activeFilter !== "today" && activeFilter !== "thisWeek" && activeFilter !== "later" && activeFilter !== "sometime") {
+        return true;
+      }
+      return reminder.category === activeFilter;
+    });
 
   return (
     <div className="flex flex-[1_0_0] min-h-px w-full items-start justify-center overflow-hidden">

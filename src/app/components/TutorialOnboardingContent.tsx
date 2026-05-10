@@ -2,6 +2,7 @@ import { useState } from 'react';
 import svgPaths from '@/imports/svg-go2phgsyt4';
 import OnboardingPage1Content, { OnboardingPage1Text } from '@/app/components/OnboardingPage1Content';
 import OnboardingPage2Content, { OnboardingPage2Text } from '@/app/components/OnboardingPage2Content';
+import { useOnboardingPage2ActiveFilter } from '@/app/components/OnboardingPage2Content';
 import OnboardingPage3Content, { OnboardingPage3Text } from '@/app/components/OnboardingPage3Content';
 import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
 import OnboardingPage5Content, { OnboardingPage5Text } from '@/app/components/OnboardingPage5Content';
@@ -99,6 +100,7 @@ function ListsTutorialPlaceholderPage({
 
 export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant, variant, isListsEnabled: _isListsEnabled, settingsMenuEnabled, savedListsEnabled }: TutorialOnboardingContentProps) {
   const [currentPage, setCurrentPage] = useState(0);
+  const page2ActiveFilter = useOnboardingPage2ActiveFilter(!isListsTutorial && currentPage === 1);
   const page7ActiveFilter = useOnboardingPage7ActiveFilter(filtersMenuVariant);
 
   const handleNext = () => {
@@ -169,11 +171,12 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
                 filterRow={
                   <TutorialReminderFilters
                     items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    activeKey={page2ActiveFilter}
                     showHiddenItems
                   />
                 }
               >
-                <OnboardingPage2Content />
+                <OnboardingPage2Content activeFilter={page2ActiveFilter} />
               </TutorialPhoneShell>
             </div>
           </div>

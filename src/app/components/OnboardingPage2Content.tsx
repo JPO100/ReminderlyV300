@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
+import type { TutorialFilterKey } from "./TutorialReminderFilters";
 
 function Frame3() {
   return (
@@ -24,6 +25,49 @@ export function OnboardingPage2Text() {
       </div>
     </div>
   );
+}
+
+const PAGE_2_FILTER_LOOP_SEQUENCE: Array<TutorialFilterKey | undefined> = [
+  undefined,
+  "today",
+  "thisWeek",
+  "later",
+  "sometime",
+  undefined,
+];
+
+export function useOnboardingPage2ActiveFilter(enabled: boolean) {
+  const [activeFilter, setActiveFilter] = useState<TutorialFilterKey | undefined>(undefined);
+
+  useEffect(() => {
+    if (!enabled) {
+      setActiveFilter(undefined);
+      return;
+    }
+
+    let timeoutId: number | null = null;
+    let sequenceIndex = 0;
+
+    setActiveFilter(PAGE_2_FILTER_LOOP_SEQUENCE[0]);
+
+    const scheduleNext = () => {
+      timeoutId = window.setTimeout(() => {
+        sequenceIndex = (sequenceIndex + 1) % PAGE_2_FILTER_LOOP_SEQUENCE.length;
+        setActiveFilter(PAGE_2_FILTER_LOOP_SEQUENCE[sequenceIndex]);
+        scheduleNext();
+      }, 500);
+    };
+
+    scheduleNext();
+
+    return () => {
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [enabled]);
+
+  return activeFilter;
 }
 
 function UndoneTickBlue() {
@@ -298,20 +342,10 @@ function NewReminderBtn() {
   );
 }
 
-export default function OnboardingPage2Content() {
-  const [animationKey, setAnimationKey] = useState(0);
-
-  useEffect(() => {
-    const loopTimer = setTimeout(() => {
-      setAnimationKey((prev) => prev + 1);
-    }, 11500);
-
-    return () => clearTimeout(loopTimer);
-  }, [animationKey]);
-
+export default function OnboardingPage2Content({ activeFilter }: { activeFilter?: TutorialFilterKey }) {
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
-      <TutorialStaticReminderList />
+      <TutorialStaticReminderList activeFilter={activeFilter} />
     </div>
   );
 }
