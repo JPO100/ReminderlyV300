@@ -221,6 +221,9 @@ function TutorialStaticReminderRow({
 export default function TutorialStaticReminderList({
   page1BuildSequence = false,
   page3DoneSequence = false,
+  visibleReminderIds,
+  fadeReminderIds,
+  onFadeReminderComplete,
   doneReminderIds,
   activeFilter,
   menuTargetReminderId,
@@ -228,6 +231,9 @@ export default function TutorialStaticReminderList({
 }: {
   page1BuildSequence?: boolean;
   page3DoneSequence?: boolean;
+  visibleReminderIds?: readonly string[];
+  fadeReminderIds?: readonly string[];
+  onFadeReminderComplete?: (id: string) => void;
   doneReminderIds?: readonly string[];
   activeFilter?: TutorialFilterKey;
   menuTargetReminderId?: string;
@@ -402,7 +408,7 @@ export default function TutorialStaticReminderList({
     };
   }, [page3DoneSequence]);
 
-  const sourceVisibleIds = doneReminderIds ?? visibleIds;
+  const sourceVisibleIds = visibleReminderIds ?? doneReminderIds ?? visibleIds;
   const visibleReminders = sourceVisibleIds
     .map((id) => STATIC_REMINDERS.find((reminder) => reminder.id === id))
     .filter((reminder): reminder is (typeof STATIC_REMINDERS)[number] => reminder != null)
@@ -432,6 +438,7 @@ export default function TutorialStaticReminderList({
             {visibleReminders.map((reminder) => {
               const isReinserted = reinsertedId === reminder.id;
               const isPage3ResetFade = page3ResetFadeIds.has(reminder.id);
+              const isPage5Fade = fadeReminderIds?.includes(reminder.id) ?? false;
               const isHighlighted = insertHighlightId === reminder.id;
               const isDoneReminder = doneReminderIds != null;
               const isPendingDone = pendingDoneIds.has(reminder.id);
@@ -456,10 +463,10 @@ export default function TutorialStaticReminderList({
                 <motion.div
                   key={reminder.id}
                   layout
-                  initial={isReinserted || isPage3ResetFade ? { opacity: 0 } : false}
+                  initial={isReinserted || isPage3ResetFade || isPage5Fade ? { opacity: 0 } : false}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={isReinserted || isPage3ResetFade ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } }}
+                  transition={isReinserted || isPage3ResetFade || isPage5Fade ? { opacity: { duration: 0.2 } } : { layout: { duration: 0.25 } }}
                   onAnimationComplete={() => {
                     if (isReinserted) {
                       setReinsertedId(null);
@@ -470,6 +477,9 @@ export default function TutorialStaticReminderList({
                         next.delete(reminder.id);
                         return next;
                       });
+                    }
+                    if (isPage5Fade) {
+                      onFadeReminderComplete?.(reminder.id);
                     }
                   }}
                 >

@@ -1,8 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 const PAGE_5_DONE_REMINDER_IDS = ["later-2", "later", "this-week", "today-2", "today"] as const;
+const PAGE_5_DEFAULT_REMINDER_IDS = ["sometime"] as const;
+const PAGE_5_SEQUENCE_DELAY = 2750;
+const PAGE_5_RECYCLE_DELAY = 2000;
 
 function Frame3() {
   return (
@@ -25,11 +28,25 @@ export function OnboardingPage5Text() {
   );
 }
 
-function ReminderList({ showDoneReminders }: { showDoneReminders: boolean }) {
+function ReminderList({
+  showDoneReminders,
+  visibleReminderIds,
+  fadeReminderIds,
+  setFadeReminderIds,
+}: {
+  showDoneReminders: boolean;
+  visibleReminderIds: readonly string[];
+  fadeReminderIds: readonly string[];
+  setFadeReminderIds: Dispatch<SetStateAction<readonly string[]>>;
+}) {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full" data-name="Reminder list">
       <TutorialStaticReminderList
-        activeFilter={showDoneReminders ? undefined : "sometime"}
+        visibleReminderIds={visibleReminderIds}
+        fadeReminderIds={fadeReminderIds}
+        onFadeReminderComplete={(id) => {
+          setFadeReminderIds((prev) => prev.filter((reminderId) => reminderId !== id));
+        }}
         doneReminderIds={showDoneReminders ? PAGE_5_DONE_REMINDER_IDS : undefined}
       />
     </div>
@@ -45,17 +62,48 @@ export default function OnboardingPage5Content({
   onDoneRemindersChange: (visible: boolean) => void;
   showDoneReminders: boolean;
 }) {
-  useEffect(() => {
-    onDoneRemindersChange(false);
-    onLogoHighlightChange(true);
+  const [visibleReminderIds, setVisibleReminderIds] = useState<readonly string[]>(PAGE_5_DEFAULT_REMINDER_IDS);
+  const [fadeReminderIds, setFadeReminderIds] = useState<readonly string[]>([]);
 
-    const timer = window.setTimeout(() => {
-      onLogoHighlightChange(false);
-      onDoneRemindersChange(true);
-    }, 2750);
+  useEffect(() => {
+    const timers: number[] = [];
+    let cancelled = false;
+
+    const startCycle = () => {
+      if (cancelled) {
+        return;
+      }
+
+      onDoneRemindersChange(false);
+      onLogoHighlightChange(true);
+      setVisibleReminderIds(PAGE_5_DEFAULT_REMINDER_IDS);
+      setFadeReminderIds(PAGE_5_DEFAULT_REMINDER_IDS);
+
+      const doneTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        onLogoHighlightChange(false);
+        onDoneRemindersChange(true);
+        setVisibleReminderIds(PAGE_5_DONE_REMINDER_IDS);
+        setFadeReminderIds(PAGE_5_DONE_REMINDER_IDS);
+
+        const recycleTimer = window.setTimeout(() => {
+          startCycle();
+        }, PAGE_5_RECYCLE_DELAY);
+        timers.push(recycleTimer);
+      }, PAGE_5_SEQUENCE_DELAY);
+      timers.push(doneTimer);
+    };
+
+    startCycle();
 
     return () => {
-      clearTimeout(timer);
+      cancelled = true;
+      timers.forEach((timer) => clearTimeout(timer));
+      setVisibleReminderIds(PAGE_5_DEFAULT_REMINDER_IDS);
+      setFadeReminderIds([]);
       onLogoHighlightChange(false);
       onDoneRemindersChange(false);
     };
@@ -63,7 +111,12 @@ export default function OnboardingPage5Content({
 
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
-      <ReminderList showDoneReminders={showDoneReminders} />
+      <ReminderList
+        showDoneReminders={showDoneReminders}
+        visibleReminderIds={visibleReminderIds}
+        fadeReminderIds={fadeReminderIds}
+        setFadeReminderIds={setFadeReminderIds}
+      />
     </div>
   );
 }
