@@ -5,6 +5,7 @@ import { formatTime12h } from "../utils/normalise-text";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
 const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
+const NEW_REMINDER_INSERT_DELAY = 500;
 const INSERT_HIGHLIGHT_MS = 1000;
 const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
 
@@ -195,6 +196,7 @@ export default function TutorialStaticReminderList({ page1BuildSequence = false 
   const [reinsertedId, setReinsertedId] = useState<string | null>(null);
   const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
   const timeoutsRef = useRef<number[]>([]);
+  const insertHighlightTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!page1BuildSequence) {
@@ -210,14 +212,21 @@ export default function TutorialStaticReminderList({ page1BuildSequence = false 
 
     const timers = PAGE_1_BUILD_SEQUENCE_IDS.slice(1).map((id, index) =>
       window.setTimeout(() => {
-        setVisibleIds((prev) => [id, ...prev]);
-        setReinsertedId(id);
-        setInsertHighlightId(id);
+        const insertTimer = window.setTimeout(() => {
+          setVisibleIds((prev) => [id, ...prev]);
+          setReinsertedId(id);
+          setInsertHighlightId(id);
 
-        const highlightTimer = window.setTimeout(() => {
-          setInsertHighlightId((current) => (current === id ? null : current));
-        }, INSERT_HIGHLIGHT_MS);
-        timeoutsRef.current.push(highlightTimer);
+          if (insertHighlightTimerRef.current !== null) {
+            clearTimeout(insertHighlightTimerRef.current);
+          }
+          insertHighlightTimerRef.current = window.setTimeout(() => {
+            insertHighlightTimerRef.current = null;
+            setInsertHighlightId(null);
+          }, INSERT_HIGHLIGHT_MS);
+          timeoutsRef.current.push(insertHighlightTimerRef.current);
+        }, NEW_REMINDER_INSERT_DELAY);
+        timeoutsRef.current.push(insertTimer);
       }, (index + 1) * 100)
     );
 
@@ -226,6 +235,10 @@ export default function TutorialStaticReminderList({ page1BuildSequence = false 
     return () => {
       timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
       timeoutsRef.current = [];
+      if (insertHighlightTimerRef.current !== null) {
+        clearTimeout(insertHighlightTimerRef.current);
+        insertHighlightTimerRef.current = null;
+      }
     };
   }, [page1BuildSequence]);
 
