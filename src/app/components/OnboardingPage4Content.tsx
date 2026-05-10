@@ -113,7 +113,7 @@ function ReminderList({
     const overlayTimer = window.setTimeout(() => {
       setShowCircle(false);
       onOverlayOpenChange?.(true);
-    }, 2950);
+    }, 2850);
 
     return () => {
       clearTimeout(overlayTimer);
