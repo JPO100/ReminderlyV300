@@ -1,6 +1,5 @@
-import svgPaths from "@/imports/svg-b2700o3wr8";
-import NewReminderPopPage4 from "@/app/components/NewReminderPopPage4";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
+import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 function Frame3() {
   return (
@@ -26,24 +25,7 @@ export function OnboardingPage4Text() {
 function ReminderList() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full" data-name="Reminder list">
-      <div className="px-[14px] w-full">
-        <NewReminderPopPage4 />
-      </div>
-    </div>
-  );
-}
-
-function NewReminderBtn() {
-  return (
-    <div className="bg-[#4784f8] content-stretch flex gap-[11.167px] h-[41.876px] items-center justify-center px-[20.938px] py-[15.355px] relative rounded-[69.794px] shrink-0 w-[252.654px]" data-name="New reminder btn">
-      <div className="relative shrink-0 size-[10.469px]" data-name="Union">
-        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 10.4688 10.4688">
-          <path d={svgPaths.paece300} fill="var(--fill-0, white)" id="Union" />
-        </svg>
-      </div>
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[13.959px] text-white">
-        <p className="css-ew64yg leading-[normal]">New reminder</p>
-      </div>
+      <TutorialStaticReminderList />
     </div>
   );
 }
