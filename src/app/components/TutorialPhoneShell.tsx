@@ -32,7 +32,7 @@ export default function TutorialPhoneShell({
         style={{ backgroundColor: "#000000", paddingTop: "14px", paddingLeft: "14px", paddingRight: "14px", boxSizing: "border-box" }}
       >
         <div
-          className="overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-[calc(100%+2px)] w-full"
+          className="overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full"
           style={{ backgroundColor: resolvedShellColor }}
         >
           <div
