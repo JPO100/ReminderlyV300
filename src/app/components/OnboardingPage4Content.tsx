@@ -7,7 +7,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col items-center relative shrink-0">
       <div className={TUTORIAL_TITLE_CLASSNAME}>
-        <p className="css-ew64yg leading-[normal]">Mark items as 'done'</p>
+        <p className="css-ew64yg leading-[normal]">Mark reminders as 'done'</p>
       </div>
     </div>
   );
