@@ -184,26 +184,6 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         
         {!isListsTutorial && currentPage === 2 && (
           <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
-            <OnboardingPage3Text />
-            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
-              <TutorialPhoneShell
-                activeMainTab="reminders"
-                showHeaderMenu={settingsMenuEnabled}
-                filterRow={
-                  <TutorialReminderFilters
-                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                    showHiddenItems
-                  />
-                }
-              >
-                <OnboardingPage3Content />
-              </TutorialPhoneShell>
-            </div>
-          </div>
-        )}
-        
-        {!isListsTutorial && currentPage === 3 && (
-          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage4Text />
             <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
               <TutorialPhoneShell
@@ -217,6 +197,26 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
                 }
               >
                 <OnboardingPage4Content />
+              </TutorialPhoneShell>
+            </div>
+          </div>
+        )}
+        
+        {!isListsTutorial && currentPage === 3 && (
+          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
+            <OnboardingPage3Text />
+            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
+              <TutorialPhoneShell
+                activeMainTab="reminders"
+                showHeaderMenu={settingsMenuEnabled}
+                filterRow={
+                  <TutorialReminderFilters
+                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+                    showHiddenItems
+                  />
+                }
+              >
+                <OnboardingPage3Content />
               </TutorialPhoneShell>
             </div>
           </div>
