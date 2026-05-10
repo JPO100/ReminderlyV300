@@ -290,8 +290,8 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
       </div>
       
       <div className="flex flex-col items-center gap-[36px] [@media(max-height:570px)]:pt-[30px] [@media(max-height:570px)]:pb-[30px]">
-        <div className="h-[7.935px] w-[133.476px] [@media(max-height:570px)]:hidden">
-          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 133.476 7.93457">
+        <div className="h-[7.935px] w-[115.542px] [@media(max-height:570px)]:hidden">
+          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 115.542 7.93457">
             <g>
               <circle cx="3.96729" cy="3.96729" fill={currentPage === 0 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
               <circle cx="21.9019" cy="3.96729" fill={currentPage === 1 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
@@ -304,7 +304,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </svg>
         </div>
         
-        <div className="flex items-center justify-between w-full max-w-[322px]">
+        <div className="grid grid-cols-[35px_180px_35px] items-center justify-center w-full max-w-[250px]">
           {!isFirstPage ? (
             <button 
               className="h-[45px] w-[35px] cursor-pointer"
@@ -331,18 +331,20 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </button>
           
           {isLastPage ? (
-            <button 
-              className="h-[28.321px] w-[34.741px] cursor-pointer"
-              onClick={handleRestart}
-            >
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 35.4912 29.8213">
-                <g>
-                  <path d={svgPaths.p171ed6b0} fill="#D9D9D9" stroke="#D9D9D9" strokeWidth="1.5" />
-                </g>
-              </svg>
-            </button>
+            <div className="flex h-[45px] w-[35px] items-center justify-center">
+              <button 
+                className="h-[28.321px] w-[34.741px] cursor-pointer"
+                onClick={handleRestart}
+              >
+                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 35.4912 29.8213">
+                  <g>
+                    <path d={svgPaths.p171ed6b0} fill="#D9D9D9" stroke="#D9D9D9" strokeWidth="1.5" />
+                  </g>
+                </svg>
+              </button>
+            </div>
           ) : (
-            <div className="h-[28.321px] w-[34.741px]" />
+            <div className="h-[45px] w-[35px]" />
           )}
         </div>
       </div>
