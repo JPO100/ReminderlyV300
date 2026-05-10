@@ -7,10 +7,6 @@ import OnboardingPage3Content, { CALL_DENTIST_TUTORIAL_REMINDER, OnboardingPage3
 import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
 import OnboardingPage5Content, { OnboardingPage5Text } from '@/app/components/OnboardingPage5Content';
 import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/OnboardingPage6Content';
-import OnboardingPage7Content, {
-  OnboardingPage7Text,
-  useOnboardingPage7ActiveFilter,
-} from '@/app/components/OnboardingPage7Content';
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
 import TutorialReminderFilters, {
@@ -30,7 +26,9 @@ interface TutorialOnboardingContentProps {
   savedListsEnabled: boolean;
 }
 
-const TOTAL_PAGES = 7;
+const LIST_TUTORIAL_TOTAL_PAGES = 7;
+const REMINDER_TUTORIAL_BASE_TOTAL_PAGES = 5;
+const REMINDER_TUTORIAL_SETTINGS_TOTAL_PAGES = 6;
 const REMINDERLY_DARK_BLUE = "#1C2C42";
 const REMINDERLY_LIGHT_BLUE = "#4784F8";
 const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[35px]";
@@ -46,6 +44,38 @@ function TemplatesTutorialButton() {
         <svg className="block shrink-0" width="5" height="7" viewBox="0 0 7 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M1.72101 0.269035C1.34568 -0.0896783 0.737045 -0.0896783 0.361708 0.269035C-0.0135638 0.627741 -0.0135771 1.20921 0.361708 1.56791L3.91284 4.96154L0.281458 8.43209C-0.0938212 8.79079 -0.0938182 9.37226 0.281458 9.73096C0.656796 10.0897 1.26543 10.0897 1.64076 9.73096L5.80081 5.75517C5.86027 5.71933 5.91677 5.67686 5.96858 5.62735C6.34382 5.26866 6.3438 4.68717 5.96858 4.32847L1.72101 0.269035Z" fill="white"/>
         </svg>
+      </div>
+    </div>
+  );
+}
+
+function Page5DoneDeletedFilters() {
+  return (
+    <div className="relative shrink-0 w-full px-[14px] pt-[14px] pb-[8px]">
+      <div className="flex items-center justify-between gap-[10px]">
+        <div className="flex items-center gap-[8px]">
+          <div
+            className="bg-white content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0"
+            style={{ boxShadow: "inset 0 0 0 1.392px #1C2C42", color: "#1C2C42" }}
+          >
+            <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
+              Done
+            </div>
+          </div>
+          <div
+            className="content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0"
+            style={{ boxShadow: "inset 0 0 0 0.696px #898989", color: "#898989" }}
+          >
+            <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
+              Deleted
+            </div>
+          </div>
+        </div>
+        <div className="content-stretch flex items-center justify-center h-[28px] w-[66px] relative rounded-[69.652px] shrink-0 border border-solid border-[#4784f8] text-[#4784f8]">
+          <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
+            Clear all
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -102,10 +132,14 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const [currentPage, setCurrentPage] = useState(0);
   const isListsTutorial = variant === 'lists';
   const page2ActiveFilter = useOnboardingPage2ActiveFilter(!isListsTutorial && currentPage === 1);
-  const page7ActiveFilter = useOnboardingPage7ActiveFilter(filtersMenuVariant);
   const [page3ShowOverlay, setPage3ShowOverlay] = useState(false);
   const [page5ShowLogoHighlight, setPage5ShowLogoHighlight] = useState(false);
   const [page5ShowDoneReminders, setPage5ShowDoneReminders] = useState(false);
+  const totalPages = isListsTutorial
+    ? LIST_TUTORIAL_TOTAL_PAGES
+    : settingsMenuEnabled
+    ? REMINDER_TUTORIAL_SETTINGS_TOTAL_PAGES
+    : REMINDER_TUTORIAL_BASE_TOTAL_PAGES;
 
   useEffect(() => {
     if (isListsTutorial || currentPage !== 2) {
@@ -120,8 +154,14 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
     }
   }, [currentPage, isListsTutorial]);
 
+  useEffect(() => {
+    if (currentPage >= totalPages) {
+      setCurrentPage(totalPages - 1);
+    }
+  }, [currentPage, totalPages]);
+
   const handleNext = () => {
-    if (currentPage < TOTAL_PAGES - 1) {
+    if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
     } else {
       onComplete();
@@ -139,7 +179,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   };
 
   const isFirstPage = currentPage === 0;
-  const isLastPage = currentPage === TOTAL_PAGES - 1;
+  const isLastPage = currentPage === totalPages - 1;
   const activePaginationColor = isListsTutorial ? REMINDERLY_DARK_BLUE : REMINDERLY_LIGHT_BLUE;
   const nextButtonColor = isListsTutorial ? REMINDERLY_DARK_BLUE : "#4784f8";
 
@@ -246,14 +286,19 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
               <TutorialPhoneShell
                 activeMainTab="reminders"
                 showHeaderMenu={settingsMenuEnabled}
-                headerProps={{ logoTickHighlight: page5ShowLogoHighlight }}
+                headerProps={{
+                  logoTickHighlight: page5ShowLogoHighlight,
+                  logoTickDone: page5ShowDoneReminders,
+                }}
                 remindersLabel={page5ShowDoneReminders ? "Done reminders" : undefined}
-                filterRow={
+                filterRow={page5ShowDoneReminders ? (
+                  <Page5DoneDeletedFilters />
+                ) : (
                   <TutorialReminderFilters
                     items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
                     showHiddenItems
                   />
-                }
+                )}
               >
                 <OnboardingPage5Content
                   onLogoHighlightChange={setPage5ShowLogoHighlight}
@@ -265,7 +310,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </div>
         )}
         
-        {!isListsTutorial && currentPage === 5 && (
+        {!isListsTutorial && settingsMenuEnabled && currentPage === 5 && (
           <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
             <OnboardingPage6Text />
             <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
@@ -285,30 +330,6 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </div>
         )}
         
-        {!isListsTutorial && currentPage === 6 && (
-          <div className="content-stretch flex flex-col items-center relative w-full h-full min-h-0">
-            <OnboardingPage7Text />
-            <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
-              <TutorialPhoneShell
-                activeMainTab="reminders"
-                showHeaderMenu={settingsMenuEnabled}
-                filterRow={
-                  <TutorialReminderFilters
-                    items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
-                    activeKey={page7ActiveFilter}
-                    showHiddenItems
-                  />
-                }
-              >
-                <OnboardingPage7Content
-                  activeFilter={page7ActiveFilter}
-                  filtersMenuVariant={filtersMenuVariant}
-                />
-              </TutorialPhoneShell>
-            </div>
-          </div>
-        )}
-        
         {isListsTutorial && <ListsTutorialPlaceholderPage filtersMenuVariant={filtersMenuVariant} settingsMenuEnabled={settingsMenuEnabled} savedListsEnabled={savedListsEnabled} />}
       </div>
       
@@ -316,13 +337,15 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
         <div className="h-[7.935px] w-[115.542px] [@media(max-height:570px)]:hidden">
           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 115.542 7.93457">
             <g>
-              <circle cx="3.96729" cy="3.96729" fill={currentPage === 0 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
-              <circle cx="21.9019" cy="3.96729" fill={currentPage === 1 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
-              <circle cx="39.8364" cy="3.96729" fill={currentPage === 2 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
-              <circle cx="57.771" cy="3.96729" fill={currentPage === 3 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
-              <circle cx="75.7056" cy="3.96729" fill={currentPage === 4 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
-              <circle cx="93.6401" cy="3.96729" fill={currentPage === 5 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
-              <circle cx="111.575" cy="3.96729" fill={currentPage === 6 ? activePaginationColor : "#D9D9D9"} r="3.96729" />
+              {Array.from({ length: totalPages }, (_, index) => (
+                <circle
+                  key={index}
+                  cx={3.96729 + index * 17.93461}
+                  cy="3.96729"
+                  fill={currentPage === index ? activePaginationColor : "#D9D9D9"}
+                  r="3.96729"
+                />
+              ))}
             </g>
           </svg>
         </div>
@@ -349,7 +372,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
             style={{ height: 'clamp(40px, calc(20vh - 73.6px), 54px)', backgroundColor: nextButtonColor }}
           >
             <span className="font-['Lato',sans-serif] font-bold text-[17px] text-white leading-[normal]">
-              {isLastPage ? 'Okay, got it!' : 'Next'}
+              {isLastPage ? (isListsTutorial ? 'Okay, got it!' : 'Okay, got it') : 'Next'}
             </span>
           </button>
           
