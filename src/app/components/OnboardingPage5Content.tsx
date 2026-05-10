@@ -4,7 +4,7 @@ import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 const PAGE_5_DONE_REMINDER_IDS = ["later-2", "later", "this-week", "today-2", "today"] as const;
 const PAGE_5_HIGHLIGHT_SEQUENCE_DELAY = 2750;
-const PAGE_5_STATE_PAUSE_DELAY = 2000;
+const PAGE_5_STATE_PAUSE_DELAY = 0;
 
 function Frame3() {
   return (
