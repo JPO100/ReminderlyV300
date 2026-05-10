@@ -229,6 +229,7 @@ export default function TutorialStaticReminderList({
   const [reinsertedId, setReinsertedId] = useState<string | null>(null);
   const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
   const [pendingDoneIds, setPendingDoneIds] = useState<Set<string>>(new Set());
+  const [suppressPage3ResetAnimation, setSuppressPage3ResetAnimation] = useState(false);
   const timeoutsRef = useRef<number[]>([]);
   const insertHighlightTimerRef = useRef<number | null>(null);
 
@@ -297,11 +298,13 @@ export default function TutorialStaticReminderList({
   useEffect(() => {
     if (!page3DoneSequence) {
       setPendingDoneIds(new Set());
+      setSuppressPage3ResetAnimation(false);
       return;
     }
 
     setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
     setPendingDoneIds(new Set());
+    setSuppressPage3ResetAnimation(false);
 
     const sequenceIds = STATIC_REMINDERS
       .map((reminder) => reminder.id)
@@ -314,8 +317,17 @@ export default function TutorialStaticReminderList({
         return;
       }
 
+      setSuppressPage3ResetAnimation(true);
       setPendingDoneIds(new Set());
       setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
+
+      const clearSuppressTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+        setSuppressPage3ResetAnimation(false);
+      }, 0);
+      timers.push(clearSuppressTimer);
 
       sequenceIds.forEach((id, index) => {
         const startTimer = window.setTimeout(() => {
@@ -353,7 +365,7 @@ export default function TutorialStaticReminderList({
         }
         setPendingDoneIds(new Set());
         startCycle();
-      }, 500 * (sequenceIds.length + 2));
+      }, (sequenceIds.length * 500) + COMPLETION_DELAY + 1000);
 
       timers.push(resetTimer);
     };
@@ -398,7 +410,7 @@ export default function TutorialStaticReminderList({
               return (
                 <motion.div
                   key={reminder.id}
-                  layout
+                  layout={!suppressPage3ResetAnimation}
                   initial={isReinserted ? { opacity: 0 } : false}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
