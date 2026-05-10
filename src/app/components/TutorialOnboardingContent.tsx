@@ -51,40 +51,6 @@ function TemplatesTutorialButton() {
   );
 }
 
-function Page5DoneDeletedFilters() {
-  return (
-    <div className="relative shrink-0 w-full px-[14px] pt-[14px] pb-[8px]">
-      <div className="flex items-center justify-between gap-[10px]">
-        <div className="flex items-center gap-[8px]">
-          <div
-            className="bg-white content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0"
-            style={{ boxShadow: "inset 0 0 0 1.392px #1C2C42", color: "#1C2C42" }}
-          >
-            <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
-              Done
-            </div>
-          </div>
-          <div
-            className="content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0"
-            style={{ boxShadow: "inset 0 0 0 0.696px #898989", color: "#898989" }}
-          >
-            <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
-              Deleted
-            </div>
-          </div>
-        </div>
-        <div
-          className="content-stretch flex items-center justify-center h-[28px] w-[66px] relative rounded-[69.652px] shrink-0 border border-solid border-[#4784f8] text-[#4784f8]"
-        >
-          <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
-            Clear all
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ListsTutorialPlaceholderPage({
   filtersMenuVariant,
   settingsMenuEnabled,
@@ -280,19 +246,14 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
               <TutorialPhoneShell
                 activeMainTab="reminders"
                 showHeaderMenu={settingsMenuEnabled}
-                headerProps={{
-                  logoTickHighlight: page5ShowLogoHighlight,
-                  logoTickDone: page5ShowDoneReminders,
-                }}
+                headerProps={{ logoTickHighlight: page5ShowLogoHighlight }}
                 remindersLabel={page5ShowDoneReminders ? "Done reminders" : undefined}
-                filterRow={page5ShowDoneReminders ? (
-                  <Page5DoneDeletedFilters />
-                ) : (
+                filterRow={
                   <TutorialReminderFilters
                     items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
                     showHiddenItems
                   />
-                )}
+                }
               >
                 <OnboardingPage5Content
                   onLogoHighlightChange={setPage5ShowLogoHighlight}

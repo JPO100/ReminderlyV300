@@ -1,12 +1,8 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect } from "react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 const PAGE_5_DONE_REMINDER_IDS = ["later-2", "later", "this-week", "today-2", "today"] as const;
-const PAGE_5_DEFAULT_REMINDER_IDS = ["sometime"] as const;
-const PAGE_5_SEQUENCE_DELAY = 2750;
-const PAGE_5_INSERT_DELAY = 500;
-const PAGE_5_RECYCLE_DELAY = 2000;
 
 function Frame3() {
   return (
@@ -29,25 +25,11 @@ export function OnboardingPage5Text() {
   );
 }
 
-function ReminderList({
-  showDoneReminders,
-  visibleReminderIds,
-  fadeReminderIds,
-  setFadeReminderIds,
-}: {
-  showDoneReminders: boolean;
-  visibleReminderIds: readonly string[];
-  fadeReminderIds: readonly string[];
-  setFadeReminderIds: Dispatch<SetStateAction<readonly string[]>>;
-}) {
+function ReminderList({ showDoneReminders }: { showDoneReminders: boolean }) {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full" data-name="Reminder list">
       <TutorialStaticReminderList
-        visibleReminderIds={visibleReminderIds}
-        fadeReminderIds={fadeReminderIds}
-        onFadeReminderComplete={(id) => {
-          setFadeReminderIds((prev) => prev.filter((reminderId) => reminderId !== id));
-        }}
+        activeFilter={showDoneReminders ? undefined : "sometime"}
         doneReminderIds={showDoneReminders ? PAGE_5_DONE_REMINDER_IDS : undefined}
       />
     </div>
@@ -63,58 +45,17 @@ export default function OnboardingPage5Content({
   onDoneRemindersChange: (visible: boolean) => void;
   showDoneReminders: boolean;
 }) {
-  const [visibleReminderIds, setVisibleReminderIds] = useState<readonly string[]>(PAGE_5_DEFAULT_REMINDER_IDS);
-  const [fadeReminderIds, setFadeReminderIds] = useState<readonly string[]>([]);
-
   useEffect(() => {
-    const timers: number[] = [];
-    let cancelled = false;
+    onDoneRemindersChange(false);
+    onLogoHighlightChange(true);
 
-    const startCycle = () => {
-      if (cancelled) {
-        return;
-      }
-
-      onDoneRemindersChange(false);
-      onLogoHighlightChange(true);
-      setVisibleReminderIds([]);
-      setFadeReminderIds([]);
-
-      const defaultInsertTimer = window.setTimeout(() => {
-        if (cancelled) {
-          return;
-        }
-
-        setVisibleReminderIds(PAGE_5_DEFAULT_REMINDER_IDS);
-        setFadeReminderIds(PAGE_5_DEFAULT_REMINDER_IDS);
-      }, PAGE_5_INSERT_DELAY);
-      timers.push(defaultInsertTimer);
-
-      const doneTimer = window.setTimeout(() => {
-        if (cancelled) {
-          return;
-        }
-
-        onLogoHighlightChange(false);
-        onDoneRemindersChange(true);
-        setVisibleReminderIds(PAGE_5_DONE_REMINDER_IDS);
-        setFadeReminderIds([]);
-
-        const recycleTimer = window.setTimeout(() => {
-          startCycle();
-        }, PAGE_5_RECYCLE_DELAY);
-        timers.push(recycleTimer);
-      }, PAGE_5_SEQUENCE_DELAY);
-      timers.push(doneTimer);
-    };
-
-    startCycle();
+    const timer = window.setTimeout(() => {
+      onLogoHighlightChange(false);
+      onDoneRemindersChange(true);
+    }, 2750);
 
     return () => {
-      cancelled = true;
-      timers.forEach((timer) => clearTimeout(timer));
-      setVisibleReminderIds(PAGE_5_DEFAULT_REMINDER_IDS);
-      setFadeReminderIds([]);
+      clearTimeout(timer);
       onLogoHighlightChange(false);
       onDoneRemindersChange(false);
     };
@@ -122,12 +63,7 @@ export default function OnboardingPage5Content({
 
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
-      <ReminderList
-        showDoneReminders={showDoneReminders}
-        visibleReminderIds={visibleReminderIds}
-        fadeReminderIds={fadeReminderIds}
-        setFadeReminderIds={setFadeReminderIds}
-      />
+      <ReminderList showDoneReminders={showDoneReminders} />
     </div>
   );
 }
