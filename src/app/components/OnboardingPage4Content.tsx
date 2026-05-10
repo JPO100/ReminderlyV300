@@ -9,11 +9,11 @@ const TUTORIAL_OVERLAY_SCALE = 296 / 340;
 const TARGET_CIRCLE_SIZE = 35;
 
 export const CALL_DENTIST_TUTORIAL_REMINDER: Reminder = {
-  id: "today-2",
-  originalText: "Call the dentist",
-  displayText: "Call the dentist",
+  id: "today",
+  originalText: "Pick up milk",
+  displayText: "Pick up milk",
   createdAt: 0,
-  schedule: { kind: "scheduled", date: "2025-08-11", time: "16:30" },
+  schedule: { kind: "scheduled", date: "2025-08-11", time: "14:00" },
   completedAt: null,
 };
 
@@ -32,10 +32,10 @@ export function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }
       >
         <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
-            <p className="leading-[normal]" style={{ fontWeight: 700 }}>Call the dentist</p>
+            <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{reminder.displayText}</p>
           </div>
           <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[17px] text-center max-w-full text-[#1c2c42]">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[17px] text-center max-w-full" style={{ color: "#1c2c42" }}>
               <p className="leading-[normal] whitespace-nowrap" style={{ fontWeight: 700 }}>{dueLine}</p>
             </div>
           </div>
@@ -152,7 +152,7 @@ function ReminderList({
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full relative" data-name="Reminder list">
       <TutorialStaticReminderList
-        menuTargetReminderId="today-2"
+        menuTargetReminderId="today"
         onMenuTargetElementChange={(element) => {
           setLocalMenuTargetElement(element);
           setMenuTargetElement(element);
