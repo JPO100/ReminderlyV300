@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import svgPaths from "@/imports/svg-tzdfx9foxi";
 import page8Paths from "@/imports/svg-b2700o3wr8";
 import tickPaths from "@/imports/svg-jngdeg2tc1";
@@ -55,12 +56,38 @@ function TutorialHeaderMenuIcon() {
   );
 }
 
-function TutorialWordmark() {
+function TutorialWordmark({ showTickHighlight = false }: { showTickHighlight?: boolean }) {
   return (
     <div
       className="relative shrink-0"
       style={{ width: `${LOGO_WIDTH}px`, height: `${LOGO_HEIGHT}px` }}
     >
+      {showTickHighlight && (
+        <motion.div
+          className="absolute pointer-events-none"
+          style={{
+            left: "-10.5px",
+            top: "-10.5px",
+            width: 46,
+            height: 46,
+            zIndex: 1,
+          }}
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: [0, 1, 0, 0, 1, 0, 0, 1, 0],
+          }}
+          transition={{
+            duration: 2.3,
+            delay: 0.4,
+            times: [0, 0.109, 0.217, 0.391, 0.5, 0.609, 0.783, 0.891, 1],
+            ease: "easeInOut",
+          }}
+        >
+          <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+            <circle cx="23" cy="23" r="21.25" stroke="#1C2C42" strokeWidth="3.5" />
+          </svg>
+        </motion.div>
+      )}
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 209.653 35.6533">
         <g>
           <g>
@@ -157,6 +184,7 @@ export interface TutorialPhoneHeaderProps {
   tickDone?: boolean;
   tickFlash?: boolean;
   showDone?: boolean;
+  logoTickHighlight?: boolean;
 }
 
 export default function TutorialPhoneHeader({
@@ -168,6 +196,7 @@ export default function TutorialPhoneHeader({
   tickDone = false,
   tickFlash = false,
   showDone = false,
+  logoTickHighlight = false,
 }: TutorialPhoneHeaderProps) {
   const resolvedBackgroundColor = backgroundColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
   const defaultSensorColor = activeMainTab === "lists" ? "#000000" : "#1c2c42";
@@ -203,7 +232,7 @@ export default function TutorialPhoneHeader({
           className="flex items-center justify-center shrink-0"
           style={{ height: `${LOGO_ROW_HEIGHT}px` }}
         >
-          <TutorialWordmark />
+          <TutorialWordmark showTickHighlight={logoTickHighlight} />
         </div>
         {showMenuIcon && (
           <div

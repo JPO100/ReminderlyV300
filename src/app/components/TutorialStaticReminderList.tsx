@@ -221,12 +221,14 @@ function TutorialStaticReminderRow({
 export default function TutorialStaticReminderList({
   page1BuildSequence = false,
   page3DoneSequence = false,
+  doneReminderIds,
   activeFilter,
   menuTargetReminderId,
   onMenuTargetElementChange,
 }: {
   page1BuildSequence?: boolean;
   page3DoneSequence?: boolean;
+  doneReminderIds?: readonly string[];
   activeFilter?: TutorialFilterKey;
   menuTargetReminderId?: string;
   onMenuTargetElementChange?: (element: HTMLDivElement | null) => void;
@@ -400,10 +402,12 @@ export default function TutorialStaticReminderList({
     };
   }, [page3DoneSequence]);
 
-  const visibleReminders = visibleIds
+  const sourceVisibleIds = doneReminderIds ?? visibleIds;
+  const visibleReminders = sourceVisibleIds
     .map((id) => STATIC_REMINDERS.find((reminder) => reminder.id === id))
     .filter((reminder): reminder is (typeof STATIC_REMINDERS)[number] => reminder != null)
     .filter((reminder) => {
+      if (doneReminderIds != null) return true;
       if (activeFilter == null) return true;
       if (activeFilter !== "today" && activeFilter !== "thisWeek" && activeFilter !== "later" && activeFilter !== "sometime") {
         return true;
@@ -411,7 +415,7 @@ export default function TutorialStaticReminderList({
       return reminder.category === activeFilter;
     });
 
-  const animatePresenceKey = `tutorial-${page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
+  const animatePresenceKey = `tutorial-${doneReminderIds != null ? "done-reminders" : page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
 
   return (
     <div className="flex flex-[1_0_0] min-h-px w-full items-start justify-center overflow-hidden">
@@ -429,6 +433,7 @@ export default function TutorialStaticReminderList({
               const isReinserted = reinsertedId === reminder.id;
               const isPage3ResetFade = page3ResetFadeIds.has(reminder.id);
               const isHighlighted = insertHighlightId === reminder.id;
+              const isDoneReminder = doneReminderIds != null;
               const isPendingDone = pendingDoneIds.has(reminder.id);
               if (suppressPage3ResetAnimation) {
                 return (
@@ -439,6 +444,7 @@ export default function TutorialStaticReminderList({
                     circleColor={reminder.circleColor}
                     showRepeatIcon={Boolean(reminder.repeatRule)}
                     titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
+                    isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
                     menuButtonRef={reminder.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
                   />
@@ -473,6 +479,7 @@ export default function TutorialStaticReminderList({
                     circleColor={reminder.circleColor}
                     showRepeatIcon={Boolean(reminder.repeatRule)}
                     titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
+                    isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
                     menuButtonRef={reminder.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
                   />

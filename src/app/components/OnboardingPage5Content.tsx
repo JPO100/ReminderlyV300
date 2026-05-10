@@ -1,7 +1,8 @@
-import svgPaths from "@/imports/svg-b2700o3wr8";
-import ImportedReminderList from "@/imports/ReminderList-1192-126";
+import { useEffect } from "react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
+
+const PAGE_5_DONE_REMINDER_IDS = ["later-2", "later", "this-week", "today-2", "today"] as const;
 
 function Frame3() {
   return (
@@ -24,33 +25,42 @@ export function OnboardingPage5Text() {
   );
 }
 
-function ReminderList() {
+function ReminderList({ showDoneReminders }: { showDoneReminders: boolean }) {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col items-start min-h-px min-w-px w-full" data-name="Reminder list">
-      <ImportedReminderList />
+      <TutorialStaticReminderList doneReminderIds={showDoneReminders ? PAGE_5_DONE_REMINDER_IDS : undefined} />
     </div>
   );
 }
 
-function NewReminderBtn() {
-  return (
-    <div className="bg-[#4784f8] content-stretch flex gap-[11.167px] h-[41.876px] items-center justify-center px-[20.938px] py-[15.355px] relative rounded-[69.794px] shrink-0 w-[252.654px]" data-name="New reminder btn">
-      <div className="relative shrink-0 size-[10.469px]" data-name="Union">
-        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 10.4688 10.4688">
-          <path d={svgPaths.paece300} fill="var(--fill-0, white)" id="Union" />
-        </svg>
-      </div>
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[13.959px] text-white">
-        <p className="css-ew64yg leading-[normal]">New reminder</p>
-      </div>
-    </div>
-  );
-}
+export default function OnboardingPage5Content({
+  onLogoHighlightChange,
+  onDoneRemindersChange,
+  showDoneReminders,
+}: {
+  onLogoHighlightChange: (visible: boolean) => void;
+  onDoneRemindersChange: (visible: boolean) => void;
+  showDoneReminders: boolean;
+}) {
+  useEffect(() => {
+    onDoneRemindersChange(false);
+    onLogoHighlightChange(true);
 
-export default function OnboardingPage5Content() {
+    const timer = window.setTimeout(() => {
+      onLogoHighlightChange(false);
+      onDoneRemindersChange(true);
+    }, 2750);
+
+    return () => {
+      clearTimeout(timer);
+      onLogoHighlightChange(false);
+      onDoneRemindersChange(false);
+    };
+  }, [onDoneRemindersChange, onLogoHighlightChange]);
+
   return (
     <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
-      <TutorialStaticReminderList />
+      <ReminderList showDoneReminders={showDoneReminders} />
     </div>
   );
 }

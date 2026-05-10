@@ -104,10 +104,19 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const page2ActiveFilter = useOnboardingPage2ActiveFilter(!isListsTutorial && currentPage === 1);
   const page7ActiveFilter = useOnboardingPage7ActiveFilter(filtersMenuVariant);
   const [page3ShowOverlay, setPage3ShowOverlay] = useState(false);
+  const [page5ShowLogoHighlight, setPage5ShowLogoHighlight] = useState(false);
+  const [page5ShowDoneReminders, setPage5ShowDoneReminders] = useState(false);
 
   useEffect(() => {
     if (isListsTutorial || currentPage !== 2) {
       setPage3ShowOverlay(false);
+    }
+  }, [currentPage, isListsTutorial]);
+
+  useEffect(() => {
+    if (isListsTutorial || currentPage !== 4) {
+      setPage5ShowLogoHighlight(false);
+      setPage5ShowDoneReminders(false);
     }
   }, [currentPage, isListsTutorial]);
 
@@ -237,6 +246,8 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
               <TutorialPhoneShell
                 activeMainTab="reminders"
                 showHeaderMenu={settingsMenuEnabled}
+                headerProps={{ logoTickHighlight: page5ShowLogoHighlight }}
+                remindersLabel={page5ShowDoneReminders ? "Done reminders" : undefined}
                 filterRow={
                   <TutorialReminderFilters
                     items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
@@ -244,7 +255,11 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
                   />
                 }
               >
-                <OnboardingPage5Content />
+                <OnboardingPage5Content
+                  onLogoHighlightChange={setPage5ShowLogoHighlight}
+                  onDoneRemindersChange={setPage5ShowDoneReminders}
+                  showDoneReminders={page5ShowDoneReminders}
+                />
               </TutorialPhoneShell>
             </div>
           </div>

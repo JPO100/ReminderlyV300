@@ -1,4 +1,10 @@
-export default function TutorialMainTabBar({ activeMainTab }: { activeMainTab: "reminders" | "lists" }) {
+export default function TutorialMainTabBar({
+  activeMainTab,
+  remindersLabel = "Reminders",
+}: {
+  activeMainTab: "reminders" | "lists";
+  remindersLabel?: string;
+}) {
   return (
     <div className="content-stretch flex gap-[7.179px] items-end justify-center px-[14.359px] relative w-full">
       <div className={`${activeMainTab === "reminders" ? "bg-white" : "bg-[rgba(255,255,255,0.25)]"} flex-[1_0_0] min-h-px min-w-px relative rounded-tl-[8.615px] rounded-tr-[8.615px] h-[37.333px]`}>
@@ -8,7 +14,7 @@ export default function TutorialMainTabBar({ activeMainTab }: { activeMainTab: "
         <div className="flex flex-row items-center justify-center size-full">
           <div className="content-stretch flex items-center justify-center px-[21.538px] relative size-full">
             <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[12.205px] whitespace-nowrap ${activeMainTab === "reminders" ? "text-[#4784f8]" : "text-white"}`}>
-              <p className="leading-[normal]">Reminders</p>
+              <p className="leading-[normal]">{remindersLabel}</p>
             </div>
           </div>
         </div>

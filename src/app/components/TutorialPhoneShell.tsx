@@ -12,6 +12,7 @@ export default function TutorialPhoneShell({
   bezelColor = "#1c2c42",
   showHeaderMenu = true,
   headerProps,
+  remindersLabel,
 }: {
   activeMainTab: "reminders" | "lists";
   filterRow: ReactNode;
@@ -22,6 +23,7 @@ export default function TutorialPhoneShell({
   bezelColor?: string;
   showHeaderMenu?: boolean;
   headerProps?: Partial<Omit<TutorialPhoneHeaderProps, "activeMainTab" | "backgroundColor" | "showMenuIcon">>;
+  remindersLabel?: string;
 }) {
   const resolvedShellColor = shellColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
 
@@ -45,7 +47,7 @@ export default function TutorialPhoneShell({
               showMenuIcon={showHeaderMenu}
               {...headerProps}
             />
-            <TutorialMainTabBar activeMainTab={activeMainTab} />
+            <TutorialMainTabBar activeMainTab={activeMainTab} remindersLabel={remindersLabel} />
             <div className="bg-white flex-[1_0_0] min-h-px min-w-px relative w-full rounded-tl-[10.769px] rounded-tr-[10.769px]">
               <div className="flex flex-col items-center size-full">
                 {filterRow}
