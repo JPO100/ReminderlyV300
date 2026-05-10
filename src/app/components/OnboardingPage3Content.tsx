@@ -39,29 +39,29 @@ export function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }
               <p className="leading-[normal] whitespace-nowrap" style={{ fontWeight: 700 }}>{dueLine}</p>
             </div>
           </div>
-          <div className="content-stretch flex flex-col gap-[30px] items-start mt-[7px] relative shrink-0 w-full">
-            <div className="bg-[#4784f8] h-[50px] relative rounded-[100px] shrink-0 w-full">
+          <div className="content-stretch flex flex-col gap-[26px] items-start mt-[7px] relative shrink-0 w-full">
+            <div className="bg-[#4784f8] h-[44px] relative rounded-[88px] shrink-0 w-full">
               <div className="flex flex-row items-center justify-center size-full">
-                <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-left text-white whitespace-nowrap">
+                <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-left text-white whitespace-nowrap">
                     <p className="leading-[normal]">Mark as done</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="bg-[#4784f8] h-[50px] relative rounded-[100px] shrink-0 w-full">
+            <div className="bg-[#4784f8] h-[44px] relative rounded-[88px] shrink-0 w-full">
               <div className="flex flex-row items-center justify-center size-full">
-                <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
                     <p className="leading-[normal]">Edit reminder</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="bg-[#939393] h-[50px] relative rounded-[100px] shrink-0 w-full">
+            <div className="bg-[#939393] h-[44px] relative rounded-[88px] shrink-0 w-full">
               <div className="flex flex-row items-center justify-center size-full">
-                <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
                     <p className="leading-[normal]">Delete reminder</p>
                   </div>
                 </div>
