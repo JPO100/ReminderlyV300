@@ -12,7 +12,7 @@ function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }) {
   const dueLine = formatDueLine(reminder, new Date(2025, 7, 11, 12, 0, 0, 0));
 
   return (
-    <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50">
+    <div className="absolute z-20 flex items-center justify-center bg-black/50 left-[-14px] right-[-14px] top-[-50px] bottom-0">
       <div
         className="pointer-events-none"
         style={{
