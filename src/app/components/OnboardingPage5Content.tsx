@@ -81,7 +81,10 @@ export default function OnboardingPage5Content({
 
             onLogoHighlightChange(false);
             onDoneRemindersChange(false);
-            startCycle();
+            const restartTimer = window.setTimeout(() => {
+              startCycle();
+            }, 0);
+            timers.push(restartTimer);
           }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
           timers.push(closeDoneTimer);
         }, PAGE_5_DONE_LIST_DELAY);
