@@ -56,9 +56,7 @@ export default function TutorialPhoneShell({
                 )}
               </div>
             </div>
-            <div className="absolute inset-0 overflow-clip rounded-tl-[30px] rounded-tr-[30px]">
-              {overlay}
-            </div>
+            {overlay}
           </div>
         </div>
       </div>
