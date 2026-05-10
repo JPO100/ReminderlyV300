@@ -36,7 +36,7 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
   },
   {
     id: "later",
-    title: "Renew passport",
+    title: "Submit expenses",
     circleColor: "#FDB146",
     schedule: { kind: "scheduled", date: "2025-08-28", time: "08:00" },
   },
@@ -48,7 +48,7 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
   },
   {
     id: "sometime",
-    title: "Organise family photos",
+    title: "Organise family photo",
     circleColor: "#939393",
     schedule: { kind: "sometime" },
   },
