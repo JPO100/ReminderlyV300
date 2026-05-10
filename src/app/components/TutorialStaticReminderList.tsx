@@ -5,7 +5,8 @@ import { formatTime12h } from "../utils/normalise-text";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
 const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
-const PAGE_1_INSERT_START_GAP = 400;
+const PAGE_1_INITIAL_INSERT_DELAY = 200;
+const PAGE_1_INSERT_START_GAP = 500;
 const NEW_REMINDER_INSERT_DELAY = 500;
 const INSERT_HIGHLIGHT_MS = 1000;
 const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
@@ -192,7 +193,7 @@ function TutorialStaticReminderRow({
 
 export default function TutorialStaticReminderList({ page1BuildSequence = false }: { page1BuildSequence?: boolean }) {
   const [visibleIds, setVisibleIds] = useState<string[]>(
-    page1BuildSequence ? [PAGE_1_BUILD_SEQUENCE_IDS[0]] : STATIC_REMINDERS.map((reminder) => reminder.id)
+    page1BuildSequence ? [] : STATIC_REMINDERS.map((reminder) => reminder.id)
   );
   const [reinsertedId, setReinsertedId] = useState<string | null>(null);
   const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
@@ -207,9 +208,27 @@ export default function TutorialStaticReminderList({ page1BuildSequence = false 
       return;
     }
 
-    setVisibleIds([PAGE_1_BUILD_SEQUENCE_IDS[0]]);
+    setVisibleIds([]);
     setReinsertedId(null);
     setInsertHighlightId(null);
+
+    const initialTimer = window.setTimeout(() => {
+      const insertTimer = window.setTimeout(() => {
+        setVisibleIds([PAGE_1_BUILD_SEQUENCE_IDS[0]]);
+        setReinsertedId(PAGE_1_BUILD_SEQUENCE_IDS[0]);
+        setInsertHighlightId(PAGE_1_BUILD_SEQUENCE_IDS[0]);
+
+        if (insertHighlightTimerRef.current !== null) {
+          clearTimeout(insertHighlightTimerRef.current);
+        }
+        insertHighlightTimerRef.current = window.setTimeout(() => {
+          insertHighlightTimerRef.current = null;
+          setInsertHighlightId(null);
+        }, INSERT_HIGHLIGHT_MS);
+        timeoutsRef.current.push(insertHighlightTimerRef.current);
+      }, NEW_REMINDER_INSERT_DELAY);
+      timeoutsRef.current.push(insertTimer);
+    }, PAGE_1_INITIAL_INSERT_DELAY);
 
     const timers = PAGE_1_BUILD_SEQUENCE_IDS.slice(1).map((id, index) =>
       window.setTimeout(() => {
@@ -228,10 +247,10 @@ export default function TutorialStaticReminderList({ page1BuildSequence = false 
           timeoutsRef.current.push(insertHighlightTimerRef.current);
         }, NEW_REMINDER_INSERT_DELAY);
         timeoutsRef.current.push(insertTimer);
-      }, (index + 1) * PAGE_1_INSERT_START_GAP)
+      }, PAGE_1_INITIAL_INSERT_DELAY + (index + 1) * PAGE_1_INSERT_START_GAP)
     );
 
-    timeoutsRef.current = timers;
+    timeoutsRef.current = [initialTimer, ...timers];
 
     return () => {
       timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
