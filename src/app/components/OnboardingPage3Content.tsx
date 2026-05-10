@@ -107,16 +107,38 @@ function ReminderList({
   const [showCircle, setShowCircle] = useState(false);
 
   useEffect(() => {
-    onOverlayOpenChange?.(false);
-    setShowCircle(true);
+    const timers: number[] = [];
+    let cancelled = false;
 
-    const overlayTimer = window.setTimeout(() => {
-      setShowCircle(false);
-      onOverlayOpenChange?.(true);
-    }, 2750);
+    const startCycle = () => {
+      if (cancelled) {
+        return;
+      }
+
+      onOverlayOpenChange?.(false);
+      setShowCircle(true);
+
+      const overlayTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setShowCircle(false);
+        onOverlayOpenChange?.(true);
+
+        const recycleTimer = window.setTimeout(() => {
+          startCycle();
+        }, 2000);
+        timers.push(recycleTimer);
+      }, 2750);
+      timers.push(overlayTimer);
+    };
+
+    startCycle();
 
     return () => {
-      clearTimeout(overlayTimer);
+      cancelled = true;
+      timers.forEach((timer) => clearTimeout(timer));
       onOverlayOpenChange?.(false);
     };
   }, [onOverlayOpenChange]);

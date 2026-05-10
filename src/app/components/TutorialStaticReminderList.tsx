@@ -11,6 +11,7 @@ const PAGE_1_INITIAL_INSERT_DELAY = 200;
 const PAGE_1_INSERT_START_GAP = 500;
 const NEW_REMINDER_INSERT_DELAY = 500;
 const INSERT_HIGHLIGHT_MS = 1000;
+const TUTORIAL_RECYCLE_DELAY = 2000;
 const COMPLETION_DELAY = 350;
 const DONE_BLUE = "#1C2C42";
 const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
@@ -248,34 +249,16 @@ export default function TutorialStaticReminderList({
       return;
     }
 
-    setVisibleIds([]);
-    setReinsertedId(null);
-    setInsertHighlightId(null);
+    const startCycle = () => {
+      setVisibleIds([]);
+      setReinsertedId(null);
+      setInsertHighlightId(null);
 
-    const initialTimer = window.setTimeout(() => {
-      const insertTimer = window.setTimeout(() => {
-        setVisibleIds([PAGE_1_BUILD_SEQUENCE_IDS[0]]);
-        setReinsertedId(PAGE_1_BUILD_SEQUENCE_IDS[0]);
-        setInsertHighlightId(PAGE_1_BUILD_SEQUENCE_IDS[0]);
-
-        if (insertHighlightTimerRef.current !== null) {
-          clearTimeout(insertHighlightTimerRef.current);
-        }
-        insertHighlightTimerRef.current = window.setTimeout(() => {
-          insertHighlightTimerRef.current = null;
-          setInsertHighlightId(null);
-        }, INSERT_HIGHLIGHT_MS);
-        timeoutsRef.current.push(insertHighlightTimerRef.current);
-      }, NEW_REMINDER_INSERT_DELAY);
-      timeoutsRef.current.push(insertTimer);
-    }, PAGE_1_INITIAL_INSERT_DELAY);
-
-    const timers = PAGE_1_BUILD_SEQUENCE_IDS.slice(1).map((id, index) =>
-      window.setTimeout(() => {
+      const initialTimer = window.setTimeout(() => {
         const insertTimer = window.setTimeout(() => {
-          setVisibleIds((prev) => [id, ...prev]);
-          setReinsertedId(id);
-          setInsertHighlightId(id);
+          setVisibleIds([PAGE_1_BUILD_SEQUENCE_IDS[0]]);
+          setReinsertedId(PAGE_1_BUILD_SEQUENCE_IDS[0]);
+          setInsertHighlightId(PAGE_1_BUILD_SEQUENCE_IDS[0]);
 
           if (insertHighlightTimerRef.current !== null) {
             clearTimeout(insertHighlightTimerRef.current);
@@ -287,10 +270,36 @@ export default function TutorialStaticReminderList({
           timeoutsRef.current.push(insertHighlightTimerRef.current);
         }, NEW_REMINDER_INSERT_DELAY);
         timeoutsRef.current.push(insertTimer);
-      }, PAGE_1_INITIAL_INSERT_DELAY + (index + 1) * PAGE_1_INSERT_START_GAP)
-    );
+      }, PAGE_1_INITIAL_INSERT_DELAY);
 
-    timeoutsRef.current = [initialTimer, ...timers];
+      const timers = PAGE_1_BUILD_SEQUENCE_IDS.slice(1).map((id, index) =>
+        window.setTimeout(() => {
+          const insertTimer = window.setTimeout(() => {
+            setVisibleIds((prev) => [id, ...prev]);
+            setReinsertedId(id);
+            setInsertHighlightId(id);
+
+            if (insertHighlightTimerRef.current !== null) {
+              clearTimeout(insertHighlightTimerRef.current);
+            }
+            insertHighlightTimerRef.current = window.setTimeout(() => {
+              insertHighlightTimerRef.current = null;
+              setInsertHighlightId(null);
+            }, INSERT_HIGHLIGHT_MS);
+            timeoutsRef.current.push(insertHighlightTimerRef.current);
+          }, NEW_REMINDER_INSERT_DELAY);
+          timeoutsRef.current.push(insertTimer);
+        }, PAGE_1_INITIAL_INSERT_DELAY + (index + 1) * PAGE_1_INSERT_START_GAP)
+      );
+
+      const recycleTimer = window.setTimeout(() => {
+        startCycle();
+      }, PAGE_1_INITIAL_INSERT_DELAY + (PAGE_1_BUILD_SEQUENCE_IDS.length - 1) * PAGE_1_INSERT_START_GAP + NEW_REMINDER_INSERT_DELAY + INSERT_HIGHLIGHT_MS + TUTORIAL_RECYCLE_DELAY);
+
+      timeoutsRef.current.push(initialTimer, ...timers, recycleTimer);
+    };
+
+    startCycle();
 
     return () => {
       timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
@@ -362,6 +371,10 @@ export default function TutorialStaticReminderList({
         timers.push(startTimer);
       });
 
+      const recycleTimer = window.setTimeout(() => {
+        startCycle();
+      }, 500 * sequenceIds.length + COMPLETION_DELAY + TUTORIAL_RECYCLE_DELAY);
+      timers.push(recycleTimer);
     };
 
     startCycle();

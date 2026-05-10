@@ -35,6 +35,8 @@ const PAGE_2_FILTER_LOOP_SEQUENCE: Array<TutorialFilterKey | undefined> = [
   "sometime",
   undefined,
 ];
+const PAGE_2_FILTER_STEP_DELAY = 1000;
+const PAGE_2_FILTER_RECYCLE_DELAY = 2000;
 
 export function useOnboardingPage2ActiveFilter(enabled: boolean) {
   const [activeFilter, setActiveFilter] = useState<TutorialFilterKey | undefined>(undefined);
@@ -51,11 +53,12 @@ export function useOnboardingPage2ActiveFilter(enabled: boolean) {
     setActiveFilter(PAGE_2_FILTER_LOOP_SEQUENCE[0]);
 
     const scheduleNext = () => {
+      const isRecycleDelay = sequenceIndex === PAGE_2_FILTER_LOOP_SEQUENCE.length - 1;
       timeoutId = window.setTimeout(() => {
-        sequenceIndex = (sequenceIndex + 1) % PAGE_2_FILTER_LOOP_SEQUENCE.length;
+        sequenceIndex = isRecycleDelay ? 1 : sequenceIndex + 1;
         setActiveFilter(PAGE_2_FILTER_LOOP_SEQUENCE[sequenceIndex]);
         scheduleNext();
-      }, 1000);
+      }, isRecycleDelay ? PAGE_2_FILTER_RECYCLE_DELAY : PAGE_2_FILTER_STEP_DELAY);
     };
 
     scheduleNext();
