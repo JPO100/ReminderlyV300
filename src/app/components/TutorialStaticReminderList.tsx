@@ -5,7 +5,7 @@ import { formatTime12h } from "../utils/normalise-text";
 import { TUTORIAL_FILTER_RECYCLE_DELAY, TUTORIAL_FILTER_STEP_DELAY, type TutorialFilterKey } from "./TutorialReminderFilters";
 import { CompletedCircleIcon } from "./icons/ReminderStateIcons";
 
-const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
+export const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
 const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
 const PAGE_1_INITIAL_INSERT_DELAY = 450;
 const PAGE_1_INSERT_START_GAP = 750;

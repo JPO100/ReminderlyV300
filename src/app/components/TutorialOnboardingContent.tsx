@@ -21,7 +21,7 @@ import OnboardingPage5Content, { OnboardingPage5Text, PAGE_5_HIGHLIGHT_SEQUENCE_
 import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/OnboardingPage6Content';
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
-import TutorialStaticReminderList, { TUTORIAL_PAGE_2_DONE_LIST_IDS } from '@/app/components/TutorialStaticReminderList';
+import TutorialStaticReminderList, { TUTORIAL_PAGE_2_DONE_LIST_IDS, TUTORIAL_REMINDER_LIST_SCALE } from '@/app/components/TutorialStaticReminderList';
 import AddListItemInput from '@/app/components/lists/AddListItemInput';
 import EditableListItem from '@/app/components/lists/EditableListItem';
 import TutorialReminderFilters, {
@@ -49,6 +49,7 @@ const REMINDERLY_DARK_BLUE = "#1C2C42";
 const REMINDERLY_LIGHT_BLUE = "#4784F8";
 const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[35px]";
 const TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME = "pb-[45px]";
+const TUTORIAL_LIST_OVERLAY_TOP = 11 + 5.026 + 65 - 2;
 const LISTS_PAGE_3_TARGET_LIST_ID = "list-4";
 const LISTS_PAGE_3_OPEN_ITEMS = [
   { id: "birthday-1", text: "Book table", completed: true },
@@ -118,13 +119,23 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
           />
           <motion.div
             initial={{ y: "100%" }}
-            animate={{ y: 0, top: 0 }}
+            animate={{ y: 0, top: TUTORIAL_LIST_OVERLAY_TOP }}
             exit={{ y: "100%" }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="absolute left-0 right-0 z-50 mx-auto w-full"
             style={{ bottom: 0 }}
           >
-            <motion.div className="bg-white relative rounded-tl-[15px] rounded-tr-[15px] size-full">
+            <motion.div
+              className="bg-white relative rounded-tl-[15px] rounded-tr-[15px]"
+              style={{
+                width: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
+                height: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
+                transform: `scale(${TUTORIAL_REMINDER_LIST_SCALE})`,
+                transformOrigin: "top center",
+                left: "50%",
+                translate: "-50% 0",
+              }}
+            >
               <div className="relative w-full h-full flex flex-col mx-auto">
                 <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
                   <ListsHeader
