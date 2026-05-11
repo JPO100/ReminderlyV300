@@ -58,6 +58,10 @@ const LISTS_PAGE_3_OPEN_ITEMS = [
   { id: "work-4", text: "Update roadmap", completed: false },
   { id: "work-5", text: "Reply to Alex", completed: false },
 ] as const;
+const LISTS_PAGE_3_DEMO_ITEM = "Prepare update";
+const LISTS_PAGE_3_DEMO_ITEM_ID = "work-prepare-update";
+const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
+const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
   return (
@@ -107,6 +111,109 @@ function Page5DoneDeletedFilters() {
 }
 
 function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
+  const [items, setItems] = useState(LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })));
+  const [inputValue, setInputValue] = useState("");
+  const [inputFocused, setInputFocused] = useState(false);
+  const [showAddHighlight, setShowAddHighlight] = useState(false);
+  const [addButtonElement, setAddButtonElement] = useState<HTMLDivElement | null>(null);
+  const [addButtonRect, setAddButtonRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+  const [reinsertedItemId, setReinsertedItemId] = useState<string | null>(null);
+  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+  const completedCount = items.filter((item) => item.completed).length;
+
+  useEffect(() => {
+    if (!open) {
+      setItems(LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })));
+      setInputValue("");
+      setInputFocused(false);
+      setShowAddHighlight(false);
+      setReinsertedItemId(null);
+      setHighlightedItemId(null);
+      return;
+    }
+
+    const timers: number[] = [];
+    let cancelled = false;
+
+    setItems(LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })));
+    setInputValue("");
+    setInputFocused(false);
+    setShowAddHighlight(false);
+    setReinsertedItemId(null);
+    setHighlightedItemId(null);
+
+    const inputTimer = window.setTimeout(() => {
+      if (cancelled) {
+        return;
+      }
+
+      setInputFocused(true);
+      setInputValue(LISTS_PAGE_3_DEMO_ITEM);
+      setShowAddHighlight(true);
+
+      const addTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setShowAddHighlight(false);
+        setInputFocused(false);
+        setInputValue("");
+        setItems((currentItems) => [
+          { id: LISTS_PAGE_3_DEMO_ITEM_ID, text: LISTS_PAGE_3_DEMO_ITEM, completed: false },
+          ...currentItems.filter((item) => item.id !== LISTS_PAGE_3_DEMO_ITEM_ID),
+        ]);
+        setReinsertedItemId(LISTS_PAGE_3_DEMO_ITEM_ID);
+        setHighlightedItemId(LISTS_PAGE_3_DEMO_ITEM_ID);
+
+        const clearHighlightTimer = window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
+          setHighlightedItemId(null);
+        }, LIST_ITEM_INSERT_HIGHLIGHT_MS);
+        timers.push(clearHighlightTimer);
+      }, TUTORIAL_ATTENTION_SEQUENCE_DELAY);
+      timers.push(addTimer);
+    }, LISTS_PAGE_3_ADD_INPUT_DELAY);
+    timers.push(inputTimer);
+
+    return () => {
+      cancelled = true;
+      timers.forEach((timer) => clearTimeout(timer));
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!addButtonElement) {
+      setAddButtonRect(null);
+      return;
+    }
+
+    const updateRect = () => {
+      const parent = addButtonElement.offsetParent;
+      if (!(parent instanceof HTMLElement)) {
+        setAddButtonRect(null);
+        return;
+      }
+
+      const targetRect = addButtonElement.getBoundingClientRect();
+      const parentRect = parent.getBoundingClientRect();
+      setAddButtonRect({
+        left: targetRect.left - parentRect.left,
+        top: targetRect.top - parentRect.top,
+        width: targetRect.width,
+        height: targetRect.height,
+      });
+    };
+
+    updateRect();
+    window.addEventListener("resize", updateRect);
+    return () => {
+      window.removeEventListener("resize", updateRect);
+    };
+  }, [addButtonElement]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -146,7 +253,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                     isEditMode
                     onSubmit={() => {}}
                     onClose={() => {}}
-                    subtitleText="0 of 5"
+                    subtitleText={`${completedCount} of ${items.length}`}
                     showMenuButton
                   />
                   <AddListItemInput
@@ -154,28 +261,69 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                     accentColor="#9468D5"
                     idleCircleColor="#D9D9D9"
                     nextPlaceholder="Add your next item..."
+                    demoValue={inputValue}
+                    demoFocused={inputFocused}
+                    onAddButtonElementChange={setAddButtonElement}
                   />
+                  {showAddHighlight && addButtonRect && (
+                    <motion.div
+                      className="absolute z-10 pointer-events-none"
+                      style={{
+                        left: addButtonRect.left + (addButtonRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+                        top: addButtonRect.top + (addButtonRect.height / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+                        width: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+                        height: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: [0, 1, 0, 0, 1, 0, 0, 1, 0],
+                      }}
+                      transition={{
+                        duration: TUTORIAL_ATTENTION_THROB_DURATION,
+                        delay: TUTORIAL_ATTENTION_THROB_DELAY,
+                        times: TUTORIAL_ATTENTION_THROB_TIMES,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
+                        <circle cx="17.5" cy="17.5" r="16" stroke="#1C2C42" strokeWidth="3" />
+                      </svg>
+                    </motion.div>
+                  )}
                 </div>
                 <div className="flex flex-col gap-[23px] items-start px-[24px] pb-[24px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[35px]">
                   <AnimatePresence initial={false}>
-                    {LISTS_PAGE_3_OPEN_ITEMS.map((item) => (
-                      <motion.div
-                        key={item.id}
-                        layout="position"
-                        initial={false}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ layout: { type: 'spring', stiffness: 220, damping: 26, mass: 0.9 } }}
-                        className="w-full"
-                      >
-                        <EditableListItem
-                          name={item.text}
-                          completed={item.completed}
-                          accentColor="#9468D5"
-                          editable
-                        />
-                      </motion.div>
-                    ))}
+                    {items.map((item) => {
+                      const isItemReinserted = reinsertedItemId === item.id;
+                      const isItemHighlighted = highlightedItemId === item.id;
+                      return (
+                        <motion.div
+                          key={item.id}
+                          layout="position"
+                          initial={isItemReinserted ? { opacity: 0 } : false}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={isItemReinserted
+                            ? { opacity: { duration: 0.2 }, layout: { type: 'spring', stiffness: 220, damping: 26, mass: 0.9 } }
+                            : { layout: { type: 'spring', stiffness: 220, damping: 26, mass: 0.9 } }
+                          }
+                          onAnimationComplete={() => {
+                            if (isItemReinserted) {
+                              setReinsertedItemId(null);
+                            }
+                          }}
+                          className="w-full"
+                        >
+                          <EditableListItem
+                            name={item.text}
+                            completed={item.completed}
+                            isHighlighted={isItemHighlighted}
+                            accentColor="#9468D5"
+                            editable
+                          />
+                        </motion.div>
+                      );
+                    })}
                   </AnimatePresence>
                 </div>
               </div>
