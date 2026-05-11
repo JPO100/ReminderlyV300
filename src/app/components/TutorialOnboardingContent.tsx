@@ -61,6 +61,7 @@ const LISTS_PAGE_3_OPEN_ITEMS = [
 const LISTS_PAGE_3_DEMO_ITEM = "Prepare update";
 const LISTS_PAGE_3_DEMO_ITEM_ID = "work-prepare-update";
 const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
+const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -115,7 +116,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
   const [inputValue, setInputValue] = useState("");
   const [inputFocused, setInputFocused] = useState(false);
   const [showAddHighlight, setShowAddHighlight] = useState(false);
-  const [addButtonElement, setAddButtonElement] = useState<HTMLDivElement | null>(null);
+  const [addButtonElement, setAddButtonElement] = useState<HTMLButtonElement | null>(null);
   const [addButtonRect, setAddButtonRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [reinsertedItemId, setReinsertedItemId] = useState<string | null>(null);
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
@@ -148,8 +149,25 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
       }
 
       setInputFocused(true);
-      setInputValue(LISTS_PAGE_3_DEMO_ITEM);
-      setShowAddHighlight(true);
+      LISTS_PAGE_3_DEMO_ITEM.split("").forEach((_, index) => {
+        const typingTimer = window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
+
+          setInputValue(LISTS_PAGE_3_DEMO_ITEM.slice(0, index + 1));
+        }, index * LISTS_PAGE_3_TYPING_STEP_DELAY);
+        timers.push(typingTimer);
+      });
+
+      const highlightTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setShowAddHighlight(true);
+      }, LISTS_PAGE_3_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY);
+      timers.push(highlightTimer);
 
       const addTimer = window.setTimeout(() => {
         if (cancelled) {
@@ -173,7 +191,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
           setHighlightedItemId(null);
         }, LIST_ITEM_INSERT_HIGHLIGHT_MS);
         timers.push(clearHighlightTimer);
-      }, TUTORIAL_ATTENTION_SEQUENCE_DELAY);
+      }, LISTS_PAGE_3_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
       timers.push(addTimer);
     }, LISTS_PAGE_3_ADD_INPUT_DELAY);
     timers.push(inputTimer);

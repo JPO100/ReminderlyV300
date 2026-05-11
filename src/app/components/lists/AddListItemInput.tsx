@@ -1,9 +1,16 @@
 import type { ReactNode } from "react";
 import { useRef, useState } from "react";
 
-function AddTickButton({ active }: { active: boolean }) {
+function AddTickButton({
+    active,
+    buttonRef,
+}: {
+    active: boolean;
+    buttonRef?: (element: HTMLButtonElement | null) => void;
+}) {
     return (
         <button
+            ref={buttonRef}
             className={`relative block size-[35px] shrink-0 border-none bg-transparent p-0 ${active ? "cursor-pointer" : "cursor-default"}`}
             data-name="add-tick-btn"
             disabled={!active}
@@ -29,7 +36,7 @@ type AddListItemInputProps = {
     focusedLeadingIcon?: ReactNode;
     demoValue?: string;
     demoFocused?: boolean;
-    onAddButtonElementChange?: (element: HTMLDivElement | null) => void;
+    onAddButtonElementChange?: (element: HTMLButtonElement | null) => void;
     emptyPlaceholder?: string;
     nextPlaceholder?: string;
 };
@@ -102,8 +109,8 @@ export default function AddListItemInput({
                         className="font-['Lato:Bold',sans-serif] w-full border-none bg-transparent text-[17px] not-italic text-[#1c2c42] caret-[#1c2c42] outline-none placeholder-[#D9D9D9]"
                     />
                 </div>
-                <div className="flex items-center" onClick={handleAdd} ref={onAddButtonElementChange}>
-                    <AddTickButton active={hasTypedText} />
+                <div className="flex items-center" onClick={handleAdd}>
+                    <AddTickButton active={hasTypedText} buttonRef={onAddButtonElementChange} />
                 </div>
             </div>
         </div>
