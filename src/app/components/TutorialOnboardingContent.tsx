@@ -13,6 +13,7 @@ import TutorialStaticReminderList from '@/app/components/TutorialStaticReminderL
 import TutorialReminderFilters, {
   GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
   SAVED_LISTS_TUTORIAL_FILTER_ITEMS,
+  type TutorialFilterKey,
   UNGROUPED_TUTORIAL_FILTER_ITEMS,
   UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS,
 } from '@/app/components/TutorialReminderFilters';
@@ -87,11 +88,15 @@ function ListsTutorialPlaceholderPage({
   currentPage,
   settingsMenuEnabled,
   savedListsEnabled,
+  activeFilter,
+  onActiveFilterChange,
 }: {
   filtersMenuVariant: FiltersMenuVariant;
   currentPage: number;
   settingsMenuEnabled: boolean;
   savedListsEnabled: boolean;
+  activeFilter?: TutorialFilterKey;
+  onActiveFilterChange?: (activeFilter: TutorialFilterKey | undefined) => void;
 }) {
   const listFilterItems =
     savedListsEnabled
@@ -99,6 +104,14 @@ function ListsTutorialPlaceholderPage({
       : filtersMenuVariant === 'grouped'
       ? GROUPED_TUTORIAL_LIST_FILTER_ITEMS
       : UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS;
+  const displayActiveFilter: TutorialFilterKey | undefined =
+    currentPage === 0 && !savedListsEnabled && filtersMenuVariant === 'grouped'
+      ? activeFilter === 'todo'
+        ? 'grouped-todo'
+        : activeFilter === 'started'
+        ? 'almost'
+        : activeFilter
+      : activeFilter;
 
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
@@ -126,11 +139,17 @@ function ListsTutorialPlaceholderPage({
               layout={savedListsEnabled || filtersMenuVariant === 'grouped' ? 'inline' : 'between'}
               rowGapClassName={savedListsEnabled || filtersMenuVariant === 'grouped' ? 'gap-[12.923px]' : 'gap-[10px]'}
               groupGapClassName="gap-[8.615px]"
+              activeKey={currentPage === 0 ? displayActiveFilter : undefined}
             />
           }
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
-            <TutorialStaticReminderList mode="lists" page1BuildSequence={currentPage === 0} />
+            <TutorialStaticReminderList
+              mode="lists"
+              page1BuildSequence={currentPage === 0}
+              activeFilter={currentPage === 0 ? activeFilter : undefined}
+              onListFilterChange={currentPage === 0 ? onActiveFilterChange : undefined}
+            />
           </div>
         </TutorialPhoneShell>
       </div>
@@ -142,6 +161,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const [currentPage, setCurrentPage] = useState(0);
   const isListsTutorial = variant === 'lists';
   const page2ActiveFilter = useOnboardingPage2ActiveFilter(!isListsTutorial && currentPage === 1);
+  const [listsTutorialActiveFilter, setListsTutorialActiveFilter] = useState<TutorialFilterKey | undefined>(undefined);
   const [page3ShowOverlay, setPage3ShowOverlay] = useState(false);
   const [page5ShowLogoHighlight, setPage5ShowLogoHighlight] = useState(false);
   const [page5ShowDoneReminders, setPage5ShowDoneReminders] = useState(false);
@@ -161,6 +181,12 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
     if (isListsTutorial || currentPage !== 4) {
       setPage5ShowLogoHighlight(false);
       setPage5ShowDoneReminders(false);
+    }
+  }, [currentPage, isListsTutorial]);
+
+  useEffect(() => {
+    if (!isListsTutorial || currentPage !== 0) {
+      setListsTutorialActiveFilter(undefined);
     }
   }, [currentPage, isListsTutorial]);
 
@@ -345,7 +371,16 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </div>
         )}
         
-        {isListsTutorial && <ListsTutorialPlaceholderPage filtersMenuVariant={filtersMenuVariant} currentPage={currentPage} settingsMenuEnabled={settingsMenuEnabled} savedListsEnabled={savedListsEnabled} />}
+        {isListsTutorial && (
+          <ListsTutorialPlaceholderPage
+            filtersMenuVariant={filtersMenuVariant}
+            currentPage={currentPage}
+            settingsMenuEnabled={settingsMenuEnabled}
+            savedListsEnabled={savedListsEnabled}
+            activeFilter={listsTutorialActiveFilter}
+            onActiveFilterChange={setListsTutorialActiveFilter}
+          />
+        )}
       </div>
       
       <div className="shrink-0 flex flex-col items-center gap-[36px] [@media(max-height:570px)]:pt-[30px] [@media(max-height:570px)]:pb-[30px]">

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
-import type { TutorialFilterKey } from "./TutorialReminderFilters";
+import { TUTORIAL_FILTER_RECYCLE_DELAY, TUTORIAL_FILTER_STEP_DELAY, type TutorialFilterKey } from "./TutorialReminderFilters";
 
 function Frame3() {
   return (
@@ -35,9 +35,6 @@ const PAGE_2_FILTER_LOOP_SEQUENCE: Array<TutorialFilterKey | undefined> = [
   "sometime",
   undefined,
 ];
-const PAGE_2_FILTER_STEP_DELAY = 1000;
-const PAGE_2_FILTER_RECYCLE_DELAY = 2000;
-
 export function useOnboardingPage2ActiveFilter(enabled: boolean) {
   const [activeFilter, setActiveFilter] = useState<TutorialFilterKey | undefined>(undefined);
 
@@ -58,7 +55,7 @@ export function useOnboardingPage2ActiveFilter(enabled: boolean) {
         sequenceIndex = isRecycleDelay ? 1 : sequenceIndex + 1;
         setActiveFilter(PAGE_2_FILTER_LOOP_SEQUENCE[sequenceIndex]);
         scheduleNext();
-      }, isRecycleDelay ? PAGE_2_FILTER_RECYCLE_DELAY : PAGE_2_FILTER_STEP_DELAY);
+      }, isRecycleDelay ? TUTORIAL_FILTER_RECYCLE_DELAY : TUTORIAL_FILTER_STEP_DELAY);
     };
 
     scheduleNext();

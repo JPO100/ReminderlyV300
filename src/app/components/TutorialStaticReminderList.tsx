@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { formatReminderNextOccurrenceLabel, formatRepeatLabel, formatRepeatRuleText, formatScheduledDateForRow } from "../reminder-utils";
 import { useEffect, useRef, useState } from "react";
 import { formatTime12h } from "../utils/normalise-text";
-import type { TutorialFilterKey } from "./TutorialReminderFilters";
+import { TUTORIAL_FILTER_RECYCLE_DELAY, TUTORIAL_FILTER_STEP_DELAY, type TutorialFilterKey } from "./TutorialReminderFilters";
 import { CompletedCircleIcon } from "./icons/ReminderStateIcons";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
@@ -132,6 +132,16 @@ const STATIC_LISTS: readonly TutorialList[] = [
 const REMINDER_DEFAULT_VISIBLE_IDS = STATIC_REMINDERS.map((reminder) => reminder.id);
 const LIST_DEFAULT_VISIBLE_IDS = STATIC_LISTS.map((list) => list.id);
 const PAGE_1_LIST_BUILD_SEQUENCE_IDS = [...LIST_DEFAULT_VISIBLE_IDS].reverse();
+const LIST_FILTER_LOOP_SEQUENCE: Array<TutorialFilterKey | undefined> = [
+  "todo",
+  "started",
+  "complete",
+  undefined,
+  "todo",
+  "started",
+  "complete",
+  undefined,
+];
 
 function getTutorialReminderSubtitle(reminder: TutorialReminder): string {
   if (reminder.repeatRule) {
@@ -289,6 +299,7 @@ export default function TutorialStaticReminderList({
   activeFilter,
   menuTargetReminderId,
   onMenuTargetElementChange,
+  onListFilterChange,
 }: {
   mode?: "reminders" | "lists";
   page1BuildSequence?: boolean;
@@ -297,6 +308,7 @@ export default function TutorialStaticReminderList({
   activeFilter?: TutorialFilterKey;
   menuTargetReminderId?: string;
   onMenuTargetElementChange?: (element: HTMLDivElement | null) => void;
+  onListFilterChange?: (activeFilter: TutorialFilterKey | undefined) => void;
 }) {
   const sequenceIds = mode === "lists" ? PAGE_1_LIST_BUILD_SEQUENCE_IDS : PAGE_1_BUILD_SEQUENCE_IDS;
   const defaultVisibleIds = mode === "lists" ? LIST_DEFAULT_VISIBLE_IDS : REMINDER_DEFAULT_VISIBLE_IDS;
@@ -316,6 +328,9 @@ export default function TutorialStaticReminderList({
       setVisibleIds(defaultVisibleIds);
       setReinsertedId(null);
       setInsertHighlightId(null);
+      if (mode === "lists") {
+        onListFilterChange?.(undefined);
+      }
       return;
     }
 
@@ -323,6 +338,9 @@ export default function TutorialStaticReminderList({
       setVisibleIds([]);
       setReinsertedId(null);
       setInsertHighlightId(null);
+      if (mode === "lists") {
+        onListFilterChange?.(undefined);
+      }
 
       const initialTimer = window.setTimeout(() => {
         const insertTimer = window.setTimeout(() => {
@@ -362,9 +380,26 @@ export default function TutorialStaticReminderList({
         }, PAGE_1_INITIAL_INSERT_DELAY + (index + 1) * PAGE_1_INSERT_START_GAP)
       );
 
-      const recycleTimer = window.setTimeout(() => {
-        startCycle();
-      }, PAGE_1_INITIAL_INSERT_DELAY + (sequenceIds.length - 1) * PAGE_1_INSERT_START_GAP + NEW_REMINDER_INSERT_DELAY + INSERT_HIGHLIGHT_MS + TUTORIAL_RECYCLE_DELAY);
+      const populatedAt = PAGE_1_INITIAL_INSERT_DELAY + (sequenceIds.length - 1) * PAGE_1_INSERT_START_GAP + NEW_REMINDER_INSERT_DELAY + INSERT_HIGHLIGHT_MS;
+      let recycleTimer: number;
+      if (mode === "lists") {
+        let elapsed = TUTORIAL_FILTER_RECYCLE_DELAY;
+        LIST_FILTER_LOOP_SEQUENCE.forEach((filter, index) => {
+          const filterTimer = window.setTimeout(() => {
+            onListFilterChange?.(filter);
+          }, populatedAt + elapsed);
+          timeoutsRef.current.push(filterTimer);
+          const isFullListPause = filter == null && index < LIST_FILTER_LOOP_SEQUENCE.length - 1;
+          elapsed += isFullListPause ? TUTORIAL_FILTER_RECYCLE_DELAY : TUTORIAL_FILTER_STEP_DELAY;
+        });
+        recycleTimer = window.setTimeout(() => {
+          startCycle();
+        }, populatedAt + elapsed + TUTORIAL_FILTER_RECYCLE_DELAY - TUTORIAL_FILTER_STEP_DELAY);
+      } else {
+        recycleTimer = window.setTimeout(() => {
+          startCycle();
+        }, populatedAt + TUTORIAL_RECYCLE_DELAY);
+      }
 
       timeoutsRef.current.push(initialTimer, ...timers, recycleTimer);
     };
@@ -379,7 +414,7 @@ export default function TutorialStaticReminderList({
         insertHighlightTimerRef.current = null;
       }
     };
-  }, [mode, page1BuildSequence]);
+  }, [mode, onListFilterChange, page1BuildSequence]);
 
   useEffect(() => {
     if (!page3DoneSequence) {
@@ -488,7 +523,13 @@ export default function TutorialStaticReminderList({
     });
   const visibleLists = visibleIds
     .map((id) => STATIC_LISTS.find((list) => list.id === id))
-    .filter((list): list is (typeof STATIC_LISTS)[number] => list != null);
+    .filter((list): list is (typeof STATIC_LISTS)[number] => list != null)
+    .filter((list) => {
+      if (activeFilter == null) return true;
+      if (activeFilter === "complete") return list.state === "done";
+      if (activeFilter === "todo" || activeFilter === "started") return list.state === activeFilter;
+      return true;
+    });
   const visibleItems = mode === "lists" ? visibleLists : visibleReminders;
 
   const animatePresenceKey = mode === "lists"

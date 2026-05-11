@@ -14,6 +14,9 @@ export type TutorialFilterKey =
   | "todo"
   | "grouped-todo";
 
+export const TUTORIAL_FILTER_STEP_DELAY = 1000;
+export const TUTORIAL_FILTER_RECYCLE_DELAY = 2000;
+
 export interface TutorialFilterItem {
   key: TutorialFilterKey;
   label: string;
