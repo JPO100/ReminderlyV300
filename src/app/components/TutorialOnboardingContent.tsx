@@ -135,7 +135,7 @@ function ListsTutorialPlaceholderPage({
           {currentPage === 0 ? (
             <p className="block leading-[normal]">Lists are grouped by colour and<br />filtered in the same way as reminders</p>
           ) : currentPage === 1 ? (
-            <p className="block leading-[normal]">Move finished lists to done<br />and switch between active and completed lists</p>
+            <p className="block leading-[normal]">Move finished lists to done<br />and view completed lists</p>
           ) : (
             <p className="block leading-[normal]">Setting subtitle</p>
           )}
