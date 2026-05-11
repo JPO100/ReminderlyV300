@@ -13,6 +13,8 @@ const NEW_REMINDER_INSERT_DELAY = 500;
 const INSERT_HIGHLIGHT_MS = 1000;
 const TUTORIAL_RECYCLE_DELAY = 2000;
 const COMPLETION_DELAY = 350;
+const DONE_SEQUENCE_INITIAL_DELAY = 1000;
+const DONE_SEQUENCE_REMOVAL_GAP = 500;
 const DONE_BLUE = "#1C2C42";
 const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
 
@@ -392,14 +394,14 @@ export default function TutorialStaticReminderList({
           }, COMPLETION_DELAY);
 
           timers.push(commitTimer);
-        }, NEW_REMINDER_INSERT_DELAY + 500 * (index + 1));
+        }, DONE_SEQUENCE_INITIAL_DELAY + index * (COMPLETION_DELAY + DONE_SEQUENCE_REMOVAL_GAP));
 
         timers.push(startTimer);
       });
 
       const recycleTimer = window.setTimeout(() => {
         startCycle({ fadeReset: true });
-      }, NEW_REMINDER_INSERT_DELAY + 500 * sequenceIds.length + COMPLETION_DELAY + TUTORIAL_RECYCLE_DELAY);
+      }, DONE_SEQUENCE_INITIAL_DELAY + (sequenceIds.length - 1) * (COMPLETION_DELAY + DONE_SEQUENCE_REMOVAL_GAP) + COMPLETION_DELAY + TUTORIAL_RECYCLE_DELAY);
       timers.push(recycleTimer);
     };
 

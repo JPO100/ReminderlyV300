@@ -1,0 +1,66 @@
+{
+  "fill" : {
+    "solid" : "display-p3:0.33667,0.51172,0.94189,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "solid" : "display-p3:0.99316,0.99316,0.99316,1.00000"
+          },
+          "glass" : false,
+          "image-name-specializations" : [
+            {
+              "value" : "logo 2.svg"
+            },
+            {
+              "appearance" : "light",
+              "value" : "logo 2.svg"
+            }
+          ],
+          "name" : "logo 2",
+          "position" : {
+            "scale" : 1.98,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "solid" : "display-p3:0.32495,0.49365,0.90869,1.00000"
+          },
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "bg.svg",
+          "name" : "bg",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -890.7109375,
+              -171.625
+            ]
+          }
+        }
+      ],
+      "name" : "Group",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : [
+      "iOS"
+    ]
+  }
+}
