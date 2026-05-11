@@ -94,17 +94,17 @@ const STATIC_LISTS: readonly TutorialList[] = [
   },
   {
     id: "list-2",
+    title: "Work tasks",
+    subtitle: "0 of 5",
+    state: "todo",
+    circleColor: "#939393",
+  },
+  {
+    id: "list-3",
     title: "Weekly shop",
     subtitle: "3 of 9",
     state: "started",
     circleColor: "#9468D5",
-  },
-  {
-    id: "list-3",
-    title: "House jobs",
-    subtitle: "6 of 6",
-    state: "done",
-    circleColor: "#005BE3",
   },
   {
     id: "list-4",
@@ -115,10 +115,10 @@ const STATIC_LISTS: readonly TutorialList[] = [
   },
   {
     id: "list-5",
-    title: "Work tasks",
-    subtitle: "0 of 5",
-    state: "todo",
-    circleColor: "#939393",
+    title: "House jobs",
+    subtitle: "6 of 6",
+    state: "done",
+    circleColor: "#005BE3",
   },
   {
     id: "list-6",
@@ -512,7 +512,6 @@ export default function TutorialStaticReminderList({
               const isPage3ResetFade = page3ResetFadeIds.has(item.id);
               const isHighlighted = insertHighlightId === item.id;
               const isDoneReminder = doneReminderIds != null;
-              const isDoneList = mode === "lists" && (item as TutorialList).state === "done";
               const isPendingDone = pendingDoneIds.has(item.id);
               if (suppressPage3ResetAnimation) {
                 return (
@@ -523,7 +522,7 @@ export default function TutorialStaticReminderList({
                     circleColor={(item as TutorialReminder | TutorialList).circleColor}
                     showRepeatIcon={mode === "reminders" && Boolean((item as TutorialReminder).repeatRule)}
                     titleColor={isHighlighted ? item.circleColor : "#1c2c42"}
-                    isDone={isDoneReminder || isDoneList}
+                    isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
                     showMenuButton={!isDoneReminder}
                     menuButtonRef={item.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
@@ -559,7 +558,7 @@ export default function TutorialStaticReminderList({
                     circleColor={(item as TutorialReminder | TutorialList).circleColor}
                     showRepeatIcon={mode === "reminders" && Boolean((item as TutorialReminder).repeatRule)}
                     titleColor={isHighlighted ? item.circleColor : "#1c2c42"}
-                    isDone={isDoneReminder || isDoneList}
+                    isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
                     showMenuButton={!isDoneReminder}
                     menuButtonRef={item.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
