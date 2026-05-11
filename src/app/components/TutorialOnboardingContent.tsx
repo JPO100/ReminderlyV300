@@ -84,10 +84,12 @@ function Page5DoneDeletedFilters() {
 
 function ListsTutorialPlaceholderPage({
   filtersMenuVariant,
+  currentPage,
   settingsMenuEnabled,
   savedListsEnabled,
 }: {
   filtersMenuVariant: FiltersMenuVariant;
+  currentPage: number;
   settingsMenuEnabled: boolean;
   savedListsEnabled: boolean;
 }) {
@@ -102,10 +104,14 @@ function ListsTutorialPlaceholderPage({
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
       <div className="flex w-full flex-col items-center gap-[16px]">
         <div className={TUTORIAL_TITLE_CLASSNAME}>
-          <p className="block leading-[normal] whitespace-pre-wrap">Setting title</p>
+          <p className="block leading-[normal] whitespace-pre-wrap">{currentPage === 0 ? "A tour of lists" : "Setting title"}</p>
         </div>
         <div className={TUTORIAL_BODY_CLASSNAME}>
-          <p className="block leading-[normal]">Setting subtitle</p>
+          {currentPage === 0 ? (
+            <p className="block leading-[normal]">Lists are grouped by colour and<br />filtered in the same way as reminders</p>
+          ) : (
+            <p className="block leading-[normal]">Setting subtitle</p>
+          )}
         </div>
       </div>
       <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
@@ -124,7 +130,7 @@ function ListsTutorialPlaceholderPage({
           }
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
-            <TutorialStaticReminderList mode="lists" page1BuildSequence />
+            <TutorialStaticReminderList mode="lists" page1BuildSequence={currentPage === 0} />
           </div>
         </TutorialPhoneShell>
       </div>
@@ -339,7 +345,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </div>
         )}
         
-        {isListsTutorial && <ListsTutorialPlaceholderPage filtersMenuVariant={filtersMenuVariant} settingsMenuEnabled={settingsMenuEnabled} savedListsEnabled={savedListsEnabled} />}
+        {isListsTutorial && <ListsTutorialPlaceholderPage filtersMenuVariant={filtersMenuVariant} currentPage={currentPage} settingsMenuEnabled={settingsMenuEnabled} savedListsEnabled={savedListsEnabled} />}
       </div>
       
       <div className="shrink-0 flex flex-col items-center gap-[36px] [@media(max-height:570px)]:pt-[30px] [@media(max-height:570px)]:pb-[30px]">
