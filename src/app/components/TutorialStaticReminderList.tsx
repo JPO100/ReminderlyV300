@@ -7,8 +7,8 @@ import { CompletedCircleIcon } from "./icons/ReminderStateIcons";
 
 const TUTORIAL_REMINDER_LIST_SCALE = 0.696;
 const TUTORIAL_NOW = new Date(2025, 7, 11, 12, 0, 0, 0);
-const PAGE_1_INITIAL_INSERT_DELAY = 200;
-const PAGE_1_INSERT_START_GAP = 500;
+const PAGE_1_INITIAL_INSERT_DELAY = 450;
+const PAGE_1_INSERT_START_GAP = 750;
 const NEW_REMINDER_INSERT_DELAY = 500;
 const INSERT_HIGHLIGHT_MS = 1000;
 const TUTORIAL_RECYCLE_DELAY = 2000;
