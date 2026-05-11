@@ -127,11 +127,15 @@ function ListsTutorialPlaceholderPage({
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
       <div className="flex w-full flex-col items-center gap-[16px]">
         <div className={TUTORIAL_TITLE_CLASSNAME}>
-          <p className="block leading-[normal] whitespace-pre-wrap">{currentPage === 0 ? "A tour of lists" : "Setting title"}</p>
+          <p className="block leading-[normal] whitespace-pre-wrap">
+            {currentPage === 0 ? "A tour of lists" : currentPage === 1 ? "Manage completed lists" : "Setting title"}
+          </p>
         </div>
         <div className={TUTORIAL_BODY_CLASSNAME}>
           {currentPage === 0 ? (
             <p className="block leading-[normal]">Lists are grouped by colour and<br />filtered in the same way as reminders</p>
+          ) : currentPage === 1 ? (
+            <p className="block leading-[normal]">Move finished lists to done<br />and switch between active and completed lists</p>
           ) : (
             <p className="block leading-[normal]">Setting subtitle</p>
           )}
