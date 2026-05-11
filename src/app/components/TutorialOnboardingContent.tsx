@@ -9,6 +9,7 @@ import OnboardingPage5Content, { OnboardingPage5Text } from '@/app/components/On
 import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/OnboardingPage6Content';
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
+import TutorialStaticReminderList from '@/app/components/TutorialStaticReminderList';
 import TutorialReminderFilters, {
   GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
   SAVED_LISTS_TUTORIAL_FILTER_ITEMS,
@@ -121,8 +122,11 @@ function ListsTutorialPlaceholderPage({
               groupGapClassName="gap-[8.615px]"
             />
           }
-          blankBody
-        />
+        >
+          <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
+            <TutorialStaticReminderList mode="lists" page1BuildSequence />
+          </div>
+        </TutorialPhoneShell>
       </div>
     </div>
   );

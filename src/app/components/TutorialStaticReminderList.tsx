@@ -29,6 +29,14 @@ type TutorialReminder = {
   repeatRule?: { frequency: "weekly" | "monthly"; interval: number; byDay: string[] | null } | null;
 };
 
+type TutorialList = {
+  id: string;
+  title: string;
+  subtitle: string;
+  state: "todo" | "started" | "done";
+  circleColor: string;
+};
+
 const STATIC_REMINDERS: readonly TutorialReminder[] = [
   {
     id: "today",
@@ -75,6 +83,55 @@ const STATIC_REMINDERS: readonly TutorialReminder[] = [
     schedule: { kind: "sometime" },
   },
 ] as const;
+
+const STATIC_LISTS: readonly TutorialList[] = [
+  {
+    id: "list-1",
+    title: "Holiday packing",
+    subtitle: "0 of 8",
+    state: "todo",
+    circleColor: "#939393",
+  },
+  {
+    id: "list-2",
+    title: "Weekly shop",
+    subtitle: "3 of 9",
+    state: "started",
+    circleColor: "#9468D5",
+  },
+  {
+    id: "list-3",
+    title: "House jobs",
+    subtitle: "6 of 6",
+    state: "done",
+    circleColor: "#005BE3",
+  },
+  {
+    id: "list-4",
+    title: "Birthday plans",
+    subtitle: "2 of 7",
+    state: "started",
+    circleColor: "#9468D5",
+  },
+  {
+    id: "list-5",
+    title: "Work tasks",
+    subtitle: "0 of 5",
+    state: "todo",
+    circleColor: "#939393",
+  },
+  {
+    id: "list-6",
+    title: "Weekend DIY",
+    subtitle: "4 of 4",
+    state: "done",
+    circleColor: "#005BE3",
+  },
+] as const;
+
+const REMINDER_DEFAULT_VISIBLE_IDS = STATIC_REMINDERS.map((reminder) => reminder.id);
+const LIST_DEFAULT_VISIBLE_IDS = STATIC_LISTS.map((list) => list.id);
+const PAGE_1_LIST_BUILD_SEQUENCE_IDS = [...LIST_DEFAULT_VISIBLE_IDS].reverse();
 
 function getTutorialReminderSubtitle(reminder: TutorialReminder): string {
   if (reminder.repeatRule) {
@@ -225,6 +282,7 @@ function TutorialStaticReminderRow({
 }
 
 export default function TutorialStaticReminderList({
+  mode = "reminders",
   page1BuildSequence = false,
   page3DoneSequence = false,
   doneReminderIds,
@@ -232,6 +290,7 @@ export default function TutorialStaticReminderList({
   menuTargetReminderId,
   onMenuTargetElementChange,
 }: {
+  mode?: "reminders" | "lists";
   page1BuildSequence?: boolean;
   page3DoneSequence?: boolean;
   doneReminderIds?: readonly string[];
@@ -239,8 +298,10 @@ export default function TutorialStaticReminderList({
   menuTargetReminderId?: string;
   onMenuTargetElementChange?: (element: HTMLDivElement | null) => void;
 }) {
+  const sequenceIds = mode === "lists" ? PAGE_1_LIST_BUILD_SEQUENCE_IDS : PAGE_1_BUILD_SEQUENCE_IDS;
+  const defaultVisibleIds = mode === "lists" ? LIST_DEFAULT_VISIBLE_IDS : REMINDER_DEFAULT_VISIBLE_IDS;
   const [visibleIds, setVisibleIds] = useState<string[]>(
-    page1BuildSequence ? [] : STATIC_REMINDERS.map((reminder) => reminder.id)
+    page1BuildSequence ? [] : defaultVisibleIds
   );
   const [reinsertedId, setReinsertedId] = useState<string | null>(null);
   const [insertHighlightId, setInsertHighlightId] = useState<string | null>(null);
@@ -252,7 +313,7 @@ export default function TutorialStaticReminderList({
 
   useEffect(() => {
     if (!page1BuildSequence) {
-      setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
+      setVisibleIds(defaultVisibleIds);
       setReinsertedId(null);
       setInsertHighlightId(null);
       return;
@@ -265,9 +326,9 @@ export default function TutorialStaticReminderList({
 
       const initialTimer = window.setTimeout(() => {
         const insertTimer = window.setTimeout(() => {
-          setVisibleIds([PAGE_1_BUILD_SEQUENCE_IDS[0]]);
-          setReinsertedId(PAGE_1_BUILD_SEQUENCE_IDS[0]);
-          setInsertHighlightId(PAGE_1_BUILD_SEQUENCE_IDS[0]);
+          setVisibleIds([sequenceIds[0]]);
+          setReinsertedId(sequenceIds[0]);
+          setInsertHighlightId(sequenceIds[0]);
 
           if (insertHighlightTimerRef.current !== null) {
             clearTimeout(insertHighlightTimerRef.current);
@@ -281,7 +342,7 @@ export default function TutorialStaticReminderList({
         timeoutsRef.current.push(insertTimer);
       }, PAGE_1_INITIAL_INSERT_DELAY);
 
-      const timers = PAGE_1_BUILD_SEQUENCE_IDS.slice(1).map((id, index) =>
+      const timers = sequenceIds.slice(1).map((id, index) =>
         window.setTimeout(() => {
           const insertTimer = window.setTimeout(() => {
             setVisibleIds((prev) => [id, ...prev]);
@@ -303,7 +364,7 @@ export default function TutorialStaticReminderList({
 
       const recycleTimer = window.setTimeout(() => {
         startCycle();
-      }, PAGE_1_INITIAL_INSERT_DELAY + (PAGE_1_BUILD_SEQUENCE_IDS.length - 1) * PAGE_1_INSERT_START_GAP + NEW_REMINDER_INSERT_DELAY + INSERT_HIGHLIGHT_MS + TUTORIAL_RECYCLE_DELAY);
+      }, PAGE_1_INITIAL_INSERT_DELAY + (sequenceIds.length - 1) * PAGE_1_INSERT_START_GAP + NEW_REMINDER_INSERT_DELAY + INSERT_HIGHLIGHT_MS + TUTORIAL_RECYCLE_DELAY);
 
       timeoutsRef.current.push(initialTimer, ...timers, recycleTimer);
     };
@@ -318,7 +379,7 @@ export default function TutorialStaticReminderList({
         insertHighlightTimerRef.current = null;
       }
     };
-  }, [page1BuildSequence]);
+  }, [mode, page1BuildSequence]);
 
   useEffect(() => {
     if (!page3DoneSequence) {
@@ -425,8 +486,14 @@ export default function TutorialStaticReminderList({
       }
       return reminder.category === activeFilter;
     });
+  const visibleLists = visibleIds
+    .map((id) => STATIC_LISTS.find((list) => list.id === id))
+    .filter((list): list is (typeof STATIC_LISTS)[number] => list != null);
+  const visibleItems = mode === "lists" ? visibleLists : visibleReminders;
 
-  const animatePresenceKey = `tutorial-${doneReminderIds != null ? "done-reminders" : page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
+  const animatePresenceKey = mode === "lists"
+    ? `tutorial-lists-${page1BuildSequence ? "page1-sequence" : "all"}`
+    : `tutorial-${doneReminderIds != null ? "done-reminders" : page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
 
   return (
     <div className="flex flex-[1_0_0] min-h-px w-full items-start justify-center overflow-hidden">
@@ -440,25 +507,26 @@ export default function TutorialStaticReminderList({
       >
         <div className="flex flex-col gap-[23px] w-full" style={{ position: "relative", zIndex: 1 }}>
           <AnimatePresence key={animatePresenceKey}>
-            {visibleReminders.map((reminder) => {
-              const isReinserted = reinsertedId === reminder.id;
-              const isPage3ResetFade = page3ResetFadeIds.has(reminder.id);
-              const isHighlighted = insertHighlightId === reminder.id;
+            {visibleItems.map((item) => {
+              const isReinserted = reinsertedId === item.id;
+              const isPage3ResetFade = page3ResetFadeIds.has(item.id);
+              const isHighlighted = insertHighlightId === item.id;
               const isDoneReminder = doneReminderIds != null;
-              const isPendingDone = pendingDoneIds.has(reminder.id);
+              const isDoneList = mode === "lists" && (item as TutorialList).state === "done";
+              const isPendingDone = pendingDoneIds.has(item.id);
               if (suppressPage3ResetAnimation) {
                 return (
-                  <div key={reminder.id}>
+                  <div key={item.id}>
                     <TutorialStaticReminderRow
-                      title={reminder.title}
-                      subtitle={getTutorialReminderSubtitle(reminder)}
-                    circleColor={reminder.circleColor}
-                    showRepeatIcon={Boolean(reminder.repeatRule)}
-                    titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
-                    isDone={isDoneReminder}
+                      title={item.title}
+                      subtitle={mode === "lists" ? (item as TutorialList).subtitle : getTutorialReminderSubtitle(item as TutorialReminder)}
+                    circleColor={(item as TutorialReminder | TutorialList).circleColor}
+                    showRepeatIcon={mode === "reminders" && Boolean((item as TutorialReminder).repeatRule)}
+                    titleColor={isHighlighted ? item.circleColor : "#1c2c42"}
+                    isDone={isDoneReminder || isDoneList}
                     isPendingDone={isPendingDone}
                     showMenuButton={!isDoneReminder}
-                    menuButtonRef={reminder.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
+                    menuButtonRef={item.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
                   />
                 </div>
               );
@@ -466,7 +534,7 @@ export default function TutorialStaticReminderList({
 
               return (
                 <motion.div
-                  key={reminder.id}
+                  key={item.id}
                   layout
                   initial={isReinserted || isPage3ResetFade ? { opacity: 0 } : false}
                   animate={{ opacity: 1 }}
@@ -479,22 +547,22 @@ export default function TutorialStaticReminderList({
                     if (isPage3ResetFade) {
                       setPage3ResetFadeIds((prev) => {
                         const next = new Set(prev);
-                        next.delete(reminder.id);
+                        next.delete(item.id);
                         return next;
                       });
                     }
                   }}
                 >
                   <TutorialStaticReminderRow
-                    title={reminder.title}
-                    subtitle={getTutorialReminderSubtitle(reminder)}
-                    circleColor={reminder.circleColor}
-                    showRepeatIcon={Boolean(reminder.repeatRule)}
-                    titleColor={isHighlighted ? reminder.circleColor : "#1c2c42"}
-                    isDone={isDoneReminder}
+                    title={item.title}
+                    subtitle={mode === "lists" ? (item as TutorialList).subtitle : getTutorialReminderSubtitle(item as TutorialReminder)}
+                    circleColor={(item as TutorialReminder | TutorialList).circleColor}
+                    showRepeatIcon={mode === "reminders" && Boolean((item as TutorialReminder).repeatRule)}
+                    titleColor={isHighlighted ? item.circleColor : "#1c2c42"}
+                    isDone={isDoneReminder || isDoneList}
                     isPendingDone={isPendingDone}
                     showMenuButton={!isDoneReminder}
-                    menuButtonRef={reminder.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
+                    menuButtonRef={item.id === menuTargetReminderId ? onMenuTargetElementChange ?? null : null}
                   />
                 </motion.div>
               );
