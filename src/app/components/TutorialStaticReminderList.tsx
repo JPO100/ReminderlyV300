@@ -533,7 +533,7 @@ export default function TutorialStaticReminderList({
   const visibleItems = mode === "lists" ? visibleLists : visibleReminders;
 
   const animatePresenceKey = mode === "lists"
-    ? `tutorial-lists-${page1BuildSequence ? "page1-sequence" : "all"}`
+    ? `tutorial-lists-${page1BuildSequence && activeFilter == null ? "page1-sequence" : activeFilter ?? "all"}`
     : `tutorial-${doneReminderIds != null ? "done-reminders" : page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
 
   return (
