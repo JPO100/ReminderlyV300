@@ -1,15 +1,29 @@
 import { useCallback, useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import svgPaths from '@/imports/svg-go2phgsyt4';
+import ListsHeader from '@/imports/Header';
 import OnboardingPage1Content, { OnboardingPage1Text } from '@/app/components/OnboardingPage1Content';
 import OnboardingPage2Content, { OnboardingPage2Text } from '@/app/components/OnboardingPage2Content';
 import { useOnboardingPage2ActiveFilter } from '@/app/components/OnboardingPage2Content';
-import OnboardingPage3Content, { CALL_DENTIST_TUTORIAL_REMINDER, OnboardingPage3Text, TutorialReminderInfoOverlay } from '@/app/components/OnboardingPage3Content';
+import OnboardingPage3Content, {
+  CALL_DENTIST_TUTORIAL_REMINDER,
+  OnboardingPage3Text,
+  TUTORIAL_ATTENTION_RECYCLE_DELAY,
+  TUTORIAL_ATTENTION_SEQUENCE_DELAY,
+  TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+  TUTORIAL_ATTENTION_THROB_DELAY,
+  TUTORIAL_ATTENTION_THROB_DURATION,
+  TUTORIAL_ATTENTION_THROB_TIMES,
+  TutorialReminderInfoOverlay,
+} from '@/app/components/OnboardingPage3Content';
 import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
 import OnboardingPage5Content, { OnboardingPage5Text, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY, PAGE_5_INITIAL_PAUSE_DELAY, PAGE_5_STATE_PAUSE_DELAY } from '@/app/components/OnboardingPage5Content';
 import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/OnboardingPage6Content';
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
 import TutorialStaticReminderList, { TUTORIAL_PAGE_2_DONE_LIST_IDS } from '@/app/components/TutorialStaticReminderList';
+import AddListItemInput from '@/app/components/lists/AddListItemInput';
+import EditableListItem from '@/app/components/lists/EditableListItem';
 import TutorialReminderFilters, {
   GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
   SAVED_LISTS_TUTORIAL_FILTER_ITEMS,
@@ -35,6 +49,13 @@ const REMINDERLY_DARK_BLUE = "#1C2C42";
 const REMINDERLY_LIGHT_BLUE = "#4784F8";
 const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[35px]";
 const TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME = "pb-[45px]";
+const LISTS_PAGE_3_TARGET_LIST_ID = "list-4";
+const LISTS_PAGE_3_OPEN_ITEMS = [
+  { id: "birthday-1", text: "Book table", completed: true },
+  { id: "birthday-2", text: "Buy candles", completed: true },
+  { id: "birthday-3", text: "Order cake", completed: false },
+  { id: "birthday-4", text: "Wrap present", completed: false },
+] as const;
 
 function TemplatesTutorialButton() {
   return (
@@ -83,6 +104,77 @@ function Page5DoneDeletedFilters() {
   );
 }
 
+function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 z-40 bg-black/0"
+          />
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0, top: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="absolute left-0 right-0 z-50 mx-auto w-full"
+            style={{ bottom: 0 }}
+          >
+            <motion.div className="bg-white relative rounded-tl-[15px] rounded-tr-[15px] size-full">
+              <div className="relative w-full h-full flex flex-col mx-auto">
+                <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
+                  <ListsHeader
+                    value="Birthday plans"
+                    onChange={() => {}}
+                    active
+                    isEditMode
+                    onSubmit={() => {}}
+                    onClose={() => {}}
+                    subtitleText="2 of 4"
+                    showMenuButton
+                  />
+                  <AddListItemInput
+                    isEmpty={false}
+                    accentColor="#9468D5"
+                    idleCircleColor="#D9D9D9"
+                    nextPlaceholder="Add your next item..."
+                  />
+                </div>
+                <div className="flex flex-col gap-[23px] items-start px-[24px] pb-[24px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[35px]">
+                  <AnimatePresence initial={false}>
+                    {LISTS_PAGE_3_OPEN_ITEMS.map((item) => (
+                      <motion.div
+                        key={item.id}
+                        layout="position"
+                        initial={false}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ layout: { type: 'spring', stiffness: 220, damping: 26, mass: 0.9 } }}
+                        className="w-full"
+                      >
+                        <EditableListItem
+                          name={item.text}
+                          completed={item.completed}
+                          accentColor="#9468D5"
+                          editable
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
 function ListsTutorialPlaceholderPage({
   filtersMenuVariant,
   currentPage,
@@ -108,6 +200,10 @@ function ListsTutorialPlaceholderPage({
   page2ShowDoneLists: boolean;
   onPage2DoneSequenceComplete: () => void;
 }) {
+  const [page3TargetElement, setPage3TargetElement] = useState<HTMLDivElement | null>(null);
+  const [page3TargetRect, setPage3TargetRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+  const [page3ShowHighlight, setPage3ShowHighlight] = useState(false);
+  const [page3ListOpen, setPage3ListOpen] = useState(false);
   const listFilterItems =
     savedListsEnabled
       ? SAVED_LISTS_TUTORIAL_FILTER_ITEMS
@@ -122,6 +218,80 @@ function ListsTutorialPlaceholderPage({
         ? 'almost'
         : activeFilter
       : activeFilter;
+
+  useEffect(() => {
+    if (currentPage !== 2) {
+      setPage3ShowHighlight(false);
+      setPage3ListOpen(false);
+      return;
+    }
+
+    const timers: number[] = [];
+    let cancelled = false;
+
+    const startCycle = () => {
+      if (cancelled) {
+        return;
+      }
+
+      setPage3ListOpen(false);
+      setPage3ShowHighlight(true);
+
+      const openTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setPage3ShowHighlight(false);
+        setPage3ListOpen(true);
+
+        const recycleTimer = window.setTimeout(() => {
+          startCycle();
+        }, TUTORIAL_ATTENTION_RECYCLE_DELAY);
+        timers.push(recycleTimer);
+      }, TUTORIAL_ATTENTION_SEQUENCE_DELAY);
+      timers.push(openTimer);
+    };
+
+    startCycle();
+
+    return () => {
+      cancelled = true;
+      timers.forEach((timer) => clearTimeout(timer));
+      setPage3ShowHighlight(false);
+      setPage3ListOpen(false);
+    };
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (!page3TargetElement) {
+      setPage3TargetRect(null);
+      return;
+    }
+
+    const updateRect = () => {
+      const parent = page3TargetElement.offsetParent;
+      if (!(parent instanceof HTMLElement)) {
+        setPage3TargetRect(null);
+        return;
+      }
+
+      const targetRect = page3TargetElement.getBoundingClientRect();
+      const parentRect = parent.getBoundingClientRect();
+      setPage3TargetRect({
+        left: targetRect.left - parentRect.left,
+        top: targetRect.top - parentRect.top,
+        width: targetRect.width,
+        height: targetRect.height,
+      });
+    };
+
+    updateRect();
+    window.addEventListener("resize", updateRect);
+    return () => {
+      window.removeEventListener("resize", updateRect);
+    };
+  }, [page3TargetElement]);
 
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
@@ -163,6 +333,7 @@ function ListsTutorialPlaceholderPage({
               activeKey={currentPage === 0 ? displayActiveFilter : undefined}
             />
           )}
+          overlay={currentPage === 2 ? <ListsTutorialOpenListOverlay open={page3ListOpen} /> : undefined}
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
             <TutorialStaticReminderList
@@ -175,7 +346,34 @@ function ListsTutorialPlaceholderPage({
               activeFilter={currentPage === 0 ? activeFilter : undefined}
               onListFilterChange={currentPage === 0 ? onActiveFilterChange : undefined}
               onPage3DoneSequenceComplete={currentPage === 1 ? onPage2DoneSequenceComplete : undefined}
+              rowTargetListId={currentPage === 2 ? LISTS_PAGE_3_TARGET_LIST_ID : undefined}
+              onRowTargetElementChange={currentPage === 2 ? setPage3TargetElement : undefined}
             />
+            {currentPage === 2 && page3ShowHighlight && page3TargetRect && (
+              <motion.div
+                className="absolute z-10 pointer-events-none"
+                style={{
+                  left: page3TargetRect.left + (page3TargetRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+                  top: page3TargetRect.top + (page3TargetRect.height / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+                  width: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+                  height: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+                }}
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: [0, 1, 0, 0, 1, 0, 0, 1, 0],
+                }}
+                transition={{
+                  duration: TUTORIAL_ATTENTION_THROB_DURATION,
+                  delay: TUTORIAL_ATTENTION_THROB_DELAY,
+                  times: TUTORIAL_ATTENTION_THROB_TIMES,
+                  ease: "easeInOut",
+                }}
+              >
+                <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
+                  <circle cx="17.5" cy="17.5" r="16" stroke="#1C2C42" strokeWidth="3" />
+                </svg>
+              </motion.div>
+            )}
           </div>
         </TutorialPhoneShell>
       </div>

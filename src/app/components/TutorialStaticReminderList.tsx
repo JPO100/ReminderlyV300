@@ -303,6 +303,8 @@ export default function TutorialStaticReminderList({
   onMenuTargetElementChange,
   onListFilterChange,
   onPage3DoneSequenceComplete,
+  rowTargetListId,
+  onRowTargetElementChange,
 }: {
   mode?: "reminders" | "lists";
   page1BuildSequence?: boolean;
@@ -314,6 +316,8 @@ export default function TutorialStaticReminderList({
   onMenuTargetElementChange?: (element: HTMLDivElement | null) => void;
   onListFilterChange?: (activeFilter: TutorialFilterKey | undefined) => void;
   onPage3DoneSequenceComplete?: () => void;
+  rowTargetListId?: string;
+  onRowTargetElementChange?: (element: HTMLDivElement | null) => void;
 }) {
   const sequenceIds = mode === "lists" ? PAGE_1_LIST_BUILD_SEQUENCE_IDS : PAGE_1_BUILD_SEQUENCE_IDS;
   const defaultVisibleIds = mode === "lists" ? LIST_DEFAULT_VISIBLE_IDS : REMINDER_DEFAULT_VISIBLE_IDS;
@@ -590,6 +594,7 @@ export default function TutorialStaticReminderList({
               return (
                 <motion.div
                   key={item.id}
+                  ref={mode === "lists" && item.id === rowTargetListId ? onRowTargetElementChange : undefined}
                   layout
                   initial={isReinserted || isPage3ResetFade ? { opacity: 0 } : false}
                   animate={{ opacity: 1 }}

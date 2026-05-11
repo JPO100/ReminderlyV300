@@ -6,7 +6,12 @@ import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTok
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 const TUTORIAL_OVERLAY_SCALE = 296 / 340;
-const TARGET_CIRCLE_SIZE = 35;
+export const TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE = 35;
+export const TUTORIAL_ATTENTION_THROB_DURATION = 2.3;
+export const TUTORIAL_ATTENTION_THROB_DELAY = 0.4;
+export const TUTORIAL_ATTENTION_THROB_TIMES = [0, 0.109, 0.217, 0.391, 0.5, 0.609, 0.783, 0.891, 1];
+export const TUTORIAL_ATTENTION_SEQUENCE_DELAY = 2750;
+export const TUTORIAL_ATTENTION_RECYCLE_DELAY = 2000;
 
 export const CALL_DENTIST_TUTORIAL_REMINDER: Reminder = {
   id: "today",
@@ -128,9 +133,9 @@ function ReminderList({
 
         const recycleTimer = window.setTimeout(() => {
           startCycle();
-        }, 2000);
+        }, TUTORIAL_ATTENTION_RECYCLE_DELAY);
         timers.push(recycleTimer);
-      }, 2750);
+      }, TUTORIAL_ATTENTION_SEQUENCE_DELAY);
       timers.push(overlayTimer);
     };
 
@@ -159,8 +164,8 @@ function ReminderList({
       const targetRect = menuTargetElement.getBoundingClientRect();
       const parentRect = parent.getBoundingClientRect();
       setMenuTargetRect({
-        left: targetRect.left - parentRect.left + (targetRect.width / 2) - (TARGET_CIRCLE_SIZE / 2),
-        top: targetRect.top - parentRect.top + (targetRect.height / 2) - (TARGET_CIRCLE_SIZE / 2),
+        left: targetRect.left - parentRect.left + (targetRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+        top: targetRect.top - parentRect.top + (targetRect.height / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
       });
     };
 
@@ -186,17 +191,17 @@ function ReminderList({
           style={{
             left: menuTargetRect.left,
             top: menuTargetRect.top,
-            width: TARGET_CIRCLE_SIZE,
-            height: TARGET_CIRCLE_SIZE,
+            width: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+            height: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
           }}
           initial={{ opacity: 0 }}
           animate={{
             opacity: [0, 1, 0, 0, 1, 0, 0, 1, 0],
           }}
           transition={{
-            duration: 2.3,
-            delay: 0.4,
-            times: [0, 0.109, 0.217, 0.391, 0.5, 0.609, 0.783, 0.891, 1],
+            duration: TUTORIAL_ATTENTION_THROB_DURATION,
+            delay: TUTORIAL_ATTENTION_THROB_DELAY,
+            times: TUTORIAL_ATTENTION_THROB_TIMES,
             ease: "easeInOut",
           }}
         >
