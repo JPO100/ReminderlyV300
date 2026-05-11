@@ -303,7 +303,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                       }}
                     >
                       <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
-                        <circle cx="25" cy="25" r="23.5" stroke="#FFFFFF" strokeWidth="3" />
+                        <circle cx="25" cy="25" r="23.5" stroke="#1C2C42" strokeWidth="3" />
                       </svg>
                     </motion.div>
                   )}
