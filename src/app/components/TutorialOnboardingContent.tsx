@@ -50,12 +50,13 @@ const REMINDERLY_LIGHT_BLUE = "#4784F8";
 const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[35px]";
 const TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME = "pb-[45px]";
 const TUTORIAL_LIST_OVERLAY_TOP = 11 + 5.026 + 65 - 2;
-const LISTS_PAGE_3_TARGET_LIST_ID = "list-4";
+const LISTS_PAGE_3_TARGET_LIST_ID = "list-2";
 const LISTS_PAGE_3_OPEN_ITEMS = [
-  { id: "birthday-1", text: "Book table", completed: true },
-  { id: "birthday-2", text: "Buy candles", completed: true },
-  { id: "birthday-3", text: "Order cake", completed: false },
-  { id: "birthday-4", text: "Wrap present", completed: false },
+  { id: "work-1", text: "Send invoice", completed: false },
+  { id: "work-2", text: "Review notes", completed: false },
+  { id: "work-3", text: "Book meeting", completed: false },
+  { id: "work-4", text: "Update roadmap", completed: false },
+  { id: "work-5", text: "Reply to Alex", completed: false },
 ] as const;
 
 function TemplatesTutorialButton() {
@@ -139,13 +140,13 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
               <div className="relative w-full h-full flex flex-col mx-auto">
                 <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
                   <ListsHeader
-                    value="Birthday plans"
+                    value="Work tasks"
                     onChange={() => {}}
                     active
                     isEditMode
                     onSubmit={() => {}}
                     onClose={() => {}}
-                    subtitleText="2 of 4"
+                    subtitleText="0 of 5"
                     showMenuButton
                   />
                   <AddListItemInput
