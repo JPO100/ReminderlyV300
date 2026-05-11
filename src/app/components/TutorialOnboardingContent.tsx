@@ -62,6 +62,7 @@ const LISTS_PAGE_3_DEMO_ITEM = "Prepare update";
 const LISTS_PAGE_3_DEMO_ITEM_ID = "work-prepare-update";
 const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
 const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
+const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -285,10 +286,10 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                     <motion.div
                       className="absolute z-10 pointer-events-none"
                       style={{
-                        left: addButtonRect.left + (addButtonRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
-                        top: addButtonRect.top + (addButtonRect.height / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
-                        width: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
-                        height: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+                        left: addButtonRect.left + (addButtonRect.width / 2) - (LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE / 2),
+                        top: addButtonRect.top + (addButtonRect.height / 2) - (LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE / 2),
+                        width: LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE,
+                        height: LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE,
                       }}
                       initial={{ opacity: 0 }}
                       animate={{
@@ -301,8 +302,8 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                         ease: "easeInOut",
                       }}
                     >
-                      <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
-                        <circle cx="17.5" cy="17.5" r="16" stroke="#FFFFFF" strokeWidth="3" />
+                      <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
+                        <circle cx="25" cy="25" r="23.5" stroke="#FFFFFF" strokeWidth="3" />
                       </svg>
                     </motion.div>
                   )}
