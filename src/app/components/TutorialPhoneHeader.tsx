@@ -56,7 +56,13 @@ function TutorialHeaderMenuIcon() {
   );
 }
 
-function TutorialWordmark({ showTickHighlight = false }: { showTickHighlight?: boolean }) {
+function TutorialWordmark({
+  showTickHighlight = false,
+  tickDone = false,
+}: {
+  showTickHighlight?: boolean;
+  tickDone?: boolean;
+}) {
   return (
     <div
       className="relative shrink-0"
@@ -84,7 +90,7 @@ function TutorialWordmark({ showTickHighlight = false }: { showTickHighlight?: b
           }}
         >
           <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
-            <circle cx="23" cy="23" r="21.25" stroke="#1C2C42" strokeWidth="3.5" />
+            <circle cx="23" cy="23" r="21.25" stroke="#FFFFFF" strokeWidth="3.5" />
           </svg>
         </motion.div>
       )}
@@ -107,6 +113,33 @@ function TutorialWordmark({ showTickHighlight = false }: { showTickHighlight?: b
           <path d={svgPaths.p3babd700} fill="white" />
         </g>
       </svg>
+      {tickDone && (
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            left: 0,
+            top: 0,
+            width: 25,
+            height: 25,
+            zIndex: 1,
+          }}
+        >
+          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24.8332 24.8332">
+            <g clipPath="url(#clip0_default_header_done_tick)">
+              <path d={tickPaths.p9b9c500} fill="#FFFFFF" />
+              <g>
+                <path d={tickPaths.p1d837f80} fill="#1C2C42" />
+                <path d={tickPaths.p1d2e7380} fill="#1C2C42" />
+              </g>
+            </g>
+            <defs>
+              <clipPath id="clip0_default_header_done_tick">
+                <rect fill="white" height="24.8332" width="24.8332" />
+              </clipPath>
+            </defs>
+          </svg>
+        </div>
+      )}
     </div>
   );
 }
@@ -185,6 +218,7 @@ export interface TutorialPhoneHeaderProps {
   tickFlash?: boolean;
   showDone?: boolean;
   logoTickHighlight?: boolean;
+  logoTickDone?: boolean;
 }
 
 export default function TutorialPhoneHeader({
@@ -197,6 +231,7 @@ export default function TutorialPhoneHeader({
   tickFlash = false,
   showDone = false,
   logoTickHighlight = false,
+  logoTickDone = false,
 }: TutorialPhoneHeaderProps) {
   const resolvedBackgroundColor = backgroundColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
   const defaultSensorColor = activeMainTab === "lists" ? "#000000" : "#1c2c42";
@@ -232,7 +267,7 @@ export default function TutorialPhoneHeader({
           className="flex items-center justify-center shrink-0"
           style={{ height: `${LOGO_ROW_HEIGHT}px` }}
         >
-          <TutorialWordmark showTickHighlight={logoTickHighlight} />
+          <TutorialWordmark showTickHighlight={logoTickHighlight} tickDone={logoTickDone} />
         </div>
         {showMenuIcon && (
           <div
