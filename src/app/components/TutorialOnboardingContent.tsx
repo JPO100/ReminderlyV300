@@ -10,10 +10,7 @@ import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/On
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
 import TutorialReminderFilters, {
-  GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
-  SAVED_LISTS_TUTORIAL_FILTER_ITEMS,
   UNGROUPED_TUTORIAL_FILTER_ITEMS,
-  UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS,
 } from '@/app/components/TutorialReminderFilters';
 import type { FiltersMenuVariant } from '../reminder-utils';
 
@@ -36,14 +33,46 @@ const TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME = "pb-[45px]";
 
 function TemplatesTutorialButton() {
   return (
-    <div className="bg-[#1C2C42] content-stretch flex items-center justify-center px-[11.487px] h-[28.718px] relative rounded-[71.795px] shrink-0">
-      <div className="content-stretch flex items-center justify-center gap-[5.744px] relative">
-        <div className="font-['Lato',sans-serif] font-bold text-[10.051px] text-white whitespace-nowrap">
+    <div className="bg-[#1C2C42] content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0">
+      <div className="content-stretch flex items-center justify-center gap-[5.568px] relative">
+        <div className="font-['Lato',sans-serif] font-bold text-[9.751px] text-white whitespace-nowrap">
           Templates
         </div>
         <svg className="block shrink-0" width="5" height="7" viewBox="0 0 7 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M1.72101 0.269035C1.34568 -0.0896783 0.737045 -0.0896783 0.361708 0.269035C-0.0135638 0.627741 -0.0135771 1.20921 0.361708 1.56791L3.91284 4.96154L0.281458 8.43209C-0.0938212 8.79079 -0.0938182 9.37226 0.281458 9.73096C0.656796 10.0897 1.26543 10.0897 1.64076 9.73096L5.80081 5.75517C5.86027 5.71933 5.91677 5.67686 5.96858 5.62735C6.34382 5.26866 6.3438 4.68717 5.96858 4.32847L1.72101 0.269035Z" fill="white"/>
         </svg>
+      </div>
+    </div>
+  );
+}
+
+function ListsTutorialFilters() {
+  const items = [
+    { key: "todo", label: "Todo", color: "#939393" },
+    { key: "started", label: "Started", color: "#9468D5" },
+    { key: "complete", label: "Done", color: "#005BE3" },
+  ] as const;
+
+  return (
+    <div className="relative shrink-0 w-full px-[14px] pt-[14px] pb-[8px]">
+      <div className="flex items-center gap-[12.528px] relative w-full">
+        <div className="flex flex-1 min-w-0 items-center justify-between">
+          {items.map((item) => (
+            <div
+              key={item.key}
+              className="content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0 bg-transparent"
+              style={{ boxShadow: `inset 0 0 0 0.696px ${item.color}` }}
+            >
+              <div
+                className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[9.751px]"
+                style={{ color: item.color }}
+              >
+                <p className="leading-[normal]">{item.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <TemplatesTutorialButton />
       </div>
     </div>
   );
@@ -82,21 +111,10 @@ function Page5DoneDeletedFilters() {
 }
 
 function ListsTutorialPlaceholderPage({
-  filtersMenuVariant,
   settingsMenuEnabled,
-  savedListsEnabled,
 }: {
-  filtersMenuVariant: FiltersMenuVariant;
   settingsMenuEnabled: boolean;
-  savedListsEnabled: boolean;
 }) {
-  const listFilterItems =
-    savedListsEnabled
-      ? SAVED_LISTS_TUTORIAL_FILTER_ITEMS
-      : filtersMenuVariant === 'grouped'
-      ? GROUPED_TUTORIAL_LIST_FILTER_ITEMS
-      : UNGROUPED_TUTORIAL_LIST_FILTER_ITEMS;
-
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
       <div className="flex w-full flex-col items-center gap-[16px]">
@@ -111,16 +129,7 @@ function ListsTutorialPlaceholderPage({
         <TutorialPhoneShell
           activeMainTab="lists"
           showHeaderMenu={settingsMenuEnabled}
-          filterRow={
-            <TutorialReminderFilters
-              items={listFilterItems}
-              showSettings={!savedListsEnabled && filtersMenuVariant === 'grouped'}
-              trailing={savedListsEnabled ? <TemplatesTutorialButton /> : undefined}
-              layout={savedListsEnabled || filtersMenuVariant === 'grouped' ? 'inline' : 'between'}
-              rowGapClassName={savedListsEnabled || filtersMenuVariant === 'grouped' ? 'gap-[12.923px]' : 'gap-[10px]'}
-              groupGapClassName="gap-[8.615px]"
-            />
-          }
+          filterRow={<ListsTutorialFilters />}
           blankBody
         />
       </div>
@@ -128,7 +137,7 @@ function ListsTutorialPlaceholderPage({
   );
 }
 
-export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant, variant, isListsEnabled: _isListsEnabled, settingsMenuEnabled, savedListsEnabled }: TutorialOnboardingContentProps) {
+export default function TutorialOnboardingContent({ onComplete, filtersMenuVariant: _filtersMenuVariant, variant, isListsEnabled: _isListsEnabled, settingsMenuEnabled, savedListsEnabled: _savedListsEnabled }: TutorialOnboardingContentProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const isListsTutorial = variant === 'lists';
   const page2ActiveFilter = useOnboardingPage2ActiveFilter(!isListsTutorial && currentPage === 1);
@@ -335,7 +344,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
           </div>
         )}
         
-        {isListsTutorial && <ListsTutorialPlaceholderPage filtersMenuVariant={filtersMenuVariant} settingsMenuEnabled={settingsMenuEnabled} savedListsEnabled={savedListsEnabled} />}
+        {isListsTutorial && <ListsTutorialPlaceholderPage settingsMenuEnabled={settingsMenuEnabled} />}
       </div>
       
       <div className="shrink-0 flex flex-col items-center gap-[36px] [@media(max-height:570px)]:pt-[30px] [@media(max-height:570px)]:pb-[30px]">
