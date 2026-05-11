@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import svgPaths from '@/imports/svg-go2phgsyt4';
 import OnboardingPage1Content, { OnboardingPage1Text } from '@/app/components/OnboardingPage1Content';
 import OnboardingPage2Content, { OnboardingPage2Text } from '@/app/components/OnboardingPage2Content';
 import { useOnboardingPage2ActiveFilter } from '@/app/components/OnboardingPage2Content';
 import OnboardingPage3Content, { CALL_DENTIST_TUTORIAL_REMINDER, OnboardingPage3Text, TutorialReminderInfoOverlay } from '@/app/components/OnboardingPage3Content';
 import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
-import OnboardingPage5Content, { OnboardingPage5Text } from '@/app/components/OnboardingPage5Content';
+import OnboardingPage5Content, { OnboardingPage5Text, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY, PAGE_5_INITIAL_PAUSE_DELAY, PAGE_5_STATE_PAUSE_DELAY } from '@/app/components/OnboardingPage5Content';
 import OnboardingPage6Content, { OnboardingPage6Text } from '@/app/components/OnboardingPage6Content';
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from '@/app/components/tutorialTokens';
 import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
-import TutorialStaticReminderList from '@/app/components/TutorialStaticReminderList';
+import TutorialStaticReminderList, { TUTORIAL_PAGE_2_DONE_LIST_IDS } from '@/app/components/TutorialStaticReminderList';
 import TutorialReminderFilters, {
   GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
   SAVED_LISTS_TUTORIAL_FILTER_ITEMS,
@@ -90,6 +90,11 @@ function ListsTutorialPlaceholderPage({
   savedListsEnabled,
   activeFilter,
   onActiveFilterChange,
+  page2CycleKey,
+  page2Phase,
+  page2ShowLogoHighlight,
+  page2ShowDoneLists,
+  onPage2DoneSequenceComplete,
 }: {
   filtersMenuVariant: FiltersMenuVariant;
   currentPage: number;
@@ -97,6 +102,11 @@ function ListsTutorialPlaceholderPage({
   savedListsEnabled: boolean;
   activeFilter?: TutorialFilterKey;
   onActiveFilterChange?: (activeFilter: TutorialFilterKey | undefined) => void;
+  page2CycleKey: number;
+  page2Phase: "marking" | "done-list";
+  page2ShowLogoHighlight: boolean;
+  page2ShowDoneLists: boolean;
+  onPage2DoneSequenceComplete: () => void;
 }) {
   const listFilterItems =
     savedListsEnabled
@@ -131,7 +141,14 @@ function ListsTutorialPlaceholderPage({
         <TutorialPhoneShell
           activeMainTab="lists"
           showHeaderMenu={settingsMenuEnabled}
-          filterRow={
+          headerProps={{
+            logoTickHighlight: currentPage === 1 && page2ShowLogoHighlight,
+            logoTickDone: currentPage === 1 && page2ShowDoneLists,
+          }}
+          listsLabel={currentPage === 1 && page2ShowDoneLists ? "Done lists" : undefined}
+          filterRow={currentPage === 1 && page2ShowDoneLists ? (
+            <Page5DoneDeletedFilters />
+          ) : (
             <TutorialReminderFilters
               items={listFilterItems}
               showSettings={!savedListsEnabled && filtersMenuVariant === 'grouped'}
@@ -141,14 +158,19 @@ function ListsTutorialPlaceholderPage({
               groupGapClassName="gap-[8.615px]"
               activeKey={currentPage === 0 ? displayActiveFilter : undefined}
             />
-          }
+          )}
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
             <TutorialStaticReminderList
+              key={currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
               mode="lists"
               page1BuildSequence={currentPage === 0}
+              page3DoneSequence={currentPage === 1 && page2Phase === "marking"}
+              page3DoneSequenceCycle={currentPage !== 1}
+              doneReminderIds={currentPage === 1 && page2ShowDoneLists ? TUTORIAL_PAGE_2_DONE_LIST_IDS : undefined}
               activeFilter={currentPage === 0 ? activeFilter : undefined}
               onListFilterChange={currentPage === 0 ? onActiveFilterChange : undefined}
+              onPage3DoneSequenceComplete={currentPage === 1 ? onPage2DoneSequenceComplete : undefined}
             />
           </div>
         </TutorialPhoneShell>
@@ -162,6 +184,10 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const isListsTutorial = variant === 'lists';
   const page2ActiveFilter = useOnboardingPage2ActiveFilter(!isListsTutorial && currentPage === 1);
   const [listsTutorialActiveFilter, setListsTutorialActiveFilter] = useState<TutorialFilterKey | undefined>(undefined);
+  const [listsPage2CycleKey, setListsPage2CycleKey] = useState(0);
+  const [listsPage2Phase, setListsPage2Phase] = useState<"marking" | "done-list">("marking");
+  const [listsPage2ShowLogoHighlight, setListsPage2ShowLogoHighlight] = useState(false);
+  const [listsPage2ShowDoneLists, setListsPage2ShowDoneLists] = useState(false);
   const [page3ShowOverlay, setPage3ShowOverlay] = useState(false);
   const [page5ShowLogoHighlight, setPage5ShowLogoHighlight] = useState(false);
   const [page5ShowDoneReminders, setPage5ShowDoneReminders] = useState(false);
@@ -191,6 +217,81 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   }, [currentPage, isListsTutorial]);
 
   useEffect(() => {
+    if (!isListsTutorial || currentPage !== 1) {
+      setListsPage2Phase("marking");
+      setListsPage2ShowLogoHighlight(false);
+      setListsPage2ShowDoneLists(false);
+    }
+  }, [currentPage, isListsTutorial]);
+
+  useEffect(() => {
+    if (!isListsTutorial || currentPage !== 1 || listsPage2Phase !== "done-list") {
+      return;
+    }
+
+    const timers: number[] = [];
+    let cancelled = false;
+
+    setListsPage2ShowLogoHighlight(false);
+    setListsPage2ShowDoneLists(false);
+
+    const mainPauseTimer = window.setTimeout(() => {
+      if (cancelled) {
+        return;
+      }
+
+      setListsPage2ShowLogoHighlight(true);
+
+      const openDoneTimer = window.setTimeout(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setListsPage2ShowLogoHighlight(false);
+        setListsPage2ShowDoneLists(true);
+
+        const donePauseTimer = window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
+
+          setListsPage2ShowLogoHighlight(true);
+
+          const closeDoneTimer = window.setTimeout(() => {
+            if (cancelled) {
+              return;
+            }
+
+            setListsPage2ShowLogoHighlight(false);
+            setListsPage2ShowDoneLists(false);
+
+            const restartTimer = window.setTimeout(() => {
+              if (cancelled) {
+                return;
+              }
+
+              setListsPage2Phase("marking");
+              setListsPage2CycleKey((value) => value + 1);
+            }, PAGE_5_STATE_PAUSE_DELAY);
+            timers.push(restartTimer);
+          }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
+          timers.push(closeDoneTimer);
+        }, PAGE_5_STATE_PAUSE_DELAY);
+        timers.push(donePauseTimer);
+      }, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY);
+      timers.push(openDoneTimer);
+    }, PAGE_5_INITIAL_PAUSE_DELAY);
+    timers.push(mainPauseTimer);
+
+    return () => {
+      cancelled = true;
+      timers.forEach((timer) => clearTimeout(timer));
+      setListsPage2ShowLogoHighlight(false);
+      setListsPage2ShowDoneLists(false);
+    };
+  }, [currentPage, isListsTutorial, listsPage2Phase]);
+
+  useEffect(() => {
     if (currentPage >= totalPages) {
       setCurrentPage(totalPages - 1);
     }
@@ -213,6 +314,10 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const handleRestart = () => {
     setCurrentPage(0);
   };
+
+  const handleListsPage2DoneSequenceComplete = useCallback(() => {
+    setListsPage2Phase("done-list");
+  }, []);
 
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
@@ -379,6 +484,11 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
             savedListsEnabled={savedListsEnabled}
             activeFilter={listsTutorialActiveFilter}
             onActiveFilterChange={setListsTutorialActiveFilter}
+            page2CycleKey={listsPage2CycleKey}
+            page2Phase={listsPage2Phase}
+            page2ShowLogoHighlight={listsPage2ShowLogoHighlight}
+            page2ShowDoneLists={listsPage2ShowDoneLists}
+            onPage2DoneSequenceComplete={handleListsPage2DoneSequenceComplete}
           />
         )}
       </div>

@@ -129,6 +129,7 @@ const STATIC_LISTS: readonly TutorialList[] = [
   },
 ] as const;
 
+export const TUTORIAL_PAGE_2_DONE_LIST_IDS = STATIC_LISTS.slice(0, -1).map((list) => list.id);
 const REMINDER_DEFAULT_VISIBLE_IDS = STATIC_REMINDERS.map((reminder) => reminder.id);
 const LIST_DEFAULT_VISIBLE_IDS = STATIC_LISTS.map((list) => list.id);
 const PAGE_1_LIST_BUILD_SEQUENCE_IDS = [...LIST_DEFAULT_VISIBLE_IDS].reverse();
@@ -295,20 +296,24 @@ export default function TutorialStaticReminderList({
   mode = "reminders",
   page1BuildSequence = false,
   page3DoneSequence = false,
+  page3DoneSequenceCycle = true,
   doneReminderIds,
   activeFilter,
   menuTargetReminderId,
   onMenuTargetElementChange,
   onListFilterChange,
+  onPage3DoneSequenceComplete,
 }: {
   mode?: "reminders" | "lists";
   page1BuildSequence?: boolean;
   page3DoneSequence?: boolean;
+  page3DoneSequenceCycle?: boolean;
   doneReminderIds?: readonly string[];
   activeFilter?: TutorialFilterKey;
   menuTargetReminderId?: string;
   onMenuTargetElementChange?: (element: HTMLDivElement | null) => void;
   onListFilterChange?: (activeFilter: TutorialFilterKey | undefined) => void;
+  onPage3DoneSequenceComplete?: () => void;
 }) {
   const sequenceIds = mode === "lists" ? PAGE_1_LIST_BUILD_SEQUENCE_IDS : PAGE_1_BUILD_SEQUENCE_IDS;
   const defaultVisibleIds = mode === "lists" ? LIST_DEFAULT_VISIBLE_IDS : REMINDER_DEFAULT_VISIBLE_IDS;
@@ -424,14 +429,20 @@ export default function TutorialStaticReminderList({
       return;
     }
 
-    setVisibleIds(STATIC_REMINDERS.map((reminder) => reminder.id));
+    const resetIds = mode === "lists"
+      ? STATIC_LISTS.map((list) => list.id)
+      : STATIC_REMINDERS.map((reminder) => reminder.id);
+
+    setVisibleIds(resetIds);
     setPendingDoneIds(new Set());
     setPage3ResetFadeIds(new Set());
     setSuppressPage3ResetAnimation(false);
 
-    const sequenceIds = STATIC_REMINDERS
-      .map((reminder) => reminder.id)
-      .filter((id) => id !== "sometime");
+    const sequenceIds = mode === "lists"
+      ? STATIC_LISTS.slice(0, -1).map((list) => list.id)
+      : STATIC_REMINDERS
+        .map((reminder) => reminder.id)
+        .filter((id) => id !== "sometime");
     const timers: number[] = [];
     let cancelled = false;
 
@@ -444,7 +455,6 @@ export default function TutorialStaticReminderList({
       setPendingDoneIds(new Set());
       setPage3ResetFadeIds(new Set());
 
-      const resetIds = STATIC_REMINDERS.map((reminder) => reminder.id);
       if (fadeReset) {
         setVisibleIds([]);
         const resetTimer = window.setTimeout(() => {
@@ -496,7 +506,11 @@ export default function TutorialStaticReminderList({
       });
 
       const recycleTimer = window.setTimeout(() => {
-        startCycle({ fadeReset: true });
+        if (page3DoneSequenceCycle) {
+          startCycle({ fadeReset: true });
+        } else {
+          onPage3DoneSequenceComplete?.();
+        }
       }, DONE_SEQUENCE_INITIAL_DELAY + (sequenceIds.length - 1) * (COMPLETION_DELAY + DONE_SEQUENCE_REMOVAL_GAP) + COMPLETION_DELAY + TUTORIAL_RECYCLE_DELAY);
       timers.push(recycleTimer);
     };
@@ -507,7 +521,7 @@ export default function TutorialStaticReminderList({
       cancelled = true;
       timers.forEach((timeoutId) => clearTimeout(timeoutId));
     };
-  }, [page3DoneSequence]);
+  }, [mode, onPage3DoneSequenceComplete, page3DoneSequence, page3DoneSequenceCycle]);
 
   const sourceVisibleIds = doneReminderIds ?? visibleIds;
   const visibleReminders = sourceVisibleIds
@@ -521,7 +535,8 @@ export default function TutorialStaticReminderList({
       }
       return reminder.category === activeFilter;
     });
-  const visibleLists = visibleIds
+  const listSourceVisibleIds = doneReminderIds ?? visibleIds;
+  const visibleLists = listSourceVisibleIds
     .map((id) => STATIC_LISTS.find((list) => list.id === id))
     .filter((list): list is (typeof STATIC_LISTS)[number] => list != null)
     .filter((list) => {
@@ -533,7 +548,7 @@ export default function TutorialStaticReminderList({
   const visibleItems = mode === "lists" ? visibleLists : visibleReminders;
 
   const animatePresenceKey = mode === "lists"
-    ? `tutorial-lists-${page1BuildSequence && activeFilter == null ? "page1-sequence" : activeFilter ?? "all"}`
+    ? `tutorial-lists-${doneReminderIds != null ? "done-lists" : page1BuildSequence && activeFilter == null ? "page1-sequence" : activeFilter ?? "all"}`
     : `tutorial-${doneReminderIds != null ? "done-reminders" : page1BuildSequence ? "page1-sequence" : activeFilter ?? "all"}`;
 
   return (
