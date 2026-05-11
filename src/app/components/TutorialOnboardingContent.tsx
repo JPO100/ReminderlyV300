@@ -255,11 +255,6 @@ function ListsTutorialPlaceholderPage({
 
         setPage3ShowHighlight(false);
         setPage3ListOpen(true);
-
-        const recycleTimer = window.setTimeout(() => {
-          startCycle();
-        }, TUTORIAL_ATTENTION_RECYCLE_DELAY);
-        timers.push(recycleTimer);
       }, TUTORIAL_ATTENTION_SEQUENCE_DELAY);
       timers.push(openTimer);
     };
@@ -364,8 +359,8 @@ function ListsTutorialPlaceholderPage({
               <motion.div
                 className="absolute z-10 pointer-events-none"
                 style={{
-                  left: page3TargetRect.left + (page3TargetRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
-                  top: page3TargetRect.top + (page3TargetRect.height / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+                  left: page3TargetRect.left + (page3TargetRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2) - 40,
+                  top: page3TargetRect.top + (page3TargetRect.height / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2) + 10,
                   width: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
                   height: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
                 }}
