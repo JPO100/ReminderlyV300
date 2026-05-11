@@ -117,6 +117,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
   const [inputFocused, setInputFocused] = useState(false);
   const [showAddHighlight, setShowAddHighlight] = useState(false);
   const [addButtonElement, setAddButtonElement] = useState<HTMLButtonElement | null>(null);
+  const [addHighlightHostElement, setAddHighlightHostElement] = useState<HTMLDivElement | null>(null);
   const [addButtonRect, setAddButtonRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [reinsertedItemId, setReinsertedItemId] = useState<string | null>(null);
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
@@ -203,25 +204,19 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
   }, [open]);
 
   useEffect(() => {
-    if (!addButtonElement) {
+    if (!addButtonElement || !addHighlightHostElement) {
       setAddButtonRect(null);
       return;
     }
 
     const updateRect = () => {
-      const parent = addButtonElement.offsetParent;
-      if (!(parent instanceof HTMLElement)) {
-        setAddButtonRect(null);
-        return;
-      }
-
       const targetRect = addButtonElement.getBoundingClientRect();
-      const parentRect = parent.getBoundingClientRect();
+      const parentRect = addHighlightHostElement.getBoundingClientRect();
       setAddButtonRect({
-        left: targetRect.left - parentRect.left,
-        top: targetRect.top - parentRect.top,
-        width: targetRect.width,
-        height: targetRect.height,
+        left: (targetRect.left - parentRect.left) / TUTORIAL_REMINDER_LIST_SCALE,
+        top: (targetRect.top - parentRect.top) / TUTORIAL_REMINDER_LIST_SCALE,
+        width: targetRect.width / TUTORIAL_REMINDER_LIST_SCALE,
+        height: targetRect.height / TUTORIAL_REMINDER_LIST_SCALE,
       });
     };
 
@@ -230,7 +225,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
     return () => {
       window.removeEventListener("resize", updateRect);
     };
-  }, [addButtonElement]);
+  }, [addButtonElement, addHighlightHostElement]);
 
   return (
     <AnimatePresence>
@@ -263,7 +258,10 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
               }}
             >
               <div className="relative w-full h-full flex flex-col mx-auto">
-                <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
+                <div
+                  ref={setAddHighlightHostElement}
+                  className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0"
+                >
                   <ListsHeader
                     value="Work tasks"
                     onChange={() => {}}
