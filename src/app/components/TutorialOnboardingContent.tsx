@@ -581,7 +581,7 @@ function ListsTutorialPlaceholderPage({
 
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
-      <div className="flex w-full flex-col items-center gap-[16px]">
+      <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] [@media(max-height:570px)]:!min-h-0 items-center relative shrink-0">
         <div className={TUTORIAL_TITLE_CLASSNAME}>
           <p className="block leading-[normal] whitespace-pre-wrap">
             {currentPage === 0 ? "A tour of lists" : currentPage === 1 ? "Manage completed lists" : "Setting title"}
