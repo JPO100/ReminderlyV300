@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { Reminder } from "../reminder-utils";
 import { formatDueLine } from "./ReminderInfoOverlay";
@@ -15,6 +16,29 @@ export const TUTORIAL_ATTENTION_THROB_TIMES = [0, 0.109, 0.217, 0.391, 0.5, 0.60
 export const TUTORIAL_ATTENTION_SEQUENCE_DELAY = 2750;
 export const TUTORIAL_ATTENTION_RECYCLE_DELAY = 2000;
 
+export function TutorialMiniOverlayShell({
+  children,
+  zIndexClassName = "z-20",
+}: {
+  children: ReactNode;
+  zIndexClassName?: string;
+}) {
+  return (
+    <div className={`absolute inset-0 ${zIndexClassName} flex items-start justify-center bg-black/50 pt-[40px]`}>
+      <div
+        className="pointer-events-none"
+        style={{
+          width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
+          transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
+          transformOrigin: "center center",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export const CALL_DENTIST_TUTORIAL_REMINDER: Reminder = {
   id: "today",
   originalText: "Pick up milk",
@@ -28,56 +52,47 @@ export function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }
   const dueLine = formatDueLine(reminder, new Date(2025, 7, 11, 12, 0, 0, 0));
 
   return (
-    <div className="absolute inset-0 z-20 flex items-start justify-center bg-black/50 pt-[40px]">
-      <div
-        className="pointer-events-none"
-        style={{
-          width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
-          transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
-          transformOrigin: "center center",
-        }}
-      >
-        <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
-          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[18px] text-center">
-            <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{reminder.displayText}</p>
+    <TutorialMiniOverlayShell>
+      <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
+        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[18px] text-center">
+          <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{reminder.displayText}</p>
+        </div>
+        <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[15px] text-center max-w-full" style={{ color: "#1c2c42" }}>
+            <p className="leading-[normal] whitespace-nowrap" style={{ fontWeight: 700 }}>{dueLine}</p>
           </div>
-          <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[15px] text-center max-w-full" style={{ color: "#1c2c42" }}>
-              <p className="leading-[normal] whitespace-nowrap" style={{ fontWeight: 700 }}>{dueLine}</p>
-            </div>
-          </div>
-          <div className="content-stretch flex flex-col gap-[26px] items-start mt-[7px] relative shrink-0 w-full">
-            <div className="bg-[#4784f8] h-[44px] relative rounded-[88px] shrink-0 w-full">
-              <div className="flex flex-row items-center justify-center size-full">
-                <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
-                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-left text-white whitespace-nowrap">
-                    <p className="leading-[normal]">Mark as done</p>
-                  </div>
+        </div>
+        <div className="content-stretch flex flex-col gap-[26px] items-start mt-[7px] relative shrink-0 w-full">
+          <div className="bg-[#4784f8] h-[44px] relative rounded-[88px] shrink-0 w-full">
+            <div className="flex flex-row items-center justify-center size-full">
+              <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
+                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-left text-white whitespace-nowrap">
+                  <p className="leading-[normal]">Mark as done</p>
                 </div>
               </div>
             </div>
-            <div className="bg-[#4784f8] h-[44px] relative rounded-[88px] shrink-0 w-full">
-              <div className="flex flex-row items-center justify-center size-full">
-                <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
-                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
-                    <p className="leading-[normal]">Edit reminder</p>
-                  </div>
+          </div>
+          <div className="bg-[#4784f8] h-[44px] relative rounded-[88px] shrink-0 w-full">
+            <div className="flex flex-row items-center justify-center size-full">
+              <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
+                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
+                  <p className="leading-[normal]">Edit reminder</p>
                 </div>
               </div>
             </div>
-            <div className="bg-[#939393] h-[44px] relative rounded-[88px] shrink-0 w-full">
-              <div className="flex flex-row items-center justify-center size-full">
-                <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
-                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
-                    <p className="leading-[normal]">Delete reminder</p>
-                  </div>
+          </div>
+          <div className="bg-[#939393] h-[44px] relative rounded-[88px] shrink-0 w-full">
+            <div className="flex flex-row items-center justify-center size-full">
+              <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
+                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
+                  <p className="leading-[normal]">Delete reminder</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </TutorialMiniOverlayShell>
   );
 }
 
