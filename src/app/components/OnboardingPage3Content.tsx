@@ -5,6 +5,7 @@ import type { Reminder } from "../reminder-utils";
 import { formatDueLine } from "./ReminderInfoOverlay";
 import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTokens";
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
+import infoOverlaySvgPaths from "@/imports/svg-oxn8g14l6y";
 
 export const TUTORIAL_OVERLAY_SOURCE_WIDTH = 340;
 export const TUTORIAL_OVERLAY_PHONE_INTERIOR_WIDTH = 280;
@@ -73,12 +74,13 @@ function TutorialOverlayButton({ label, color }: { label: string; color: string 
   );
 }
 
-function TutorialOverlayToggleRow({ title, subtitle, active }: { title: string; subtitle: string; active: boolean }) {
+function TutorialOverlayToggleRow({ title, subtitle, active, icon }: { title: string; subtitle: string; active: boolean; icon: ReactNode }) {
   const textColor = active ? "#1c2c42" : "#d9d9d9";
   const toggleBg = active ? "#1c2c42" : "#d9d9d9";
   return (
     <div className="content-stretch flex gap-[16px] items-start justify-center relative shrink-0 w-full">
-      <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
+      {icon}
+      <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
         <div className="flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap" style={{ color: textColor }}>
           <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>{title}</p>
         </div>
@@ -91,6 +93,20 @@ function TutorialOverlayToggleRow({ title, subtitle, active }: { title: string; 
           <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
             <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
           </svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TutorialListSettingsButton({ label, color }: { label: string; color: string }) {
+  return (
+    <div className="h-[50px] relative rounded-[100px] shrink-0 w-full" style={{ backgroundColor: color }}>
+      <div className="flex flex-row items-center justify-center size-full">
+        <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+            <p className="leading-[normal]">{label}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -124,20 +140,54 @@ export function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }
 export function TutorialListSettingsOverlay() {
   return (
     <TutorialMiniOverlayShell>
-      <TutorialOverlayCard>
+      <div className="bg-white relative flex flex-col gap-[33px] items-center justify-start pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
         <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
           <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>Work tasks</p>
         </div>
         <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
-          <TutorialOverlayToggleRow title="List in order added" subtitle="Most recent at the top" active />
-          <TutorialOverlayToggleRow title="List alphabetically" subtitle="Displayed A - Z" active={false} />
+          <TutorialOverlayToggleRow
+            title="List in order added"
+            subtitle="Most recent at the top"
+            active
+            icon={
+              <div className="h-[20.824px] relative shrink-0 w-[20.83px]">
+                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20.8301 20.8242">
+                  <g>
+                    <path d={infoOverlaySvgPaths.p1f326770} fill="#1C2C42" />
+                    <path d={infoOverlaySvgPaths.p10221f80} fill="#1C2C42" />
+                    <path d={infoOverlaySvgPaths.p30c3ae80} fill="#1C2C42" />
+                    <path d={infoOverlaySvgPaths.p2dfdd480} fill="#1C2C42" />
+                    <path d={infoOverlaySvgPaths.p390e3940} fill="#1C2C42" />
+                  </g>
+                </svg>
+              </div>
+            }
+          />
+          <TutorialOverlayToggleRow
+            title="List alphabetically"
+            subtitle="Displayed A - Z"
+            active={false}
+            icon={
+              <div className="h-[20.814px] relative shrink-0 w-[22.387px]">
+                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.3867 20.8145">
+                  <g>
+                    <path d={infoOverlaySvgPaths.pa5a1880} fill="#D9D9D9" />
+                    <path d={infoOverlaySvgPaths.p3a034e00} fill="#D9D9D9" />
+                    <path d={infoOverlaySvgPaths.pbb6b280} fill="#D9D9D9" />
+                    <path clipRule="evenodd" d={infoOverlaySvgPaths.p37945200} fill="#D9D9D9" fillRule="evenodd" />
+                    <path d={infoOverlaySvgPaths.p3a58ae80} fill="#D9D9D9" />
+                  </g>
+                </svg>
+              </div>
+            }
+          />
         </div>
-        <div className="content-stretch flex flex-col gap-[26px] items-start relative shrink-0 w-full">
-          <TutorialOverlayButton label="Uncheck all items" color="#1c2c42" />
-          <TutorialOverlayButton label="Create template from list" color="#1c2c42" />
-          <TutorialOverlayButton label="Delete list" color="#939393" />
+        <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
+          <TutorialListSettingsButton label="Uncheck all items" color="#d9d9d9" />
+          <TutorialListSettingsButton label="Create template from list" color="#1c2c42" />
+          <TutorialListSettingsButton label="Delete list" color="#939393" />
         </div>
-      </TutorialOverlayCard>
+      </div>
     </TutorialMiniOverlayShell>
   );
 }
