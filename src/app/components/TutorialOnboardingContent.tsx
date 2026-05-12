@@ -369,7 +369,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                     <motion.div
                       className="absolute z-10 pointer-events-none"
                       style={{
-                        left: menuDotsRect.left + (menuDotsRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+                        left: menuDotsRect.left + (menuDotsRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2) + 7,
                         top: menuDotsRect.top + (menuDotsRect.height / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
                         width: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
                         height: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
