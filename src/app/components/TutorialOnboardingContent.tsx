@@ -15,6 +15,8 @@ import OnboardingPage3Content, {
   TUTORIAL_ATTENTION_THROB_DURATION,
   TUTORIAL_ATTENTION_THROB_TIMES,
   TUTORIAL_OVERLAY_SCALE,
+  TUTORIAL_OVERLAY_SOURCE_WIDTH,
+  TUTORIAL_OVERLAY_VISUAL_WIDTH,
   TutorialReminderInfoOverlay,
 } from '@/app/components/OnboardingPage3Content';
 import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
@@ -67,6 +69,7 @@ const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
 const LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET = 40;
+const LISTS_PAGE_3_SETTINGS_OVERLAY_SOURCE_HEIGHT = 474;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -128,9 +131,6 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
   const [menuDotsRect, setMenuDotsRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [showMenuDotsHighlight, setShowMenuDotsHighlight] = useState(false);
   const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
-  const [settingsOverlayHostElement, setSettingsOverlayHostElement] = useState<HTMLDivElement | null>(null);
-  const [settingsOverlayElement, setSettingsOverlayElement] = useState<HTMLDivElement | null>(null);
-  const [settingsOverlayScale, setSettingsOverlayScale] = useState(TUTORIAL_OVERLAY_SCALE);
   const [reinsertedItemId, setReinsertedItemId] = useState<string | null>(null);
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
   const completedCount = items.filter((item) => item.completed).length;
@@ -290,31 +290,6 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
     };
   }, [openPanelElement, addHighlightHostElement]);
 
-  useEffect(() => {
-    if (!showSettingsOverlay || !settingsOverlayHostElement || !settingsOverlayElement) {
-      setSettingsOverlayScale(TUTORIAL_OVERLAY_SCALE);
-      return;
-    }
-
-    const updateScale = () => {
-      const hostHeight = settingsOverlayHostElement.getBoundingClientRect().height;
-      const sourceHeight = settingsOverlayElement.offsetHeight;
-      if (hostHeight <= 0 || sourceHeight <= 0) {
-        setSettingsOverlayScale(TUTORIAL_OVERLAY_SCALE);
-        return;
-      }
-
-      const availableHeight = hostHeight - (LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET * 2);
-      setSettingsOverlayScale(Math.min(TUTORIAL_OVERLAY_SCALE, availableHeight / sourceHeight));
-    };
-
-    updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => {
-      window.removeEventListener("resize", updateScale);
-    };
-  }, [showSettingsOverlay, settingsOverlayHostElement, settingsOverlayElement]);
-
   return (
     <AnimatePresence>
       {open && (
@@ -459,36 +434,44 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
             </motion.div>
           </motion.div>
           {showSettingsOverlay && (
-            <div
-              ref={setSettingsOverlayHostElement}
-              className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50"
-              style={{ paddingTop: LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET }}
-            >
+            <div className="absolute inset-0 z-[60] bg-black/50">
               <div
-                ref={setSettingsOverlayElement}
-                className="pointer-events-none"
+                className="pointer-events-none absolute left-1/2"
                 style={{
-                  width: 340,
-                  transform: `scale(${settingsOverlayScale})`,
-                  transformOrigin: "center center",
+                  top: LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET,
+                  width: TUTORIAL_OVERLAY_VISUAL_WIDTH,
+                  height: LISTS_PAGE_3_SETTINGS_OVERLAY_SOURCE_HEIGHT * TUTORIAL_OVERLAY_SCALE,
+                  transform: "translateX(-50%)",
                 }}
               >
-                <InfoOverlay
-                  sortMode="insertion"
-                  onSortChange={() => {}}
-                  listTitle="Work tasks"
-                  onUncheckAll={() => {}}
-                  onCreateTemplate={() => {}}
-                  createTemplateStage="idle"
-                  onDelete={() => {}}
-                  allUnchecked
-                  smartReminders={false}
-                  onSmartRemindersChange={() => {}}
-                  showSmartReminders={false}
-                  smartReminderDueDate={null}
-                  smartReminderTime={null}
-                  onSetSmartReminderDueDate={() => {}}
-                />
+                <div
+                  style={{
+                    width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
+                    height: LISTS_PAGE_3_SETTINGS_OVERLAY_SOURCE_HEIGHT,
+                    position: "relative",
+                    left: "50%",
+                    marginLeft: -(TUTORIAL_OVERLAY_SOURCE_WIDTH / 2),
+                    transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
+                    transformOrigin: "top center",
+                  }}
+                >
+                  <InfoOverlay
+                    sortMode="insertion"
+                    onSortChange={() => {}}
+                    listTitle="Work tasks"
+                    onUncheckAll={() => {}}
+                    onCreateTemplate={() => {}}
+                    createTemplateStage="idle"
+                    onDelete={() => {}}
+                    allUnchecked
+                    smartReminders={false}
+                    onSmartRemindersChange={() => {}}
+                    showSmartReminders={false}
+                    smartReminderDueDate={null}
+                    smartReminderTime={null}
+                    onSetSmartReminderDueDate={() => {}}
+                  />
+                </div>
               </div>
             </div>
           )}
