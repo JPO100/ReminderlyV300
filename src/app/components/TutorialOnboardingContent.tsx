@@ -66,6 +66,7 @@ const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
 const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
+const LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET = 40;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -127,6 +128,9 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
   const [menuDotsRect, setMenuDotsRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [showMenuDotsHighlight, setShowMenuDotsHighlight] = useState(false);
   const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
+  const [settingsOverlayHostElement, setSettingsOverlayHostElement] = useState<HTMLDivElement | null>(null);
+  const [settingsOverlayElement, setSettingsOverlayElement] = useState<HTMLDivElement | null>(null);
+  const [settingsOverlayScale, setSettingsOverlayScale] = useState(TUTORIAL_OVERLAY_SCALE);
   const [reinsertedItemId, setReinsertedItemId] = useState<string | null>(null);
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
   const completedCount = items.filter((item) => item.completed).length;
@@ -286,6 +290,31 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
     };
   }, [openPanelElement, addHighlightHostElement]);
 
+  useEffect(() => {
+    if (!showSettingsOverlay || !settingsOverlayHostElement || !settingsOverlayElement) {
+      setSettingsOverlayScale(TUTORIAL_OVERLAY_SCALE);
+      return;
+    }
+
+    const updateScale = () => {
+      const hostHeight = settingsOverlayHostElement.getBoundingClientRect().height;
+      const sourceHeight = settingsOverlayElement.offsetHeight;
+      if (hostHeight <= 0 || sourceHeight <= 0) {
+        setSettingsOverlayScale(TUTORIAL_OVERLAY_SCALE);
+        return;
+      }
+
+      const availableHeight = hostHeight - (LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET * 2);
+      setSettingsOverlayScale(Math.min(TUTORIAL_OVERLAY_SCALE, availableHeight / sourceHeight));
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => {
+      window.removeEventListener("resize", updateScale);
+    };
+  }, [showSettingsOverlay, settingsOverlayHostElement, settingsOverlayElement]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -430,12 +459,17 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
             </motion.div>
           </motion.div>
           {showSettingsOverlay && (
-            <div className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50 pt-[40px]">
+            <div
+              ref={setSettingsOverlayHostElement}
+              className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50"
+              style={{ paddingTop: LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET }}
+            >
               <div
+                ref={setSettingsOverlayElement}
                 className="pointer-events-none"
                 style={{
                   width: 340,
-                  transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
+                  transform: `scale(${settingsOverlayScale})`,
                   transformOrigin: "center center",
                 }}
               >
