@@ -146,6 +146,22 @@ export function TutorialListSettingsOverlay() {
         </div>
         <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
           <TutorialOverlayToggleRow
+            title="Set smart reminder"
+            subtitle="No completion date set"
+            active={false}
+            icon={
+              <div className="h-[21.5px] relative self-start shrink-0 w-[19.5px] top-[1px]">
+                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19.5002 21.5002">
+                  <g>
+                    <path clipRule="evenodd" d={infoOverlaySvgPaths.p23b20a00} fill="#D9D9D9" fillRule="evenodd" />
+                    <path clipRule="evenodd" d={infoOverlaySvgPaths.p15d6fbb2} fill="#D9D9D9" fillRule="evenodd" />
+                    <path clipRule="evenodd" d={infoOverlaySvgPaths.p1797f00} fill="#D9D9D9" fillRule="evenodd" />
+                  </g>
+                </svg>
+              </div>
+            }
+          />
+          <TutorialOverlayToggleRow
             title="List in order added"
             subtitle="Most recent at the top"
             active
@@ -183,7 +199,7 @@ export function TutorialListSettingsOverlay() {
           />
         </div>
         <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
-          <TutorialListSettingsButton label="Uncheck all items" color="#d9d9d9" />
+          <TutorialListSettingsButton label="Uncheck all items" color="#1c2c42" />
           <TutorialListSettingsButton label="Create template from list" color="#1c2c42" />
           <TutorialListSettingsButton label="Delete list" color="#939393" />
         </div>
