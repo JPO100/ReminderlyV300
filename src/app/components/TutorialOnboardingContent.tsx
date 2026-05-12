@@ -14,7 +14,6 @@ import OnboardingPage3Content, {
   TUTORIAL_ATTENTION_THROB_DELAY,
   TUTORIAL_ATTENTION_THROB_DURATION,
   TUTORIAL_ATTENTION_THROB_TIMES,
-  TUTORIAL_OVERLAY_SCALE,
   TUTORIAL_OVERLAY_SOURCE_WIDTH,
   TutorialReminderInfoOverlay,
 } from '@/app/components/OnboardingPage3Content';
@@ -67,6 +66,8 @@ const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
 const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
+const LISTS_PAGE_3_SETTINGS_OVERLAY_VISUAL_WIDTH = 280;
+const LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE = LISTS_PAGE_3_SETTINGS_OVERLAY_VISUAL_WIDTH / TUTORIAL_OVERLAY_SOURCE_WIDTH;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -436,7 +437,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                 className="pointer-events-none"
                 style={{
                   width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
-                  transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
+                  transform: `scale(${LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE})`,
                   transformOrigin: "center center",
                 }}
               >
