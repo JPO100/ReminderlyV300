@@ -19,9 +19,13 @@ export const TUTORIAL_ATTENTION_RECYCLE_DELAY = 2000;
 export function TutorialMiniOverlayShell({
   children,
   zIndexClassName = "z-20",
+  overlayScale = TUTORIAL_OVERLAY_SCALE,
+  transformOrigin = "center center",
 }: {
   children: ReactNode;
   zIndexClassName?: string;
+  overlayScale?: number;
+  transformOrigin?: string;
 }) {
   return (
     <div className={`absolute inset-0 ${zIndexClassName} flex items-start justify-center bg-black/50 pt-[40px]`}>
@@ -29,8 +33,8 @@ export function TutorialMiniOverlayShell({
         className="pointer-events-none"
         style={{
           width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
-          transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
-          transformOrigin: "center center",
+          transform: `scale(${overlayScale})`,
+          transformOrigin,
         }}
       >
         {children}
