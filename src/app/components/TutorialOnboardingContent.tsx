@@ -14,6 +14,7 @@ import OnboardingPage3Content, {
   TUTORIAL_ATTENTION_THROB_DELAY,
   TUTORIAL_ATTENTION_THROB_DURATION,
   TUTORIAL_ATTENTION_THROB_TIMES,
+  TutorialListSettingsOverlay,
   TutorialMiniOverlayShell,
   TutorialReminderInfoOverlay,
 } from '@/app/components/OnboardingPage3Content';
@@ -25,7 +26,6 @@ import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
 import TutorialStaticReminderList, { TUTORIAL_PAGE_2_DONE_LIST_IDS, TUTORIAL_REMINDER_LIST_SCALE } from '@/app/components/TutorialStaticReminderList';
 import AddListItemInput from '@/app/components/lists/AddListItemInput';
 import EditableListItem from '@/app/components/lists/EditableListItem';
-import InfoOverlay from '@/imports/InfoOverlay';
 import TutorialReminderFilters, {
   GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
   SAVED_LISTS_TUTORIAL_FILTER_ITEMS,
@@ -430,24 +430,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
             </motion.div>
           </motion.div>
           {showSettingsOverlay && (
-            <TutorialMiniOverlayShell>
-              <InfoOverlay
-                sortMode="insertion"
-                onSortChange={() => {}}
-                listTitle="Work tasks"
-                onUncheckAll={() => {}}
-                onCreateTemplate={() => {}}
-                createTemplateStage="idle"
-                onDelete={() => {}}
-                allUnchecked
-                smartReminders={false}
-                onSmartRemindersChange={() => {}}
-                showSmartReminders={false}
-                smartReminderDueDate={null}
-                smartReminderTime={null}
-                onSetSmartReminderDueDate={() => {}}
-              />
-            </TutorialMiniOverlayShell>
+            <TutorialListSettingsOverlay />
           )}
         </>
       )}

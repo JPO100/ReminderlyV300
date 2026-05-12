@@ -51,12 +51,58 @@ export const CALL_DENTIST_TUTORIAL_REMINDER: Reminder = {
   completedAt: null,
 };
 
+export function TutorialOverlayCard({ children }: { children: ReactNode }) {
+  return (
+    <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
+      {children}
+    </div>
+  );
+}
+
+function TutorialOverlayButton({ label, color }: { label: string; color: string }) {
+  return (
+    <div className="h-[44px] relative rounded-[88px] shrink-0 w-full" style={{ backgroundColor: color }}>
+      <div className="flex flex-row items-center justify-center size-full">
+        <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
+            <p className="leading-[normal]">{label}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TutorialOverlayToggleRow({ title, subtitle, active }: { title: string; subtitle: string; active: boolean }) {
+  const textColor = active ? "#1c2c42" : "#d9d9d9";
+  const toggleBg = active ? "#1c2c42" : "#d9d9d9";
+  return (
+    <div className="content-stretch flex gap-[16px] items-start justify-center relative shrink-0 w-full">
+      <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
+        <div className="flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap" style={{ color: textColor }}>
+          <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>{title}</p>
+        </div>
+        <div className="flex flex-col justify-start relative shrink-0 text-[14px] w-full" style={{ color: active ? "#bababa" : textColor }}>
+          <p className="leading-[14px]" style={{ fontWeight: 700 }}>{subtitle}</p>
+        </div>
+      </div>
+      <div className="content-stretch flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px]" style={{ backgroundColor: toggleBg, justifyContent: active ? "flex-end" : "flex-start" }}>
+        <div className="relative shrink-0 size-[22.5px]">
+          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+            <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }) {
   const dueLine = formatDueLine(reminder, new Date(2025, 7, 11, 12, 0, 0, 0));
 
   return (
     <TutorialMiniOverlayShell>
-      <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
+      <TutorialOverlayCard>
         <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[18px] text-center">
           <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{reminder.displayText}</p>
         </div>
@@ -66,35 +112,32 @@ export function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }
           </div>
         </div>
         <div className="content-stretch flex flex-col gap-[26px] items-start mt-[7px] relative shrink-0 w-full">
-          <div className="bg-[#4784f8] h-[44px] relative rounded-[88px] shrink-0 w-full">
-            <div className="flex flex-row items-center justify-center size-full">
-              <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-left text-white whitespace-nowrap">
-                  <p className="leading-[normal]">Mark as done</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-[#4784f8] h-[44px] relative rounded-[88px] shrink-0 w-full">
-            <div className="flex flex-row items-center justify-center size-full">
-              <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
-                  <p className="leading-[normal]">Edit reminder</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-[#939393] h-[44px] relative rounded-[88px] shrink-0 w-full">
-            <div className="flex flex-row items-center justify-center size-full">
-              <div className="content-stretch flex items-center justify-center px-[16px] py-[13px] relative size-full">
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[15px] text-white whitespace-nowrap">
-                  <p className="leading-[normal]">Delete reminder</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TutorialOverlayButton label="Mark as done" color="#4784f8" />
+          <TutorialOverlayButton label="Edit reminder" color="#4784f8" />
+          <TutorialOverlayButton label="Delete reminder" color="#939393" />
         </div>
-      </div>
+      </TutorialOverlayCard>
+    </TutorialMiniOverlayShell>
+  );
+}
+
+export function TutorialListSettingsOverlay() {
+  return (
+    <TutorialMiniOverlayShell>
+      <TutorialOverlayCard>
+        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
+          <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>Work tasks</p>
+        </div>
+        <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
+          <TutorialOverlayToggleRow title="List in order added" subtitle="Most recent at the top" active />
+          <TutorialOverlayToggleRow title="List alphabetically" subtitle="Displayed A - Z" active={false} />
+        </div>
+        <div className="content-stretch flex flex-col gap-[26px] items-start relative shrink-0 w-full">
+          <TutorialOverlayButton label="Uncheck all items" color="#1c2c42" />
+          <TutorialOverlayButton label="Create template from list" color="#1c2c42" />
+          <TutorialOverlayButton label="Delete list" color="#939393" />
+        </div>
+      </TutorialOverlayCard>
     </TutorialMiniOverlayShell>
   );
 }
