@@ -437,7 +437,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                 className="pointer-events-none"
                 style={{
                   width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
-                  transform: `scale(${LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE})`,
+                  transform: "scale(0.5)",
                   transformOrigin: "center center",
                   border: "4px solid red",
                 }}
