@@ -9,6 +9,8 @@ import TutorialStaticReminderList from "./TutorialStaticReminderList";
 export const TUTORIAL_OVERLAY_SOURCE_WIDTH = 340;
 export const TUTORIAL_OVERLAY_VISUAL_WIDTH = 296;
 export const TUTORIAL_OVERLAY_SCALE = TUTORIAL_OVERLAY_VISUAL_WIDTH / TUTORIAL_OVERLAY_SOURCE_WIDTH;
+export const TUTORIAL_OVERLAY_TOP_OFFSET = 63;
+export const TUTORIAL_OVERLAY_TRANSFORM_ORIGIN = "top center";
 export const TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE = 35;
 export const TUTORIAL_ATTENTION_THROB_DURATION = 2.3;
 export const TUTORIAL_ATTENTION_THROB_DELAY = 0.4;
@@ -18,23 +20,20 @@ export const TUTORIAL_ATTENTION_RECYCLE_DELAY = 2000;
 
 export function TutorialMiniOverlayShell({
   children,
-  zIndexClassName = "z-20",
-  overlayScale = TUTORIAL_OVERLAY_SCALE,
-  transformOrigin = "center center",
 }: {
   children: ReactNode;
-  zIndexClassName?: string;
-  overlayScale?: number;
-  transformOrigin?: string;
 }) {
   return (
-    <div className={`absolute inset-0 ${zIndexClassName} flex items-start justify-center bg-black/50 pt-[40px]`}>
+    <div
+      className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50"
+      style={{ paddingTop: TUTORIAL_OVERLAY_TOP_OFFSET }}
+    >
       <div
         className="pointer-events-none"
         style={{
           width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
-          transform: `scale(${overlayScale})`,
-          transformOrigin,
+          transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
+          transformOrigin: TUTORIAL_OVERLAY_TRANSFORM_ORIGIN,
         }}
       >
         {children}

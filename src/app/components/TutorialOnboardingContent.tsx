@@ -66,7 +66,6 @@ const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
 const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
-const LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE = 0.74;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -431,11 +430,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
             </motion.div>
           </motion.div>
           {showSettingsOverlay && (
-            <TutorialMiniOverlayShell
-              zIndexClassName="z-[60]"
-              overlayScale={LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE}
-              transformOrigin="top center"
-            >
+            <TutorialMiniOverlayShell>
               <InfoOverlay
                 sortMode="insertion"
                 onSortChange={() => {}}
