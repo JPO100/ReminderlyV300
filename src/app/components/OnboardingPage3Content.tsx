@@ -7,8 +7,8 @@ import { TUTORIAL_BODY_CLASSNAME, TUTORIAL_TITLE_CLASSNAME } from "./tutorialTok
 import TutorialStaticReminderList from "./TutorialStaticReminderList";
 
 export const TUTORIAL_OVERLAY_SOURCE_WIDTH = 340;
-export const TUTORIAL_OVERLAY_VISUAL_WIDTH = 296;
-export const TUTORIAL_OVERLAY_VISUAL_HEIGHT = 296;
+export const TUTORIAL_OVERLAY_PHONE_INTERIOR_WIDTH = 280;
+export const TUTORIAL_OVERLAY_SCALE = TUTORIAL_OVERLAY_PHONE_INTERIOR_WIDTH / TUTORIAL_OVERLAY_SOURCE_WIDTH;
 export const TUTORIAL_OVERLAY_TOP_OFFSET = 63;
 export const TUTORIAL_OVERLAY_TRANSFORM_ORIGIN = "top center";
 export const TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE = 35;
@@ -23,59 +23,20 @@ export function TutorialMiniOverlayShell({
 }: {
   children: ReactNode;
 }) {
-  const [sourceSize, setSourceSize] = useState({
-    width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
-    height: TUTORIAL_OVERLAY_VISUAL_HEIGHT,
-  });
-
-  const overlayScale = Math.min(
-    TUTORIAL_OVERLAY_VISUAL_WIDTH / sourceSize.width,
-    TUTORIAL_OVERLAY_VISUAL_HEIGHT / sourceSize.height,
-  );
-  const visualWidth = sourceSize.width * overlayScale;
-  const visualHeight = sourceSize.height * overlayScale;
-
   return (
     <div
       className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50"
       style={{ paddingTop: TUTORIAL_OVERLAY_TOP_OFFSET }}
     >
       <div
-        className="pointer-events-none overflow-hidden"
+        className="pointer-events-none"
         style={{
-          width: TUTORIAL_OVERLAY_VISUAL_WIDTH,
-          height: TUTORIAL_OVERLAY_VISUAL_HEIGHT,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "flex-start",
+          width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
+          transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
+          transformOrigin: TUTORIAL_OVERLAY_TRANSFORM_ORIGIN,
         }}
       >
-        <div
-          ref={(element) => {
-            if (!element) {
-              return;
-            }
-            const nextWidth = element.offsetWidth || TUTORIAL_OVERLAY_SOURCE_WIDTH;
-            const nextHeight = element.offsetHeight || TUTORIAL_OVERLAY_VISUAL_HEIGHT;
-            setSourceSize((currentSize) => (
-              currentSize.width === nextWidth && currentSize.height === nextHeight
-                ? currentSize
-                : { width: nextWidth, height: nextHeight }
-            ));
-          }}
-          style={{
-            transform: `scale(${overlayScale})`,
-            transformOrigin: TUTORIAL_OVERLAY_TRANSFORM_ORIGIN,
-            width: sourceSize.width,
-          }}
-          data-tutorial-overlay-source-width={sourceSize.width}
-          data-tutorial-overlay-source-height={sourceSize.height}
-          data-tutorial-overlay-scale={overlayScale}
-          data-tutorial-overlay-visual-width={visualWidth}
-          data-tutorial-overlay-visual-height={visualHeight}
-        >
-          {children}
-        </div>
+        {children}
       </div>
     </div>
   );
