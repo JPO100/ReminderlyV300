@@ -438,7 +438,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                 style={{
                   width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
                   transform: `scale(${LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE})`,
-                  transformOrigin: "center center",
+                  transformOrigin: "top center",
                 }}
               >
                 <InfoOverlay
