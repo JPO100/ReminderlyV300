@@ -24,6 +24,7 @@ import TutorialPhoneShell from '@/app/components/TutorialPhoneShell';
 import TutorialStaticReminderList, { TUTORIAL_PAGE_2_DONE_LIST_IDS, TUTORIAL_REMINDER_LIST_SCALE } from '@/app/components/TutorialStaticReminderList';
 import AddListItemInput from '@/app/components/lists/AddListItemInput';
 import EditableListItem from '@/app/components/lists/EditableListItem';
+import InfoOverlay from '@/imports/InfoOverlay';
 import TutorialReminderFilters, {
   GROUPED_TUTORIAL_LIST_FILTER_ITEMS,
   SAVED_LISTS_TUTORIAL_FILTER_ITEMS,
@@ -63,6 +64,8 @@ const LISTS_PAGE_3_DEMO_ITEM_ID = "work-prepare-update";
 const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
 const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
+const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
+const LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE = 296 / 340;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -120,6 +123,10 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
   const [addButtonElement, setAddButtonElement] = useState<HTMLButtonElement | null>(null);
   const [addHighlightHostElement, setAddHighlightHostElement] = useState<HTMLDivElement | null>(null);
   const [addButtonRect, setAddButtonRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+  const [openPanelElement, setOpenPanelElement] = useState<HTMLDivElement | null>(null);
+  const [menuDotsRect, setMenuDotsRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+  const [showMenuDotsHighlight, setShowMenuDotsHighlight] = useState(false);
+  const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
   const [reinsertedItemId, setReinsertedItemId] = useState<string | null>(null);
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
   const completedCount = items.filter((item) => item.completed).length;
@@ -130,6 +137,8 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
       setInputValue("");
       setInputFocused(false);
       setShowAddHighlight(false);
+      setShowMenuDotsHighlight(false);
+      setShowSettingsOverlay(false);
       setReinsertedItemId(null);
       setHighlightedItemId(null);
       return;
@@ -142,6 +151,8 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
     setInputValue("");
     setInputFocused(false);
     setShowAddHighlight(false);
+    setShowMenuDotsHighlight(false);
+    setShowSettingsOverlay(false);
     setReinsertedItemId(null);
     setHighlightedItemId(null);
 
@@ -193,6 +204,23 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
           setHighlightedItemId(null);
         }, LIST_ITEM_INSERT_HIGHLIGHT_MS);
         timers.push(clearHighlightTimer);
+
+        const menuHighlightTimer = window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
+          setShowMenuDotsHighlight(true);
+        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY);
+        timers.push(menuHighlightTimer);
+
+        const settingsOverlayTimer = window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
+          setShowMenuDotsHighlight(false);
+          setShowSettingsOverlay(true);
+        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
+        timers.push(settingsOverlayTimer);
       }, LISTS_PAGE_3_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
       timers.push(addTimer);
     }, LISTS_PAGE_3_ADD_INPUT_DELAY);
@@ -228,6 +256,36 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
     };
   }, [addButtonElement, addHighlightHostElement]);
 
+  useEffect(() => {
+    if (!openPanelElement || !addHighlightHostElement) {
+      setMenuDotsRect(null);
+      return;
+    }
+
+    const updateRect = () => {
+      const menuButton = openPanelElement.querySelector('[data-name="menu-dots-btn"]');
+      if (!(menuButton instanceof HTMLElement)) {
+        setMenuDotsRect(null);
+        return;
+      }
+
+      const targetRect = menuButton.getBoundingClientRect();
+      const parentRect = addHighlightHostElement.getBoundingClientRect();
+      setMenuDotsRect({
+        left: (targetRect.left - parentRect.left) / TUTORIAL_REMINDER_LIST_SCALE,
+        top: (targetRect.top - parentRect.top) / TUTORIAL_REMINDER_LIST_SCALE,
+        width: targetRect.width / TUTORIAL_REMINDER_LIST_SCALE,
+        height: targetRect.height / TUTORIAL_REMINDER_LIST_SCALE,
+      });
+    };
+
+    updateRect();
+    window.addEventListener("resize", updateRect);
+    return () => {
+      window.removeEventListener("resize", updateRect);
+    };
+  }, [openPanelElement, addHighlightHostElement]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -258,7 +316,7 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                 translate: "-50% 0",
               }}
             >
-              <div className="relative w-full h-full flex flex-col mx-auto">
+              <div ref={setOpenPanelElement} className="relative w-full h-full flex flex-col mx-auto">
                 <div
                   ref={setAddHighlightHostElement}
                   className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0"
@@ -307,6 +365,31 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
                       </svg>
                     </motion.div>
                   )}
+                  {showMenuDotsHighlight && menuDotsRect && (
+                    <motion.div
+                      className="absolute z-10 pointer-events-none"
+                      style={{
+                        left: menuDotsRect.left + (menuDotsRect.width / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+                        top: menuDotsRect.top + (menuDotsRect.height / 2) - (TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE / 2),
+                        width: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+                        height: TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: [0, 1, 0, 0, 1, 0, 0, 1, 0],
+                      }}
+                      transition={{
+                        duration: TUTORIAL_ATTENTION_THROB_DURATION,
+                        delay: TUTORIAL_ATTENTION_THROB_DELAY,
+                        times: TUTORIAL_ATTENTION_THROB_TIMES,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
+                        <circle cx="17.5" cy="17.5" r="16" stroke="#1C2C42" strokeWidth="3" />
+                      </svg>
+                    </motion.div>
+                  )}
                 </div>
                 <div className="flex flex-col gap-[23px] items-start px-[24px] pb-[24px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[35px]">
                   <AnimatePresence initial={false}>
@@ -346,6 +429,35 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
               </div>
             </motion.div>
           </motion.div>
+          {showSettingsOverlay && (
+            <div className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50 pt-[40px]">
+              <div
+                className="pointer-events-none"
+                style={{
+                  width: 340,
+                  transform: `scale(${LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE})`,
+                  transformOrigin: "center center",
+                }}
+              >
+                <InfoOverlay
+                  sortMode="insertion"
+                  onSortChange={() => {}}
+                  listTitle="Work tasks"
+                  onUncheckAll={() => {}}
+                  onCreateTemplate={() => {}}
+                  createTemplateStage="idle"
+                  onDelete={() => {}}
+                  allUnchecked
+                  smartReminders={false}
+                  onSmartRemindersChange={() => {}}
+                  showSmartReminders={false}
+                  smartReminderDueDate={null}
+                  smartReminderTime={null}
+                  onSetSmartReminderDueDate={() => {}}
+                />
+              </div>
+            </div>
+          )}
         </>
       )}
     </AnimatePresence>
