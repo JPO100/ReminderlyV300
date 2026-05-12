@@ -16,7 +16,6 @@ import OnboardingPage3Content, {
   TUTORIAL_ATTENTION_THROB_TIMES,
   TUTORIAL_OVERLAY_SCALE,
   TUTORIAL_OVERLAY_SOURCE_WIDTH,
-  TUTORIAL_OVERLAY_VISUAL_WIDTH,
   TutorialReminderInfoOverlay,
 } from '@/app/components/OnboardingPage3Content';
 import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
@@ -68,8 +67,6 @@ const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
 const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
-const LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET = 40;
-const LISTS_PAGE_3_SETTINGS_OVERLAY_SOURCE_HEIGHT = 474;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -434,44 +431,31 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
             </motion.div>
           </motion.div>
           {showSettingsOverlay && (
-            <div className="absolute inset-0 z-[60] bg-black/50">
+            <div className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50 pt-[40px]">
               <div
-                className="pointer-events-none absolute left-1/2"
+                className="pointer-events-none"
                 style={{
-                  top: LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET,
-                  width: TUTORIAL_OVERLAY_VISUAL_WIDTH,
-                  height: LISTS_PAGE_3_SETTINGS_OVERLAY_SOURCE_HEIGHT * TUTORIAL_OVERLAY_SCALE,
-                  transform: "translateX(-50%)",
+                  width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
+                  transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
+                  transformOrigin: "center center",
                 }}
               >
-                <div
-                  style={{
-                    width: TUTORIAL_OVERLAY_SOURCE_WIDTH,
-                    height: LISTS_PAGE_3_SETTINGS_OVERLAY_SOURCE_HEIGHT,
-                    position: "relative",
-                    left: "50%",
-                    marginLeft: -(TUTORIAL_OVERLAY_SOURCE_WIDTH / 2),
-                    transform: `scale(${TUTORIAL_OVERLAY_SCALE})`,
-                    transformOrigin: "top center",
-                  }}
-                >
-                  <InfoOverlay
-                    sortMode="insertion"
-                    onSortChange={() => {}}
-                    listTitle="Work tasks"
-                    onUncheckAll={() => {}}
-                    onCreateTemplate={() => {}}
-                    createTemplateStage="idle"
-                    onDelete={() => {}}
-                    allUnchecked
-                    smartReminders={false}
-                    onSmartRemindersChange={() => {}}
-                    showSmartReminders={false}
-                    smartReminderDueDate={null}
-                    smartReminderTime={null}
-                    onSetSmartReminderDueDate={() => {}}
-                  />
-                </div>
+                <InfoOverlay
+                  sortMode="insertion"
+                  onSortChange={() => {}}
+                  listTitle="Work tasks"
+                  onUncheckAll={() => {}}
+                  onCreateTemplate={() => {}}
+                  createTemplateStage="idle"
+                  onDelete={() => {}}
+                  allUnchecked
+                  smartReminders={false}
+                  onSmartRemindersChange={() => {}}
+                  showSmartReminders={false}
+                  smartReminderDueDate={null}
+                  smartReminderTime={null}
+                  onSetSmartReminderDueDate={() => {}}
+                />
               </div>
             </div>
           )}
