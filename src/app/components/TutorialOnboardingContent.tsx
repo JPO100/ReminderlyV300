@@ -68,6 +68,7 @@ const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
 const LISTS_PAGE_3_SETTINGS_OVERLAY_SCALE = 0.74;
+const LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET = 57;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 
 function TemplatesTutorialButton() {
@@ -432,7 +433,10 @@ function ListsTutorialOpenListOverlay({ open }: { open: boolean }) {
             </motion.div>
           </motion.div>
           {showSettingsOverlay && (
-            <div className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50 pt-[40px]">
+            <div
+              className="absolute inset-0 z-[60] flex items-start justify-center bg-black/50"
+              style={{ paddingTop: LISTS_PAGE_3_SETTINGS_OVERLAY_TOP_OFFSET }}
+            >
               <div
                 className="pointer-events-none"
                 style={{
