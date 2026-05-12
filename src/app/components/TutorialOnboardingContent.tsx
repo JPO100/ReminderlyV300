@@ -554,18 +554,20 @@ function ListsTutorialPlaceholderPage({
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
       <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] [@media(max-height:570px)]:!min-h-0 items-center relative shrink-0">
-        <div className={TUTORIAL_TITLE_CLASSNAME}>
-          <p className="block leading-[normal] whitespace-pre-wrap">
-            {currentPage === 0 ? "A tour of lists" : currentPage === 1 ? "Manage completed lists" : "Setting title"}
-          </p>
+        <div className="content-stretch flex flex-col items-center relative shrink-0">
+          <div className={TUTORIAL_TITLE_CLASSNAME}>
+            <p className="css-ew64yg leading-[normal]">
+              {currentPage === 0 ? "A tour of lists" : currentPage === 1 ? "Manage completed lists" : "Setting title"}
+            </p>
+          </div>
         </div>
         <div className={TUTORIAL_BODY_CLASSNAME}>
           {currentPage === 0 ? (
-            <p className="block leading-[normal]">Lists are grouped by colour and<br />filtered in the same way as reminders</p>
+            <p className="css-4hzbpn leading-[30px]">Lists are grouped by colour and<br />filtered in the same way as reminders</p>
           ) : currentPage === 1 ? (
-            <p className="block leading-[normal]">Move finished lists to done<br />and view completed lists</p>
+            <p className="css-4hzbpn leading-[30px]">Move finished lists to done<br />and view completed lists</p>
           ) : (
-            <p className="block leading-[normal]">Setting subtitle</p>
+            <p className="css-4hzbpn leading-[30px]">Setting subtitle</p>
           )}
         </div>
       </div>
