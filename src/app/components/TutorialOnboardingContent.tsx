@@ -583,7 +583,7 @@ function ListsTutorialPlaceholderPage({
           ) : currentPage === 2 ? (
             <p className="css-4hzbpn leading-[30px]">Quickly add, update, and organise<br />your lists in one place.</p>
           ) : currentPage === 3 ? (
-            <p className="css-4hzbpn leading-[30px]">Link reminders to lists so you<br />never miss important tasks.</p>
+            <p className="css-4hzbpn leading-[30px]">Link lists to reminders so you<br />never miss important tasks.</p>
           ) : (
             <p className="css-4hzbpn leading-[30px]">Setting subtitle</p>
           )}
