@@ -801,7 +801,7 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
   const nextButtonColor = isListsTutorial ? REMINDERLY_DARK_BLUE : "#4784f8";
   const paginationWidth = 115.542;
   const paginationDotRadius = 3.96729;
-  const paginationDotSpacing = 17.93461;
+  const paginationDotSpacing = totalPages <= 7 ? 17.93461 : (paginationWidth - paginationDotRadius * 2) / (totalPages - 1);
   const paginationDotsWidth = (totalPages - 1) * paginationDotSpacing + paginationDotRadius * 2;
   const paginationStartX = (paginationWidth - paginationDotsWidth) / 2 + paginationDotRadius;
 
