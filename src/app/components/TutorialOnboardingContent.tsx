@@ -571,7 +571,7 @@ function ListsTutorialPlaceholderPage({
         <div className="content-stretch flex flex-col items-center relative shrink-0">
           <div className={TUTORIAL_TITLE_CLASSNAME}>
             <p className="css-ew64yg leading-[normal]">
-              {currentPage === 0 ? "A tour of lists" : currentPage === 1 ? "Manage completed lists" : "Setting title"}
+              {currentPage === 0 ? "A tour of lists" : currentPage === 1 ? "Manage completed lists" : currentPage === 2 ? "View and edit lists" : currentPage === 3 ? "Create smart reminders" : "Setting title"}
             </p>
           </div>
         </div>
@@ -580,6 +580,10 @@ function ListsTutorialPlaceholderPage({
             <p className="css-4hzbpn leading-[30px]">Lists are grouped by colour and<br />filtered in the same way as reminders</p>
           ) : currentPage === 1 ? (
             <p className="css-4hzbpn leading-[30px]">Move finished lists to done<br />and view completed lists</p>
+          ) : currentPage === 2 ? (
+            <p className="css-4hzbpn leading-[30px]">Quickly add, update, and organise<br />your lists in one place.</p>
+          ) : currentPage === 3 ? (
+            <p className="css-4hzbpn leading-[30px]">Link reminders to lists so you<br />never miss important tasks.</p>
           ) : (
             <p className="css-4hzbpn leading-[30px]">Setting subtitle</p>
           )}
