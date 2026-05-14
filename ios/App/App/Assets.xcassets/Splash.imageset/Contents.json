@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "reminderly logo-iOS-Default-1024x1024@1x.png",
+      "filename" : "logo-figma.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "reminderly logo-iOS-Default-1024x1024@1x 1.png",
+      "filename" : "logo-figma 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "reminderly logo-iOS-Default-1024x1024@1x 2.png",
+      "filename" : "logo-figma 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
