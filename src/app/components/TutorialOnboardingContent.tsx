@@ -1282,67 +1282,82 @@ function ListsTutorialPlaceholderPage({
               </motion.div>
             )}
             {page5ShowTemplatesPanel && (
-              <div className="absolute inset-0 z-30 bg-white overflow-hidden flex items-start justify-center">
+              <div className="absolute inset-0 z-30 overflow-hidden flex items-start justify-center">
                 <div
-                  className="shrink-0"
+                  className="shrink-0 h-full"
                   style={{
                     width: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
                     transform: `scale(${TUTORIAL_REMINDER_LIST_SCALE})`,
                     transformOrigin: "top center",
                   }}
                 >
-                  <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[0px]">
-                    <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
-                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
-                        List templates
-                      </div>
-                      <div
-                        className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center w-[30px] h-[30px]"
-                      >
-                        <svg className="block shrink-0" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                          <path d="M11.7528 0.439116C12.3385 -0.146356 13.2882 -0.146389 13.8739 0.439116C14.4596 1.02493 14.4596 1.97537 13.8739 2.56119L9.27819 7.15787L13.8739 11.7536C14.4596 12.3394 14.4596 13.2898 13.8739 13.8756C13.2882 14.4612 12.3385 14.4611 11.7528 13.8756L7.15709 9.27896L2.56041 13.8756C1.97466 14.461 1.02496 14.4612 0.439319 13.8756C-0.14644 13.2898 -0.146439 12.3394 0.439319 11.7536L5.03502 7.15787L0.439319 2.56119C-0.146439 1.97537 -0.14644 1.02493 0.439319 0.439116C1.02496 -0.146462 1.97466 -0.146282 2.56041 0.439116L7.15709 5.0358L11.7528 0.439116Z" fill="#BABABA"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="relative w-full max-w-[768px] flex-1 min-h-0">
-                      <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: 'hidden', height: '100%' }}>
-                        <div className="flex flex-col gap-[23px] w-full" style={{ position: 'relative', zIndex: 1 }}>
-                          {PAGE_5_TEMPLATES.map((tpl) => (
-                            <div
-                              key={tpl.id}
-                              ref={tpl.id === PAGE_5_TARGET_TEMPLATE_ID ? setPage5TargetTemplateElement : undefined}
-                            >
-                              <div className="content-stretch flex items-start justify-between px-px relative w-full">
-                                <div className="flex-[1_0_0] min-h-px min-w-px relative">
-                                  <div className="flex flex-row items-start size-full">
-                                    <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full min-w-0">
-                                      <div className="relative shrink-0 size-[25px]" style={{ marginTop: '3px' }}>
-                                        <TutorialSavedListTemplateIcon />
-                                      </div>
-                                      <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
-                                        <div
-                                          className="overflow-hidden text-ellipsis whitespace-nowrap"
-                                          style={{ color: '#1c2c42', textDecorationColor: '#1c2c42', clipPath: 'inset(0 0 -4px 0)' }}
-                                        >
-                                          <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>
-                                            {tpl.title}
-                                          </p>
-                                        </div>
-                                        <div
-                                          className="flex items-center overflow-visible min-w-0"
-                                          style={{ textDecorationColor: '#BABABA' }}
-                                        >
-                                          <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: '#BABABA' }}>
-                                            {tpl.itemCount} {tpl.itemCount === 1 ? 'item' : 'items'}
-                                          </p>
+                  {/* Mirrors production App.tsx line 3445: padding parent */}
+                  <div className="bg-white content-stretch flex flex-col gap-[24px] items-center px-[20px] pt-[24px] relative rounded-tl-[15px] rounded-tr-[15px] w-full h-full min-h-[350px]">
+                    {/* Mirrors production App.tsx line 3647: active lists wrapper */}
+                    <div className="relative flex flex-col gap-[24px] w-full flex-1 min-h-0">
+                      {/* Mirrors production App.tsx line 3749: list content area */}
+                      <div className="relative w-full max-w-[768px] flex-1 min-h-0">
+                        {/* Mirrors production App.tsx lines 3934-3936: templates panel overlay */}
+                        <div className="absolute inset-0 bg-white" style={{ zIndex: 2 }}>
+                          {/* Mirrors production App.tsx line 3938: templates inner column */}
+                          <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[0px]">
+                            {/* Mirrors production App.tsx line 3939: title row */}
+                            <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
+                              <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
+                                List templates
+                              </div>
+                              <div className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center w-[30px] h-[30px]">
+                                <svg className="block shrink-0" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                  <path d="M11.7528 0.439116C12.3385 -0.146356 13.2882 -0.146389 13.8739 0.439116C14.4596 1.02493 14.4596 1.97537 13.8739 2.56119L9.27819 7.15787L13.8739 11.7536C14.4596 12.3394 14.4596 13.2898 13.8739 13.8756C13.2882 14.4612 12.3385 14.4611 11.7528 13.8756L7.15709 9.27896L2.56041 13.8756C1.97466 14.461 1.02496 14.4612 0.439319 13.8756C-0.14644 13.2898 -0.146439 12.3394 0.439319 11.7536L5.03502 7.15787L0.439319 2.56119C-0.146439 1.97537 -0.14644 1.02493 0.439319 0.439116C1.02496 -0.146462 1.97466 -0.146282 2.56041 0.439116L7.15709 5.0358L11.7528 0.439116Z" fill="#BABABA"/>
+                                </svg>
+                              </div>
+                            </div>
+                            {/* Mirrors production App.tsx line 3954: inner scroll container */}
+                            <div className="relative w-full max-w-[768px] flex-1 min-h-0">
+                              <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: 'hidden', height: '100%' }}>
+                                {/* Mirrors production App.tsx line 3963: rows wrapper */}
+                                <div className="flex flex-col gap-[23px] w-full" style={{ position: 'relative', zIndex: 1 }}>
+                                  {PAGE_5_TEMPLATES.map((tpl) => (
+                                    <div
+                                      key={tpl.id}
+                                      ref={tpl.id === PAGE_5_TARGET_TEMPLATE_ID ? setPage5TargetTemplateElement : undefined}
+                                    >
+                                      {/* Mirrors production App.tsx lines 3975-4004: row structure (RowMenuButton stripped) */}
+                                      <div className="content-stretch flex items-start justify-between px-px relative w-full">
+                                        <div className="flex-[1_0_0] min-h-px min-w-px relative">
+                                          <div className="flex flex-row items-start size-full">
+                                            <div className="content-stretch flex gap-[16px] items-start pr-[16px] relative w-full min-w-0">
+                                              <div className="relative shrink-0 size-[25px]" style={{ marginTop: '3px' }}>
+                                                <TutorialSavedListTemplateIcon />
+                                              </div>
+                                              <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
+                                                <div
+                                                  className="overflow-hidden text-ellipsis whitespace-nowrap"
+                                                  style={{ color: '#1c2c42', textDecorationColor: '#1c2c42', clipPath: 'inset(0 0 -4px 0)' }}
+                                                >
+                                                  <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>
+                                                    {tpl.title}
+                                                  </p>
+                                                </div>
+                                                <div
+                                                  className="flex items-center overflow-visible min-w-0"
+                                                  style={{ textDecorationColor: '#BABABA' }}
+                                                >
+                                                  <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: '#BABABA' }}>
+                                                    {tpl.itemCount} {tpl.itemCount === 1 ? 'item' : 'items'}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
-                                  </div>
+                                  ))}
                                 </div>
                               </div>
                             </div>
-                          ))}
+                          </div>
                         </div>
                       </div>
                     </div>

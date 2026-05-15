@@ -102,6 +102,7 @@ export default function TutorialReminderFilters({
   groupGapClassName = "gap-[8px]",
   showHiddenItems = false,
   pillVariant = "default",
+  onTrailingElementChange,
 }: {
   items: TutorialFilterItem[];
   activeKey?: TutorialFilterKey;
@@ -113,6 +114,7 @@ export default function TutorialReminderFilters({
   groupGapClassName?: string;
   showHiddenItems?: boolean;
   pillVariant?: "default" | "ghost";
+  onTrailingElementChange?: (element: HTMLDivElement | null) => void;
 }) {
   const hasTrailingControl = trailing != null || showSettings;
   const isFullWidthBetweenLayout = layout === "between" && !hasTrailingControl;
@@ -136,7 +138,7 @@ export default function TutorialReminderFilters({
           </div>
         )}
         {trailing ? (
-          <div className="shrink-0">{trailing}</div>
+          <div ref={onTrailingElementChange} className="shrink-0">{trailing}</div>
         ) : showSettings ? (
           <div className="shrink-0" style={{ width: "35px", height: "28px" }}>
             <SettingsBtnSml />
