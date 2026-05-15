@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import svgPaths from '@/imports/svg-go2phgsyt4';
 import ListsHeader from '@/imports/Header';
@@ -74,7 +74,8 @@ const SMART_REMINDER_POST_DOTS_PAUSE = 750;
 const SMART_REMINDER_POST_SETTINGS_PAUSE = 750;
 const SMART_REMINDER_POST_TOGGLE_PAUSE = 750;
 const SMART_REMINDER_POST_CLOSE_PAUSE = 250;
-const SMART_REMINDER_SHEET_PAUSE = 1000;
+const SMART_REMINDER_SHEET_PRE_THROB_PAUSE = 750;
+const SMART_REMINDER_TICK_THROB_CIRCLE_SIZE = 62;
 const NEW_REMINDER_INSERT_DELAY = 500;
 
 function TemplatesTutorialButton() {
@@ -496,7 +497,27 @@ function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { 
   );
 }
 
-function SmartReminderSheetOverlay({ visible, onExitComplete }: { visible: boolean; onExitComplete?: () => void }) {
+function SmartReminderSheetOverlay({ visible, showTickThrob, onExitComplete }: { visible: boolean; showTickThrob?: boolean; onExitComplete?: () => void }) {
+  const [tickButtonElement, setTickButtonElement] = useState<HTMLDivElement | null>(null);
+  const [tickButtonRect, setTickButtonRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+  const scaledContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!tickButtonElement || !scaledContainerRef.current) {
+      setTickButtonRect(null);
+      return;
+    }
+    const parentRect = scaledContainerRef.current.getBoundingClientRect();
+    const targetRect = tickButtonElement.getBoundingClientRect();
+    const scale = TUTORIAL_REMINDER_LIST_SCALE;
+    setTickButtonRect({
+      left: (targetRect.left - parentRect.left) / scale,
+      top: (targetRect.top - parentRect.top) / scale,
+      width: targetRect.width / scale,
+      height: targetRect.height / scale,
+    });
+  }, [tickButtonElement]);
+
   return (
     <AnimatePresence onExitComplete={onExitComplete}>
       {visible && (
@@ -519,6 +540,7 @@ function SmartReminderSheetOverlay({ visible, onExitComplete }: { visible: boole
             style={{ bottom: 0 }}
           >
             <motion.div
+              ref={scaledContainerRef}
               className="bg-white relative rounded-tl-[15px] rounded-tr-[15px]"
               style={{
                 width: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
@@ -529,7 +551,32 @@ function SmartReminderSheetOverlay({ visible, onExitComplete }: { visible: boole
                 translate: "-50% 0",
               }}
             >
-              <TutorialSmartReminderSheet />
+              <TutorialSmartReminderSheet onTickButtonElementChange={setTickButtonElement} />
+              {showTickThrob && tickButtonRect && (
+                <motion.div
+                  className="absolute z-10 pointer-events-none"
+                  style={{
+                    left: tickButtonRect.left + (tickButtonRect.width / 2) - (SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2),
+                    top: tickButtonRect.top + (tickButtonRect.height / 2) - (SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2),
+                    width: SMART_REMINDER_TICK_THROB_CIRCLE_SIZE,
+                    height: SMART_REMINDER_TICK_THROB_CIRCLE_SIZE,
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: [0, 1, 0, 0, 1, 0, 0, 1, 0],
+                  }}
+                  transition={{
+                    duration: TUTORIAL_ATTENTION_THROB_DURATION,
+                    delay: TUTORIAL_ATTENTION_THROB_DELAY,
+                    times: TUTORIAL_ATTENTION_THROB_TIMES,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <svg width={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE} height={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE} viewBox={`0 0 ${SMART_REMINDER_TICK_THROB_CIRCLE_SIZE} ${SMART_REMINDER_TICK_THROB_CIRCLE_SIZE}`} fill="none">
+                    <circle cx={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2} cy={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2} r={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2 - 1.5} stroke="#1C2C42" strokeWidth="3" />
+                  </svg>
+                </motion.div>
+              )}
             </motion.div>
           </motion.div>
         </>
@@ -567,9 +614,9 @@ function ListsTutorialPlaceholderPage({
   const [page3TargetRect, setPage3TargetRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [page3ShowHighlight, setPage3ShowHighlight] = useState(false);
   const [page3ListOpen, setPage3ListOpen] = useState(false);
-  const [smartFlowPhase, setSmartFlowPhase] = useState<"none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet" | "sheet-closing" | "insert-delay" | "reminder-visible">("none");
-  const page4ShowSmartSheet = smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-closing";
-  const page4ActiveTab: "reminders" | "lists" = (smartFlowPhase === "closing" || smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists";
+  const [smartFlowPhase, setSmartFlowPhase] = useState<"none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet" | "sheet-throb" | "sheet-closing" | "insert-delay" | "reminder-visible">("none");
+  const page4ShowSmartSheet = smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-throb" || smartFlowPhase === "sheet-closing";
+  const page4ActiveTab: "reminders" | "lists" = (smartFlowPhase === "closing" || smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-throb" || smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists";
   const listFilterItems =
     savedListsEnabled
       ? SAVED_LISTS_TUTORIAL_FILTER_ITEMS
@@ -677,9 +724,21 @@ function ListsTutorialPlaceholderPage({
   useEffect(() => {
     if (smartFlowPhase !== "smart-sheet") return;
 
+    const throbTimer = window.setTimeout(() => {
+      setSmartFlowPhase("sheet-throb");
+    }, SMART_REMINDER_SHEET_PRE_THROB_PAUSE);
+
+    return () => {
+      clearTimeout(throbTimer);
+    };
+  }, [smartFlowPhase]);
+
+  useEffect(() => {
+    if (smartFlowPhase !== "sheet-throb") return;
+
     const closeTimer = window.setTimeout(() => {
       setSmartFlowPhase("sheet-closing");
-    }, SMART_REMINDER_SHEET_PAUSE);
+    }, (TUTORIAL_ATTENTION_THROB_DELAY + TUTORIAL_ATTENTION_THROB_DURATION) * 1000);
 
     return () => {
       clearTimeout(closeTimer);
@@ -751,16 +810,16 @@ function ListsTutorialPlaceholderPage({
           )}
           overlay={
             currentPage === 3 && page4ShowSmartSheet ? (
-              <SmartReminderSheetOverlay visible={smartFlowPhase === "smart-sheet"} onExitComplete={handleSheetExitComplete} />
-            ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet" && smartFlowPhase !== "sheet-closing" && smartFlowPhase !== "insert-delay" && smartFlowPhase !== "reminder-visible")) ? (
+              <SmartReminderSheetOverlay visible={smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-throb"} showTickThrob={smartFlowPhase === "sheet-throb"} onExitComplete={handleSheetExitComplete} />
+            ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet" && smartFlowPhase !== "sheet-throb" && smartFlowPhase !== "sheet-closing" && smartFlowPhase !== "insert-delay" && smartFlowPhase !== "reminder-visible")) ? (
               <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} onSmartFlowPhaseChange={currentPage === 3 ? setSmartFlowPhase : undefined} />
             ) : undefined
           }
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
             <TutorialStaticReminderList
-              key={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "lists-page-4-reminders" : currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
-              mode={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists"}
+              key={currentPage === 3 && (smartFlowPhase === "sheet-throb" || smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "lists-page-4-reminders" : currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
+              mode={currentPage === 3 && (smartFlowPhase === "sheet-throb" || smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists"}
               page1BuildSequence={currentPage === 0}
               page3DoneSequence={currentPage === 1 && page2Phase === "marking"}
               page3DoneSequenceCycle={currentPage !== 1}
