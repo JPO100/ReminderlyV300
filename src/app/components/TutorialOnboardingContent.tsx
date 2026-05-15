@@ -87,17 +87,19 @@ const PAGE_5_TEMPLATES = [
   { id: "tpl-5", title: "Spaghetti bolognese", itemCount: 6 },
   { id: "tpl-6", title: "Pancakes (classic)", itemCount: 6 },
 ] as const;
-const PAGE_5_TARGET_TEMPLATE_ID = "tpl-5";
+const PAGE_5_TARGET_TEMPLATE_ID = "tpl-1";
 const PAGE_5_EDITOR_ITEMS = [
-  { id: "spaghetti-1", text: "Minced beef", completed: false },
-  { id: "spaghetti-2", text: "Onion", completed: false },
-  { id: "spaghetti-3", text: "Garlic", completed: false },
-  { id: "spaghetti-4", text: "Chopped tomatoes", completed: false },
-  { id: "spaghetti-5", text: "Tomato purée", completed: false },
-  { id: "spaghetti-6", text: "Spaghetti", completed: false },
+  { id: "shop-1", text: "Milk", completed: false },
+  { id: "shop-2", text: "Bread", completed: false },
+  { id: "shop-3", text: "Eggs", completed: false },
+  { id: "shop-4", text: "Chicken", completed: false },
+  { id: "shop-5", text: "Rice", completed: false },
+  { id: "shop-6", text: "Bananas", completed: false },
+  { id: "shop-7", text: "Pasta", completed: false },
+  { id: "shop-8", text: "Butter", completed: false },
 ] as const;
 const PAGE_5_DEMO_ITEM = "Olive oil";
-const PAGE_5_DEMO_ITEM_ID = "spaghetti-olive-oil";
+const PAGE_5_DEMO_ITEM_ID = "shop-olive-oil";
 const PAGE_5_THROB_TOTAL_MS = (TUTORIAL_ATTENTION_THROB_DELAY + TUTORIAL_ATTENTION_THROB_DURATION) * 1000;
 
 function TutorialSavedListTemplateIcon() {
@@ -1148,7 +1150,7 @@ function ListsTutorialPlaceholderPage({
                     <div ref={setPage5EditorHostElement} className="relative w-full h-full flex flex-col mx-auto">
                       <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
                         <ListsHeader
-                          value="Spaghetti bolognese"
+                          value="Weekly food shop"
                           onChange={() => {}}
                           active
                           isEditMode
@@ -1256,7 +1258,7 @@ function ListsTutorialPlaceholderPage({
                 <TutorialMiniOverlayShell>
                   <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
-                      <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>Spaghetti bolognese</p>
+                      <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>Weekly food shop</p>
                     </div>
                     <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
                       <div className="h-[50px] relative rounded-[100px] shrink-0 w-full" style={{ backgroundColor: '#1C2C42' }}>
