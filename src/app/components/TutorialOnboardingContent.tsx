@@ -1118,13 +1118,16 @@ function ListsTutorialPlaceholderPage({
               <SmartReminderSheetOverlay visible={smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-throb"} showTickThrob={smartFlowPhase === "sheet-throb"} onExitComplete={handleSheetExitComplete} />
             ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet" && smartFlowPhase !== "sheet-throb" && smartFlowPhase !== "sheet-closing" && smartFlowPhase !== "insert-delay" && smartFlowPhase !== "reminder-visible")) ? (
               <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} onSmartFlowPhaseChange={currentPage === 3 ? setSmartFlowPhase : undefined} onAddItemSequenceComplete={currentPage === 2 ? handleAddItemSequenceComplete : undefined} />
-            ) : page5ShowEditor ? (
+            ) : currentPage === 4 ? (
               <>
               <AnimatePresence>
+                {page5ShowEditor && (
+                <>
                 <motion.div
                   key="page5-editor-backdrop"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
                   className="absolute inset-0 z-40 bg-black/0"
                 />
@@ -1132,6 +1135,7 @@ function ListsTutorialPlaceholderPage({
                   key="page5-editor-panel"
                   initial={{ y: "100%" }}
                   animate={{ y: 0, top: TUTORIAL_LIST_OVERLAY_TOP }}
+                  exit={{ y: "100%" }}
                   transition={{ duration: 0.25, ease: "easeInOut" }}
                   className="absolute left-0 right-0 z-50 mx-auto w-full"
                   style={{ bottom: 0 }}
@@ -1253,6 +1257,8 @@ function ListsTutorialPlaceholderPage({
                     </div>
                   </motion.div>
                 </motion.div>
+                </>
+                )}
               </AnimatePresence>
               {page5Phase === "settings-overlay" && (
                 <TutorialMiniOverlayShell>
