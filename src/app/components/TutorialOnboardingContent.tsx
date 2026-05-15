@@ -207,18 +207,6 @@ function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { 
           onSmartFlowPhaseChange?.("closing");
         }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY + SMART_REMINDER_CLOSE_DELAY);
         timers.push(closeTimer);
-
-        const sheetLaunchTimer = window.setTimeout(() => {
-          if (cancelled) return;
-          onSmartFlowPhaseChange?.("smart-sheet");
-        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY + SMART_REMINDER_CLOSE_DELAY + SMART_REMINDER_SHEET_LAUNCH_DELAY);
-        timers.push(sheetLaunchTimer);
-
-        const recycleTimer = window.setTimeout(() => {
-          if (cancelled) return;
-          startSettingsCycle();
-        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY + SMART_REMINDER_CLOSE_DELAY + SMART_REMINDER_SHEET_LAUNCH_DELAY + SMART_REMINDER_SHEET_HOLD_DELAY);
-        timers.push(recycleTimer);
       };
 
       startSettingsCycle();
@@ -669,6 +657,27 @@ function ListsTutorialPlaceholderPage({
       window.removeEventListener("resize", updateRect);
     };
   }, [page3TargetElement]);
+
+  useEffect(() => {
+    if (smartFlowPhase !== "closing") return;
+
+    const timers: number[] = [];
+
+    const sheetTimer = window.setTimeout(() => {
+      setSmartFlowPhase("smart-sheet");
+    }, SMART_REMINDER_SHEET_LAUNCH_DELAY);
+    timers.push(sheetTimer);
+
+    const recycleTimer = window.setTimeout(() => {
+      setSmartFlowPhase("none");
+      setPage3ListOpen(true);
+    }, SMART_REMINDER_SHEET_LAUNCH_DELAY + SMART_REMINDER_SHEET_HOLD_DELAY);
+    timers.push(recycleTimer);
+
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+    };
+  }, [smartFlowPhase]);
 
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
