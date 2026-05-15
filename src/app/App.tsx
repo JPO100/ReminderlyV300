@@ -567,7 +567,9 @@ export default function App() {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [isReminderOverlayFocusReady, setIsReminderOverlayFocusReady] = useState(false);
   const [isListsOverlayOpen, setIsListsOverlayOpen] = useState(false);
+  const [listOverlayAnimatedIn, setListOverlayAnimatedIn] = useState(false);
   const [isSavedListsOverlayOpen, setIsSavedListsOverlayOpen] = useState(false);
+  useEffect(() => { if (!isListsOverlayOpen && !isSavedListsOverlayOpen) setListOverlayAnimatedIn(false); }, [isListsOverlayOpen, isSavedListsOverlayOpen]);
   const [savedListMenuId, setSavedListMenuId] = useState<string | null>(null);
   const [templateEditorMenuId, setTemplateEditorMenuId] = useState<string | null>(null);
   const [savedListUseFeedback, setSavedListUseFeedback] = useState<{ id: string; createdListId: string; stage: 'idle' | 'fill' | 'copied' | 'blank' | 'go' } | null>(null);
@@ -973,7 +975,7 @@ export default function App() {
   const [nlcMode, setNlcMode] = useState<NlcMode>('auto');
 
   // Dev-only: NLC feature flag — controls whether NLC parsing and UI are active
-  const [nlcEnabled, setNlcEnabled] = useState(true);
+  const [nlcEnabled, setNlcEnabled] = useState(false);
 
   // Dev-only: onboarding tutorial feature flag — controls whether tutorial overlay is available
   const [isOnboardingTutorialEnabled, setIsOnboardingTutorialEnabled] = useState<boolean>(() => {
@@ -4674,6 +4676,7 @@ export default function App() {
               animate={{ y: 0, top: getBottomSheetTopPosition() }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
+              onAnimationComplete={(def) => { if (def.y === 0) setListOverlayAnimatedIn(true); }}
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
@@ -4766,7 +4769,7 @@ export default function App() {
                       return (
                         <motion.div
                           key={item.id}
-                          layout="position"
+                          layout={listOverlayAnimatedIn ? "position" : false}
                           initial={isItemReinserted ? { opacity: 0 } : false}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
