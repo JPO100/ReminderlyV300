@@ -1134,11 +1134,11 @@ function ListsTutorialPlaceholderPage({
                 <motion.div
                   key="page5-editor-panel"
                   initial={{ y: "100%" }}
-                  animate={{ y: 0, top: TUTORIAL_LIST_OVERLAY_TOP }}
+                  animate={{ y: 0 }}
                   exit={{ y: "100%" }}
                   transition={{ duration: 0.25, ease: "easeInOut" }}
                   className="absolute left-0 right-0 z-50 mx-auto w-full"
-                  style={{ bottom: 0 }}
+                  style={{ bottom: 0, top: TUTORIAL_LIST_OVERLAY_TOP }}
                 >
                   <motion.div
                     className="bg-white relative rounded-tl-[15px] rounded-tr-[15px]"
