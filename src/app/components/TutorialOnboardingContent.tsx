@@ -1088,7 +1088,7 @@ function ListsTutorialPlaceholderPage({
               items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
               showHiddenItems
             />
-          ) : (
+          ) : page5ShowTemplatesPanel || page5ShowEditor ? null : (
             <TutorialReminderFilters
               items={listFilterItems}
               showSettings={!savedListsEnabled && filtersMenuVariant === 'grouped'}
@@ -1284,9 +1284,10 @@ function ListsTutorialPlaceholderPage({
             {page5ShowTemplatesPanel && (
               <div className="absolute inset-0 z-30 overflow-hidden flex items-start justify-center">
                 <div
-                  className="shrink-0 h-full"
+                  className="shrink-0"
                   style={{
                     width: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
+                    height: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
                     transform: `scale(${TUTORIAL_REMINDER_LIST_SCALE})`,
                     transformOrigin: "top center",
                   }}
