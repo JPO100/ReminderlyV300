@@ -8,7 +8,6 @@ import { useOnboardingPage2ActiveFilter } from '@/app/components/OnboardingPage2
 import OnboardingPage3Content, {
   CALL_DENTIST_TUTORIAL_REMINDER,
   OnboardingPage3Text,
-  TUTORIAL_ATTENTION_RECYCLE_DELAY,
   TUTORIAL_ATTENTION_SEQUENCE_DELAY,
   TUTORIAL_ATTENTION_TARGET_CIRCLE_SIZE,
   TUTORIAL_ATTENTION_THROB_DELAY,
@@ -64,10 +63,11 @@ const LISTS_PAGE_3_OPEN_ITEMS = [
 ] as const;
 const LISTS_PAGE_3_DEMO_ITEM = "Prepare update";
 const LISTS_PAGE_3_DEMO_ITEM_ID = "work-prepare-update";
-const LISTS_PAGE_3_ADD_INPUT_DELAY = 2000;
+const LISTS_PAGE_3_ADD_INPUT_DELAY = 750;
 const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
-const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
+const LISTS_PAGE_3_POST_INSERT_PAUSE = 2000;
+const LISTS_PAGE_3_POST_CLOSE_PAUSE = 2000;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
 const SMART_REMINDER_PRE_DOTS_PAUSE = 750;
 const SMART_REMINDER_POST_DOTS_PAUSE = 750;
@@ -125,7 +125,7 @@ function Page5DoneDeletedFilters() {
   );
 }
 
-function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { open: boolean; mode: "add-item" | "settings"; onSmartFlowPhaseChange?: (phase: "none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet" | "sheet-closing" | "reminder-visible") => void }) {
+function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange, onAddItemSequenceComplete }: { open: boolean; mode: "add-item" | "settings"; onSmartFlowPhaseChange?: (phase: "none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet" | "sheet-closing" | "reminder-visible") => void; onAddItemSequenceComplete?: () => void }) {
   const [items, setItems] = useState(LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })));
   const [inputValue, setInputValue] = useState("");
   const [inputFocused, setInputFocused] = useState(false);
@@ -270,10 +270,11 @@ function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { 
             }, LIST_ITEM_INSERT_HIGHLIGHT_MS);
             timers.push(clearHighlightTimer);
 
-            const recycleTimer = window.setTimeout(() => {
-              startAddItemCycle();
-            }, TUTORIAL_ATTENTION_RECYCLE_DELAY);
-            timers.push(recycleTimer);
+            const completeTimer = window.setTimeout(() => {
+              if (cancelled) return;
+              onAddItemSequenceComplete?.();
+            }, LIST_ITEM_INSERT_HIGHLIGHT_MS + LISTS_PAGE_3_POST_INSERT_PAUSE);
+            timers.push(completeTimer);
           }, LISTS_PAGE_3_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
           timers.push(addTimer);
         }, LISTS_PAGE_3_ADD_INPUT_DELAY);
@@ -632,6 +633,8 @@ function ListsTutorialPlaceholderPage({
         : activeFilter
       : activeFilter;
 
+  const page3CycleRef = useRef<{ timers: number[]; cancelled: boolean; startCycle: () => void }>({ timers: [], cancelled: true, startCycle: () => {} });
+
   useEffect(() => {
     if (currentPage !== 2 && currentPage !== 3) {
       setPage3ShowHighlight(false);
@@ -647,37 +650,45 @@ function ListsTutorialPlaceholderPage({
       return;
     }
 
-    const timers: number[] = [];
-    let cancelled = false;
+    const state = { timers: [] as number[], cancelled: false, startCycle: () => {} };
+    page3CycleRef.current = state;
 
-    const startCycle = () => {
-      if (cancelled) {
-        return;
-      }
+    state.startCycle = () => {
+      if (state.cancelled) return;
 
       setPage3ListOpen(false);
       setPage3ShowHighlight(true);
 
       const openTimer = window.setTimeout(() => {
-        if (cancelled) {
-          return;
-        }
-
+        if (state.cancelled) return;
         setPage3ShowHighlight(false);
         setPage3ListOpen(true);
       }, TUTORIAL_ATTENTION_SEQUENCE_DELAY);
-      timers.push(openTimer);
+      state.timers.push(openTimer);
     };
 
-    startCycle();
+    state.startCycle();
 
     return () => {
-      cancelled = true;
-      timers.forEach((timer) => clearTimeout(timer));
+      state.cancelled = true;
+      state.timers.forEach((timer) => clearTimeout(timer));
       setPage3ShowHighlight(false);
       setPage3ListOpen(false);
     };
   }, [currentPage]);
+
+  const handleAddItemSequenceComplete = useCallback(() => {
+    const state = page3CycleRef.current;
+    if (state.cancelled) return;
+
+    setPage3ListOpen(false);
+
+    const restartTimer = window.setTimeout(() => {
+      if (state.cancelled) return;
+      state.startCycle();
+    }, LISTS_PAGE_3_POST_CLOSE_PAUSE);
+    state.timers.push(restartTimer);
+  }, []);
 
   useEffect(() => {
     if (!page3TargetElement) {
@@ -812,7 +823,7 @@ function ListsTutorialPlaceholderPage({
             currentPage === 3 && page4ShowSmartSheet ? (
               <SmartReminderSheetOverlay visible={smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-throb"} showTickThrob={smartFlowPhase === "sheet-throb"} onExitComplete={handleSheetExitComplete} />
             ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet" && smartFlowPhase !== "sheet-throb" && smartFlowPhase !== "sheet-closing" && smartFlowPhase !== "insert-delay" && smartFlowPhase !== "reminder-visible")) ? (
-              <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} onSmartFlowPhaseChange={currentPage === 3 ? setSmartFlowPhase : undefined} />
+              <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} onSmartFlowPhaseChange={currentPage === 3 ? setSmartFlowPhase : undefined} onAddItemSequenceComplete={currentPage === 2 ? handleAddItemSequenceComplete : undefined} />
             ) : undefined
           }
         >
