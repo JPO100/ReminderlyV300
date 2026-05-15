@@ -15,8 +15,10 @@ import OnboardingPage3Content, {
   TUTORIAL_ATTENTION_THROB_DURATION,
   TUTORIAL_ATTENTION_THROB_TIMES,
   TutorialListSettingsOverlay,
+  TutorialListSettingsOverlayWithToggle,
   TutorialMiniOverlayShell,
   TutorialReminderInfoOverlay,
+  TutorialSmartReminderSheet,
 } from '@/app/components/OnboardingPage3Content';
 import OnboardingPage4Content, { OnboardingPage4Text } from '@/app/components/OnboardingPage4Content';
 import OnboardingPage5Content, { OnboardingPage5Text, PAGE_5_HIGHLIGHT_SEQUENCE_DELAY, PAGE_5_INITIAL_PAUSE_DELAY, PAGE_5_STATE_PAUSE_DELAY } from '@/app/components/OnboardingPage5Content';
@@ -67,6 +69,11 @@ const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
+const SMART_REMINDER_TOGGLE_THROB_DELAY = 2000;
+const SMART_REMINDER_TOGGLE_ACTIVATE_DELAY = 2750;
+const SMART_REMINDER_CLOSE_DELAY = 150;
+const SMART_REMINDER_SHEET_LAUNCH_DELAY = 100;
+const SMART_REMINDER_SHEET_HOLD_DELAY = 3000;
 
 function TemplatesTutorialButton() {
   return (
@@ -115,7 +122,7 @@ function Page5DoneDeletedFilters() {
   );
 }
 
-function ListsTutorialOpenListOverlay({ open, mode }: { open: boolean; mode: "add-item" | "settings" }) {
+function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { open: boolean; mode: "add-item" | "settings"; onSmartFlowPhaseChange?: (phase: "none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet") => void }) {
   const [items, setItems] = useState(LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })));
   const [inputValue, setInputValue] = useState("");
   const [inputFocused, setInputFocused] = useState(false);
@@ -127,6 +134,7 @@ function ListsTutorialOpenListOverlay({ open, mode }: { open: boolean; mode: "ad
   const [menuDotsRect, setMenuDotsRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [showMenuDotsHighlight, setShowMenuDotsHighlight] = useState(false);
   const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
+  const [smartToggleActive, setSmartToggleActive] = useState(false);
   const [reinsertedItemId, setReinsertedItemId] = useState<string | null>(null);
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
   const completedCount = items.filter((item) => item.completed).length;
@@ -139,8 +147,10 @@ function ListsTutorialOpenListOverlay({ open, mode }: { open: boolean; mode: "ad
       setShowAddHighlight(false);
       setShowMenuDotsHighlight(false);
       setShowSettingsOverlay(false);
+      setSmartToggleActive(false);
       setReinsertedItemId(null);
       setHighlightedItemId(null);
+      onSmartFlowPhaseChange?.("none");
       return;
     }
 
@@ -152,86 +162,139 @@ function ListsTutorialOpenListOverlay({ open, mode }: { open: boolean; mode: "ad
     setShowAddHighlight(false);
     setShowMenuDotsHighlight(false);
     setShowSettingsOverlay(false);
+    setSmartToggleActive(false);
     setReinsertedItemId(null);
     setHighlightedItemId(null);
+    onSmartFlowPhaseChange?.("none");
 
     if (mode === "settings") {
-      setItems([
-        { id: LISTS_PAGE_3_DEMO_ITEM_ID, text: LISTS_PAGE_3_DEMO_ITEM, completed: false },
-        ...LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })),
-      ]);
+      const startSettingsCycle = () => {
+        if (cancelled) return;
 
-      const menuHighlightTimer = window.setTimeout(() => {
-        if (cancelled) {
-          return;
-        }
-        setShowMenuDotsHighlight(true);
-      }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY);
-      timers.push(menuHighlightTimer);
-
-      const settingsOverlayTimer = window.setTimeout(() => {
-        if (cancelled) {
-          return;
-        }
+        setItems([
+          { id: LISTS_PAGE_3_DEMO_ITEM_ID, text: LISTS_PAGE_3_DEMO_ITEM, completed: false },
+          ...LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })),
+        ]);
         setShowMenuDotsHighlight(false);
-        setShowSettingsOverlay(true);
-      }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
-      timers.push(settingsOverlayTimer);
-    } else {
-      setItems(LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })));
+        setShowSettingsOverlay(false);
+        setSmartToggleActive(false);
+        onSmartFlowPhaseChange?.("none");
 
-      const inputTimer = window.setTimeout(() => {
+        const menuHighlightTimer = window.setTimeout(() => {
+          if (cancelled) return;
+          setShowMenuDotsHighlight(true);
+        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY);
+        timers.push(menuHighlightTimer);
+
+        const settingsOverlayTimer = window.setTimeout(() => {
+          if (cancelled) return;
+          setShowMenuDotsHighlight(false);
+          setShowSettingsOverlay(true);
+          onSmartFlowPhaseChange?.("settings-with-toggle");
+        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
+        timers.push(settingsOverlayTimer);
+
+        const smartToggleActivateTimer = window.setTimeout(() => {
+          if (cancelled) return;
+          setSmartToggleActive(true);
+          onSmartFlowPhaseChange?.("toggle-active");
+        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY);
+        timers.push(smartToggleActivateTimer);
+
+        const closeTimer = window.setTimeout(() => {
+          if (cancelled) return;
+          setShowSettingsOverlay(false);
+          onSmartFlowPhaseChange?.("closing");
+        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY + SMART_REMINDER_CLOSE_DELAY);
+        timers.push(closeTimer);
+
+        const sheetLaunchTimer = window.setTimeout(() => {
+          if (cancelled) return;
+          onSmartFlowPhaseChange?.("smart-sheet");
+        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY + SMART_REMINDER_CLOSE_DELAY + SMART_REMINDER_SHEET_LAUNCH_DELAY);
+        timers.push(sheetLaunchTimer);
+
+        const recycleTimer = window.setTimeout(() => {
+          if (cancelled) return;
+          startSettingsCycle();
+        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY + SMART_REMINDER_CLOSE_DELAY + SMART_REMINDER_SHEET_LAUNCH_DELAY + SMART_REMINDER_SHEET_HOLD_DELAY);
+        timers.push(recycleTimer);
+      };
+
+      startSettingsCycle();
+    } else {
+      const startAddItemCycle = () => {
         if (cancelled) {
           return;
         }
 
-        setInputFocused(true);
-        LISTS_PAGE_3_DEMO_ITEM.split("").forEach((_, index) => {
-          const typingTimer = window.setTimeout(() => {
-            if (cancelled) {
-              return;
-            }
+        setItems(LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })));
+        setInputValue("");
+        setInputFocused(false);
+        setShowAddHighlight(false);
+        setReinsertedItemId(null);
+        setHighlightedItemId(null);
 
-            setInputValue(LISTS_PAGE_3_DEMO_ITEM.slice(0, index + 1));
-          }, index * LISTS_PAGE_3_TYPING_STEP_DELAY);
-          timers.push(typingTimer);
-        });
-
-        const highlightTimer = window.setTimeout(() => {
+        const inputTimer = window.setTimeout(() => {
           if (cancelled) {
             return;
           }
 
-          setShowAddHighlight(true);
-        }, LISTS_PAGE_3_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY);
-        timers.push(highlightTimer);
+          setInputFocused(true);
+          LISTS_PAGE_3_DEMO_ITEM.split("").forEach((_, index) => {
+            const typingTimer = window.setTimeout(() => {
+              if (cancelled) {
+                return;
+              }
 
-        const addTimer = window.setTimeout(() => {
-          if (cancelled) {
-            return;
-          }
+              setInputValue(LISTS_PAGE_3_DEMO_ITEM.slice(0, index + 1));
+            }, index * LISTS_PAGE_3_TYPING_STEP_DELAY);
+            timers.push(typingTimer);
+          });
 
-          setShowAddHighlight(false);
-          setInputFocused(false);
-          setInputValue("");
-          setItems((currentItems) => [
-            { id: LISTS_PAGE_3_DEMO_ITEM_ID, text: LISTS_PAGE_3_DEMO_ITEM, completed: false },
-            ...currentItems.filter((item) => item.id !== LISTS_PAGE_3_DEMO_ITEM_ID),
-          ]);
-          setReinsertedItemId(LISTS_PAGE_3_DEMO_ITEM_ID);
-          setHighlightedItemId(LISTS_PAGE_3_DEMO_ITEM_ID);
-
-          const clearHighlightTimer = window.setTimeout(() => {
+          const highlightTimer = window.setTimeout(() => {
             if (cancelled) {
               return;
             }
-            setHighlightedItemId(null);
-          }, LIST_ITEM_INSERT_HIGHLIGHT_MS);
-          timers.push(clearHighlightTimer);
-        }, LISTS_PAGE_3_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
-        timers.push(addTimer);
-      }, LISTS_PAGE_3_ADD_INPUT_DELAY);
-      timers.push(inputTimer);
+
+            setShowAddHighlight(true);
+          }, LISTS_PAGE_3_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY);
+          timers.push(highlightTimer);
+
+          const addTimer = window.setTimeout(() => {
+            if (cancelled) {
+              return;
+            }
+
+            setShowAddHighlight(false);
+            setInputFocused(false);
+            setInputValue("");
+            setItems((currentItems) => [
+              { id: LISTS_PAGE_3_DEMO_ITEM_ID, text: LISTS_PAGE_3_DEMO_ITEM, completed: false },
+              ...currentItems.filter((item) => item.id !== LISTS_PAGE_3_DEMO_ITEM_ID),
+            ]);
+            setReinsertedItemId(LISTS_PAGE_3_DEMO_ITEM_ID);
+            setHighlightedItemId(LISTS_PAGE_3_DEMO_ITEM_ID);
+
+            const clearHighlightTimer = window.setTimeout(() => {
+              if (cancelled) {
+                return;
+              }
+              setHighlightedItemId(null);
+            }, LIST_ITEM_INSERT_HIGHLIGHT_MS);
+            timers.push(clearHighlightTimer);
+
+            const recycleTimer = window.setTimeout(() => {
+              startAddItemCycle();
+            }, TUTORIAL_ATTENTION_RECYCLE_DELAY);
+            timers.push(recycleTimer);
+          }, LISTS_PAGE_3_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
+          timers.push(addTimer);
+        }, LISTS_PAGE_3_ADD_INPUT_DELAY);
+        timers.push(inputTimer);
+      };
+
+      startAddItemCycle();
     }
 
     return () => {
@@ -437,12 +500,49 @@ function ListsTutorialOpenListOverlay({ open, mode }: { open: boolean; mode: "ad
               </div>
             </motion.div>
           </motion.div>
-          {showSettingsOverlay && (
+          {showSettingsOverlay && (mode === "settings" ? (
+            <TutorialListSettingsOverlayWithToggle smartToggleActive={smartToggleActive} />
+          ) : (
             <TutorialListSettingsOverlay />
-          )}
+          ))}
         </>
       )}
     </AnimatePresence>
+  );
+}
+
+function SmartReminderSheetOverlay() {
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
+        className="absolute inset-0 z-40 bg-black/0"
+      />
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0, top: TUTORIAL_LIST_OVERLAY_TOP }}
+        transition={{ duration: 0.25, ease: "easeInOut" }}
+        className="absolute left-0 right-0 z-50 mx-auto w-full"
+        style={{ bottom: 0 }}
+      >
+        <motion.div
+          className="bg-white relative rounded-tl-[15px] rounded-tr-[15px]"
+          style={{
+            width: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
+            height: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
+            transform: `scale(${TUTORIAL_REMINDER_LIST_SCALE})`,
+            transformOrigin: "top center",
+            left: "50%",
+            translate: "-50% 0",
+          }}
+        >
+          <TutorialSmartReminderSheet />
+        </motion.div>
+      </motion.div>
+    </>
   );
 }
 
@@ -475,6 +575,9 @@ function ListsTutorialPlaceholderPage({
   const [page3TargetRect, setPage3TargetRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [page3ShowHighlight, setPage3ShowHighlight] = useState(false);
   const [page3ListOpen, setPage3ListOpen] = useState(false);
+  const [smartFlowPhase, setSmartFlowPhase] = useState<"none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet">("none");
+  const page4ShowSmartSheet = smartFlowPhase === "smart-sheet";
+  const page4ActiveTab: "reminders" | "lists" = (smartFlowPhase === "closing" || smartFlowPhase === "smart-sheet") ? "reminders" : "lists";
   const listFilterItems =
     savedListsEnabled
       ? SAVED_LISTS_TUTORIAL_FILTER_ITEMS
@@ -494,12 +597,14 @@ function ListsTutorialPlaceholderPage({
     if (currentPage !== 2 && currentPage !== 3) {
       setPage3ShowHighlight(false);
       setPage3ListOpen(false);
+      setSmartFlowPhase("none");
       return;
     }
 
     if (currentPage === 3) {
       setPage3ShowHighlight(false);
       setPage3ListOpen(true);
+      setSmartFlowPhase("none");
       return;
     }
 
@@ -591,7 +696,7 @@ function ListsTutorialPlaceholderPage({
       </div>
       <div className={`flex min-h-0 flex-1 items-center justify-center w-full ${TUTORIAL_PHONE_GAP_TOP_CLASSNAME} ${TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME}`}>
         <TutorialPhoneShell
-          activeMainTab="lists"
+          activeMainTab={currentPage === 3 ? page4ActiveTab : "lists"}
           showHeaderMenu={settingsMenuEnabled}
           headerProps={{
             logoTickHighlight: currentPage === 1 && page2ShowLogoHighlight,
@@ -600,6 +705,11 @@ function ListsTutorialPlaceholderPage({
           listsLabel={currentPage === 1 && page2ShowDoneLists ? "Done lists" : undefined}
           filterRow={currentPage === 1 && page2ShowDoneLists ? (
             <Page5DoneDeletedFilters />
+          ) : currentPage === 3 && page4ActiveTab === "reminders" ? (
+            <TutorialReminderFilters
+              items={UNGROUPED_TUTORIAL_FILTER_ITEMS}
+              showHiddenItems
+            />
           ) : (
             <TutorialReminderFilters
               items={listFilterItems}
@@ -611,7 +721,13 @@ function ListsTutorialPlaceholderPage({
               activeKey={currentPage === 0 ? displayActiveFilter : undefined}
             />
           )}
-          overlay={(currentPage === 2 || currentPage === 3) ? <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} /> : undefined}
+          overlay={
+            currentPage === 3 && page4ShowSmartSheet ? (
+              <SmartReminderSheetOverlay />
+            ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet")) ? (
+              <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} onSmartFlowPhaseChange={currentPage === 3 ? setSmartFlowPhase : undefined} />
+            ) : undefined
+          }
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
             <TutorialStaticReminderList
