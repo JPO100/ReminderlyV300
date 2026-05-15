@@ -2,6 +2,8 @@
 
 Last updated: 2026-03-12
 
+> **Stale**: this baseline reflects 280 checks from 2026-03-12. The current suite total is 425 checks across 8 suites. Re-run self-checks and replace the output below to bring this baseline current.
+
 ## Clean Run (Expected)
 
 ```

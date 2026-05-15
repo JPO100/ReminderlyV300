@@ -212,6 +212,18 @@ const newReminder: Reminder = {
 - At small viewports, calendar and time picker compress vertically
 - See [Content Overlay Responsive](../05-design-and-layout/content-overlay-responsive.md) for full pattern
 
+## Smart Reminder Mode
+
+When opened with `smartReminderCreateList` prop, the overlay creates a smart reminder linked to that list:
+
+- `smartReminderCreateListId` state in `App.tsx` drives this mode (null = normal reminder)
+- The resolved list is passed as `smartReminderCreateList` to `NewReminderOverlay`
+- On save, `onCreateSmartReminder` is called instead of the normal creation flow
+- The created reminder includes `linkedListId` and `isSmartReminder: true` fields
+- Smart reminder text is generated from the list title via `buildSmartReminderText()`
+
+This mode is triggered from the list settings overlay when enabling smart reminders for a list.
+
 ## Edit Mode
 
 When opened with `editReminder` prop, overlay enters edit mode:
