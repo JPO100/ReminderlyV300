@@ -75,6 +75,7 @@ const SMART_REMINDER_POST_SETTINGS_PAUSE = 750;
 const SMART_REMINDER_POST_TOGGLE_PAUSE = 750;
 const SMART_REMINDER_POST_CLOSE_PAUSE = 250;
 const SMART_REMINDER_SHEET_PAUSE = 1000;
+const NEW_REMINDER_INSERT_DELAY = 500;
 
 function TemplatesTutorialButton() {
   return (
@@ -566,9 +567,9 @@ function ListsTutorialPlaceholderPage({
   const [page3TargetRect, setPage3TargetRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [page3ShowHighlight, setPage3ShowHighlight] = useState(false);
   const [page3ListOpen, setPage3ListOpen] = useState(false);
-  const [smartFlowPhase, setSmartFlowPhase] = useState<"none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet" | "sheet-closing" | "reminder-visible">("none");
+  const [smartFlowPhase, setSmartFlowPhase] = useState<"none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet" | "sheet-closing" | "insert-delay" | "reminder-visible">("none");
   const page4ShowSmartSheet = smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-closing";
-  const page4ActiveTab: "reminders" | "lists" = (smartFlowPhase === "closing" || smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-closing" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists";
+  const page4ActiveTab: "reminders" | "lists" = (smartFlowPhase === "closing" || smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists";
   const listFilterItems =
     savedListsEnabled
       ? SAVED_LISTS_TUTORIAL_FILTER_ITEMS
@@ -686,8 +687,16 @@ function ListsTutorialPlaceholderPage({
   }, [smartFlowPhase]);
 
   const handleSheetExitComplete = useCallback(() => {
-    setSmartFlowPhase("reminder-visible");
+    setSmartFlowPhase("insert-delay");
   }, []);
+
+  useEffect(() => {
+    if (smartFlowPhase !== "insert-delay") return;
+    const insertTimer = window.setTimeout(() => {
+      setSmartFlowPhase("reminder-visible");
+    }, NEW_REMINDER_INSERT_DELAY);
+    return () => { clearTimeout(insertTimer); };
+  }, [smartFlowPhase]);
 
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
@@ -743,15 +752,15 @@ function ListsTutorialPlaceholderPage({
           overlay={
             currentPage === 3 && page4ShowSmartSheet ? (
               <SmartReminderSheetOverlay visible={smartFlowPhase === "smart-sheet"} onExitComplete={handleSheetExitComplete} />
-            ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet" && smartFlowPhase !== "sheet-closing" && smartFlowPhase !== "reminder-visible")) ? (
+            ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet" && smartFlowPhase !== "sheet-closing" && smartFlowPhase !== "insert-delay" && smartFlowPhase !== "reminder-visible")) ? (
               <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} onSmartFlowPhaseChange={currentPage === 3 ? setSmartFlowPhase : undefined} />
             ) : undefined
           }
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
             <TutorialStaticReminderList
-              key={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "reminder-visible") ? "lists-page-4-reminders" : currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
-              mode={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists"}
+              key={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "lists-page-4-reminders" : currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
+              mode={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "insert-delay" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists"}
               page1BuildSequence={currentPage === 0}
               page3DoneSequence={currentPage === 1 && page2Phase === "marking"}
               page3DoneSequenceCycle={currentPage !== 1}
@@ -761,7 +770,7 @@ function ListsTutorialPlaceholderPage({
               onPage3DoneSequenceComplete={currentPage === 1 ? onPage2DoneSequenceComplete : undefined}
               rowTargetListId={currentPage === 2 ? LISTS_PAGE_3_TARGET_LIST_ID : undefined}
               onRowTargetElementChange={currentPage === 2 ? setPage3TargetElement : undefined}
-              prependSmartReminder={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "reminder-visible")}
+              prependSmartReminder={currentPage === 3 && smartFlowPhase === "reminder-visible"}
             />
             {currentPage === 2 && page3ShowHighlight && page3TargetRect && (
               <motion.div
