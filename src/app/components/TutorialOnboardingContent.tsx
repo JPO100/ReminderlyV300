@@ -1097,7 +1097,7 @@ function ListsTutorialPlaceholderPage({
                           isEditMode
                           onSubmit={() => {}}
                           onClose={() => {}}
-                          subtitleText={`0 of ${page5EditorItems.length}`}
+                          subtitleText={`${page5EditorItems.length} items`}
                           showMenuButton
                         />
                         <AddListItemInput
@@ -1190,7 +1190,35 @@ function ListsTutorialPlaceholderPage({
                   </motion.div>
                 </motion.div>
               </AnimatePresence>
-              {page5Phase === "settings-overlay" && <TutorialListSettingsOverlay />}
+              {page5Phase === "settings-overlay" && (
+                <TutorialMiniOverlayShell>
+                  <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none" style={{ width: 340 }}>
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
+                      <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>Spaghetti bolognese</p>
+                    </div>
+                    <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
+                      <div className="h-[50px] relative rounded-[100px] shrink-0 w-full" style={{ backgroundColor: '#1C2C42' }}>
+                        <div className="flex flex-row items-center justify-center size-full">
+                          <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                              <p className="leading-[normal]">Use a list</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="h-[50px] relative rounded-[100px] shrink-0 w-full" style={{ backgroundColor: '#939393' }}>
+                        <div className="flex flex-row items-center justify-center size-full">
+                          <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                              <p className="leading-[normal]">Delete template</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TutorialMiniOverlayShell>
+              )}
               </>
             ) : undefined
           }
