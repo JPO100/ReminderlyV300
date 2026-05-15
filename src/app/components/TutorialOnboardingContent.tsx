@@ -1254,7 +1254,7 @@ function ListsTutorialPlaceholderPage({
               </AnimatePresence>
               {page5Phase === "settings-overlay" && (
                 <TutorialMiniOverlayShell>
-                  <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none" style={{ width: 340 }}>
+                  <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
                       <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>Spaghetti bolognese</p>
                     </div>
