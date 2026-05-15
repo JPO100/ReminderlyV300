@@ -857,10 +857,7 @@ function ListsTutorialPlaceholderPage({
     const t3 = t2 + SMART_REMINDER_PRE_DOTS_PAUSE;
     const t4 = t3 + PAGE_5_THROB_TOTAL_MS + SMART_REMINDER_PRE_DOTS_PAUSE;
     const t5 = t4 + SMART_REMINDER_PRE_DOTS_PAUSE;
-    const typingDuration = PAGE_5_DEMO_ITEM.length * LISTS_PAGE_3_TYPING_STEP_DELAY;
-    const t6 = t5 + typingDuration;
-    const t7 = t6 + PAGE_5_THROB_TOTAL_MS;
-    const t8 = t7 + LIST_ITEM_INSERT_HIGHLIGHT_MS + SMART_REMINDER_PRE_DOTS_PAUSE;
+    const t6 = t5 + PAGE_5_THROB_TOTAL_MS;
 
     const throbTimer = window.setTimeout(() => {
       if (cancelled) return;
@@ -886,59 +883,16 @@ function ListsTutorialPlaceholderPage({
     }, t4);
     timers.push(editorOpenTimer);
 
-    const typingStartTimer = window.setTimeout(() => {
-      if (cancelled) return;
-      setPage5Phase("typing");
-      setPage5InputFocused(true);
-      PAGE_5_DEMO_ITEM.split("").forEach((_, index) => {
-        const charTimer = window.setTimeout(() => {
-          if (cancelled) return;
-          setPage5InputValue(PAGE_5_DEMO_ITEM.slice(0, index + 1));
-        }, index * LISTS_PAGE_3_TYPING_STEP_DELAY);
-        timers.push(charTimer);
-      });
-    }, t5);
-    timers.push(typingStartTimer);
-
-    const addThrobTimer = window.setTimeout(() => {
-      if (cancelled) return;
-      setPage5Phase("add-throb");
-      setPage5ShowAddHighlight(true);
-    }, t6);
-    timers.push(addThrobTimer);
-
-    const itemAddTimer = window.setTimeout(() => {
-      if (cancelled) return;
-      setPage5Phase("item-added");
-      setPage5ShowAddHighlight(false);
-      setPage5InputFocused(false);
-      setPage5InputValue("");
-      setPage5EditorItems((prev) => [
-        { id: PAGE_5_DEMO_ITEM_ID, text: PAGE_5_DEMO_ITEM, completed: false },
-        ...prev.filter((item) => item.id !== PAGE_5_DEMO_ITEM_ID),
-      ]);
-      setPage5ReinsertedItemId(PAGE_5_DEMO_ITEM_ID);
-      setPage5HighlightedItemId(PAGE_5_DEMO_ITEM_ID);
-
-      const clearHighlightTimer = window.setTimeout(() => {
-        if (cancelled) return;
-        setPage5HighlightedItemId(null);
-      }, LIST_ITEM_INSERT_HIGHLIGHT_MS);
-      timers.push(clearHighlightTimer);
-    }, t7);
-    timers.push(itemAddTimer);
-
     const menuThrobTimer = window.setTimeout(() => {
       if (cancelled) return;
       setPage5Phase("menu-throb");
-    }, t8);
+    }, t5);
     timers.push(menuThrobTimer);
 
-    const t9 = t8 + PAGE_5_THROB_TOTAL_MS;
     const settingsOverlayTimer = window.setTimeout(() => {
       if (cancelled) return;
       setPage5Phase("settings-overlay");
-    }, t9);
+    }, t6);
     timers.push(settingsOverlayTimer);
 
     return () => {
