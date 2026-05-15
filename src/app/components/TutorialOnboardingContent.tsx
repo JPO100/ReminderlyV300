@@ -69,11 +69,11 @@ const LISTS_PAGE_3_TYPING_STEP_DELAY = 80;
 const LISTS_PAGE_3_ADD_HIGHLIGHT_CIRCLE_SIZE = 50;
 const LISTS_PAGE_3_POST_ADD_PAUSE_DELAY = 2000;
 const LIST_ITEM_INSERT_HIGHLIGHT_MS = 1000;
-const SMART_REMINDER_TOGGLE_THROB_DELAY = 2000;
-const SMART_REMINDER_TOGGLE_ACTIVATE_DELAY = 2750;
-const SMART_REMINDER_CLOSE_DELAY = 150;
-const SMART_REMINDER_SHEET_LAUNCH_DELAY = 100;
-const SMART_REMINDER_SHEET_HOLD_DELAY = 3000;
+const SMART_REMINDER_PRE_DOTS_PAUSE = 750;
+const SMART_REMINDER_POST_DOTS_PAUSE = 750;
+const SMART_REMINDER_POST_SETTINGS_PAUSE = 750;
+const SMART_REMINDER_POST_TOGGLE_PAUSE = 750;
+const SMART_REMINDER_POST_CLOSE_PAUSE = 750;
 
 function TemplatesTutorialButton() {
   return (
@@ -168,48 +168,43 @@ function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { 
     onSmartFlowPhaseChange?.("none");
 
     if (mode === "settings") {
-      const startSettingsCycle = () => {
+      setItems([
+        { id: LISTS_PAGE_3_DEMO_ITEM_ID, text: LISTS_PAGE_3_DEMO_ITEM, completed: false },
+        ...LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })),
+      ]);
+
+      const t1 = SMART_REMINDER_PRE_DOTS_PAUSE;
+      const t2 = t1 + TUTORIAL_ATTENTION_THROB_DURATION * 1000 + SMART_REMINDER_POST_DOTS_PAUSE;
+      const t3 = t2 + SMART_REMINDER_POST_SETTINGS_PAUSE;
+      const t4 = t3 + SMART_REMINDER_POST_TOGGLE_PAUSE;
+
+      const menuHighlightTimer = window.setTimeout(() => {
         if (cancelled) return;
+        setShowMenuDotsHighlight(true);
+      }, t1);
+      timers.push(menuHighlightTimer);
 
-        setItems([
-          { id: LISTS_PAGE_3_DEMO_ITEM_ID, text: LISTS_PAGE_3_DEMO_ITEM, completed: false },
-          ...LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })),
-        ]);
+      const settingsOverlayTimer = window.setTimeout(() => {
+        if (cancelled) return;
         setShowMenuDotsHighlight(false);
+        setShowSettingsOverlay(true);
+        onSmartFlowPhaseChange?.("settings-with-toggle");
+      }, t2);
+      timers.push(settingsOverlayTimer);
+
+      const smartToggleActivateTimer = window.setTimeout(() => {
+        if (cancelled) return;
+        setSmartToggleActive(true);
+        onSmartFlowPhaseChange?.("toggle-active");
+      }, t3);
+      timers.push(smartToggleActivateTimer);
+
+      const closeTimer = window.setTimeout(() => {
+        if (cancelled) return;
         setShowSettingsOverlay(false);
-        setSmartToggleActive(false);
-        onSmartFlowPhaseChange?.("none");
-
-        const menuHighlightTimer = window.setTimeout(() => {
-          if (cancelled) return;
-          setShowMenuDotsHighlight(true);
-        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY);
-        timers.push(menuHighlightTimer);
-
-        const settingsOverlayTimer = window.setTimeout(() => {
-          if (cancelled) return;
-          setShowMenuDotsHighlight(false);
-          setShowSettingsOverlay(true);
-          onSmartFlowPhaseChange?.("settings-with-toggle");
-        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY);
-        timers.push(settingsOverlayTimer);
-
-        const smartToggleActivateTimer = window.setTimeout(() => {
-          if (cancelled) return;
-          setSmartToggleActive(true);
-          onSmartFlowPhaseChange?.("toggle-active");
-        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY);
-        timers.push(smartToggleActivateTimer);
-
-        const closeTimer = window.setTimeout(() => {
-          if (cancelled) return;
-          setShowSettingsOverlay(false);
-          onSmartFlowPhaseChange?.("closing");
-        }, LISTS_PAGE_3_POST_ADD_PAUSE_DELAY + TUTORIAL_ATTENTION_SEQUENCE_DELAY + SMART_REMINDER_TOGGLE_THROB_DELAY + SMART_REMINDER_TOGGLE_ACTIVATE_DELAY + SMART_REMINDER_CLOSE_DELAY);
-        timers.push(closeTimer);
-      };
-
-      startSettingsCycle();
+        onSmartFlowPhaseChange?.("closing");
+      }, t4);
+      timers.push(closeTimer);
     } else {
       const startAddItemCycle = () => {
         if (cancelled) {
@@ -661,21 +656,12 @@ function ListsTutorialPlaceholderPage({
   useEffect(() => {
     if (smartFlowPhase !== "closing") return;
 
-    const timers: number[] = [];
-
     const sheetTimer = window.setTimeout(() => {
       setSmartFlowPhase("smart-sheet");
-    }, SMART_REMINDER_SHEET_LAUNCH_DELAY);
-    timers.push(sheetTimer);
-
-    const recycleTimer = window.setTimeout(() => {
-      setSmartFlowPhase("none");
-      setPage3ListOpen(true);
-    }, SMART_REMINDER_SHEET_LAUNCH_DELAY + SMART_REMINDER_SHEET_HOLD_DELAY);
-    timers.push(recycleTimer);
+    }, SMART_REMINDER_POST_CLOSE_PAUSE);
 
     return () => {
-      timers.forEach((t) => clearTimeout(t));
+      clearTimeout(sheetTimer);
     };
   }, [smartFlowPhase]);
 
