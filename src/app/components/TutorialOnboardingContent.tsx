@@ -74,6 +74,7 @@ const SMART_REMINDER_POST_DOTS_PAUSE = 750;
 const SMART_REMINDER_POST_SETTINGS_PAUSE = 750;
 const SMART_REMINDER_POST_TOGGLE_PAUSE = 750;
 const SMART_REMINDER_POST_CLOSE_PAUSE = 250;
+const SMART_REMINDER_SHEET_PAUSE = 1000;
 
 function TemplatesTutorialButton() {
   return (
@@ -122,7 +123,7 @@ function Page5DoneDeletedFilters() {
   );
 }
 
-function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { open: boolean; mode: "add-item" | "settings"; onSmartFlowPhaseChange?: (phase: "none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet") => void }) {
+function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { open: boolean; mode: "add-item" | "settings"; onSmartFlowPhaseChange?: (phase: "none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet" | "sheet-closing" | "reminder-visible") => void }) {
   const [items, setItems] = useState(LISTS_PAGE_3_OPEN_ITEMS.map((item) => ({ ...item })));
   const [inputValue, setInputValue] = useState("");
   const [inputFocused, setInputFocused] = useState(false);
@@ -494,38 +495,45 @@ function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange }: { 
   );
 }
 
-function SmartReminderSheetOverlay() {
+function SmartReminderSheetOverlay({ visible, onExitComplete }: { visible: boolean; onExitComplete?: () => void }) {
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        className="absolute inset-0 z-40 bg-black/0"
-      />
-      <motion.div
-        initial={{ y: "100%" }}
-        animate={{ y: 0, top: TUTORIAL_LIST_OVERLAY_TOP }}
-        transition={{ duration: 0.25, ease: "easeInOut" }}
-        className="absolute left-0 right-0 z-50 mx-auto w-full"
-        style={{ bottom: 0 }}
-      >
-        <motion.div
-          className="bg-white relative rounded-tl-[15px] rounded-tr-[15px]"
-          style={{
-            width: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
-            height: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
-            transform: `scale(${TUTORIAL_REMINDER_LIST_SCALE})`,
-            transformOrigin: "top center",
-            left: "50%",
-            translate: "-50% 0",
-          }}
-        >
-          <TutorialSmartReminderSheet />
-        </motion.div>
-      </motion.div>
-    </>
+    <AnimatePresence onExitComplete={onExitComplete}>
+      {visible && (
+        <>
+          <motion.div
+            key="smart-sheet-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 z-40 bg-black/0"
+          />
+          <motion.div
+            key="smart-sheet-panel"
+            initial={{ y: "100%" }}
+            animate={{ y: 0, top: TUTORIAL_LIST_OVERLAY_TOP }}
+            exit={{ y: "100%" }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="absolute left-0 right-0 z-50 mx-auto w-full"
+            style={{ bottom: 0 }}
+          >
+            <motion.div
+              className="bg-white relative rounded-tl-[15px] rounded-tr-[15px]"
+              style={{
+                width: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
+                height: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
+                transform: `scale(${TUTORIAL_REMINDER_LIST_SCALE})`,
+                transformOrigin: "top center",
+                left: "50%",
+                translate: "-50% 0",
+              }}
+            >
+              <TutorialSmartReminderSheet />
+            </motion.div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -558,9 +566,9 @@ function ListsTutorialPlaceholderPage({
   const [page3TargetRect, setPage3TargetRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
   const [page3ShowHighlight, setPage3ShowHighlight] = useState(false);
   const [page3ListOpen, setPage3ListOpen] = useState(false);
-  const [smartFlowPhase, setSmartFlowPhase] = useState<"none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet">("none");
-  const page4ShowSmartSheet = smartFlowPhase === "smart-sheet";
-  const page4ActiveTab: "reminders" | "lists" = (smartFlowPhase === "closing" || smartFlowPhase === "smart-sheet") ? "reminders" : "lists";
+  const [smartFlowPhase, setSmartFlowPhase] = useState<"none" | "settings-with-toggle" | "toggle-active" | "closing" | "smart-sheet" | "sheet-closing" | "reminder-visible">("none");
+  const page4ShowSmartSheet = smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-closing";
+  const page4ActiveTab: "reminders" | "lists" = (smartFlowPhase === "closing" || smartFlowPhase === "smart-sheet" || smartFlowPhase === "sheet-closing" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists";
   const listFilterItems =
     savedListsEnabled
       ? SAVED_LISTS_TUTORIAL_FILTER_ITEMS
@@ -665,6 +673,22 @@ function ListsTutorialPlaceholderPage({
     };
   }, [smartFlowPhase]);
 
+  useEffect(() => {
+    if (smartFlowPhase !== "smart-sheet") return;
+
+    const closeTimer = window.setTimeout(() => {
+      setSmartFlowPhase("sheet-closing");
+    }, SMART_REMINDER_SHEET_PAUSE);
+
+    return () => {
+      clearTimeout(closeTimer);
+    };
+  }, [smartFlowPhase]);
+
+  const handleSheetExitComplete = useCallback(() => {
+    setSmartFlowPhase("reminder-visible");
+  }, []);
+
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
       <div className="content-stretch flex flex-col gap-[27px] [@media(max-height:570px)]:gap-[10px] [@media(max-height:570px)]:!min-h-0 items-center relative shrink-0">
@@ -718,16 +742,16 @@ function ListsTutorialPlaceholderPage({
           )}
           overlay={
             currentPage === 3 && page4ShowSmartSheet ? (
-              <SmartReminderSheetOverlay />
-            ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet")) ? (
+              <SmartReminderSheetOverlay visible={smartFlowPhase === "smart-sheet"} onExitComplete={handleSheetExitComplete} />
+            ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet" && smartFlowPhase !== "sheet-closing" && smartFlowPhase !== "reminder-visible")) ? (
               <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} onSmartFlowPhaseChange={currentPage === 3 ? setSmartFlowPhase : undefined} />
             ) : undefined
           }
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
             <TutorialStaticReminderList
-              key={currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
-              mode="lists"
+              key={currentPage === 3 && smartFlowPhase === "reminder-visible" ? "lists-page-4-reminders" : currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
+              mode={currentPage === 3 && smartFlowPhase === "reminder-visible" ? "reminders" : "lists"}
               page1BuildSequence={currentPage === 0}
               page3DoneSequence={currentPage === 1 && page2Phase === "marking"}
               page3DoneSequenceCycle={currentPage !== 1}
@@ -737,6 +761,7 @@ function ListsTutorialPlaceholderPage({
               onPage3DoneSequenceComplete={currentPage === 1 ? onPage2DoneSequenceComplete : undefined}
               rowTargetListId={currentPage === 2 ? LISTS_PAGE_3_TARGET_LIST_ID : undefined}
               onRowTargetElementChange={currentPage === 2 ? setPage3TargetElement : undefined}
+              prependSmartReminder={currentPage === 3 && smartFlowPhase === "reminder-visible"}
             />
             {currentPage === 2 && page3ShowHighlight && page3TargetRect && (
               <motion.div
