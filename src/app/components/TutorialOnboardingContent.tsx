@@ -750,8 +750,8 @@ function ListsTutorialPlaceholderPage({
         >
           <div className="content-stretch flex flex-col flex-1 min-h-0 gap-[22.334px] items-center pt-[10px] px-[14px] relative w-full">
             <TutorialStaticReminderList
-              key={currentPage === 3 && smartFlowPhase === "reminder-visible" ? "lists-page-4-reminders" : currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
-              mode={currentPage === 3 && smartFlowPhase === "reminder-visible" ? "reminders" : "lists"}
+              key={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "reminder-visible") ? "lists-page-4-reminders" : currentPage === 1 ? `lists-page-2-${page2CycleKey}` : "lists-static"}
+              mode={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "reminder-visible") ? "reminders" : "lists"}
               page1BuildSequence={currentPage === 0}
               page3DoneSequence={currentPage === 1 && page2Phase === "marking"}
               page3DoneSequenceCycle={currentPage !== 1}
@@ -761,7 +761,7 @@ function ListsTutorialPlaceholderPage({
               onPage3DoneSequenceComplete={currentPage === 1 ? onPage2DoneSequenceComplete : undefined}
               rowTargetListId={currentPage === 2 ? LISTS_PAGE_3_TARGET_LIST_ID : undefined}
               onRowTargetElementChange={currentPage === 2 ? setPage3TargetElement : undefined}
-              prependSmartReminder={currentPage === 3 && smartFlowPhase === "reminder-visible"}
+              prependSmartReminder={currentPage === 3 && (smartFlowPhase === "sheet-closing" || smartFlowPhase === "reminder-visible")}
             />
             {currentPage === 2 && page3ShowHighlight && page3TargetRect && (
               <motion.div

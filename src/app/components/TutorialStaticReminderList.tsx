@@ -358,31 +358,6 @@ export default function TutorialStaticReminderList({
   const [suppressPage3ResetAnimation, setSuppressPage3ResetAnimation] = useState(false);
   const timeoutsRef = useRef<number[]>([]);
   const insertHighlightTimerRef = useRef<number | null>(null);
-  const smartReminderHighlightTimerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (!prependSmartReminder) {
-      if (smartReminderHighlightTimerRef.current !== null) {
-        clearTimeout(smartReminderHighlightTimerRef.current);
-        smartReminderHighlightTimerRef.current = null;
-      }
-      return;
-    }
-
-    setInsertHighlightId(SMART_REMINDER_ID);
-    smartReminderHighlightTimerRef.current = window.setTimeout(() => {
-      smartReminderHighlightTimerRef.current = null;
-      setInsertHighlightId(null);
-    }, INSERT_HIGHLIGHT_MS);
-
-    return () => {
-      if (smartReminderHighlightTimerRef.current !== null) {
-        clearTimeout(smartReminderHighlightTimerRef.current);
-        smartReminderHighlightTimerRef.current = null;
-      }
-    };
-  }, [prependSmartReminder]);
-
   useEffect(() => {
     if (!page1BuildSequence) {
       setVisibleIds(defaultVisibleIds);
@@ -622,16 +597,15 @@ export default function TutorialStaticReminderList({
               <motion.div
                 key={SMART_REMINDER_ID}
                 layout
-                initial={{ opacity: 0 }}
+                initial={false}
                 animate={{ opacity: 1 }}
-                transition={{ opacity: { duration: 0.2 } }}
+                transition={{ layout: { duration: 0.25 } }}
               >
                 <TutorialStaticReminderRow
                   title={SMART_REMINDER_TITLE}
                   subtitle={SMART_REMINDER_SUBTITLE}
                   circleColor={SMART_REMINDER_CIRCLE_COLOR}
                   showSmartReminderIcon
-                  titleColor={insertHighlightId === SMART_REMINDER_ID ? SMART_REMINDER_CIRCLE_COLOR : "#1c2c42"}
                 />
               </motion.div>
             )}
