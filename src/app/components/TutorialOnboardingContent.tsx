@@ -78,7 +78,7 @@ const SMART_REMINDER_SHEET_PRE_THROB_PAUSE = 750;
 const SMART_REMINDER_TICK_THROB_CIRCLE_SIZE = 62;
 const NEW_REMINDER_INSERT_DELAY = 500;
 
-type Page5Phase = "none" | "templates-throb" | "templates-open" | "template-row-throb" | "editor-open" | "typing" | "add-throb" | "item-added" | "menu-throb";
+type Page5Phase = "none" | "templates-throb" | "templates-open" | "template-row-throb" | "editor-open" | "typing" | "add-throb" | "item-added" | "menu-throb" | "settings-overlay";
 const PAGE_5_TEMPLATES = [
   { id: "tpl-1", title: "Weekly food shop", itemCount: 8 },
   { id: "tpl-2", title: "Morning routine", itemCount: 6 },
@@ -934,6 +934,13 @@ function ListsTutorialPlaceholderPage({
     }, t8);
     timers.push(menuThrobTimer);
 
+    const t9 = t8 + PAGE_5_THROB_TOTAL_MS;
+    const settingsOverlayTimer = window.setTimeout(() => {
+      if (cancelled) return;
+      setPage5Phase("settings-overlay");
+    }, t9);
+    timers.push(settingsOverlayTimer);
+
     return () => {
       cancelled = true;
       timers.forEach((timer) => clearTimeout(timer));
@@ -1037,7 +1044,7 @@ function ListsTutorialPlaceholderPage({
   }, [page5EditorHostElement, page5Phase]);
 
   const page5ShowTemplatesPanel = currentPage === 4 && page5Phase !== "none" && page5Phase !== "templates-throb";
-  const page5ShowEditor = currentPage === 4 && (page5Phase === "editor-open" || page5Phase === "typing" || page5Phase === "add-throb" || page5Phase === "item-added" || page5Phase === "menu-throb");
+  const page5ShowEditor = currentPage === 4 && (page5Phase === "editor-open" || page5Phase === "typing" || page5Phase === "add-throb" || page5Phase === "item-added" || page5Phase === "menu-throb" || page5Phase === "settings-overlay");
 
   return (
     <div className="content-stretch flex h-full w-full flex-col items-center min-h-0">
@@ -1099,6 +1106,7 @@ function ListsTutorialPlaceholderPage({
             ) : (currentPage === 2 || (currentPage === 3 && smartFlowPhase !== "closing" && smartFlowPhase !== "smart-sheet" && smartFlowPhase !== "sheet-throb" && smartFlowPhase !== "sheet-closing" && smartFlowPhase !== "insert-delay" && smartFlowPhase !== "reminder-visible")) ? (
               <ListsTutorialOpenListOverlay open={page3ListOpen} mode={currentPage === 2 ? "add-item" : "settings"} onSmartFlowPhaseChange={currentPage === 3 ? setSmartFlowPhase : undefined} onAddItemSequenceComplete={currentPage === 2 ? handleAddItemSequenceComplete : undefined} />
             ) : page5ShowEditor ? (
+              <>
               <AnimatePresence>
                 <motion.div
                   key="page5-editor-backdrop"
@@ -1228,6 +1236,8 @@ function ListsTutorialPlaceholderPage({
                   </motion.div>
                 </motion.div>
               </AnimatePresence>
+              {page5Phase === "settings-overlay" && <TutorialListSettingsOverlay />}
+              </>
             ) : undefined
           }
         >
@@ -1272,43 +1282,54 @@ function ListsTutorialPlaceholderPage({
               </motion.div>
             )}
             {page5ShowTemplatesPanel && (
-              <div className="absolute inset-0 z-30 bg-white flex flex-col pt-[10px] px-[14px]">
-                <div className="flex items-center justify-between w-full h-[40px] shrink-0">
-                  <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
-                    List templates
-                  </div>
-                  <div className="relative shrink-0 flex items-center justify-center w-[30px] h-[30px]">
-                    <svg className="block shrink-0" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <path d="M11.7528 0.439116C12.3385 -0.146356 13.2882 -0.146389 13.8739 0.439116C14.4596 1.02493 14.4596 1.97537 13.8739 2.56119L9.27819 7.15787L13.8739 11.7536C14.4596 12.3394 14.4596 13.2898 13.8739 13.8756C13.2882 14.4612 12.3385 14.4611 11.7528 13.8756L7.15709 9.27896L2.56041 13.8756C1.97466 14.461 1.02496 14.4612 0.439319 13.8756C-0.14644 13.2898 -0.146439 12.3394 0.439319 11.7536L5.03502 7.15787L0.439319 2.56119C-0.146439 1.97537 -0.14644 1.02493 0.439319 0.439116C1.02496 -0.146462 1.97466 -0.146282 2.56041 0.439116L7.15709 5.0358L11.7528 0.439116Z" fill="#BABABA"/>
-                    </svg>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-[23px] w-full mt-[24px]">
-                  {PAGE_5_TEMPLATES.map((tpl) => (
-                    <div
-                      key={tpl.id}
-                      ref={tpl.id === PAGE_5_TARGET_TEMPLATE_ID ? setPage5TargetTemplateElement : undefined}
-                      className="content-stretch flex items-start px-px relative w-full"
-                    >
-                      <div className="flex gap-[16px] items-start w-full">
-                        <div className="relative shrink-0 size-[25px]" style={{ marginTop: '3px' }}>
-                          <TutorialSavedListTemplateIcon />
-                        </div>
-                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-start min-w-0 not-italic relative" style={{ gap: '9px', minHeight: '38px' }}>
-                          <div className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ color: '#1c2c42', clipPath: 'inset(0 0 -4px 0)' }}>
-                            <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>
-                              {tpl.title}
-                            </p>
-                          </div>
-                          <div className="flex items-center overflow-visible min-w-0">
-                            <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: '#BABABA' }}>
-                              {tpl.itemCount} {tpl.itemCount === 1 ? 'item' : 'items'}
-                            </p>
-                          </div>
-                        </div>
+              <div className="absolute inset-0 z-30 bg-white overflow-hidden flex items-start justify-center">
+                <div
+                  className="shrink-0"
+                  style={{
+                    width: `${100 / TUTORIAL_REMINDER_LIST_SCALE}%`,
+                    transform: `scale(${TUTORIAL_REMINDER_LIST_SCALE})`,
+                    transformOrigin: "top center",
+                  }}
+                >
+                  <div className="flex flex-col gap-[24px] w-full min-h-0">
+                    <div className="flex items-center justify-between w-full h-[40px] shrink-0">
+                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
+                        List templates
+                      </div>
+                      <div className="relative shrink-0 flex items-center justify-center w-[30px] h-[30px]">
+                        <svg className="block shrink-0" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M11.7528 0.439116C12.3385 -0.146356 13.2882 -0.146389 13.8739 0.439116C14.4596 1.02493 14.4596 1.97537 13.8739 2.56119L9.27819 7.15787L13.8739 11.7536C14.4596 12.3394 14.4596 13.2898 13.8739 13.8756C13.2882 14.4612 12.3385 14.4611 11.7528 13.8756L7.15709 9.27896L2.56041 13.8756C1.97466 14.461 1.02496 14.4612 0.439319 13.8756C-0.14644 13.2898 -0.146439 12.3394 0.439319 11.7536L5.03502 7.15787L0.439319 2.56119C-0.146439 1.97537 -0.14644 1.02493 0.439319 0.439116C1.02496 -0.146462 1.97466 -0.146282 2.56041 0.439116L7.15709 5.0358L11.7528 0.439116Z" fill="#BABABA"/>
+                        </svg>
                       </div>
                     </div>
-                  ))}
+                    <div className="flex flex-col gap-[23px] w-full">
+                      {PAGE_5_TEMPLATES.map((tpl) => (
+                        <div
+                          key={tpl.id}
+                          ref={tpl.id === PAGE_5_TARGET_TEMPLATE_ID ? setPage5TargetTemplateElement : undefined}
+                          className="content-stretch flex items-start px-px relative w-full"
+                        >
+                          <div className="flex gap-[16px] items-start w-full">
+                            <div className="relative shrink-0 size-[25px]" style={{ marginTop: '3px' }}>
+                              <TutorialSavedListTemplateIcon />
+                            </div>
+                            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-start min-w-0 not-italic relative" style={{ gap: '9px', minHeight: '38px' }}>
+                              <div className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ color: '#1c2c42', clipPath: 'inset(0 0 -4px 0)' }}>
+                                <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>
+                                  {tpl.title}
+                                </p>
+                              </div>
+                              <div className="flex items-center overflow-visible min-w-0">
+                                <p className="overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '14px', fontWeight: 700, fontFamily: "'Lato', sans-serif", lineHeight: 1, color: '#BABABA' }}>
+                                  {tpl.itemCount} {tpl.itemCount === 1 ? 'item' : 'items'}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
