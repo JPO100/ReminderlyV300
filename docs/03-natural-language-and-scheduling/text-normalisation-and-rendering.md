@@ -16,7 +16,10 @@ Replace relative date phrases with absolute equivalents so stored text remains a
 
 **"today"** → **"Monday 3 March"** (full weekday + date)
 **"tomorrow"** → **"Tuesday 4 March"** (full weekday + date)
+**"tonight"** → stripped (schedule carries the date)
+**"next Monday"** etc → stripped
 **Weekday names** → Unchanged (already absolute)
+**Month-name dates** → stripped (e.g. "February 28th", "28 Feb", "Feb 28 2027")
 
 ### Storage
 
@@ -59,6 +62,9 @@ If today is Tuesday 4 March: Displays as "Buy milk Monday 3 March at 5pm"
 - Date only: "Monday 3 March"
 - Time only: "at 5pm"
 - "today at 5pm", "tomorrow at 5pm"
+- Month-name dates: "February 28th", "28 Feb", "Feb 28 2027"
+- Time-of-day phrases: "in the morning", "in the afternoon", "at night", etc. (stripped when a concrete clock time exists)
+- Time-of-day words: "morning", "afternoon", "evening", "night" (stripped when a concrete clock time exists, unless protected by "every" prefix)
 
 ### Example
 

@@ -66,6 +66,8 @@ Invalidation does not close drawers. Drawer state is user-controlled only.
 
 When a repeats token is invalidated, its implied date is also cleared — unless an independent date token is still applied.
 
+When a repeats token with an implied time (e.g. "every morning") is invalidated, its implied time is also cleared and the time toggle turns off — unless an independent time token is still applied. If the repeats token is later re-applied (e.g. user re-types it), the implied time reactivates.
+
 ### Save behaviour
 
 If no tokens have been applied (or all have been invalidated), the reminder saves as "sometime" with no structured schedule. Applying a date or repeats token produces a "scheduled" reminder with a date.
@@ -80,8 +82,14 @@ If no tokens have been applied (or all have been invalidated), the reminder save
 | `tomorrow` | Tomorrow's date |
 | `Monday` ... `Sunday` | Next occurrence of that weekday (including today if it matches) |
 | `next Monday` ... `next Sunday` | The weekday at least 7 days from now |
+| `February 28th`, `Feb 28` | Month-name date (month then day, optional ordinal suffix) |
+| `28 Feb`, `28th February` | Day-first month-name date (day then month, optional ordinal suffix) |
+| `Feb 28 2027`, `28th February 2027` | Month-name date with explicit 4-digit year |
 
 - Weekday names are case-insensitive. The displayed text preserves the user's original casing.
+- Month names accept both full and abbreviated forms (e.g. `February` / `Feb`). Case-insensitive.
+- Month-name dates without a year resolve to the next occurrence of that date (this year if it hasn't passed, otherwise next year).
+- Month-name dates with an explicit year resolve to that exact date.
 - "on Friday" is recognised — the token is the weekday only, not the word "on".
 
 ### Time tokens
@@ -161,6 +169,8 @@ Repeats patterns are checked first. If a weekday appears inside a repeats token 
 
 Repeats application also turns on the date toggle and sets an anchor date. The anchor date is the next upcoming occurrence of the specified day(s), or today for interval-based repeats.
 
+Repeats tokens without an implied time (e.g. "every week", "every Monday") also turn on the time toggle and set time to 12:00pm as a default — but only when the time toggle is currently off. This does not apply when the repeats token carries its own implied time (e.g. "every morning" sets 07:00 instead).
+
 ### Invalidation flow
 
 A `useEffect` keyed on `parsedTokens` runs `computeInvalidation()` on every re-parse. For each invalidated category, the component turns off the toggle and clears the value via `applyToggleStateSilently`. Range-updated tokens are silently tracked without any visible effect.
@@ -217,7 +227,7 @@ The system enforces the invariant that time requires a date. This invariant is e
 ## Constraints and rules
 
 - Time recognition is restricted to quarter-hour intervals. This is by design; the time picker only supports these values.
-- Token click applies only the clicked category. Clicking a time token does not imply or set a date (but `applyToken` handles date enablement for time tokens internally).
+- Standalone time tokens (both clock times like `7pm` and time-of-day words like `morning`) set date to today when no explicit date token exists in the parsed text and the date toggle is off. Compound tokens (`this morning`, `tonight`, etc.) always set date to today when no explicit date token exists, regardless of toggle state.
 - Repeats always implies date. Applying a repeats token turns on both the repeats and date toggles.
 - Auto-apply requires unambiguous input (exactly one token per category) and an off toggle (with the edit-mode override described above). It is conservative by design.
 - Auto-apply of repeats requires both repeats AND date toggles to be off, to avoid overwriting a manually set date.
@@ -232,13 +242,13 @@ The system enforces the invariant that time requires a date. This invariant is e
 - **Repeat configuration**: Repeats tokens produce a `RepeatConfig` object passed to the parent via `onRepeatConfigChange`.
 - **Schedule kind**: At save time, `computeScheduleKind` uses the date toggle and selected date to determine whether the reminder is "scheduled" or "sometime". NLC does not directly set the schedule kind — it sets the inputs that the save logic reads.
 - **DevTools**: The NLC mode (click vs auto) is controlled via a segmented control on the DevTools NLC page. The mode is stored as React state in `App.tsx` and threaded through to `NewReminderElements`.
-- **Self-checks**: 53 parser checks and 43 interaction checks (including auto-apply, time-of-day, repeat-trigger, implied-time reactivation, month-name date resolution, and explicit year resolution checks) run via the DevTools self-checks page.
+- **Self-checks**: 53 parser checks and 45 interaction checks (including auto-apply, time-of-day, repeat-trigger, implied-time reactivation, month-name date resolution, and explicit year resolution checks) run via the DevTools self-checks page.
 
 ## Non-goals
 
 - NLC does not perform fuzzy matching, spelling correction, or synonym expansion.
 - NLC does not recognise numeric-only date formats (e.g. "15/03", "2026-03-15").
-- NLC does not recognise relative date phrases beyond "today", "tomorrow", and weekday names (e.g. "in 3 days", "next week" without a weekday).
+- NLC does not recognise relative date phrases beyond "today", "tomorrow", weekday names, and month-name dates (e.g. "in 3 days", "next week" without a weekday).
 - NLC does not set the reminder title. The full text the user types becomes the reminder text; tokens are scheduling metadata extracted from it.
 - NLC does not open drawers or pickers. It sets values silently.
 - NLC does not support undo. Editing the text to remove or change a token triggers invalidation, but there is no explicit "unapply" action.
@@ -253,7 +263,7 @@ The system enforces the invariant that time requires a date. This invariant is e
 ## Self-Check Coverage
 
 - 53 parser checks (`/src/app/dev/nlc-parser-checks.ts`)
-- 43 interaction checks (`/src/app/dev/nlc-interaction-checks.ts`)
-- Total: 96 NLC checks
+- 45 interaction checks (`/src/app/dev/nlc-interaction-checks.ts`)
+- Total: 98 NLC checks
 
 See [Self-Check System](../../06-quality-and-dev/self-check-system.md) for details.
