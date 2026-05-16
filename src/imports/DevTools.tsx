@@ -180,40 +180,6 @@ export default function DevTools({
           </div>
           <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
             <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] whitespace-nowrap">
-              <p className="leading-[normal]">Developer settings</p>
-            </div>
-            <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
-              <NavRow label="Filters menu" onClick={onNavigateFiltersMenu} plain />
-              <NavRow label="Reminder settings" onClick={onNavigateReminderSettings} plain />
-              <button
-                onClick={isListsEnabled ? onNavigateListSettings : undefined}
-                className={`h-[60px] relative shrink-0 w-full ${isListsEnabled ? 'cursor-pointer' : 'cursor-default'}`}
-              >
-                <div className="flex flex-row items-center size-full">
-                  <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
-                    <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: isListsEnabled ? '#1c2c42' : '#C9C9C9' }}>
-                        <p className="leading-[normal] truncate">List settings</p>
-                      </div>
-                      <div className="flex items-center justify-center relative shrink-0">
-                        <div className="-scale-y-100 flex-none rotate-180">
-                          <div className="h-[13px] relative w-[7px]" data-name="Union">
-                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
-                              <path d={svgPaths.p1b692f00} fill={isListsEnabled ? '#939393' : '#C9C9C9'} id="Union" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </button>
-              <NavRow label="Dev tools password" onClick={onNavigateDevToolsPassword} plain />
-              <div />
-            </div>
-          </div>
-          <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] whitespace-nowrap">
               <p className="leading-[normal]">Feature flags</p>
             </div>
             <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
@@ -323,6 +289,40 @@ export default function DevTools({
                   </div>
                 </div>
               </div>
+              <div />
+            </div>
+          </div>
+          <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] whitespace-nowrap">
+              <p className="leading-[normal]">Developer settings</p>
+            </div>
+            <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
+              <NavRow label="Filters menu" onClick={onNavigateFiltersMenu} plain />
+              <NavRow label="Reminder settings" onClick={onNavigateReminderSettings} plain />
+              <button
+                onClick={isListsEnabled ? onNavigateListSettings : undefined}
+                className={`h-[60px] relative shrink-0 w-full ${isListsEnabled ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                <div className="flex flex-row items-center size-full">
+                  <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
+                    <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
+                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: isListsEnabled ? '#1c2c42' : '#C9C9C9' }}>
+                        <p className="leading-[normal] truncate">List settings</p>
+                      </div>
+                      <div className="flex items-center justify-center relative shrink-0">
+                        <div className="-scale-y-100 flex-none rotate-180">
+                          <div className="h-[13px] relative w-[7px]" data-name="Union">
+                            <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
+                              <path d={svgPaths.p1b692f00} fill={isListsEnabled ? '#939393' : '#C9C9C9'} id="Union" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+              <NavRow label="Dev tools password" onClick={onNavigateDevToolsPassword} plain />
               <div />
             </div>
           </div>
