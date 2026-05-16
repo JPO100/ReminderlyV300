@@ -644,5 +644,95 @@ export function getNlcParserChecks(): Check[] {
         }
       },
     },
+
+    // ========================================================================
+    // Recognition config — category gating
+    // ========================================================================
+
+    {
+      id: 'nlc-recognition-date-off',
+      name: 'NLC parser: date recognition OFF produces no date tokens',
+      run: () => {
+        const tokens = parseTokens('Buy milk today at 3pm', { date: false, time: true, repeats: true });
+        const dateTokens = tokens.filter(t => t.category === 'date');
+        assert(dateTokens.length === 0, `Expected 0 date tokens, got ${dateTokens.length}`);
+        const timeTokens = tokens.filter(t => t.category === 'time');
+        assert(timeTokens.length === 1, `Expected 1 time token, got ${timeTokens.length}`);
+      },
+    },
+
+    {
+      id: 'nlc-recognition-time-off',
+      name: 'NLC parser: time recognition OFF produces no time tokens',
+      run: () => {
+        const tokens = parseTokens('Call dentist tomorrow at 7pm', { date: true, time: false, repeats: true });
+        const timeTokens = tokens.filter(t => t.category === 'time');
+        assert(timeTokens.length === 0, `Expected 0 time tokens, got ${timeTokens.length}`);
+        const dateTokens = tokens.filter(t => t.category === 'date');
+        assert(dateTokens.length === 1, `Expected 1 date token, got ${dateTokens.length}`);
+      },
+    },
+
+    {
+      id: 'nlc-recognition-repeats-off',
+      name: 'NLC parser: repeats recognition OFF produces no repeats tokens',
+      run: () => {
+        const tokens = parseTokens('Water plants every day', { date: true, time: true, repeats: false });
+        const repeatsTokens = tokens.filter(t => t.category === 'repeats');
+        assert(repeatsTokens.length === 0, `Expected 0 repeats tokens, got ${repeatsTokens.length}`);
+      },
+    },
+
+    {
+      id: 'nlc-recognition-repeats-off-exposes-weekday',
+      name: 'NLC parser: repeats OFF allows "every Wednesday" weekday as date token',
+      run: () => {
+        const tokens = parseTokens('Gym every Wednesday', { date: true, time: true, repeats: false });
+        const dateTokens = tokens.filter(t => t.category === 'date');
+        assert(dateTokens.length === 1, `Expected 1 date token, got ${dateTokens.length}`);
+        assert(dateTokens[0].text === 'Wednesday', `Expected "Wednesday", got "${dateTokens[0].text}"`);
+      },
+    },
+
+    {
+      id: 'nlc-recognition-repeats-off-exposes-time-of-day',
+      name: 'NLC parser: repeats OFF allows "every morning" morning as time token',
+      run: () => {
+        const tokens = parseTokens('Run every morning', { date: true, time: true, repeats: false });
+        const timeTokens = tokens.filter(t => t.category === 'time');
+        assert(timeTokens.length === 1, `Expected 1 time token, got ${timeTokens.length}`);
+        assert(timeTokens[0].text === 'morning', `Expected "morning", got "${timeTokens[0].text}"`);
+      },
+    },
+
+    {
+      id: 'nlc-recognition-mixed-date-off-time-on',
+      name: 'NLC parser: date OFF + time ON returns only time tokens',
+      run: () => {
+        const tokens = parseTokens('Meet tomorrow morning', { date: false, time: true, repeats: true });
+        assert(tokens.every(t => t.category !== 'date'), 'Expected no date tokens');
+        const timeTokens = tokens.filter(t => t.category === 'time');
+        assert(timeTokens.length === 1, `Expected 1 time token, got ${timeTokens.length}`);
+      },
+    },
+
+    {
+      id: 'nlc-recognition-all-off',
+      name: 'NLC parser: all recognition OFF returns empty array',
+      run: () => {
+        const tokens = parseTokens('Buy milk today at 3pm every week', { date: false, time: false, repeats: false });
+        assert(tokens.length === 0, `Expected 0 tokens, got ${tokens.length}`);
+      },
+    },
+
+    {
+      id: 'nlc-recognition-default-all-enabled',
+      name: 'NLC parser: default recognition config enables all categories',
+      run: () => {
+        const tokens = parseTokens('Buy milk tomorrow at 3pm');
+        assert(tokens.some(t => t.category === 'date'), 'Expected date tokens with default config');
+        assert(tokens.some(t => t.category === 'time'), 'Expected time tokens with default config');
+      },
+    },
   ];
 }

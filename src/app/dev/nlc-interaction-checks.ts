@@ -1254,5 +1254,53 @@ export function getNlcInteractionChecks(): Check[] {
         assert(actions.length === 0, `Expected 0 auto-apply actions when tokens are empty, got ${actions.length}`);
       },
     },
+
+    // ========================================================================
+    // AR) Recognition config — disabled categories produce no auto-apply actions
+    // ========================================================================
+    {
+      id: 'nlc-interaction-ar-date-recognition-off',
+      name: 'NLC interaction AR: date recognition OFF prevents date auto-apply',
+      run: () => {
+        const tokens = parseTokens('Dentist tomorrow at 3pm', { date: false, time: true, repeats: true });
+        const actions = computeAutoApplyResult(tokens, { date: false, time: false, repeats: false });
+        assert(actions.every(a => a.category !== 'date'), 'Expected no date auto-apply actions when date recognition is off');
+        assert(actions.some(a => a.category === 'time'), 'Expected time auto-apply action');
+      },
+    },
+
+    {
+      id: 'nlc-interaction-ar-time-recognition-off',
+      name: 'NLC interaction AR: time recognition OFF prevents time auto-apply',
+      run: () => {
+        const tokens = parseTokens('Dentist tomorrow at 3pm', { date: true, time: false, repeats: true });
+        const actions = computeAutoApplyResult(tokens, { date: false, time: false, repeats: false });
+        assert(actions.every(a => a.category !== 'time'), 'Expected no time auto-apply actions when time recognition is off');
+        assert(actions.some(a => a.category === 'date'), 'Expected date auto-apply action');
+      },
+    },
+
+    {
+      id: 'nlc-interaction-ar-repeats-recognition-off-no-implied',
+      name: 'NLC interaction AR: repeats recognition OFF prevents implied date/time from repeats',
+      run: () => {
+        const tokens = parseTokens('Run every morning', { date: true, time: true, repeats: false });
+        assert(tokens.every(t => t.category !== 'repeats'), 'Expected no repeats tokens when repeats recognition is off');
+        const actions = computeAutoApplyResult(tokens, { date: false, time: false, repeats: false });
+        assert(actions.every(a => a.category !== 'repeats'), 'Expected no repeats auto-apply actions');
+      },
+    },
+
+    {
+      id: 'nlc-interaction-ar-mixed-recognition',
+      name: 'NLC interaction AR: mixed recognition config filters correctly through pipeline',
+      run: () => {
+        const tokens = parseTokens('Buy milk tomorrow at 3pm every week', { date: true, time: false, repeats: false });
+        assert(tokens.length === 1, `Expected 1 token (date only), got ${tokens.length}`);
+        assert(tokens[0].category === 'date', `Expected date token, got ${tokens[0].category}`);
+        const eligible = computeEligibleTokens(tokens, emptyApplied());
+        assert(eligible.length === 1, `Expected 1 eligible token, got ${eligible.length}`);
+      },
+    },
   ];
 }

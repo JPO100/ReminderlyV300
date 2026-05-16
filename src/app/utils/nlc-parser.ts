@@ -9,6 +9,14 @@
 
 export type TokenCategory = 'date' | 'time' | 'repeats';
 
+export type NlcRecognitionConfig = {
+  date: boolean;
+  time: boolean;
+  repeats: boolean;
+};
+
+const ALL_RECOGNITION_ENABLED: NlcRecognitionConfig = { date: true, time: true, repeats: true };
+
 export interface ParsedToken {
   category: TokenCategory;
   start: number;
@@ -70,7 +78,7 @@ function isValidMonthDay(month: number, day: number, year: number): boolean {
  * - weekdays
  * - Comma-separated short weekday lists: "Mon, Wed, Fri"
  */
-export function parseTokens(text: string): ParsedToken[] {
+export function parseTokens(text: string, recognition: NlcRecognitionConfig = ALL_RECOGNITION_ENABLED): ParsedToken[] {
   const candidates: ParsedToken[] = [];
   const timeOfDayCandidates: ParsedToken[] = [];
 
@@ -104,6 +112,10 @@ export function parseTokens(text: string): ParsedToken[] {
 
   // ── Repeats tokens (checked first so they win over bare weekday date tokens) ──
 
+  if (!recognition.repeats) {
+    // Skip all repeats collection
+  } else {
+
   // "every <time-of-day>" (repeat daily with implied time)
   collect(/\bevery\s+(?:morning|afternoon|evening|night)\b/gi, 'repeats');
 
@@ -127,7 +139,13 @@ export function parseTokens(text: string): ParsedToken[] {
   );
   collect(commaListRegex, 'repeats');
 
+  } // end recognition.repeats
+
   // ── Date tokens ──
+
+  if (!recognition.date) {
+    // Skip all date collection
+  } else {
 
   // "today", "tomorrow"
   collect(/\b(?:today|tomorrow)\b/gi, 'date');
@@ -180,7 +198,13 @@ export function parseTokens(text: string): ParsedToken[] {
     }
   );
 
+  } // end recognition.date
+
   // ── Time tokens ──
+
+  if (!recognition.time) {
+    // Skip all time collection
+  } else {
 
   // 12-hour: "7pm", "7:30pm", "7 pm", "7:30 pm", "12am"
   // Validate: hour 1-12, minutes (if present) must be 00/15/30/45
@@ -232,6 +256,8 @@ export function parseTokens(text: string): ParsedToken[] {
   if (!hasExplicitTime) {
     candidates.push(...timeOfDayCandidates);
   }
+
+  } // end recognition.time
 
   // ── Repeat-suppresses-date suppression ──
   //

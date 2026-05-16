@@ -12,7 +12,7 @@
  *   5. Auto-apply (mode: 'auto')
  */
 
-import type { ParsedToken, TokenCategory } from './nlc-parser';
+import type { ParsedToken, TokenCategory, NlcRecognitionConfig } from './nlc-parser';
 import { MONTH_NAME_TO_NUMBER } from './nlc-parser';
 import type { RepeatConfig } from '../reminder-utils';
 
@@ -21,6 +21,12 @@ import type { RepeatConfig } from '../reminder-utils';
 // ============================================================================
 
 export type NlcMode = 'click' | 'auto';
+
+export type NlcConfig = {
+  autoParsingEnabled: boolean;
+  clickParsingEnabled: boolean;
+  recognition: NlcRecognitionConfig;
+};
 
 export type AppliedTokens = Record<TokenCategory, ParsedToken | null>;
 
