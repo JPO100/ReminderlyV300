@@ -81,7 +81,7 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
   const lastCommittedValueRef = useRef(value);
 
   const showGrey = isEditMode && isFocused && !hasTypedSinceFocus;
-  const textColor = showGrey ? '#B7B7B7' : '#214677';
+  const textColor = showGrey ? '#B7B7B7' : '#1C2C42';
 
   useEffect(() => {
     if (isFocused) return;
@@ -121,7 +121,7 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
               event.currentTarget.blur();
             }}
             placeholder=""
-            className="font-['Lato',sans-serif] not-italic text-[20px] leading-[23px] whitespace-nowrap bg-transparent border-none outline-none w-full min-w-0 p-0 m-0 placeholder-[#bababa] caret-[#214677]"
+            className="font-['Lato',sans-serif] not-italic text-[20px] leading-[23px] whitespace-nowrap bg-transparent border-none outline-none w-full min-w-0 p-0 m-0 placeholder-[#bababa] caret-[#1C2C42]"
             style={{ color: textColor, transition: "color 300ms", fontWeight: 700 }}
           />
         </div>

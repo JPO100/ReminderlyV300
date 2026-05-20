@@ -114,7 +114,7 @@ export default function ReminderInfoOverlay({
     ? `Repeats ${repeatRuleText.charAt(0).toLowerCase()}${repeatRuleText.slice(1)}`
     : null;
   const overdue = isOverdue(reminder, new Date());
-  const dueLineColour = overdue ? "#FF0000" : "#214677";
+  const dueLineColour = overdue ? "#FF0000" : "#1C2C42";
 
   return (
     <>

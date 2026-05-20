@@ -6,11 +6,11 @@ import { formatSmartReminderDueByFromDate } from "../app/utils/list-utils";
 function SmartRemindersLabel({ active, smartReminderDueDate, smartReminderTime, highlightDueDate, animateFadeOut }: { active: boolean; smartReminderDueDate: Date | null; smartReminderTime: string | null | undefined; highlightDueDate: boolean; animateFadeOut: boolean }) {
   return (
     <div className={`content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative ${active ? '' : 'text-[#d9d9d9]'}`}>
-      <div className={`flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#214677]' : ''}`}>
+      <div className={`flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#1C2C42]' : ''}`}>
         <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>Set smart reminder</p>
       </div>
       <div className={`flex flex-col justify-start relative shrink-0 text-[14px] w-full ${active ? 'text-[#bababa]' : ''}`}>
-        <p className="leading-[14px]" style={{ fontWeight: 700, color: active ? (highlightDueDate ? '#214677' : '#BABABA') : undefined, transition: animateFadeOut ? 'color 300ms' : 'none' }}>{formatSmartReminderDueByFromDate(smartReminderDueDate, smartReminderTime)}</p>
+        <p className="leading-[14px]" style={{ fontWeight: 700, color: active ? (highlightDueDate ? '#1C2C42' : '#BABABA') : undefined, transition: animateFadeOut ? 'color 300ms' : 'none' }}>{formatSmartReminderDueByFromDate(smartReminderDueDate, smartReminderTime)}</p>
       </div>
     </div>
   );
@@ -19,7 +19,7 @@ function SmartRemindersLabel({ active, smartReminderDueDate, smartReminderTime, 
 function AlphabeticalLabel({ active }: { active: boolean }) {
   return (
     <div className={`content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative ${active ? '' : 'text-[#d9d9d9]'}`}>
-      <div className={`flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#214677]' : ''}`}>
+      <div className={`flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#1C2C42]' : ''}`}>
         <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>List alphabetically</p>
       </div>
       <div className={`flex flex-col justify-start relative shrink-0 text-[14px] w-full ${active ? 'text-[#bababa]' : ''}`}>
@@ -32,7 +32,7 @@ function AlphabeticalLabel({ active }: { active: boolean }) {
 function InsertionLabel({ active }: { active: boolean }) {
   return (
     <div className={`content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative ${active ? '' : 'text-[#d9d9d9]'}`}>
-      <div className={`flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#214677]' : ''}`}>
+      <div className={`flex flex-col justify-start overflow-hidden relative shrink-0 text-[17px] text-ellipsis w-full whitespace-nowrap ${active ? 'text-[#1C2C42]' : ''}`}>
         <p className="leading-[17px] overflow-hidden text-ellipsis" style={{ fontWeight: 700 }}>List in order added</p>
       </div>
       <div className={`flex flex-col justify-start relative shrink-0 text-[14px] w-full ${active ? 'text-[#bababa]' : ''}`}>
@@ -87,9 +87,9 @@ function Frame3({ sortMode, onSortChange, smartReminders, onSmartRemindersChange
             <div className="h-[21.5px] relative self-start shrink-0 w-[19.5px] top-[1px]" data-name="Union">
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19.5002 21.5002">
                 <g id="Union">
-                  <path clipRule="evenodd" d={svgPaths.p23b20a00} fill={smartRemindersActive ? '#214677' : '#D9D9D9'} fillRule="evenodd" />
-                  <path clipRule="evenodd" d={svgPaths.p15d6fbb2} fill={smartRemindersActive ? '#214677' : '#D9D9D9'} fillRule="evenodd" />
-                  <path clipRule="evenodd" d={svgPaths.p1797f00} fill={smartRemindersActive ? '#214677' : '#D9D9D9'} fillRule="evenodd" />
+                  <path clipRule="evenodd" d={svgPaths.p23b20a00} fill={smartRemindersActive ? '#1C2C42' : '#D9D9D9'} fillRule="evenodd" />
+                  <path clipRule="evenodd" d={svgPaths.p15d6fbb2} fill={smartRemindersActive ? '#1C2C42' : '#D9D9D9'} fillRule="evenodd" />
+                  <path clipRule="evenodd" d={svgPaths.p1797f00} fill={smartRemindersActive ? '#1C2C42' : '#D9D9D9'} fillRule="evenodd" />
                 </g>
               </svg>
             </div>
@@ -110,11 +110,11 @@ function Frame3({ sortMode, onSortChange, smartReminders, onSmartRemindersChange
             <div className="h-[20.824px] relative shrink-0 w-[20.83px]" data-name="Union">
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20.8301 20.8242">
                 <g id="Union">
-                  <path d={svgPaths.p1f326770} fill={`var(--fill-0, ${isInsertion ? '#214677' : '#D9D9D9'})`} />
-                  <path d={svgPaths.p10221f80} fill={`var(--fill-0, ${isInsertion ? '#214677' : '#D9D9D9'})`} />
-                  <path d={svgPaths.p30c3ae80} fill={`var(--fill-0, ${isInsertion ? '#214677' : '#D9D9D9'})`} />
-                  <path d={svgPaths.p2dfdd480} fill={`var(--fill-0, ${isInsertion ? '#214677' : '#D9D9D9'})`} />
-                  <path d={svgPaths.p390e3940} fill={`var(--fill-0, ${isInsertion ? '#214677' : '#D9D9D9'})`} />
+                  <path d={svgPaths.p1f326770} fill={`var(--fill-0, ${isInsertion ? '#1C2C42' : '#D9D9D9'})`} />
+                  <path d={svgPaths.p10221f80} fill={`var(--fill-0, ${isInsertion ? '#1C2C42' : '#D9D9D9'})`} />
+                  <path d={svgPaths.p30c3ae80} fill={`var(--fill-0, ${isInsertion ? '#1C2C42' : '#D9D9D9'})`} />
+                  <path d={svgPaths.p2dfdd480} fill={`var(--fill-0, ${isInsertion ? '#1C2C42' : '#D9D9D9'})`} />
+                  <path d={svgPaths.p390e3940} fill={`var(--fill-0, ${isInsertion ? '#1C2C42' : '#D9D9D9'})`} />
                 </g>
               </svg>
             </div>
@@ -125,11 +125,11 @@ function Frame3({ sortMode, onSortChange, smartReminders, onSmartRemindersChange
             <div className="h-[20.814px] relative shrink-0 w-[22.387px]" data-name="Union">
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.3867 20.8145">
                 <g id="Union">
-                  <path d={svgPaths.pa5a1880} fill={`var(--fill-0, ${isAlpha ? '#214677' : '#D9D9D9'})`} />
-                  <path d={svgPaths.p3a034e00} fill={`var(--fill-0, ${isAlpha ? '#214677' : '#D9D9D9'})`} />
-                  <path d={svgPaths.pbb6b280} fill={`var(--fill-0, ${isAlpha ? '#214677' : '#D9D9D9'})`} />
-                  <path clipRule="evenodd" d={svgPaths.p37945200} fill={`var(--fill-0, ${isAlpha ? '#214677' : '#D9D9D9'})`} fillRule="evenodd" />
-                  <path d={svgPaths.p3a58ae80} fill={`var(--fill-0, ${isAlpha ? '#214677' : '#D9D9D9'})`} />
+                  <path d={svgPaths.pa5a1880} fill={`var(--fill-0, ${isAlpha ? '#1C2C42' : '#D9D9D9'})`} />
+                  <path d={svgPaths.p3a034e00} fill={`var(--fill-0, ${isAlpha ? '#1C2C42' : '#D9D9D9'})`} />
+                  <path d={svgPaths.pbb6b280} fill={`var(--fill-0, ${isAlpha ? '#1C2C42' : '#D9D9D9'})`} />
+                  <path clipRule="evenodd" d={svgPaths.p37945200} fill={`var(--fill-0, ${isAlpha ? '#1C2C42' : '#D9D9D9'})`} fillRule="evenodd" />
+                  <path d={svgPaths.p3a58ae80} fill={`var(--fill-0, ${isAlpha ? '#1C2C42' : '#D9D9D9'})`} />
                 </g>
               </svg>
             </div>
