@@ -76,8 +76,8 @@ function TutorialOverlayButton({ label, color }: { label: string; color: string 
 }
 
 function TutorialOverlayToggleRow({ title, subtitle, active, icon }: { title: string; subtitle: string; active: boolean; icon: ReactNode }) {
-  const textColor = active ? "#214677" : "#d9d9d9";
-  const toggleBg = active ? "#214677" : "#d9d9d9";
+  const textColor = active ? "#2B5DA0" : "#d9d9d9";
+  const toggleBg = active ? "#2B5DA0" : "#d9d9d9";
   return (
     <div className="content-stretch flex gap-[16px] items-start justify-center relative shrink-0 w-full">
       {icon}
@@ -120,11 +120,11 @@ export function TutorialReminderInfoOverlay({ reminder }: { reminder: Reminder }
   return (
     <TutorialMiniOverlayShell>
       <TutorialOverlayCard>
-        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[18px] text-center">
+        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#2B5DA0] text-[18px] text-center">
           <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{reminder.displayText}</p>
         </div>
         <div className="content-stretch flex items-center justify-center gap-[8px] min-w-full relative shrink-0">
-          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[15px] text-center max-w-full" style={{ color: "#214677" }}>
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-0 not-italic relative shrink text-[15px] text-center max-w-full" style={{ color: "#2B5DA0" }}>
             <p className="leading-[normal] whitespace-nowrap" style={{ fontWeight: 700 }}>{dueLine}</p>
           </div>
         </div>
@@ -170,11 +170,11 @@ export function TutorialListSettingsOverlay() {
               <div className="h-[20.824px] relative shrink-0 w-[20.83px]">
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20.8301 20.8242">
                   <g>
-                    <path d={infoOverlaySvgPaths.p1f326770} fill="#214677" />
-                    <path d={infoOverlaySvgPaths.p10221f80} fill="#214677" />
-                    <path d={infoOverlaySvgPaths.p30c3ae80} fill="#214677" />
-                    <path d={infoOverlaySvgPaths.p2dfdd480} fill="#214677" />
-                    <path d={infoOverlaySvgPaths.p390e3940} fill="#214677" />
+                    <path d={infoOverlaySvgPaths.p1f326770} fill="#2B5DA0" />
+                    <path d={infoOverlaySvgPaths.p10221f80} fill="#2B5DA0" />
+                    <path d={infoOverlaySvgPaths.p30c3ae80} fill="#2B5DA0" />
+                    <path d={infoOverlaySvgPaths.p2dfdd480} fill="#2B5DA0" />
+                    <path d={infoOverlaySvgPaths.p390e3940} fill="#2B5DA0" />
                   </g>
                 </svg>
               </div>
@@ -200,8 +200,8 @@ export function TutorialListSettingsOverlay() {
           />
         </div>
         <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
-          <TutorialListSettingsButton label="Uncheck all items" color="#214677" />
-          <TutorialListSettingsButton label="Create template from list" color="#214677" />
+          <TutorialListSettingsButton label="Uncheck all items" color="#2B5DA0" />
+          <TutorialListSettingsButton label="Create template from list" color="#2B5DA0" />
           <TutorialListSettingsButton label="Delete list" color="#939393" />
         </div>
       </div>
@@ -210,7 +210,7 @@ export function TutorialListSettingsOverlay() {
 }
 
 export function TutorialListSettingsOverlayWithToggle({ smartToggleActive }: { smartToggleActive: boolean }) {
-  const smartIconColor = smartToggleActive ? "#214677" : "#d9d9d9";
+  const smartIconColor = smartToggleActive ? "#2B5DA0" : "#d9d9d9";
   return (
     <TutorialMiniOverlayShell>
       <div className="bg-white relative flex flex-col gap-[33px] items-center justify-start pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
@@ -242,11 +242,11 @@ export function TutorialListSettingsOverlayWithToggle({ smartToggleActive }: { s
               <div className="h-[20.824px] relative shrink-0 w-[20.83px]">
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20.8301 20.8242">
                   <g>
-                    <path d={infoOverlaySvgPaths.p1f326770} fill="#214677" />
-                    <path d={infoOverlaySvgPaths.p10221f80} fill="#214677" />
-                    <path d={infoOverlaySvgPaths.p30c3ae80} fill="#214677" />
-                    <path d={infoOverlaySvgPaths.p2dfdd480} fill="#214677" />
-                    <path d={infoOverlaySvgPaths.p390e3940} fill="#214677" />
+                    <path d={infoOverlaySvgPaths.p1f326770} fill="#2B5DA0" />
+                    <path d={infoOverlaySvgPaths.p10221f80} fill="#2B5DA0" />
+                    <path d={infoOverlaySvgPaths.p30c3ae80} fill="#2B5DA0" />
+                    <path d={infoOverlaySvgPaths.p2dfdd480} fill="#2B5DA0" />
+                    <path d={infoOverlaySvgPaths.p390e3940} fill="#2B5DA0" />
                   </g>
                 </svg>
               </div>
@@ -272,8 +272,8 @@ export function TutorialListSettingsOverlayWithToggle({ smartToggleActive }: { s
           />
         </div>
         <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
-          <TutorialListSettingsButton label="Uncheck all items" color="#214677" />
-          <TutorialListSettingsButton label="Create template from list" color="#214677" />
+          <TutorialListSettingsButton label="Uncheck all items" color="#2B5DA0" />
+          <TutorialListSettingsButton label="Create template from list" color="#2B5DA0" />
           <TutorialListSettingsButton label="Delete list" color="#939393" />
         </div>
       </div>
@@ -282,7 +282,7 @@ export function TutorialListSettingsOverlayWithToggle({ smartToggleActive }: { s
 }
 
 function SmartReminderOptionRow({ label, valueLabel, isOn, iconContent, inactiveColor = "#B7B7B7" }: { label: string; valueLabel?: string; isOn: boolean; iconContent: ReactNode; inactiveColor?: string }) {
-  const color = isOn ? "#214677" : inactiveColor;
+  const color = isOn ? "#2B5DA0" : inactiveColor;
   return (
     <div className="content-stretch flex items-center justify-between gap-[16px] relative shrink-0 w-full">
       <div className="content-stretch flex gap-[16px] items-center relative min-w-0 flex-1">
@@ -334,7 +334,7 @@ export function TutorialSmartReminderSheet({ onTickButtonElementChange }: { onTi
                     <mask fill="white" id="tut-smart-date-mask">
                       <path d={reminderOverlaySvgPaths.p37c4f500} />
                     </mask>
-                    <path d={reminderOverlaySvgPaths.pde59c80} fill="#214677" mask="url(#tut-smart-date-mask)" />
+                    <path d={reminderOverlaySvgPaths.pde59c80} fill="#2B5DA0" mask="url(#tut-smart-date-mask)" />
                   </svg>
                 </div>
               }
@@ -349,7 +349,7 @@ export function TutorialSmartReminderSheet({ onTickButtonElementChange }: { onTi
                     <mask fill="white" id="tut-smart-time-mask">
                       <path d={reminderOverlaySvgPaths.p37c4f500} />
                     </mask>
-                    <path d={reminderOverlaySvgPaths.pde59c80} fill="#214677" mask="url(#tut-smart-time-mask)" />
+                    <path d={reminderOverlaySvgPaths.pde59c80} fill="#2B5DA0" mask="url(#tut-smart-time-mask)" />
                   </svg>
                 </div>
               }

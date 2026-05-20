@@ -3,7 +3,7 @@ import svgPaths from "./svg-nziaiw92zn";
 function Frame2() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[11px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative text-ellipsis whitespace-nowrap">
-      <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[#214677] text-[17px] w-full">
+      <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[#2B5DA0] text-[17px] w-full">
         <p className="leading-[normal] overflow-hidden">Show date and time subtitles</p>
       </div>
       <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[#bababa] text-[13.5px] w-full">
@@ -19,12 +19,12 @@ function Frame() {
       <div className="h-[24px] relative shrink-0 w-[22.9px]" data-name="Union">
         <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.9004 24">
           <g id="Union">
-            <path d={svgPaths.p10ad3640} fill="#214677" />
-            <path d={svgPaths.pe9ba000} fill="#214677" />
-            <path d={svgPaths.p1ffae300} fill="#214677" />
-            <path d={svgPaths.paf45580} fill="#214677" />
-            <path d={svgPaths.pc271000} fill="#214677" />
-            <path clipRule="evenodd" d={svgPaths.pd7cba80} fill="#214677" fillRule="evenodd" />
+            <path d={svgPaths.p10ad3640} fill="#2B5DA0" />
+            <path d={svgPaths.pe9ba000} fill="#2B5DA0" />
+            <path d={svgPaths.p1ffae300} fill="#2B5DA0" />
+            <path d={svgPaths.paf45580} fill="#2B5DA0" />
+            <path d={svgPaths.pc271000} fill="#2B5DA0" />
+            <path clipRule="evenodd" d={svgPaths.pd7cba80} fill="#2B5DA0" fillRule="evenodd" />
           </g>
         </svg>
       </div>

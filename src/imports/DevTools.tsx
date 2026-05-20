@@ -372,7 +372,7 @@ export default function DevTools({
                     setPendingNlcState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#214677' }}
+                  style={{ backgroundColor: '#2B5DA0' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -431,7 +431,7 @@ export default function DevTools({
                     setPendingOnboardingState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#214677' }}
+                  style={{ backgroundColor: '#2B5DA0' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -490,7 +490,7 @@ export default function DevTools({
                     setPendingListsState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#214677' }}
+                  style={{ backgroundColor: '#2B5DA0' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">

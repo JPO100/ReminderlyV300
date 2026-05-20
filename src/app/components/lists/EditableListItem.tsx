@@ -283,8 +283,8 @@ export default function EditableListItem({
                             }}
                         >
                             <g>
-                                <rect fill="#214677" height="23" rx="11.5" width="23" x="1" y="1" />
-                                <rect height="23" rx="11.5" stroke="#214677" strokeWidth="2" width="23" x="1" y="1" />
+                                <rect fill="#2B5DA0" height="23" rx="11.5" width="23" x="1" y="1" />
+                                <rect height="23" rx="11.5" stroke="#2B5DA0" strokeWidth="2" width="23" x="1" y="1" />
                                 <path d={DONE_TICK_PATH} fill="white" />
                             </g>
                         </svg>

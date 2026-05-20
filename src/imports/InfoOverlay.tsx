@@ -44,7 +44,7 @@ function InsertionLabel({ active }: { active: boolean }) {
 
 function ToggleButton({ active, onClick }: { active: boolean; onClick: () => void }) {
   return (
-    <button className={`${active ? 'bg-[#214677] justify-end' : 'bg-[#d9d9d9]'} content-stretch cursor-pointer flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px]`} onClick={(event) => { event.stopPropagation(); onClick(); }}>
+    <button className={`${active ? 'bg-[#2B5DA0] justify-end' : 'bg-[#d9d9d9]'} content-stretch cursor-pointer flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px]`} onClick={(event) => { event.stopPropagation(); onClick(); }}>
       <div className="relative shrink-0 size-[22.5px]">
         <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
           <circle cx="11.25" cy="11.25" fill="var(--fill-0, white)" r="11.25" />
@@ -144,7 +144,7 @@ function Frame3({ sortMode, onSortChange, smartReminders, onSmartRemindersChange
 
 function UncheckAllBtn({ onClick, disabled }: { onClick: () => void; disabled: boolean }) {
   return (
-    <div className={`${disabled ? 'bg-[#d9d9d9]' : 'bg-[#214677] cursor-pointer'} h-[50px] relative rounded-[100px] shrink-0 w-full`} data-name="uncheck-all-btn" onClick={disabled ? undefined : onClick}>
+    <div className={`${disabled ? 'bg-[#d9d9d9]' : 'bg-[#2B5DA0] cursor-pointer'} h-[50px] relative rounded-[100px] shrink-0 w-full`} data-name="uncheck-all-btn" onClick={disabled ? undefined : onClick}>
       <div className="flex flex-row items-center justify-center size-full">
         <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -158,7 +158,7 @@ function UncheckAllBtn({ onClick, disabled }: { onClick: () => void; disabled: b
 
 function CreateTemplateBtn({ onClick, stage }: { onClick: () => void; stage: 'idle' | 'fill' | 'copied' | 'blank' | 'go' }) {
   return (
-    <button className="bg-[#214677] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="create-template-btn" onClick={onClick}>
+    <button className="bg-[#2B5DA0] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="create-template-btn" onClick={onClick}>
       <div className="flex flex-row items-center justify-center size-full">
         <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
           {stage === 'copied' ? (
@@ -192,7 +192,7 @@ function CreateTemplateBtn({ onClick, stage }: { onClick: () => void; stage: 'id
 
 function SetDateBtn({ onClick }: { onClick: () => void }) {
   return (
-    <button className="bg-[#214677] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="set-date-btn" onClick={onClick}>
+    <button className="bg-[#2B5DA0] h-[50px] relative rounded-[100px] shrink-0 w-full border-none p-0 cursor-pointer" data-name="set-date-btn" onClick={onClick}>
       <div className="flex flex-row items-center justify-center size-full">
         <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
           <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">

@@ -3,7 +3,7 @@ import svgPaths from "./svg-lmz2w7n99w";
 function Frame1() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col gap-[16px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center overflow-hidden relative shrink-0 text-[#214677] text-[17px] text-ellipsis w-full whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center overflow-hidden relative shrink-0 text-[#2B5DA0] text-[17px] text-ellipsis w-full whitespace-nowrap">
         <p className="leading-[normal] overflow-hidden">Unlimited reminders</p>
       </div>
       <div className="flex flex-col font-['Lato:SemiBold',sans-serif] justify-center relative shrink-0 text-[#939393] text-[15px] w-full">
@@ -27,11 +27,11 @@ function Frame() {
       <div className="h-[21px] relative shrink-0 w-[24.46px]" data-name="Union">
         <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24.4599 21.0002">
           <g id="Union">
-            <path d={svgPaths.p2515f980} fill="var(--fill-0, #214677)" />
-            <path d={svgPaths.p20872d70} fill="var(--fill-0, #214677)" />
-            <path d={svgPaths.p1d735a00} fill="var(--fill-0, #214677)" />
-            <path d={svgPaths.p33ae7180} fill="var(--fill-0, #214677)" />
-            <path d={svgPaths.p1ed57680} fill="var(--fill-0, #214677)" />
+            <path d={svgPaths.p2515f980} fill="var(--fill-0, #2B5DA0)" />
+            <path d={svgPaths.p20872d70} fill="var(--fill-0, #2B5DA0)" />
+            <path d={svgPaths.p1d735a00} fill="var(--fill-0, #2B5DA0)" />
+            <path d={svgPaths.p33ae7180} fill="var(--fill-0, #2B5DA0)" />
+            <path d={svgPaths.p1ed57680} fill="var(--fill-0, #2B5DA0)" />
           </g>
         </svg>
       </div>

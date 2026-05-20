@@ -17,7 +17,7 @@ function AddTickButton({
         >
             <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 35 35">
                 <g id="add-tick-btn">
-                    <rect fill={active ? "#214677" : "#D9D9D9"} height="35" rx="17.5" width="35" />
+                    <rect fill={active ? "#2B5DA0" : "#D9D9D9"} height="35" rx="17.5" width="35" />
                     <path d="M17.5 25.5L17.5 9.5M9.5 17.5H25.5" id="Vector" stroke="white" strokeLinecap="round" strokeWidth="2" />
                 </g>
             </svg>

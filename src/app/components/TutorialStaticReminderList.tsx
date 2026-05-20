@@ -15,7 +15,7 @@ const TUTORIAL_RECYCLE_DELAY = 2000;
 const COMPLETION_DELAY = 350;
 const DONE_SEQUENCE_INITIAL_DELAY = 1000;
 const DONE_SEQUENCE_REMOVAL_GAP = 500;
-const DONE_BLUE = "#214677";
+const DONE_BLUE = "#2B5DA0";
 const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
 
 type TutorialReminder = {

@@ -166,7 +166,7 @@ The calendar tracks which month is currently being viewed, independent of `selec
 
 | State | Background | Text Color | Cursor |
 |-------|-----------|------------|--------|
-| **Default** | transparent | `#214677` | pointer |
+| **Default** | transparent | `#2B5DA0` | pointer |
 | **Selected** | `#08f` (blue circle) | white | pointer |
 | **Past date** | transparent | `#D9D9D9` | not-allowed |
 
@@ -282,10 +282,10 @@ Compares year, month, and day — ignoring time components.
 
 | Element | Font | Weight | Size | Color |
 |---------|------|--------|------|-------|
-| Month/Year header | Lato Bold | 700 | 17px | `#214677` |
+| Month/Year header | Lato Bold | 700 | 17px | `#2B5DA0` |
 | Day headers (MON, TUE...) | Lato | 600 | 13px | `rgba(0,0,0,0.2)` |
-| Day numbers | Lato Bold | 700 | 17px | `#214677` / white / `#D9D9D9` |
-| "Set date" label | Lato Bold | 700 | 17px | `#214677` (on) / `#939393` (off) |
+| Day numbers | Lato Bold | 700 | 17px | `#2B5DA0` / white / `#D9D9D9` |
+| "Set date" label | Lato Bold | 700 | 17px | `#2B5DA0` (on) / `#939393` (off) |
 | Date display | Lato | 600 | 17px | `#4784F8` |
 | Nav arrows | SF Compact Semibold | 656.2 | 21px | `#0088fe` |
 

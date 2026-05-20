@@ -107,8 +107,8 @@ The setting row has two visual states based on the toggle:
 
 | Element | Colour |
 |---------|--------|
-| Icon (SVG) | `#214677` |
-| Title text | `#214677` |
+| Icon (SVG) | `#2B5DA0` |
+| Title text | `#2B5DA0` |
 | Subtitle text | `#BABABA` |
 | Toggle track | `#4784F8` |
 | Toggle thumb | White, positioned right (cx=41) |

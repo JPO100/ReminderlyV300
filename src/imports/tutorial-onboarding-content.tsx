@@ -247,8 +247,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -405,7 +405,7 @@ function NusBlank({ animationKey }: { animationKey: number }) {
 function ReminderColours({ animationKey }: { animationKey: number }) {
   return (
     <div className="h-[329px] relative shrink-0 w-[308px]" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full">
           <NusBlank animationKey={animationKey} />
         </div>
@@ -491,8 +491,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -758,7 +758,7 @@ function ReminderList({ animationKey }: { animationKey: number }) {
                   <div className="content-stretch flex gap-[11.138px] items-center pl-0 pr-[11.138px] py-0 relative w-full">
                     {doneStates[0] ? <DoneTickBlue /> : <UndoneTickBlue />}
                     <div 
-                      className={`css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px] text-ellipsis ${doneStates[0] ? 'line-through' : ''}`}
+                      className={`css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px] text-ellipsis ${doneStates[0] ? 'line-through' : ''}`}
                     >
                       <p className="css-g0mm18 leading-[normal] overflow-hidden">Pick the milk up</p>
                     </div>
@@ -788,7 +788,7 @@ function ReminderList({ animationKey }: { animationKey: number }) {
                   <div className="content-stretch flex gap-[11.138px] items-center pl-0 pr-[11.138px] py-0 relative w-full">
                     {doneStates[1] ? <DoneTickPink /> : <UndoneTickPink />}
                     <div 
-                      className={`css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px] text-ellipsis ${doneStates[1] ? 'line-through' : ''}`}
+                      className={`css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px] text-ellipsis ${doneStates[1] ? 'line-through' : ''}`}
                     >
                       <p className="css-g0mm18 leading-[normal] overflow-hidden">Put the bins out</p>
                     </div>
@@ -818,7 +818,7 @@ function ReminderList({ animationKey }: { animationKey: number }) {
                   <div className="content-stretch flex gap-[11.138px] items-center pl-0 pr-[11.138px] py-0 relative w-full">
                     {doneStates[2] ? <DoneTickOrange /> : <UndoneTickOrange />}
                     <div 
-                      className={`css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px] text-ellipsis ${doneStates[2] ? 'line-through' : ''}`}
+                      className={`css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px] text-ellipsis ${doneStates[2] ? 'line-through' : ''}`}
                     >
                       <p className="css-g0mm18 leading-[normal] overflow-hidden">Water house plants</p>
                     </div>
@@ -848,7 +848,7 @@ function ReminderList({ animationKey }: { animationKey: number }) {
                   <div className="content-stretch flex gap-[11.138px] items-center pl-0 pr-[11.138px] py-0 relative w-full">
                     {doneStates[3] ? <DoneTickGrey /> : <UndoneTickGrey />}
                     <div 
-                      className={`css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px] text-ellipsis ${doneStates[3] ? 'line-through' : ''}`}
+                      className={`css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px] text-ellipsis ${doneStates[3] ? 'line-through' : ''}`}
                     >
                       <p className="css-g0mm18 leading-[normal] overflow-hidden">Organise family photos</p>
                     </div>
@@ -914,7 +914,7 @@ function NusBlank({ animationKey }: { animationKey: number }) {
 function ReminderColours({ animationKey }: { animationKey: number }) {
   return (
     <div className="h-[329px] relative shrink-0 w-[308px]" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full">
           <NusBlank animationKey={animationKey} />
         </div>
@@ -998,8 +998,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -1166,7 +1166,7 @@ function NusBlank() {
 function ReminderColours() {
   return (
     <div className="h-[329px] relative shrink-0 w-[308px]" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full">
           <NusBlank />
         </div>
@@ -1236,8 +1236,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -1404,7 +1404,7 @@ function NusBlank() {
 function ReminderColours() {
   return (
     <div className="h-[359px] relative shrink-0 w-[308px]" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full">
           <NusBlank />
         </div>
@@ -1474,8 +1474,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -1640,7 +1640,7 @@ function NusBlank() {
 function ReminderColours() {
   return (
     <div className="h-[329px] relative shrink-0 w-[308px]" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full">
           <NusBlank />
         </div>
@@ -1712,8 +1712,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -1934,7 +1934,7 @@ function ReminderColours() {
 
   return (
     <div className="h-[329px] relative shrink-0 w-[308px]" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full">
           <NusBlank />
           {showOverlay && (
@@ -2017,8 +2017,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -2230,7 +2230,7 @@ function NusBlank({ activeFilter }: { activeFilter?: 'today' | 'thisWeek' | 'lat
 function ReminderColours({ activeFilter }: { activeFilter?: 'today' | 'thisWeek' | 'later' | 'sometime' }) {
   return (
     <div className="h-[329px] relative shrink-0 w-[308px]" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full">
           <NusBlank activeFilter={activeFilter} />
         </div>
@@ -2338,8 +2338,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -2536,7 +2536,7 @@ function NusBlank({ showDone }: { showDone?: boolean }) {
 function ReminderColours({ showDone }: { showDone?: boolean }) {
   return (
     <div className="h-[329px] relative shrink-0 w-[308px]" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] overflow-clip relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full">
           <NusBlank showDone={showDone} />
         </div>
@@ -2633,8 +2633,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#214677] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#214677] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -2799,7 +2799,7 @@ function NusBlank({ isDarkBlue }: { isDarkBlue?: boolean }) {
 function ReminderColours({ isDarkBlue, showOverlay }: { isDarkBlue?: boolean; showOverlay?: boolean }) {
   return (
     <div className="h-[329px] relative shrink-0 w-[308px] overflow-hidden" data-name="Reminder colours">
-      <div className="bg-[#214677] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] relative rounded-tl-[26px] rounded-tr-[26px] h-full w-full overflow-hidden">
           <NusBlank isDarkBlue={isDarkBlue} />
         </div>
@@ -2941,7 +2941,7 @@ function TakeBinsOut({ text }: { text: string }) {
   return (
     <div className="bg-[#f7f7f7] h-[60px] relative rounded-[7.83px] shrink-0 w-full" data-name="Take bins out">
       <div className="content-stretch flex items-start p-[12.529px] relative size-full">
-        <div className="css-g0mm18 flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] justify-center relative w-full text-[#214677] text-[11.83px]" style={{ fontVariationSettings: "'wdth' 100", lineHeight: 'calc(1em + 8px)' }}>
+        <div className="css-g0mm18 flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] justify-center relative w-full text-[#2B5DA0] text-[11.83px]" style={{ fontVariationSettings: "'wdth' 100", lineHeight: 'calc(1em + 8px)' }}>
           <p className="css-ew64yg whitespace-normal break-words" style={{ lineHeight: 'inherit' }}>
             {renderText()}
           </p>
@@ -2952,7 +2952,7 @@ function TakeBinsOut({ text }: { text: string }) {
 }
 
 function SetTimeClock({ isActive }: { isActive: boolean }) {
-  const strokeColor = isActive ? "#214677" : "#939393";
+  const strokeColor = isActive ? "#2B5DA0" : "#939393";
   
   return (
     <div className="relative shrink-0 size-[17.413px]" data-name="Set time clock">
@@ -2970,7 +2970,7 @@ function SetTimeClock({ isActive }: { isActive: boolean }) {
 }
 
 function Frame3({ isActive, valueText }: { isActive: boolean; valueText?: string }) {
-  const textColor = isActive ? "#214677" : "#939393";
+  const textColor = isActive ? "#2B5DA0" : "#939393";
   
   return (
     <div className="content-stretch flex gap-[11.144px] items-center relative shrink-0 w-[135.734px]">
@@ -3012,7 +3012,7 @@ function SetDate({ isActive, valueText }: { isActive: boolean; valueText?: strin
 }
 
 function SetTimeClock1({ isActive }: { isActive: boolean }) {
-  const strokeColor = isActive ? "#214677" : "#939393";
+  const strokeColor = isActive ? "#2B5DA0" : "#939393";
   
   return (
     <div className="relative shrink-0 size-[17.413px]" data-name="Set time clock">
@@ -3030,7 +3030,7 @@ function SetTimeClock1({ isActive }: { isActive: boolean }) {
 }
 
 function Frame6({ isActive, valueText }: { isActive: boolean; valueText?: string }) {
-  const textColor = isActive ? "#214677" : "#939393";
+  const textColor = isActive ? "#2B5DA0" : "#939393";
   
   return (
     <div className="content-stretch flex gap-[11.144px] items-center relative shrink-0 w-[135.734px]">
@@ -3072,8 +3072,8 @@ function SetDate1({ isActive, valueText }: { isActive: boolean; valueText?: stri
 }
 
 function RepeatTimeClock({ isActive }: { isActive: boolean }) {
-  const fillColor = isActive ? "#214677" : "#939393";
-  const strokeColor = isActive ? "#214677" : "#939393";
+  const fillColor = isActive ? "#2B5DA0" : "#939393";
+  const strokeColor = isActive ? "#2B5DA0" : "#939393";
   
   return (
     <div className="bg-white h-[17.462px] relative shrink-0 w-[17.413px]" data-name="Repeat time clock">
@@ -3093,7 +3093,7 @@ function RepeatTimeClock({ isActive }: { isActive: boolean }) {
 }
 
 function Frame7({ isActive, valueText }: { isActive: boolean; valueText?: string }) {
-  const textColor = isActive ? "#214677" : "#939393";
+  const textColor = isActive ? "#2B5DA0" : "#939393";
   
   return (
     <div className="content-stretch flex gap-[11.144px] items-center relative shrink-0 w-[135.734px]">
@@ -3247,7 +3247,7 @@ export default function NewReminderPopPage4() {
 ```tsx
 function MenuBtn() {
   return (
-    <div className="bg-[#214677] h-[38.198px] relative rounded-[76.396px] shrink-0 w-full" data-name="Menu-btn">
+    <div className="bg-[#2B5DA0] h-[38.198px] relative rounded-[76.396px] shrink-0 w-full" data-name="Menu-btn">
       <div className="flex flex-row items-center justify-center size-full">
         <div className="content-stretch flex items-center justify-center px-[13.751px] py-[11.459px] relative size-full">
           <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[12.987px] text-white">

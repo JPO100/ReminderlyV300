@@ -152,7 +152,7 @@ function getListFilterPillStyle(
   filter: "complete" | "almost" | "started" | "todo" | "grouped-todo",
   activeFilter: "all" | "complete" | "almost" | "started" | "todo" | "grouped-todo"
 ) {
-  const pillColor = LIST_CATEGORY_PILL_COLOURS[filter] || "#214677";
+  const pillColor = LIST_CATEGORY_PILL_COLOURS[filter] || "#2B5DA0";
   const isActive = activeFilter === filter;
   const isDefault = activeFilter === "all";
 
@@ -205,7 +205,7 @@ function getListArchiveFilterPillStyle(filter: "done" | "deleted", activeFilter:
 const OVERDUE_COLOUR = "#FF0000";
 
 // List blue constant for done styling
-const DONE_BLUE = "#214677";
+const DONE_BLUE = "#2B5DA0";
 const APP_TEXT_DARK_BLUE = "#1C2C42";
 const DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY = 'reminderly-dev-default-templates-in-clean-state';
 const DONE_LIST_COLOUR = "#404040";
@@ -276,7 +276,7 @@ function RowMenuButton({ onClick }: { onClick?: () => void }) {
   );
 }
 
-function PinnedListIcon({ color = "#214677" }: { color?: string }) {
+function PinnedListIcon({ color = "#2B5DA0" }: { color?: string }) {
   return (
     <svg className="block" width="13" height="13" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M0.875 13.8753L4.48541 10.2642" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
@@ -3324,7 +3324,7 @@ export default function App() {
                     ? "text-[#CCCCCC]"
                     : clearListStep === 0
                     ? "bg-[rgba(255,255,255,0.15)] text-white"
-                    : "bg-white text-[#214677]"
+                    : "bg-white text-[#2B5DA0]"
                 } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid transition-colors ${isClearAllDisabled ? "cursor-default border-[#CCCCCC]" : "cursor-pointer border-white"}`}
               >
                 <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
@@ -3437,7 +3437,7 @@ export default function App() {
             )}
             <div className="flex flex-row items-center justify-center size-full">
               <div className="content-stretch flex items-center justify-center px-[30px] relative size-full">
-                <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] whitespace-nowrap ${activeMainTab === 'lists' ? 'text-[#214677]' : 'text-white'}`}>
+                <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] whitespace-nowrap ${activeMainTab === 'lists' ? 'text-[#2B5DA0]' : 'text-white'}`}>
                   <p className="leading-[normal]">{viewMode === 'lists-done' ? 'Done lists' : 'Lists'}</p>
                 </div>
               </div>
@@ -3503,9 +3503,9 @@ export default function App() {
                   isClearAllDisabled
                     ? "text-[#CCCCCC]"
                     : clearListStep === 0
-                    ? "text-[#214677]"
-                    : "bg-[#214677] text-white"
-                } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid transition-colors ${isClearAllDisabled ? "cursor-default border-[#CCCCCC]" : "cursor-pointer border-[#214677]"}`}
+                    ? "text-[#2B5DA0]"
+                    : "bg-[#2B5DA0] text-white"
+                } content-stretch flex items-center justify-center h-[40px] w-[95px] relative rounded-[100px] shrink-0 border border-solid transition-colors ${isClearAllDisabled ? "cursor-default border-[#CCCCCC]" : "cursor-pointer border-[#2B5DA0]"}`}
                 style={isClearAllDisabled ? { color: '#CCCCCC', borderColor: '#CCCCCC' } : undefined}
               >
                 <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
@@ -3667,7 +3667,7 @@ export default function App() {
                           className={`${
                             isActive
                               ? "bg-white"
-                              : "text-[#214677]"
+                              : "text-[#2B5DA0]"
                           } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer`}
                           style={getListFilterPillStyle(filter, activeListFilter)}
                         >
@@ -3679,7 +3679,7 @@ export default function App() {
                       })}
                     </div>
                     <button
-                      className="bg-[#214677] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer"
+                      className="bg-[#2B5DA0] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer"
                       type="button"
                       onClick={() => setSavedListsPanelOpen(true)}
                     >
@@ -3707,7 +3707,7 @@ export default function App() {
                           className={`${
                             isActive
                               ? "bg-white"
-                              : "text-[#214677]"
+                              : "text-[#2B5DA0]"
                           } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                             filter === "grouped-todo" ? "hidden min-[390px]:flex" : ""
                           }`}
@@ -3736,7 +3736,7 @@ export default function App() {
                       className={`${
                         isActive
                           ? "bg-white"
-                          : "text-[#214677]"
+                          : "text-[#2B5DA0]"
                       } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                         filter === "started" ? "max-[389px]:hidden" : ""
                       }`}
@@ -3842,7 +3842,7 @@ export default function App() {
                                     {isPinnedList ? (
                                       <div className="flex h-full items-center min-w-0" style={{ gap: '8px' }}>
                                         <div className="flex h-[13px] w-[13px] shrink-0 items-center justify-center">
-                                          <PinnedListIcon color="#214677" />
+                                          <PinnedListIcon color="#2B5DA0" />
                                         </div>
                                         <div className="min-w-0 overflow-hidden">
                                           <p style={{ display: 'block', width: '100%', minWidth: 0, fontSize: '17px', fontWeight: 700, lineHeight: '17px', transform: 'translateY(-1px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingBottom: '2px', boxSizing: 'content-box' }}>{list.title}</p>
@@ -3921,7 +3921,7 @@ export default function App() {
             {/* Add new list button */}
             <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[34px] shrink-0">
               <button
-                className="bg-[#214677] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
+                className="bg-[#2B5DA0] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full transition-colors"
                 style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
                 onClick={() => { setListTitle(pickDefaultListName(createdLists.map(l => l.title))); setListItems([]); setListOverlayMode('create'); setEditingListId(null); setListSortMode('insertion'); setListSmartReminders(false); setListSmartReminderDueDate(null); setListSmartReminderTime(null); setIsListsOverlayOpen(true); }}
               >
@@ -4020,7 +4020,7 @@ export default function App() {
                     <div className="content-stretch flex items-center justify-center w-full max-w-[768px] pb-[34px] shrink-0">
                       <button
                         type="button"
-                        className="bg-[#214677] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full"
+                        className="bg-[#2B5DA0] content-stretch flex gap-[16px] items-center justify-center px-[30px] relative rounded-[100px] w-full"
                         style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
                         onClick={() => {
                           setListTitle(pickDefaultListName(createdLists.map(l => l.title)));
@@ -4762,7 +4762,7 @@ export default function App() {
                           listItemHighlightTimerRef.current = null;
                           setListItemHighlightId(null);
                         }, INSERT_HIGHLIGHT_MS);
-                    }} isEmpty={listItems.length === 0} accentColor={isSavedListCreateOverlay ? '#214677' : currentListAccentColor} idleCircleColor="#D9D9D9" leadingIcon={isSavedListCreateOverlay ? <SavedListOverlayAddItemIcon /> : undefined} focusedLeadingIcon={isSavedListCreateOverlay ? <SavedListOverlayAddItemFocusedIcon /> : undefined} activeLeadingIcon={isSavedListCreateOverlay ? <SavedListOverlayAddItemFocusedIcon /> : undefined} nextPlaceholder={isSavedListCreateOverlay ? "Add your next template item..." : "Add your next item..."} />
+                    }} isEmpty={listItems.length === 0} accentColor={isSavedListCreateOverlay ? '#2B5DA0' : currentListAccentColor} idleCircleColor="#D9D9D9" leadingIcon={isSavedListCreateOverlay ? <SavedListOverlayAddItemIcon /> : undefined} focusedLeadingIcon={isSavedListCreateOverlay ? <SavedListOverlayAddItemFocusedIcon /> : undefined} activeLeadingIcon={isSavedListCreateOverlay ? <SavedListOverlayAddItemFocusedIcon /> : undefined} nextPlaceholder={isSavedListCreateOverlay ? "Add your next template item..." : "Add your next item..."} />
                   </div>
                   <div className="flex flex-col gap-[23px] items-start px-[24px] pb-[24px] relative w-full flex-1 min-h-0 overflow-y-auto mt-[35px]">
                     <AnimatePresence initial={false}>
@@ -4787,7 +4787,7 @@ export default function App() {
                           }}
                           className="w-full"
                         >
-                          <EditableListItem name={item.text} completed={isSavedListCreateOverlay ? false : item.completed} isHighlighted={isItemHighlighted} accentColor={isSavedListCreateOverlay ? '#214677' : currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={isSavedListCreateOverlay ? undefined : () => { setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { const wasCompleted = next[idx].completed; next[idx] = { ...next[idx], completed: !wasCompleted, completedAt: wasCompleted ? null : Date.now() }; } return next; }); }} onDelete={() => { setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={true} leadingIcon={isSavedListCreateOverlay ? <SavedListOverlayCheckCircle /> : undefined} onCommit={(val: string) => {
+                          <EditableListItem name={item.text} completed={isSavedListCreateOverlay ? false : item.completed} isHighlighted={isItemHighlighted} accentColor={isSavedListCreateOverlay ? '#2B5DA0' : currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={isSavedListCreateOverlay ? undefined : () => { setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { const wasCompleted = next[idx].completed; next[idx] = { ...next[idx], completed: !wasCompleted, completedAt: wasCompleted ? null : Date.now() }; } return next; }); }} onDelete={() => { setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={true} leadingIcon={isSavedListCreateOverlay ? <SavedListOverlayCheckCircle /> : undefined} onCommit={(val: string) => {
                             const currentIndex = overlayDisplayListItems.findIndex((displayItem) => displayItem.id === item.id);
                             setRevealedDeleteListItemId(null);
                             const nextItems = listItems.map((listItem) => (
@@ -4969,7 +4969,7 @@ export default function App() {
                   <button
                     className="cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
                     style={{
-                      backgroundColor: '#214677',
+                      backgroundColor: '#2B5DA0',
                       transition: 'background-color 150ms ease',
                     }}
                     onClick={() => handleUseSavedListWithFeedback(savedList)}
@@ -5007,7 +5007,7 @@ export default function App() {
                   </button>
                   <button
                     className="cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
-                    style={{ backgroundColor: '#214677' }}
+                    style={{ backgroundColor: '#2B5DA0' }}
                     onClick={() => {
                       setSavedListMenuId(null);
                       openSavedListEditor(savedList);
@@ -5070,7 +5070,7 @@ export default function App() {
                   <button
                     className="cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
                     style={{
-                      backgroundColor: '#214677',
+                      backgroundColor: '#2B5DA0',
                       transition: 'background-color 150ms ease',
                     }}
                     onClick={() => handleUseSavedListFromTemplateEditorFeedback(savedList)}
@@ -5138,7 +5138,7 @@ export default function App() {
       {(doneInfoReminder || doneInfoList) && (
         <DeletedInfoOverlay
           title={doneInfoReminder ? getDisplayTitle(doneInfoReminder) : (doneInfoList?.title ?? '')}
-          buttonColor={doneInfoReminder ? '#4784f8' : '#214677'}
+          buttonColor={doneInfoReminder ? '#4784f8' : '#2B5DA0'}
           buttonLabel={
             doneInfoReminder
               ? (doneInfoReminder.deletedAt != null ? 'Mark as not deleted' : 'Mark as not done')
@@ -5168,7 +5168,7 @@ export default function App() {
       {savedDeletedListInfo && (
         <DeletedInfoOverlay
           title={savedDeletedListInfo.title}
-          buttonColor="#214677"
+          buttonColor="#2B5DA0"
           buttonLabel="Mark as not deleted"
           onClose={() => setSavedDeletedListInfoId(null)}
           onMarkAsNotDone={() => {
@@ -5365,7 +5365,7 @@ export default function App() {
                             <p className="leading-[14px]" style={{ fontWeight: 700, color: '#BABABA' }}>Setting subtitle</p>
                           </div>
                         </div>
-                        <div className="bg-[#214677] content-stretch flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] justify-end">
+                        <div className="bg-[#2B5DA0] content-stretch flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] justify-end">
                           <div className="relative shrink-0 size-[22.5px]">
                             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
                               <circle cx="11.25" cy="11.25" fill="var(--fill-0, white)" r="11.25" />
@@ -5455,7 +5455,7 @@ export default function App() {
                             <p className="leading-[14px]" style={{ fontWeight: 700, color: '#BABABA' }}>Setting subtitle</p>
                           </div>
                         </div>
-                        <div className="bg-[#214677] content-stretch flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] justify-end">
+                        <div className="bg-[#2B5DA0] content-stretch flex h-[30px] items-center self-start p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] justify-end">
                           <div className="relative shrink-0 size-[22.5px]">
                             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
                               <circle cx="11.25" cy="11.25" fill="var(--fill-0, white)" r="11.25" />

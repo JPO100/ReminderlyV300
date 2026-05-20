@@ -11,7 +11,7 @@ See also [Text Styles](./text-styles.md).
 
 ### List blue
 
-- `#214677`
+- `#2B5DA0`
 - used for core text, done states, pinned list treatment, list/archive controls, and selected list-specific UI
 
 ### App text dark blue
@@ -41,8 +41,8 @@ Current list category colours in `App.tsx`:
 
 Pinned lists override category-colour treatment in the active `All` list view:
 
-- list check circle: `#214677`
-- pin icon: `#214677`
+- list check circle: `#2B5DA0`
+- pin icon: `#2B5DA0`
 
 ## State Colours
 

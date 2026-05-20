@@ -6,13 +6,13 @@ function Frame5() {
       <div className="h-[21.75px] relative shrink-0 w-[17.75px]" data-name="Union">
         <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.75 21.75">
           <g id="Union">
-            <path d={svgPaths.p1114c80} fill="var(--fill-0, #214677)" />
-            <path d={svgPaths.p2688cce0} fill="var(--fill-0, #214677)" />
-            <path clipRule="evenodd" d={svgPaths.pfc9c80} fill="var(--fill-0, #214677)" fillRule="evenodd" />
+            <path d={svgPaths.p1114c80} fill="var(--fill-0, #2B5DA0)" />
+            <path d={svgPaths.p2688cce0} fill="var(--fill-0, #2B5DA0)" />
+            <path clipRule="evenodd" d={svgPaths.pfc9c80} fill="var(--fill-0, #2B5DA0)" fillRule="evenodd" />
           </g>
         </svg>
       </div>
-      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#214677] text-[17px] whitespace-nowrap">Password required</p>
+      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#2B5DA0] text-[17px] whitespace-nowrap">Password required</p>
     </div>
   );
 }
@@ -43,7 +43,7 @@ function Frame6() {
           </g>
         </svg>
       </div>
-      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#214677] text-[17px] whitespace-nowrap">Password reset</p>
+      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#2B5DA0] text-[17px] whitespace-nowrap">Password reset</p>
     </div>
   );
 }
@@ -51,7 +51,7 @@ function Frame6() {
 function Frame7() {
   return (
     <div className="content-stretch flex items-center relative shrink-0">
-      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#214677] text-[17px] whitespace-nowrap">New password</p>
+      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#2B5DA0] text-[17px] whitespace-nowrap">New password</p>
     </div>
   );
 }
@@ -95,7 +95,7 @@ function Frame10() {
 function Frame8() {
   return (
     <div className="content-stretch flex items-center relative shrink-0">
-      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#214677] text-[17px] whitespace-nowrap">Confirm password</p>
+      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#2B5DA0] text-[17px] whitespace-nowrap">Confirm password</p>
     </div>
   );
 }

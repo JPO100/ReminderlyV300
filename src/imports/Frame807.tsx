@@ -5,7 +5,7 @@ function AddTickBtn({ active }: { active: boolean }) {
     <button className={`block relative shrink-0 size-[24px] p-0 m-0 border-none bg-transparent ${active ? 'cursor-pointer' : 'cursor-default'}`} data-name="add-tick-btn" disabled={!active}>
       <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
         <g id="add-tick-btn">
-          <rect fill={active ? "#214677" : "#E0E0E0"} height="24" rx="12" width="24" />
+          <rect fill={active ? "#2B5DA0" : "#E0E0E0"} height="24" rx="12" width="24" />
           <path d="M12 18L12 6M6 12H18" id="Vector" stroke={active ? "white" : "#ffffff"} strokeLinecap="round" strokeWidth="2" />
         </g>
       </svg>
@@ -38,7 +38,7 @@ export default function Frame1({ onAdd, isEmpty }: { onAdd?: (text: string) => v
             onChange={(e) => setItemText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleAdd(); }}
             placeholder={isEmpty ? "Add your first item..." : "Add your next item..."}
-            className="font-['Lato:Bold',sans-serif] not-italic text-[17px] w-full bg-transparent border-none outline-none placeholder-[#bababa] text-[#214677] caret-[#214677]"
+            className="font-['Lato:Bold',sans-serif] not-italic text-[17px] w-full bg-transparent border-none outline-none placeholder-[#bababa] text-[#2B5DA0] caret-[#2B5DA0]"
           />
         </div>
         <div className="flex items-center" onClick={handleAdd}>

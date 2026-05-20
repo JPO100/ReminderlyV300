@@ -10,7 +10,7 @@ function ReminderDetails() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #00AFEE)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Pick up the milk</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>Today at 2:00 PM</p>
           </div>
@@ -67,7 +67,7 @@ function ReminderDetails1() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #00AFEE)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Call mum tonight</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>Today at 7:00 PM</p>
           </div>
@@ -124,7 +124,7 @@ function ReminderDetails2() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #DF4DFC)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Take bins out every Wednesday</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>Every Wednesday</p>
           </div>
@@ -189,7 +189,7 @@ function ReminderDetails3() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #DF4DFC)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Submit expenses</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>Friday</p>
           </div>

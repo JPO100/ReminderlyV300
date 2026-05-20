@@ -6,9 +6,9 @@ function Frame1() {
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 21.5002">
         <g id="Frame 738">
           <g id="Union">
-            <path clipRule="evenodd" d={svgPaths.pa3f6300} fill="#214677" fillRule="evenodd" />
-            <path clipRule="evenodd" d={svgPaths.p299691f0} fill="#214677" fillRule="evenodd" />
-            <path clipRule="evenodd" d={svgPaths.p16049180} fill="#214677" fillRule="evenodd" />
+            <path clipRule="evenodd" d={svgPaths.pa3f6300} fill="#2B5DA0" fillRule="evenodd" />
+            <path clipRule="evenodd" d={svgPaths.p299691f0} fill="#2B5DA0" fillRule="evenodd" />
+            <path clipRule="evenodd" d={svgPaths.p16049180} fill="#2B5DA0" fillRule="evenodd" />
           </g>
         </g>
       </svg>
@@ -19,7 +19,7 @@ function Frame1() {
 function Frame3() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col gap-[16px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center overflow-hidden relative shrink-0 text-[#214677] text-[17px] text-ellipsis w-full whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center overflow-hidden relative shrink-0 text-[#2B5DA0] text-[17px] text-ellipsis w-full whitespace-nowrap">
         <p className="leading-[normal] overflow-hidden">Natural Language Capture</p>
       </div>
       <div className="flex flex-col font-['Lato:SemiBold',sans-serif] justify-center relative shrink-0 text-[#939393] text-[15px] w-full">

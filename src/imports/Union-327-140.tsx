@@ -5,8 +5,8 @@ export default function Union() {
     <div className="relative size-full" data-name="Union">
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 23.1994 23.75">
         <g id="Union">
-          <path clipRule="evenodd" d={svgPaths.p1100a300} fill="var(--fill-0, #214677)" fillRule="evenodd" />
-          <path clipRule="evenodd" d={svgPaths.p11234300} fill="var(--fill-0, #214677)" fillRule="evenodd" />
+          <path clipRule="evenodd" d={svgPaths.p1100a300} fill="var(--fill-0, #2B5DA0)" fillRule="evenodd" />
+          <path clipRule="evenodd" d={svgPaths.p11234300} fill="var(--fill-0, #2B5DA0)" fillRule="evenodd" />
         </g>
       </svg>
     </div>

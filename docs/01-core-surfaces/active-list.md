@@ -61,13 +61,13 @@ Row
 - 25px × 25px
 - Category-coloured outline (or overdue red)
 - No fill when active
-- Filled dark blue `#214677` with white tick when pending done
+- Filled dark blue `#2B5DA0` with white tick when pending done
 - Filled grey `#939393` with white tick when pending delete
 - `marginTop: 3px` when subtitles visible (for alignment with title)
 
 ### Text Column
 - Flex: 1 (fills available space)
-- Title: 17px Lato Bold, dark blue `#214677` (or overdue red `#FF0000`)
+- Title: 17px Lato Bold, dark blue `#2B5DA0` (or overdue red `#FF0000`)
 - Subtitle: 13.5px Lato SemiBold, grey `#BABABA`
 - `line-through` decoration when pending done or pending delete
 - Truncation: `overflow-hidden`, `text-ellipsis`, `whitespace-nowrap`
@@ -84,7 +84,7 @@ Displays in priority order:
 - Schedule-set icon (clock): scheduled reminders without repeat
 - Repeats icon (circular arrows): reminders with repeatRule
 - Schedule-unset icon (no-time): sometime reminders
-- Colour: `#BABABA` (normal), `#214677` (pending done), `#939393` (pending delete), `#FF0000` (overdue)
+- Colour: `#BABABA` (normal), `#2B5DA0` (pending done), `#939393` (pending delete), `#FF0000` (overdue)
 - Clickable: opens ReminderInfoOverlay
 - Size: varies by icon
 
@@ -92,13 +92,13 @@ Displays in priority order:
 
 **Normal (active)**
 - Circle: category-coloured outline, no fill
-- Text: dark blue `#214677`, no decoration
+- Text: dark blue `#2B5DA0`, no decoration
 - Status icon: grey `#BABABA`
 
 **Pending done (350ms window)**
-- Circle: filled dark blue `#214677` with white tick
-- Text container: `#BABABA`, text itself: dark blue `#214677` with `line-through`
-- Status icon: dark blue `#214677`
+- Circle: filled dark blue `#2B5DA0` with white tick
+- Text container: `#BABABA`, text itself: dark blue `#2B5DA0` with `line-through`
+- Status icon: dark blue `#2B5DA0`
 
 **Pending delete (350ms window)**
 - Circle: filled grey `#939393` with white tick

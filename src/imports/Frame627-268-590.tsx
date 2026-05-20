@@ -3,7 +3,7 @@ import svgPaths from "./svg-rp2ohlce8d";
 function Frame1() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col gap-[16px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center overflow-hidden relative shrink-0 text-[#214677] text-[17px] text-ellipsis w-full whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center overflow-hidden relative shrink-0 text-[#2B5DA0] text-[17px] text-ellipsis w-full whitespace-nowrap">
         <p className="leading-[normal] overflow-hidden">Testing for scrolling</p>
       </div>
       <div className="flex flex-col font-['Lato:SemiBold',sans-serif] justify-center relative shrink-0 text-[#939393] text-[15px] w-full">
@@ -40,9 +40,9 @@ export default function Frame() {
       <div className="h-[23.071px] relative shrink-0 w-[23.006px]" data-name="Union">
         <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 23.0057 23.0711">
           <g id="Union">
-            <path d={svgPaths.pda35300} fill="#214677" />
-            <path d={svgPaths.p2548ae00} fill="#214677" />
-            <path d={svgPaths.p259d8300} fill="#214677" />
+            <path d={svgPaths.pda35300} fill="#2B5DA0" />
+            <path d={svgPaths.p2548ae00} fill="#2B5DA0" />
+            <path d={svgPaths.p259d8300} fill="#2B5DA0" />
           </g>
         </svg>
       </div>
