@@ -285,7 +285,7 @@ function PinnedListIcon({ color = "#214677" }: { color?: string }) {
   );
 }
 
-function SavedListTemplateIcon({ color = "#214677" }: { color?: string }) {
+function SavedListTemplateIcon({ color = "#1C2C42" }: { color?: string }) {
   return (
     <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="block size-full">
       <path d="M18.2471 22.9885C18.8026 22.9885 19.2529 23.4388 19.2529 23.9943C19.2529 24.5497 18.8026 25 18.2471 25H14.7989C14.2434 25 13.7931 24.5497 13.7931 23.9943C13.7931 23.4388 14.2434 22.9885 14.7989 22.9885H18.2471Z" fill={color}/>
@@ -5351,14 +5351,14 @@ export default function App() {
                         <div className="h-[21.5px] relative self-start shrink-0 w-[19.5px] top-[1px]" data-name="Union">
                           <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19.5002 21.5002">
                             <g id="Union">
-                              <path clipRule="evenodd" d={listInfoOverlayPaths.p23b20a00} fill="#214677" fillRule="evenodd" />
-                              <path clipRule="evenodd" d={listInfoOverlayPaths.p15d6fbb2} fill="#214677" fillRule="evenodd" />
-                              <path clipRule="evenodd" d={listInfoOverlayPaths.p1797f00} fill="#214677" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p23b20a00} fill="#1C2C42" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p15d6fbb2} fill="#1C2C42" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p1797f00} fill="#1C2C42" fillRule="evenodd" />
                             </g>
                           </svg>
                         </div>
                         <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
-                          <div className="flex flex-col justify-start max-w-full min-w-0 overflow-visible relative shrink-0 text-[17px] text-[#214677] w-full whitespace-nowrap">
+                          <div className="flex flex-col justify-start max-w-full min-w-0 overflow-visible relative shrink-0 text-[17px] text-[#1C2C42] w-full whitespace-nowrap">
                             <p className="block leading-[17px] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap w-full" style={{ boxSizing: 'content-box', fontSize: 17, fontWeight: 700, lineHeight: '17px', margin: 0, paddingBottom: 2, transform: 'translateY(-1px)' }}>Setting title</p>
                           </div>
                           <div className="flex flex-col justify-start relative shrink-0 text-[14px] text-[#bababa] w-full">
@@ -5441,14 +5441,14 @@ export default function App() {
                         <div className="h-[21.5px] relative self-start shrink-0 w-[19.5px] top-[1px]" data-name="Union">
                           <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19.5002 21.5002">
                             <g id="Union">
-                              <path clipRule="evenodd" d={listInfoOverlayPaths.p23b20a00} fill="#214677" fillRule="evenodd" />
-                              <path clipRule="evenodd" d={listInfoOverlayPaths.p15d6fbb2} fill="#214677" fillRule="evenodd" />
-                              <path clipRule="evenodd" d={listInfoOverlayPaths.p1797f00} fill="#214677" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p23b20a00} fill="#1C2C42" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p15d6fbb2} fill="#1C2C42" fillRule="evenodd" />
+                              <path clipRule="evenodd" d={listInfoOverlayPaths.p1797f00} fill="#1C2C42" fillRule="evenodd" />
                             </g>
                           </svg>
                         </div>
                         <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[9px] items-start justify-start leading-[0] min-h-px min-w-px not-italic relative">
-                          <div className="flex flex-col justify-start max-w-full min-w-0 overflow-visible relative shrink-0 text-[17px] text-[#214677] w-full whitespace-nowrap">
+                          <div className="flex flex-col justify-start max-w-full min-w-0 overflow-visible relative shrink-0 text-[17px] text-[#1C2C42] w-full whitespace-nowrap">
                             <p className="block leading-[17px] min-w-0 overflow-hidden text-ellipsis whitespace-nowrap w-full" style={{ boxSizing: 'content-box', fontSize: 17, fontWeight: 700, lineHeight: '17px', margin: 0, paddingBottom: 2, transform: 'translateY(-1px)' }}>Setting title</p>
                           </div>
                           <div className="flex flex-col justify-start relative shrink-0 text-[14px] text-[#bababa] w-full">
