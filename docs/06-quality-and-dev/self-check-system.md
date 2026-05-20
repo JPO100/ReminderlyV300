@@ -2,269 +2,101 @@
 
 ## Overview
 
-Reminderly includes a comprehensive self-check test suite that validates core business logic through deterministic function testing. All checks run in-memory without React component mounting, ensuring fast execution and deterministic results.
+Reminderly includes a deterministic self-check system that validates core business logic without mounting React components. The suite runs entirely in memory and is exposed through Dev tools → `Automated tests`.
 
 ## Architecture
 
-### Check Runner Framework
+### Check Runner
 
-`/src/app/dev/check-system.ts` provides the check runner infrastructure:
+`src/app/dev/check-system.ts` provides the runner and report formatting layer.
 
-```typescript
-type Check = {
-  label: string;
-  fn: () => boolean;
-};
+Checks are registered as named pure functions and executed in a single run report. The automated tests page then groups and displays the results by section label.
 
-function runChecks(checks: Check[]): CheckResult[]
-```
+### Aggregation
 
-Each check is a pure function that returns `true` (pass) or `false` (fail). The runner executes all checks, collects results, and reports pass/fail counts with duration.
+The current aggregation lives in `src/app/components/DevToolsOverlay.tsx`. The `Run self-checks` action builds the full run by concatenating the outputs of:
 
-### Check Suites
+- `getScheduleChecks()`
+- `getReminderChecks()`
+- `getNlcParserChecks()`
+- `getNlcInteractionChecks()`
+- `getDoneDeletedChecks()`
+- `getCompletionChecks()`
+- `getListChecks()`
+- `getDevToolsChecks()`
 
-Organized into 7 files, each returning a pure function that builds a fresh check array:
+## Current Check Suites
+
+Reminderly currently has 8 suites and 425 checks.
 
 | Suite | File | Checks | Scope |
-|-------|------|--------|-------|
-| Schedule | `schedule-checks.ts` | 37 | Schedule utility pure functions |
-| Reminder | `reminder-checks.ts` | 77 | Persistence, sorting, categorisation |
-| NLC Parser | `nlc-parser-checks.ts` | 53 | Date/time/repeat token recognition |
-| NLC Interaction | `nlc-interaction-checks.ts` | 44 | Token click application |
-| Done/Deleted | `done-deleted-checks.ts` | 9 | Done/deleted view and subfilters |
-| Completion | `completion-checks.ts` | 14 | Completion and uncomplete logic |
-| Dev Tools | `dev-tools-checks.ts` | 46 | Dev tools settings and feature flags |
+| --- | --- | ---: | --- |
+| Schedule and reminder logic | `src/app/dev/schedule-checks.ts` | 37 | Schedule equality, delta detection, and derived schedule helpers |
+| Persistence and hydration | `src/app/dev/reminder-checks.ts` | 143 | Reminder loading, validation, migration, categorisation, sorting, labels, overdue logic, rendering, and restore flows |
+| Natural language parsing | `src/app/dev/nlc-parser-checks.ts` | 53 | Token recognition and parser hardening |
+| Natural language interaction | `src/app/dev/nlc-interaction-checks.ts` | 45 | Token application, auto-apply behaviour, invalidation, and resolved schedule output |
+| Done, deleted, and completion | `src/app/dev/done-deleted-checks.ts` | 27 | Done/deleted view logic, filters, restore behaviour, ordering, and cleanup rules |
+| Done, deleted, and completion | `src/app/dev/completion-checks.ts` | 36 | Completion flows, repeat rescheduling, uncomplete handling, and completion guards |
+| Lists and smart reminders | `src/app/dev/list-checks.ts` | 38 | List persistence, smart reminder state, list lifecycle, pinning, templates, and empty-state behaviour |
+| Dev tools and feature flags | `src/app/dev/dev-tools-checks.ts` | 46 | Dev tool state, feature flags, settings toggles, and supporting helpers |
 
-**Total: 280 checks**
+## Automated Tests Page
 
-## Access
+The `Automated tests` page currently provides:
 
-Run via DevTools → Automated tests page. Results display:
-- Pass/fail count
-- Duration (ms)
-- Individual check labels with pass/fail indicators
-- Copy-to-clipboard functionality
+- a `Run self-checks` action
+- grouped pass/fail output
+- run invocation id
+- total pass/fail counts
+- total duration
+- a `Copy results` action
+- a `Reset` action
 
-## Check Coverage
+Results are grouped by the labels injected at aggregation time:
 
-### Schedule Checks (37)
+- `Schedule and reminder logic`
+- `Persistence and hydration`
+- `Natural language parsing`
+- `Natural language interaction`
+- `Done, deleted, and completion`
+- `Lists and smart reminders`
+- `Dev tools and feature flags`
 
-- Schedule equality comparison
-- Schedule delta detection (date/time/repeat changes)
-- Date formatting and parsing
-- Week boundary calculation
-- Time utilities
+## Coverage Shape
 
-### Reminder Checks (77)
+The current suite covers:
 
-**Defensive loading** (12 checks)
-- Invalid JSON handling
-- Non-array types
-- Missing required fields (id, text, schedule)
-- Malformed schedule shapes
-- Invalid date/time formats
+- reminder schedule and persistence logic
+- reminder categorisation and sorting
+- reminder title and subtitle rendering helpers
+- NLC parsing and interaction flows
+- done, deleted, restore, and completion flows
+- list lifecycle, pinning, templates, and smart reminders
+- developer settings and feature flags
 
-**Persistence** (3 checks)
-- Round-trip save/load (new format)
-- Hourly repeat persistence
-- Weekly byDay persistence
-
-**Categorisation** (5 checks)
-- Today detection
-- This week detection
-- This week Monday edge case
-- Later detection
-- Sometime detection
-
-**Sorting** (4 checks)
-- Date ascending
-- Time ascending
-- Unscheduled after scheduled
-- Time before no-time
-
-**Repeat labels** (12 checks)
-- Hourly interval variations
-- Weekly byDay formatting
-- Daily interval variations
-- Daily with time
-- Weekly byDay with time
-- Monthly interval variations
-- Monthly date display
-
-**Overdue** (6 checks)
-- Yesterday date-only: overdue
-- Today + earlier time: overdue
-- Today + later time: not overdue
-- Tomorrow: not overdue
-- Sometime: never overdue
-- Today date-only: not overdue
-
-**Overdue sort pinning** (2 checks)
-- Within-category ordering
-- Absolute-top across categories
-
-**Legacy migration** (2 checks)
-- Removed schedule kind migration
-- Legacy text field migration
-
-**Text normalisation** (15 checks)
-- "today" substitution
-- "tomorrow" substitution
-- Weekday replacements
-- Case preservation
-- Multi-token handling
-
-**Restore from done** (2 checks)
-- Bucket colour consistency
-- Overdue colour consistency
-
-**Text rendering** (7 checks)
-- Today substitution at presentation time
-- Not-today unchanged
-- Sometime unchanged
-- Tomorrow substitution
-- Not-tomorrow unchanged
-- Recurring today
-- Recurring not-today
-
-**Display title** (5 checks)
-- Strip date+time patterns
-- Strip date only
-- Strip time only
-- No strip mid-string
-- No strip when no match
-
-### NLC Parser Checks (53)
-
-- Date token parsing (today, tomorrow, weekdays, "next X")
-- Time token parsing (12h, 24h, time-of-day, compound tokens)
-- Repeat token parsing (intervals, weekdays, custom-days, comma lists)
-- Overlap resolution (repeat suppresses date)
-- Edge cases (case insensitivity, spacing, invalid formats)
-
-### NLC Interaction Checks (44)
-
-- Token application (click and auto modes)
-- Auto-apply eligibility
-- Token invalidation
-- Edit-mode auto-apply with baseline
-- Time-of-day suppression
-- Repeat-trigger date implication
-- Implied-time reactivation
-- Drawer state independence
-
-### Done/Deleted Checks (9)
-
-- ViewMode toggle (list ↔ done-deleted)
-- Filter reset on view change
-- Sub-filter classification (done-only, deleted-only, both)
-- Pending restore visibility in sub-filters
-- Clear-all inclusion/exclusion
-- Sort key priority (pendingUndeleteSortKey > deletedAt > completedAt)
-- deletedAt persistence
-
-### Completion Checks (14)
-
-- Completion data flow
-- Repeat rescheduling timing
-- Next occurrence calculation
-- Uncomplete duplicate removal
-- Timer management
-- Guard conditions
-
-### Dev Tools Checks (46)
-
-- Dev tools settings persistence
-- Feature flag toggling
-- Debug mode activation
-- Performance metrics collection
-- Error logging
-- User feedback submission
-- Data export functionality
-- Data import functionality
-- Data validation
-- Data sanitisation
-- Data migration
-- Data backup
-- Data restore
-- Data encryption
-- Data decryption
-- Data compression
-- Data decompression
-- Data caching
-- Data retrieval
-- Data storage
-- Data deletion
-- Data update
-- Data insertion
-- Data query
-- Data indexing
-- Data sorting
-- Data filtering
-- Data aggregation
-- Data transformation
-- Data normalization
-- Data denormalization
-- Data serialization
-- Data deserialization
-- Data encoding
-- Data decoding
-- Data formatting
-- Data parsing
+The system does not mount UI components and does not validate animation timing, gesture handling, or layout behaviour.
 
 ## Baseline
 
-Expected output documented in `/src/app/dev/BASELINE.md`. Clean run shows all 280 checks passing with execution time.
+Expected clean-run output is documented in `src/app/dev/BASELINE.md`.
 
-## Pure Function Design
+The current documented baseline target is:
 
-All checks test pure functions extracted from components:
-- `nlc-parser.ts`: Token parsing
-- `nlc-interaction.ts`: Token application logic
-- `reminder-utils.ts`: Categorisation, sorting, formatting
-- `normalise-text.ts`: Text normalisation
-- `render-text.ts`: Display text substitution
-- `schedule.ts`: Schedule utilities
-
-This separation enables deterministic testing without React component overhead.
+- 425 passed
+- 0 failed
 
 ## Test Philosophy
 
-1. **No mocks**: Tests use real function implementations
-2. **Deterministic**: No random values, fixed dates, predictable results
-3. **Fast**: Pure functions, no I/O, no timers
-4. **Comprehensive**: Edge cases, invalid inputs, legacy migrations
-5. **Self-documenting**: Check labels describe expected behaviour
+Current test design principles reflected in the suite:
 
-## Running Checks
-
-### Via DevTools
-
-1. Triple-tap logo text
-2. Navigate to "Automated tests"
-3. Checks execute immediately
-4. Results display with pass/fail indicators
-5. Copy button for sharing results
-
-### Programmatic
-
-```typescript
-import { runChecks } from './check-system';
-import nlcParserChecks from './nlc-parser-checks';
-
-const results = runChecks(nlcParserChecks);
-console.log(`Passed: ${results.filter(r => r.passed).length}/${results.length}`);
-```
-
-## Maintenance
-
-When adding new features:
-1. Extract pure business logic into utility functions
-2. Add corresponding checks to appropriate suite
-3. Update check count in this documentation
-4. Update BASELINE.md with new expected output
+1. **Pure logic first**: checks exercise extracted business logic rather than component trees.
+2. **Deterministic inputs**: checks avoid randomness and uncontrolled time.
+3. **Fast execution**: all runs stay in-memory with no network dependency.
+4. **Feature-level coverage**: checks are organised around product behaviours rather than UI screens.
+5. **Regression focus**: checks heavily cover persistence, migration, scheduling, and filter-state rules.
 
 ## Related Documentation
 
-- [Dev Tools Overlay](../../01-core-surfaces/dev-tools-overlay.md) - Access via DevTools
-- [Architecture](../../00-overview/architecture.md) - Pure function modules
+- [Dev Tools](./dev-tools.md)
+- [Tests and Baselines](./tests-and-baselines.md)
+- [Dev Tools Overlay](../01-core-surfaces/dev-tools-overlay.md)

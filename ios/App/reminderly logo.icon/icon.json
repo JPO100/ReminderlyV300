@@ -1,38 +1,27 @@
 {
   "fill" : {
-    "solid" : "display-p3:0.33667,0.51172,0.94189,1.00000"
+    "solid" : "display-p3:0.33740,0.51367,0.94385,1.00000"
   },
   "groups" : [
     {
+      "blur-material" : null,
       "layers" : [
         {
-          "blend-mode" : "normal",
-          "fill" : {
-            "solid" : "display-p3:0.99316,0.99316,0.99316,1.00000"
-          },
-          "glass" : false,
-          "image-name-specializations" : [
-            {
-              "value" : "logo 2.svg"
-            },
-            {
-              "appearance" : "light",
-              "value" : "logo 2.svg"
-            }
-          ],
-          "name" : "logo 2",
+          "fill" : "automatic",
+          "image-name" : "tick-blue-thick.svg",
+          "name" : "tick-blue-thick",
           "position" : {
-            "scale" : 1.98,
+            "scale" : 1,
             "translation-in-points" : [
-              0,
-              0
+              0.25,
+              0.25
             ]
           }
         },
         {
           "blend-mode" : "normal",
           "fill" : {
-            "solid" : "display-p3:0.32495,0.49365,0.90869,1.00000"
+            "solid" : "display-p3:0.99316,0.99316,0.99316,1.00000"
           },
           "glass" : false,
           "hidden" : false,
@@ -41,19 +30,20 @@
           "position" : {
             "scale" : 1,
             "translation-in-points" : [
-              -890.7109375,
-              -171.625
+              0,
+              0
             ]
           }
         }
       ],
-      "name" : "Group",
+      "lighting" : "individual",
       "shadow" : {
-        "kind" : "neutral",
+        "kind" : "none",
         "opacity" : 0.5
       },
+      "specular" : false,
       "translucency" : {
-        "enabled" : true,
+        "enabled" : false,
         "value" : 0.5
       }
     }

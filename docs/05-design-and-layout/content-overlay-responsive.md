@@ -1,112 +1,79 @@
 # Content Overlay Responsive
 
-Content from `/docs/content-overlay-responsive.md`.
-
 ## Overview
 
-Standard responsive pattern for full-screen overlays in Reminderly. Ensures consistent layout, positioning, and responsive behaviour across all overlay components.
+Reminderly does not currently use one single overlay pattern for every surface. Most overlays are bottom sheets provided by wrappers in `App.tsx`, but some overlays use different presentation rules.
 
-## Pattern Structure
+## Current Bottom-Sheet Pattern
+
+The current reminder/settings/tutorial/dev-tools sheet pattern is:
 
 ```tsx
-<motion.div> {/* Backdrop */}
-  <motion.div> {/* Overlay container */}
-    <div className="size-full flex flex-col items-center">
-      <div className="w-full max-w-[768px]">
-        {/* Overlay content */}
-      </div>
+<motion.div /> // transparent backdrop
+<motion.div /> // sheet container, slide-up
+  <motion.div /> // optional drag wrapper
+    <div className="w-full max-w-[768px]">
+      {/* overlay content */}
     </div>
-  </motion.div>
-</motion.div>
 ```
 
-### Key Elements
+Common characteristics:
 
-**Backdrop**
-- Z-index: 40
-- Background: `bg-black/0` (transparent, allows backdrop click detection)
-- Full screen coverage
+- transparent click-catching backdrop
+- `y: "100%"` to visible slide-up motion
+- viewport-aware top offset
+- `max-w-[768px]`
+- rounded top corners
 
-**Overlay Container**
-- Z-index: 50
-- Slide-up animation: `y: "100%"` → `y: 0`, 250ms easeInOut
-- Top position: `getOverlayTopPosition()` (viewport-aware)
-- Border-radius: `rounded-tl-[20px] rounded-tr-[20px]`
+## Current Sheet-Based Surfaces
 
-**Content Wrapper**
-- `size-full items-center`: Full height, horizontally centered
-- Inner max-width: `max-w-[768px]`
-- Padding: typically `px-[20px]` horizontal
+- Settings overlay
+- Tutorial overlay
+- Dev tools overlay
+- reminder/list editor sheet flows rendered from `App.tsx`
 
-## Viewport-Aware Positioning
+## Current Exceptions
 
-`getOverlayTopPosition()` function calculates top position based on viewport height:
+### Reminder Info Overlay
 
-- Larger viewports: Leaves space at top for app context visibility
-- Smaller viewports (iPhone SE): Maximizes overlay height
+- centered modal
+- darkened backdrop
+- fixed-width white panel
+- not part of the bottom-sheet wrapper family
 
-Threshold: 667px viewport height (iPhone SE)
+### Repeats Overlay
 
-## Responsive Breakpoints
+- custom full-height overlay content
+- internal back-button close/save behaviour
+- different spacing and radius treatment from settings/tutorial/dev-tools sheets
 
-### iPhone SE (667px Height)
+## Bottom-Sheet Initial Top Constraint (fixed — persistent bug)
 
-At 667px viewport height or below, specific adjustments activate:
+This was a long-standing bug that was difficult to diagnose. The symptom: opening a list overlay via smart reminder > info overlay > "go to list" caused the panel to visibly bounce at the top — but only when the list contained more than approximately 23 items. Lists with fewer items opened normally. The 23-item threshold corresponds to the point where the list content exceeds the panel's constrained viewport height and the scroll container activates.
 
-**Settings Overlay**
-- Left icons hidden (`[@media(max-height:667px)]:hidden`)
-- Row alignment centered (`[@media(max-height:667px)]:items-center`)
-- Subtitle text hidden
-- Premium feature bullets hidden
-- Shorter CTA button text
-
-**Tutorial Overlay**
-- Container height becomes auto (`[@media(max-height:667px)]:!h-auto`)
-- Padding bottom removed (`[@media(max-height:667px)]:!pb-0`)
-- Content area: `flex-none` instead of `flex-1`
-- Page indicator dots hidden
-- Navigation controls: special padding
-
-## Max-Width Strategy
-
-All overlays constrain content to `max-w-[768px]` for:
-- Optimal reading width
-- Consistent layout across device sizes
-- Mobile app aesthetic on desktop
-
-## Padding Pattern
-
-Standard padding across overlays:
-- **Top**: 26px
-- **Horizontal**: 20px
-- **Bottom**: Varies by overlay content
-
-## Animation Pattern
-
-Standard slide-up with Motion:
+The slide-up `motion.div` must include `top: getBottomSheetTopPosition()` in both `initial` and `animate`:
 
 ```tsx
-<motion.div
-  initial={{ y: "100%" }}
-  animate={{ y: 0 }}
-  exit={{ y: "100%" }}
-  transition={{ duration: 0.25, ease: "easeInOut" }}
->
+initial={{ y: "100%", top: getBottomSheetTopPosition() }}
+animate={{ y: 0, top: getBottomSheetTopPosition() }}
 ```
 
-## Usage in Overlays
+Without `top` in `initial`, the panel's height is determined by its content on the first frame (since it only has `bottom: 0`). When content is tall enough to exceed the viewport (more than ~23 list items), `y: "100%"` calculates its translate distance from this inflated content height. Then mid-animation, `top` kicks in and collapses the height to the correct constrained value. The mismatch between the starting translate distance and the shrinking height causes the visible bounce at the top of the panel.
 
-All overlays use this pattern:
-- NewReminderOverlay
-- ReminderInfoOverlay
-- RepeatsOverlay
-- SettingsOverlay
-- TutorialOverlay
-- DevToolsOverlay
+Setting `top` in `initial` locks the panel to its correct constrained height from the first frame, so `y: "100%"` translates the right distance and the slide-up is smooth regardless of content size.
+
+## Height-Based Adjustments
+
+Current overlay content commonly changes around `667px` height:
+
+- helper text can be hidden
+- icons can be hidden
+- premium rows compress
+- tutorial spacing reduces
 
 ## Related Documentation
 
-- [Responsive Layout](./responsive-layout.md) - Overall responsive strategy
-- [All overlay documentation](../../01-core-surfaces/) - Individual overlay implementations
-
-For full details, see original `/docs/content-overlay-responsive.md`.
+- [Responsive Layout](./responsive-layout.md)
+- [Settings Overlay](../01-core-surfaces/settings-overlay.md)
+- [Tutorial Overlay](../01-core-surfaces/tutorial-overlay.md)
+- [Reminder Info Overlay](../01-core-surfaces/reminder-info-overlay.md)

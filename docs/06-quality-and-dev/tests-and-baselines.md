@@ -1,127 +1,80 @@
 # Tests and Baselines
 
-## Test Coverage
+## Current Test Coverage
 
-### Total Coverage
-
-**280 checks** across 7 test suites:
+Reminderly currently has **425 self-checks across 8 suites**.
 
 | Suite | Checks | Focus |
-|-------|--------|-------|
-| Schedule | 37 | Schedule utility pure functions |
-| Reminder | 77 | Persistence, sorting, categorisation |
-| NLC Parser | 53 | Date/time/repeat token recognition |
-| NLC Interaction | 44 | Token click application |
-| Done/Deleted | 9 | Done/deleted view and subfilters |
-| Completion | 14 | Completion and uncomplete logic |
-| Dev Tools | 46 | Dev tools settings and feature flags |
+| --- | ---: | --- |
+| Schedule and reminder logic | 37 | Schedule helpers and derived schedule state |
+| Persistence and hydration | 143 | Reminder validation, migration, persistence, categorisation, sorting, labels, overdue logic, and rendering |
+| Natural language parsing | 53 | Parser token recognition and hardening |
+| Natural language interaction | 45 | Token application and auto-apply behaviour |
+| Done, deleted, and completion | 27 | Done/deleted views, restore paths, ordering, and cleanup |
+| Done, deleted, and completion | 36 | Completion logic and repeat rescheduling |
+| Lists and smart reminders | 38 | Lists, templates, smart reminders, pinning, and list state rules |
+| Dev tools and feature flags | 46 | Developer settings and feature-flag behaviour |
 
 ## Baseline Output
 
-Expected clean run output documented in `/src/app/dev/BASELINE.md`.
+Expected clean-run output is tracked in `src/app/dev/BASELINE.md`.
 
 ### Clean Run Characteristics
 
-- All 280 checks pass
-- Execution time: typically < 100ms
-- No errors or warnings
-- Deterministic results (same output every run)
+- all 425 checks pass
+- failed count is 0
+- run invocation id varies per execution
+- duration varies per execution
+- output ordering is stable because the suite aggregation order is fixed
 
-## Test Philosophy
+## Test Shape
 
-### Pure Functions
+The current self-checks are:
 
-All tests validate pure functions:
-- No React components
-- No DOM manipulation
-- No async operations
-- No external dependencies
+- pure-function driven
+- in-memory only
+- synchronous from the point of view of the UI runner
+- grouped into labelled sections for reporting
 
-### Deterministic
+The tests do not mount React components and do not directly verify:
 
-- Fixed dates (no Date.now() in tests)
-- Predictable inputs
-- Consistent outputs
-- No randomness
-
-### Fast Execution
-
-- In-memory only
-- No I/O operations
-- No network calls
-- No timers
-
-### Comprehensive Coverage
-
-- Happy paths
-- Edge cases
-- Invalid inputs
-- Legacy migration
-- Boundary conditions
-
-## Test Organization
-
-### Check Structure
-
-```typescript
-type Check = {
-  label: string; // Describes expected behaviour
-  fn: () => boolean; // Returns true (pass) or false (fail)
-};
-```
-
-### Suite Organization
-
-Each suite is a self-contained module exporting an array of checks:
-
-```typescript
-export default [
-  { label: "Today detection", fn: () => { /* test */ } },
-  { label: "This week detection", fn: () => { /* test */ } },
-  // ...
-];
-```
+- gesture handling
+- animations
+- overlay transitions
+- responsive layout behaviour
+- native iOS shell behaviour
 
 ## Running Tests
 
-### Via DevTools
+### Via Dev Tools
 
-1. Triple-tap logo
-2. Navigate to "Automated tests"
-3. Tests execute immediately
-4. Results display with pass/fail indicators
+1. Open Dev tools from the header logo gesture.
+2. Open `Automated tests`.
+3. Run `Run self-checks`.
+4. Review grouped results or copy the report text.
 
-### Programmatic
+### Result Output
 
-```typescript
-import { runChecks } from './check-system';
-import allChecks from './all-checks'; // Aggregated
+The page currently displays:
 
-const results = runChecks(allChecks);
-```
+- run invocation id
+- passed count
+- failed count
+- run duration
+- grouped result sections
+- per-check error text when a check throws
 
 ## Baseline Maintenance
 
-When adding features:
-1. Add corresponding checks to appropriate suite
-2. Run full suite to verify all pass
-3. Update BASELINE.md with new check count
-4. Update this documentation
+When the implementation changes, the baseline and documentation must stay aligned with:
 
-## Coverage Gaps
-
-Areas without automated checks:
-- UI interactions (clicks, gestures)
-- Animation timing
-- localStorage persistence (partially covered)
-- Responsive layout breakpoints
-- Overlay positioning
-- Error handling edge cases
-
-These require manual verification.
+- suite count
+- total check count
+- section labels shown in the automated tests page
+- current focus of each suite
 
 ## Related Documentation
 
-- [Self-Check System](./self-check-system.md) - Complete test system documentation
-- [Dev Tools Overlay](../../01-core-surfaces/dev-tools-overlay.md) - How to run tests
-- [Architecture](../../00-overview/architecture.md) - Pure function design
+- [Self-Check System](./self-check-system.md)
+- [Dev Tools](./dev-tools.md)
+- [Dev Tools Overlay](../01-core-surfaces/dev-tools-overlay.md)
