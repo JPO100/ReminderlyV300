@@ -141,9 +141,9 @@ function getArchiveFilterPillStyle(filter: "done" | "deleted", activeFilter: "al
 }
 
 const LIST_CATEGORY_PILL_COLOURS: Record<string, string> = {
-  complete: "#005BE3",
+  complete: "#8168D5",
   almost: "#9468D5",
-  started: "#9468D5",
+  started: "#60C1E7",
   todo: "#939393",
   "grouped-todo": "#939393",
 };
@@ -3787,9 +3787,9 @@ export default function App() {
                       return createdLists.indexOf(a) - createdLists.indexOf(b);
                     })];
                     const listCategoryColor: Record<string, string> = {
-                      complete: "#0D45A0",
+                      complete: "#8168D5",
                       almost: "#9468D5",
-                      started: savedListsFeatureEnabled ? "#9468D5" : "#00AFEE",
+                      started: "#60C1E7",
                       todo: "#939393",
                     };
                     return sortedLists.map((list) => {

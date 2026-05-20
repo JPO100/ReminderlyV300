@@ -32,11 +32,9 @@ See also [Text Styles](./text-styles.md).
 
 Current list category colours in `App.tsx`:
 
-- Complete: `#0D45A0`
+- Complete: `#8168D5`
 - Almost: `#9468D5`
-- Started:
-  - `#00AFEE` when saved list templates are disabled
-  - `#9468D5` when saved list templates are enabled
+- Started: `#60C1E7`
 - Todo: `#939393`
 
 ### Pinned Lists
