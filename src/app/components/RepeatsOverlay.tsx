@@ -116,7 +116,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                 >
                   <span
                     className="font-['Lato:Bold',sans-serif] not-italic text-[17px] whitespace-nowrap"
-                    style={{ color: activeFrequency === 'custom-days' ? "#214677" : "#939393" }}
+                    style={{ color: activeFrequency === 'custom-days' ? "#1C2C42" : "#939393" }}
                   >
                     Custom days
                   </span>
@@ -153,7 +153,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                                 )}
                               </div>
                               <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-left whitespace-nowrap"
-                                style={{ color: isChecked ? "#214677" : "#939393" }}
+                                style={{ color: isChecked ? "#1C2C42" : "#939393" }}
                               >
                                 <p className="leading-[normal]">Every {day}</p>
                               </div>
@@ -181,7 +181,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                 >
                   <span
                     className="font-['Lato:Bold',sans-serif] not-italic text-[17px] whitespace-nowrap"
-                    style={{ color: activeFrequency === 'hourly' ? "#214677" : "#939393" }}
+                    style={{ color: activeFrequency === 'hourly' ? "#1C2C42" : "#939393" }}
                   >
                     Hourly
                   </span>
@@ -204,7 +204,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                             <path d={repeatSvg.p18547e00} fill="white" />
                           </svg>
                         </button>
-                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#214677] text-[17px] flex-1 text-center px-[10px]">
+                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[17px] flex-1 text-center px-[10px]">
                           {hourlyCount === 1
                             ? <>Repeats every hour</>
                             : <>Repeats every {hourlyCount} hours</>
@@ -241,7 +241,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                 >
                   <span
                     className="font-['Lato:Bold',sans-serif] not-italic text-[17px] whitespace-nowrap"
-                    style={{ color: activeFrequency === 'daily' ? "#214677" : "#939393" }}
+                    style={{ color: activeFrequency === 'daily' ? "#1C2C42" : "#939393" }}
                   >
                     Daily
                   </span>
@@ -264,7 +264,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                             <path d={repeatSvg.p18547e00} fill="white" />
                           </svg>
                         </button>
-                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#214677] text-[17px] flex-1 text-center px-[10px]">
+                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[17px] flex-1 text-center px-[10px]">
                           {repeatCount === 1
                             ? <>Repeats every day</>
                             : <>Repeats every {repeatCount} days</>
@@ -301,7 +301,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                 >
                   <span
                     className="font-['Lato:Bold',sans-serif] not-italic text-[17px] whitespace-nowrap"
-                    style={{ color: activeFrequency === 'weekly' ? "#214677" : "#939393" }}
+                    style={{ color: activeFrequency === 'weekly' ? "#1C2C42" : "#939393" }}
                   >
                     Weekly
                   </span>
@@ -324,7 +324,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                             <path d={repeatSvg.p18547e00} fill="white" />
                           </svg>
                         </button>
-                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#214677] text-[17px] flex-1 text-center px-[10px]">
+                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[17px] flex-1 text-center px-[10px]">
                           {weeklyCount === 1
                             ? <>Repeats every week</>
                             : <>Repeats every {weeklyCount} weeks</>
@@ -361,7 +361,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                 >
                   <span
                     className="font-['Lato:Bold',sans-serif] not-italic text-[17px] whitespace-nowrap"
-                    style={{ color: activeFrequency === 'monthly' ? "#214677" : "#939393" }}
+                    style={{ color: activeFrequency === 'monthly' ? "#1C2C42" : "#939393" }}
                   >
                     Monthly
                   </span>
@@ -384,7 +384,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                             <path d={repeatSvg.p18547e00} fill="white" />
                           </svg>
                         </button>
-                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#214677] text-[17px] flex-1 text-center px-[10px]">
+                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[17px] flex-1 text-center px-[10px]">
                           {monthlyCount === 1
                             ? <>Repeats every month</>
                             : <>Repeats every {monthlyCount} months</>

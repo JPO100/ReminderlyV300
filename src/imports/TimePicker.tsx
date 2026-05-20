@@ -214,7 +214,7 @@ function WheelColumn({ values, selectedValue, onChange, formatValue }: WheelColu
                   className="font-['Lato:Bold',sans-serif] text-center"
                   style={{
                     fontSize: style.fontSize,
-                    color: offset === 0 ? '#214677' : `rgba(0,0,0,${style.opacity})`,
+                    color: offset === 0 ? '#1C2C42' : `rgba(0,0,0,${style.opacity})`,
                     fontVariationSettings: offset === 0 ? "'wdth' 100" : `'wdth' ${offset === 0 ? 100 : Math.abs(offset) <= 1 ? 100 : Math.abs(offset) === 2 ? 122 : 150}`,
                     letterSpacing: Math.abs(offset) >= 2 ? `${Math.abs(offset) * 0.8}px` : undefined,
                   }}

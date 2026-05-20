@@ -186,7 +186,7 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
       <div className="relative shrink-0 w-full max-w-[340px] min-w-[280px] pt-[20px] pb-[16px] px-[4px]" data-name="top">
         <div className="flex flex-row items-center justify-between size-full">
           <div className="content-stretch flex gap-[3px] items-center relative shrink-0" data-name="month-year">
-            <p className="font-['Lato:Bold',sans-serif] leading-[normal] relative shrink-0 text-[17px] text-[#214677] tracking-[-0.2px]">
+            <p className="font-['Lato:Bold',sans-serif] leading-[normal] relative shrink-0 text-[17px] text-[#1C2C42] tracking-[-0.2px]">
               {formatMonthYear(viewYear, viewMonth)}
             </p>
           </div>
@@ -256,7 +256,7 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
               style={{ gridColumn: col, gridRow: row }}
               data-name="datepicker-day"
             >
-              <p className={`font-['Lato:Bold',sans-serif] leading-[normal] relative shrink-0 text-[17px] text-center ${isSelected ? 'text-white' : isPast ? 'text-[#D9D9D9]' : 'text-[#214677]'}`}>
+              <p className={`font-['Lato:Bold',sans-serif] leading-[normal] relative shrink-0 text-[17px] text-center ${isSelected ? 'text-white' : isPast ? 'text-[#D9D9D9]' : 'text-[#1C2C42]'}`}>
                 {day}
               </p>
             </button>
@@ -295,7 +295,7 @@ function Header({ isSubmitActive, onSubmit, title }: { isSubmitActive: boolean; 
 }
 
 function IconDetails({ isOn, selectedDate, onLabelClick }: { isOn: boolean; selectedDate: Date | null; onLabelClick?: () => void }) {
-  const color = isOn ? "#214677" : "#B7B7B7";
+  const color = isOn ? "#1C2C42" : "#B7B7B7";
   const dateLabel = isOn ? formatSelectedDate(selectedDate) : null;
   return (
     <div className="content-stretch flex gap-[16px] items-center relative min-w-0 flex-1" data-name="icon-details">
@@ -318,7 +318,7 @@ function IconDetails({ isOn, selectedDate, onLabelClick }: { isOn: boolean; sele
 }
 
 function IconDetails1({ isOn, selectedTime, onLabelClick }: { isOn: boolean; selectedTime: { hour: number; minute: number } | null; onLabelClick?: () => void }) {
-  const color = isOn ? "#214677" : "#B7B7B7";
+  const color = isOn ? "#1C2C42" : "#B7B7B7";
   const timeLabel = isOn ? formatSelectedTime(selectedTime) : null;
   return (
     <div className="content-stretch flex gap-[16px] items-center relative min-w-0 flex-1" data-name="icon-details">
@@ -341,7 +341,7 @@ function IconDetails1({ isOn, selectedTime, onLabelClick }: { isOn: boolean; sel
 }
 
 function IconDetails2({ isOn, repeatConfig, onLabelClick, inactiveColor = "#B7B7B7" }: { isOn: boolean; repeatConfig: RepeatConfig; onLabelClick?: () => void; inactiveColor?: string }) {
-  const color = isOn ? "#214677" : inactiveColor;
+  const color = isOn ? "#1C2C42" : inactiveColor;
   const repeatLabel = isOn ? formatRepeatConfig(repeatConfig) : null;
   return (
     <div className="content-stretch flex gap-[16px] items-center relative min-w-0 flex-1" data-name="icon-details">
@@ -1220,7 +1220,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
                   fontFamily: "'Lato', sans-serif",
                   fontSize: '17px',
                   lineHeight: 'normal',
-                  color: '#214677',
+                  color: '#1C2C42',
                   whiteSpace: 'pre-wrap',
                   overflowWrap: 'break-word',
                   wordBreak: 'break-word',
@@ -1252,7 +1252,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
           <textarea
             ref={textareaRef}
             className="w-full h-full p-[12px] font-['Lato',sans-serif] text-[17px] resize-none border-none outline-none bg-transparent relative z-10 placeholder:font-medium placeholder:text-[#bababa]"
-            style={{ color: isSmartReminderMode ? '#BABABA' : (nlcEnabled ? 'transparent' : '#214677'), caretColor: isSmartReminderMode ? '#BABABA' : '#214677', lineHeight: 'normal' }}
+            style={{ color: isSmartReminderMode ? '#BABABA' : (nlcEnabled ? 'transparent' : '#1C2C42'), caretColor: isSmartReminderMode ? '#BABABA' : '#1C2C42', lineHeight: 'normal' }}
             placeholder="Don't forget..."
             autoCapitalize="sentences"
             autoComplete="off"
