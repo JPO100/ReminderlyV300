@@ -317,7 +317,7 @@ export default function InfoOverlay({ sortMode, onSortChange, listTitle, onUnche
 
   return (
     <div className="bg-white content-stretch flex flex-col gap-[33px] items-center justify-start px-[32px] py-[35px] relative rounded-[32px] mx-auto" style={{ width: 340 }} data-name="info-overlay">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#214677] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1C2C42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
         <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>{listTitle}</p>
       </div>
       <Frame3 sortMode={sortMode} onSortChange={onSortChange} smartReminders={smartReminders} onSmartRemindersChange={handleSmartRemindersChange} showSmartReminders={showSmartReminders} displaySmartReminderDate={displaySmartReminderDate} smartReminderTime={smartReminderTime} selectedSmartReminderDate={draftSmartReminderDate} isDatePickerOpen={isDatePickerOpen} onDateSelect={setDraftSmartReminderDate} onSetDate={handleSetDate} onCloseDatePicker={handleCloseDatePicker} onOpenDatePicker={handleOpenDatePicker} onOpenSmartReminderEditor={onOpenSmartReminderEditor} highlightDueDate={dueDateHighlightPhase !== 'idle'} animateFadeOut={dueDateHighlightPhase === 'fade'} />

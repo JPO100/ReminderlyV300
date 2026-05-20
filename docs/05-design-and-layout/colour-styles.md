@@ -14,6 +14,12 @@ See also [Text Styles](./text-styles.md).
 - `#214677`
 - used for core text, done states, pinned list treatment, list/archive controls, and selected list-specific UI
 
+### App text dark blue
+
+- `#1C2C42`
+- shared heading/title colour across both reminders and lists surfaces
+- used for primary screen headings, overlay headings, sheet titles, section titles, tutorial headings, empty state headings, and settings headings
+
 ## Reminder Category Colours
 
 - Today: `#00AFEE`

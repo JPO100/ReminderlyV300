@@ -74,7 +74,7 @@ function Group() {
 function Frame({ isDarkBlue }: { isDarkBlue?: boolean }) {
   return (
     <div className="content-stretch flex flex-col items-start pb-[2.786px] pt-0 px-0 relative shrink-0">
-      <div className={`css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[23.682px] ${isDarkBlue ? 'text-[#214677]' : 'text-white'}`}>
+      <div className={`css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[23.682px] ${isDarkBlue ? 'text-[#1C2C42]' : 'text-white'}`}>
         <p className="css-ew64yg leading-[normal]">reminderly</p>
       </div>
     </div>

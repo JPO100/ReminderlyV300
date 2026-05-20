@@ -281,7 +281,7 @@ export default function ListInfoOverlay({ listTitle, smartReminders, onSmartRemi
 
   return (
     <div className="bg-white content-stretch flex flex-col gap-[17px] items-center justify-start px-[32px] py-[35px] relative rounded-[32px] mx-auto" style={{ width: 340 }} data-name="list-info-overlay">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#214677] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1C2C42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
         <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>{listTitle}</p>
       </div>
       {showSmartReminders && (

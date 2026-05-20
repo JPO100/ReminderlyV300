@@ -288,7 +288,7 @@ function AddTickBtn({ active, onSubmit }: { active: boolean; onSubmit?: () => vo
 function Header({ isSubmitActive, onSubmit, title }: { isSubmitActive: boolean; onSubmit?: () => void; title: string }) {
   return (
     <div className="flex items-center justify-between w-full" data-name="header">
-      <span className="font-['Lato:Bold',sans-serif] not-italic text-[#214677] text-[20px] whitespace-nowrap">{title}</span>
+      <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">{title}</span>
       <AddTickBtn active={isSubmitActive} onSubmit={onSubmit} />
     </div>
   );

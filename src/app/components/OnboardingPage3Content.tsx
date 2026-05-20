@@ -142,7 +142,7 @@ export function TutorialListSettingsOverlay() {
   return (
     <TutorialMiniOverlayShell>
       <div className="bg-white relative flex flex-col gap-[33px] items-center justify-start pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
-        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#214677] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
+        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1C2C42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
           <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>Work tasks</p>
         </div>
         <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
@@ -214,7 +214,7 @@ export function TutorialListSettingsOverlayWithToggle({ smartToggleActive }: { s
   return (
     <TutorialMiniOverlayShell>
       <div className="bg-white relative flex flex-col gap-[33px] items-center justify-start pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
-        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#214677] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
+        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic overflow-hidden relative shrink-0 text-[#1C2C42] text-[20px] text-ellipsis text-center w-full whitespace-nowrap">
           <p className="leading-[normal] overflow-hidden" style={{ fontWeight: 700 }}>Work tasks</p>
         </div>
         <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
@@ -308,7 +308,7 @@ export function TutorialSmartReminderSheet({ onTickButtonElementChange }: { onTi
       <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col">
         <div className="content-stretch flex flex-col gap-[22px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
           <div className="flex items-center justify-between w-full">
-            <span className="font-['Lato:Bold',sans-serif] not-italic text-[#214677] text-[20px] whitespace-nowrap">Add smart reminder</span>
+            <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Add smart reminder</span>
             <div ref={onTickButtonElementChange} className="flex items-center justify-center relative shrink-0 size-[50px]">
               <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
                 <rect fill="#4784F8" height="50" rx="25" width="50" />

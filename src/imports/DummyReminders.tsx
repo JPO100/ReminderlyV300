@@ -16,7 +16,7 @@ function Header({ onBack, onClose }: { onBack: () => void; onClose: () => void }
             </svg>
           </div>
         </button>
-        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] whitespace-nowrap">
+        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] whitespace-nowrap">
           <p className="leading-[normal]">Dummy reminders</p>
         </div>
       </div>

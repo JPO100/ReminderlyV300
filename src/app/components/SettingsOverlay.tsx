@@ -9,7 +9,7 @@ import repeatIconPaths from "../../imports/svg-6b7xc4ifcd";
 function Header({ onClose }: { onClose: () => void }) {
   return (
     <div className="content-stretch flex items-center justify-between relative shrink-0 w-full" data-name="header">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] whitespace-nowrap">
         <p className="leading-[normal]">Settings</p>
       </div>
       <button

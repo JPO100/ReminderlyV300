@@ -17,7 +17,7 @@ function ToggleBtn({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) 
 function Header({ onClose }: { onClose: () => void }) {
   return (
     <div className="content-stretch flex items-center justify-between relative shrink-0 w-full" data-name="header">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] whitespace-nowrap">
         <p className="leading-[normal]">Dev tools</p>
       </div>
       <button
@@ -340,7 +340,7 @@ export default function DevTools({
               style={{ width: 322 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
                 <p className="leading-[normal] whitespace-pre-wrap">
                   {pendingNlcState
                     ? 'Turn on NLC?'
@@ -399,7 +399,7 @@ export default function DevTools({
               style={{ width: 322 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
                 <p className="leading-[normal] whitespace-pre-wrap">
                   {pendingOnboardingState
                     ? 'Turn on onboarding tutorial?'
@@ -458,7 +458,7 @@ export default function DevTools({
               style={{ width: 322 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
                 <p className="leading-[normal] whitespace-pre-wrap">
                   {pendingListsState
                     ? 'Turn on Lists?'

@@ -18,7 +18,7 @@ function DoneTick({ isActive }: { isActive: boolean }) {
 function Frame({ isActive }: { isActive: boolean }) {
   return (
     <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[13.93px]">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[13.93px]">
         <p className="css-ew64yg leading-[normal]">New reminder</p>
       </div>
       <DoneTick isActive={isActive} />

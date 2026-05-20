@@ -226,7 +226,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">Welcome to Reminderly!</p>
       </div>
     </div>
@@ -470,7 +470,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">Mark reminders as 'done'</p>
       </div>
     </div>
@@ -975,7 +975,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">Smart reminders!</p>
       </div>
     </div>
@@ -1215,7 +1215,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">Even smarter reminders!</p>
       </div>
     </div>
@@ -1453,7 +1453,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">Reminder status at a glance</p>
       </div>
     </div>
@@ -1691,7 +1691,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">Status icons do more</p>
       </div>
     </div>
@@ -1996,7 +1996,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">Filter your reminders</p>
       </div>
     </div>
@@ -2317,7 +2317,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">See what you've done</p>
       </div>
     </div>
@@ -2612,7 +2612,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[24px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center">
         <p className="css-ew64yg leading-[normal]">Re-run this tutorial</p>
       </div>
     </div>
@@ -2658,7 +2658,7 @@ function Group() {
 function Frame({ isDarkBlue }: { isDarkBlue?: boolean }) {
   return (
     <div className="content-stretch flex flex-col items-start pb-[2.786px] pt-0 px-0 relative shrink-0">
-      <div className={`css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[23.682px] ${isDarkBlue ? 'text-[#214677]' : 'text-white'}`}>
+      <div className={`css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[23.682px] ${isDarkBlue ? 'text-[#1C2C42]' : 'text-white'}`}>
         <p className="css-ew64yg leading-[normal]">reminderly</p>
       </div>
     </div>
@@ -2894,7 +2894,7 @@ function DoneTick({ isActive }: { isActive: boolean }) {
 function Frame({ isActive }: { isActive: boolean }) {
   return (
     <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[13.93px]">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[13.93px]">
         <p className="css-ew64yg leading-[normal]">New reminder</p>
       </div>
       <DoneTick isActive={isActive} />
@@ -3300,10 +3300,10 @@ function Frame() {
 export default function ReminderInfoOverlay() {
   return (
     <div className="bg-white content-stretch flex flex-col gap-[30.558px] items-center justify-center px-[25.975px] py-[30.558px] relative rounded-[24.447px] size-full" data-name="'Pick up milk' - Reminder info">
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[12.987px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[12.987px] text-center">
         <p className="css-ew64yg leading-[normal]">'Put the bins out'</p>
       </div>
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[#214677] text-[12.987px] text-center w-[min-content]">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[#1C2C42] text-[12.987px] text-center w-[min-content]">
         <p className="css-4hzbpn leading-[normal]">Every Wednesday at 6pm</p>
       </div>
       <Frame />

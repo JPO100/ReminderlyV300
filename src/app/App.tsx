@@ -206,6 +206,7 @@ const OVERDUE_COLOUR = "#FF0000";
 
 // List blue constant for done styling
 const DONE_BLUE = "#214677";
+const APP_TEXT_DARK_BLUE = "#1C2C42";
 const DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY = 'reminderly-dev-default-templates-in-clean-state';
 const DONE_LIST_COLOUR = "#404040";
 type TutorialVariant = 'reminders' | 'lists';
@@ -3941,7 +3942,7 @@ export default function App() {
                 >
                   <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[0px]">
                     <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
-                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#214677] whitespace-nowrap">
+                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
                         List templates
                       </div>
                       <button
@@ -4958,7 +4959,7 @@ export default function App() {
                 style={{ width: 340 }}
                 onClick={(event) => event.stopPropagation()}
               >
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
+                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
                   <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>
                     {savedList.title}
                   </p>
@@ -5059,7 +5060,7 @@ export default function App() {
                 style={{ width: 340 }}
                 onClick={(event) => event.stopPropagation()}
               >
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
+                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
                   <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>
                     {savedList.title}
                   </p>
@@ -5331,7 +5332,7 @@ export default function App() {
                 <div className="relative w-full max-w-[768px] h-full flex flex-col mx-auto">
                   <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
                     <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
-                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#214677] whitespace-nowrap">
+                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
                         Reminders settings
                       </div>
                       <button
@@ -5421,7 +5422,7 @@ export default function App() {
                 <div className="relative w-full max-w-[768px] h-full flex flex-col mx-auto">
                   <div className="content-stretch flex flex-col gap-[30px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
                     <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
-                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#214677] whitespace-nowrap">
+                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
                         Lists settings
                       </div>
                       <button

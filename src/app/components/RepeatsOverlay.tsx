@@ -104,7 +104,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                   <path d={svgPaths.p2a78d200} fill="white" />
                 </svg>
               </button>
-              <span className="font-['Lato:Bold',sans-serif] not-italic text-[#214677] text-[20px] whitespace-nowrap">Reminder repeats</span>
+              <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Reminder repeats</span>
             </div>
             <div className="mt-[34px] w-full flex flex-col gap-[30px] overflow-y-auto flex-1 min-h-0 pb-[10px]">
               {/* Custom Days */}

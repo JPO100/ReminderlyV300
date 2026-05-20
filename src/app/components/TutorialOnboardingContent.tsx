@@ -48,7 +48,7 @@ interface TutorialOnboardingContentProps {
 const LIST_TUTORIAL_TOTAL_PAGES = 8;
 const REMINDER_TUTORIAL_BASE_TOTAL_PAGES = 5;
 const REMINDER_TUTORIAL_SETTINGS_TOTAL_PAGES = 6;
-const REMINDERLY_DARK_BLUE = "#214677";
+const LIST_BLUE = "#214677";
 const REMINDERLY_LIGHT_BLUE = "#4784F8";
 const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[35px]";
 const TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME = "pb-[45px]";
@@ -1263,7 +1263,7 @@ function ListsTutorialPlaceholderPage({
               {page5Phase === "settings-overlay" && (
                 <TutorialMiniOverlayShell>
                   <div className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] outline-none">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
                       <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>Weekly food shop</p>
                     </div>
                     <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
@@ -1356,7 +1356,7 @@ function ListsTutorialPlaceholderPage({
                           <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[0px]">
                             {/* Mirrors production App.tsx line 3939: title row */}
                             <div className="filters-menu flex items-center justify-between relative shrink-0 w-full h-[40px]">
-                              <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#214677] whitespace-nowrap">
+                              <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
                                 List templates
                               </div>
                               <div className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center w-[30px] h-[30px]">
@@ -1613,8 +1613,8 @@ export default function TutorialOnboardingContent({ onComplete, filtersMenuVaria
 
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
-  const activePaginationColor = isListsTutorial ? REMINDERLY_DARK_BLUE : REMINDERLY_LIGHT_BLUE;
-  const nextButtonColor = isListsTutorial ? REMINDERLY_DARK_BLUE : "#4784f8";
+  const activePaginationColor = isListsTutorial ? LIST_BLUE : REMINDERLY_LIGHT_BLUE;
+  const nextButtonColor = isListsTutorial ? LIST_BLUE : "#4784f8";
   const paginationWidth = 115.542;
   const paginationDotRadius = 3.96729;
   const paginationDotSpacing = totalPages <= 7 ? 17.93461 : (paginationWidth - paginationDotRadius * 2) / (totalPages - 1);

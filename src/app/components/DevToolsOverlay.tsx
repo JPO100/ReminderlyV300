@@ -47,7 +47,7 @@ function BackHeader({ title, onBack, onClose }: { title: string; onBack: () => v
             </svg>
           </div>
         </button>
-        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] whitespace-nowrap">
+        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] whitespace-nowrap">
           <p className="leading-[normal]">{title}</p>
         </div>
       </div>
@@ -945,7 +945,7 @@ function LoginScreen({ onUnlock, passwordRequired }: { onUnlock: () => void; pas
                 </g>
               </svg>
             </div>
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center whitespace-nowrap">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[22px] text-center whitespace-nowrap">
               <p className="leading-[normal]">Log-in to Reminderly</p>
             </div>
           </div>
