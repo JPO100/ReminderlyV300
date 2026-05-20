@@ -18,7 +18,7 @@ function DoneTick({ isActive }: { isActive: boolean }) {
 function Frame({ isActive }: { isActive: boolean }) {
   return (
     <div className="content-stretch flex items-center justify-between relative shrink-0 w-full">
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[13.93px]">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[13.93px]">
         <p className="css-ew64yg leading-[normal]">New reminder</p>
       </div>
       <DoneTick isActive={isActive} />
@@ -33,7 +33,7 @@ function TakeBinsOut({ text }: { text: string }) {
   return (
     <div className="bg-[#f7f7f7] h-[60px] relative rounded-[7.83px] shrink-0 w-full" data-name="Take bins out">
       <div className="content-stretch flex items-start p-[12.529px] relative size-full">
-        <div className="css-g0mm18 flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] justify-center leading-[0] relative shrink-0 text-[#1c2c42] text-[0px]" style={{ fontVariationSettings: "'wdth' 100" }}>
+        <div className="css-g0mm18 flex flex-col font-['SF_Pro:Medium',sans-serif] font-[510] justify-center leading-[0] relative shrink-0 text-[#214677] text-[0px]" style={{ fontVariationSettings: "'wdth' 100" }}>
           <p className="css-ew64yg text-[11.83px]">
             {hasTonight ? (
               <>
@@ -53,7 +53,7 @@ function TakeBinsOut({ text }: { text: string }) {
 }
 
 function SetTimeClock({ isActive }: { isActive: boolean }) {
-  const strokeColor = isActive ? "#1C2C42" : "#939393";
+  const strokeColor = isActive ? "#214677" : "#939393";
   
   return (
     <div className="relative shrink-0 size-[17.413px]" data-name="Set time clock">
@@ -71,7 +71,7 @@ function SetTimeClock({ isActive }: { isActive: boolean }) {
 }
 
 function Frame3({ isActive }: { isActive: boolean }) {
-  const textColor = isActive ? "#1c2c42" : "#939393";
+  const textColor = isActive ? "#214677" : "#939393";
   
   return (
     <div className="content-stretch flex gap-[11.144px] items-center relative shrink-0 w-[135.734px]">
@@ -113,7 +113,7 @@ function SetDate({ isActive }: { isActive: boolean }) {
 }
 
 function SetTimeClock1({ isActive }: { isActive: boolean }) {
-  const strokeColor = isActive ? "#1C2C42" : "#939393";
+  const strokeColor = isActive ? "#214677" : "#939393";
   
   return (
     <div className="relative shrink-0 size-[17.413px]" data-name="Set time clock">
@@ -131,7 +131,7 @@ function SetTimeClock1({ isActive }: { isActive: boolean }) {
 }
 
 function Frame6({ isActive }: { isActive: boolean }) {
-  const textColor = isActive ? "#1c2c42" : "#939393";
+  const textColor = isActive ? "#214677" : "#939393";
   
   return (
     <div className="content-stretch flex gap-[11.144px] items-center relative shrink-0 w-[135.734px]">
@@ -173,8 +173,8 @@ function SetDate1({ isActive }: { isActive: boolean }) {
 }
 
 function RepeatTimeClock({ isActive }: { isActive: boolean }) {
-  const fillColor = isActive ? "#1C2C42" : "#939393";
-  const strokeColor = isActive ? "#1C2C42" : "#939393";
+  const fillColor = isActive ? "#214677" : "#939393";
+  const strokeColor = isActive ? "#214677" : "#939393";
   
   return (
     <div className="bg-white h-[17.462px] relative shrink-0 w-[17.413px]" data-name="Repeat time clock">
@@ -194,7 +194,7 @@ function RepeatTimeClock({ isActive }: { isActive: boolean }) {
 }
 
 function Frame7({ isActive }: { isActive: boolean }) {
-  const textColor = isActive ? "#1c2c42" : "#939393";
+  const textColor = isActive ? "#214677" : "#939393";
   
   return (
     <div className="content-stretch flex gap-[11.144px] items-center relative shrink-0 w-[135.734px]">

@@ -13,7 +13,7 @@ function AddTickBtn() {
     <button className="block cursor-pointer relative shrink-0 size-[24px]" data-name="add-tick-btn">
       <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
         <g id="add-tick-btn">
-          <rect fill="var(--fill-0, #1C2C42)" height="24" rx="12" width="24" />
+          <rect fill="var(--fill-0, #214677)" height="24" rx="12" width="24" />
           <path d="M12 18L12 6M6 12H18" id="Vector" stroke="var(--stroke-0, white)" strokeLinecap="round" strokeWidth="2" />
         </g>
       </svg>

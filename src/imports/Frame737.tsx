@@ -12,7 +12,7 @@ function Frame() {
           </g>
         </svg>
       </div>
-      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#1c2c42] text-[17px] whitespace-nowrap">Show tutorial on every app start</p>
+      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#214677] text-[17px] whitespace-nowrap">Show tutorial on every app start</p>
     </div>
   );
 }

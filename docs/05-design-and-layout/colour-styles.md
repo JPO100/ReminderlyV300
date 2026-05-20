@@ -9,9 +9,9 @@ See also [Text Styles](./text-styles.md).
 - `#4784F8`
 - used for primary CTAs, active toggles, tutorial dots, and branded emphasis
 
-### Reminderly dark blue
+### List blue
 
-- `#1C2C42`
+- `#214677`
 - used for core text, done states, pinned list treatment, list/archive controls, and selected list-specific UI
 
 ## Reminder Category Colours
@@ -37,8 +37,8 @@ Current list category colours in `App.tsx`:
 
 Pinned lists override category-colour treatment in the active `All` list view:
 
-- list check circle: `#1C2C42`
-- pin icon: `#1C2C42`
+- list check circle: `#214677`
+- pin icon: `#214677`
 
 ## State Colours
 

@@ -57,11 +57,11 @@ Each reminder displays a status icon on the right side of the row.
 **Active List**
 - Normal (not overdue): `#BABABA` (grey)
 - Overdue: `#FF0000` (red)
-- Pending done: `#1C2C42` (dark blue)
+- Pending done: `#214677` (dark blue)
 - Pending delete: `#939393` (grey)
 
 **Done/Deleted Archive**
-- Done reminder: `#1C2C42` (dark blue)
+- Done reminder: `#214677` (dark blue)
 - Deleted reminder: `#939393` (grey)
 - Pending restore (uncomplete/undelete): `#BABABA` (grey), or `#FF0000` if overdue
 
@@ -100,7 +100,7 @@ Overdue colour (`#FF0000`) takes precedence over category colour.
 - Stroke colour: category colour (or overdue red)
 
 **Pending done**
-- Filled `#1C2C42` (dark blue)
+- Filled `#214677` (dark blue)
 - White tick icon overlaid
 
 **Pending delete**
@@ -108,7 +108,7 @@ Overdue colour (`#FF0000`) takes precedence over category colour.
 - White tick icon overlaid
 
 **Done**
-- Filled `#1C2C42` (dark blue)
+- Filled `#214677` (dark blue)
 - White tick icon overlaid
 - Clickable: triggers uncomplete
 
@@ -122,7 +122,7 @@ Overdue colour (`#FF0000`) takes precedence over category colour.
 ### Active List
 
 **Normal**
-- Title: `#1c2c42` (dark blue)
+- Title: `#214677` (dark blue)
 - Subtitle: `#BABABA` (grey)
 
 **Overdue**
@@ -131,7 +131,7 @@ Overdue colour (`#FF0000`) takes precedence over category colour.
 
 **Pending done**
 - Container: `#BABABA`
-- Title: `#1C2C42` with `line-through`
+- Title: `#214677` with `line-through`
 - Subtitle: `#BABABA`
 
 **Pending delete**
@@ -141,8 +141,8 @@ Overdue colour (`#FF0000`) takes precedence over category colour.
 ### Done/Deleted Archive
 
 **Done**
-- Title: `#1C2C42` (dark blue)
-- Subtitle: `#1C2C42` or `#BABABA` (depending on state)
+- Title: `#214677` (dark blue)
+- Subtitle: `#214677` or `#BABABA` (depending on state)
 
 **Deleted**
 - Title: `#939393` (grey)

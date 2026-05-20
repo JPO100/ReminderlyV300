@@ -17,7 +17,7 @@ function ToggleBtn({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) 
 function Header({ onClose }: { onClose: () => void }) {
   return (
     <div className="content-stretch flex items-center justify-between relative shrink-0 w-full" data-name="header">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] whitespace-nowrap">
         <p className="leading-[normal]">Dev tools</p>
       </div>
       <button
@@ -29,7 +29,7 @@ function Header({ onClose }: { onClose: () => void }) {
         <div className="flex-none rotate-45">
           <div className="relative size-[18px]" data-name="Union">
             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 18">
-              <path d={svgPaths.p1cbc7100} fill="var(--fill-0, #1C2C42)" id="Union" />
+              <path d={svgPaths.p1cbc7100} fill="var(--fill-0, #214677)" id="Union" />
             </svg>
           </div>
         </div>
@@ -47,7 +47,7 @@ function NavRow({ label, onClick, plain }: { label: string; onClick: () => void;
       <div className="flex flex-row items-center size-full">
         <div className={`content-stretch flex items-center ${plain ? 'pr-[30px]' : 'px-[30px]'} py-[15px] relative size-full`}>
           <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-            <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 ${plain ? 'text-[#1c2c42] text-[17px]' : 'text-[#939393] text-[17px]'} whitespace-nowrap`}>
+            <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 ${plain ? 'text-[#214677] text-[17px]' : 'text-[#939393] text-[17px]'} whitespace-nowrap`}>
               <p className="leading-[normal] truncate">{label}</p>
             </div>
             <div className="flex items-center justify-center relative shrink-0">
@@ -169,7 +169,7 @@ export default function DevTools({
       <div className="content-stretch flex flex-[1_0_0] flex-col gap-[32px] items-center min-h-px min-w-px relative w-full">
         <div className="content-stretch flex flex-col gap-[50px] items-start relative w-full" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
           <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] whitespace-nowrap">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[17px] whitespace-nowrap">
               <p className="leading-[normal]">Testing and QA</p>
             </div>
             <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
@@ -179,7 +179,7 @@ export default function DevTools({
             </div>
           </div>
           <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] whitespace-nowrap">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[17px] whitespace-nowrap">
               <p className="leading-[normal]">Feature flags</p>
             </div>
             <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
@@ -192,7 +192,7 @@ export default function DevTools({
                     <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
                       <div className="flex items-center gap-[16px] min-w-0">
                         <ToggleBtn isOn={nlcEnabled} onToggle={() => setPendingNlcState(!nlcEnabled)} />
-                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: nlcEnabled ? '#1c2c42' : '#C9C9C9' }}>
+                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: nlcEnabled ? '#214677' : '#C9C9C9' }}>
                           <p className="leading-[normal] truncate">Natural Language Capture</p>
                         </div>
                       </div>
@@ -216,7 +216,7 @@ export default function DevTools({
                   <div className="content-stretch flex items-center py-[15px] relative size-full">
                     <div className="flex items-center gap-[16px]">
                       <ToggleBtn isOn={repeatToggle} onToggle={() => setRepeatToggle(prev => !prev)} />
-                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1c2c42] text-[17px] whitespace-nowrap">
+                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#214677] text-[17px] whitespace-nowrap">
                         <p className="leading-[normal] truncate">Repeat reminders</p>
                       </div>
                     </div>
@@ -232,7 +232,7 @@ export default function DevTools({
                     <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
                       <div className="flex items-center gap-[16px] min-w-0">
                         <ToggleBtn isOn={isOnboardingTutorialEnabled} onToggle={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)} />
-                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1c2c42] text-[17px] whitespace-nowrap" style={{ color: isOnboardingTutorialEnabled ? '#1c2c42' : '#C9C9C9' }}>
+                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#214677] text-[17px] whitespace-nowrap" style={{ color: isOnboardingTutorialEnabled ? '#214677' : '#C9C9C9' }}>
                           <p className="leading-[normal] truncate">Onboarding tutorial</p>
                         </div>
                       </div>
@@ -258,7 +258,7 @@ export default function DevTools({
                     <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
                       <div className="flex items-center gap-[16px] min-w-0">
                         <ToggleBtn isOn={isListsEnabled} onToggle={() => setPendingListsState(!isListsEnabled)} />
-                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: isListsEnabled ? '#1c2c42' : '#C9C9C9' }}>
+                        <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: isListsEnabled ? '#214677' : '#C9C9C9' }}>
                           <p className="leading-[normal] truncate">Lists</p>
                         </div>
                       </div>
@@ -282,7 +282,7 @@ export default function DevTools({
                   <div className="content-stretch flex items-center py-[15px] relative size-full">
                     <div className="flex items-center gap-[16px]">
                       <ToggleBtn isOn={settingsMenuEnabled} onToggle={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)} />
-                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: settingsMenuEnabled ? '#1c2c42' : '#C9C9C9' }}>
+                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: settingsMenuEnabled ? '#214677' : '#C9C9C9' }}>
                         <p className="leading-[normal] truncate">Settings menu</p>
                       </div>
                     </div>
@@ -293,7 +293,7 @@ export default function DevTools({
             </div>
           </div>
           <div className="content-stretch flex flex-col gap-[10px] items-start relative shrink-0 w-full">
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[17px] whitespace-nowrap">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[17px] whitespace-nowrap">
               <p className="leading-[normal]">Developer settings</p>
             </div>
             <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
@@ -306,7 +306,7 @@ export default function DevTools({
                 <div className="flex flex-row items-center size-full">
                   <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
                     <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: isListsEnabled ? '#1c2c42' : '#C9C9C9' }}>
+                      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: isListsEnabled ? '#214677' : '#C9C9C9' }}>
                         <p className="leading-[normal] truncate">List settings</p>
                       </div>
                       <div className="flex items-center justify-center relative shrink-0">
@@ -340,7 +340,7 @@ export default function DevTools({
               style={{ width: 322 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
                 <p className="leading-[normal] whitespace-pre-wrap">
                   {pendingNlcState
                     ? 'Turn on NLC?'
@@ -372,7 +372,7 @@ export default function DevTools({
                     setPendingNlcState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#1c2c42' }}
+                  style={{ backgroundColor: '#214677' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -399,7 +399,7 @@ export default function DevTools({
               style={{ width: 322 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
                 <p className="leading-[normal] whitespace-pre-wrap">
                   {pendingOnboardingState
                     ? 'Turn on onboarding tutorial?'
@@ -431,7 +431,7 @@ export default function DevTools({
                     setPendingOnboardingState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#1c2c42' }}
+                  style={{ backgroundColor: '#214677' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -458,7 +458,7 @@ export default function DevTools({
               style={{ width: 322 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] text-center">
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] text-center">
                 <p className="leading-[normal] whitespace-pre-wrap">
                   {pendingListsState
                     ? 'Turn on Lists?'
@@ -490,7 +490,7 @@ export default function DevTools({
                     setPendingListsState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#1c2c42' }}
+                  style={{ backgroundColor: '#214677' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">

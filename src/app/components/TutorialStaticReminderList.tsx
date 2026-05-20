@@ -15,7 +15,7 @@ const TUTORIAL_RECYCLE_DELAY = 2000;
 const COMPLETION_DELAY = 350;
 const DONE_SEQUENCE_INITIAL_DELAY = 1000;
 const DONE_SEQUENCE_REMOVAL_GAP = 500;
-const DONE_BLUE = "#1C2C42";
+const DONE_BLUE = "#214677";
 const PAGE_1_BUILD_SEQUENCE_IDS = ["sometime", "later-2", "later", "this-week", "today-2", "today"] as const;
 
 type TutorialReminder = {
@@ -211,7 +211,7 @@ function RepeatReminderIndicator({ color = "#BABABA" }: { color?: string }) {
 }
 
 function TutorialStaticReminderRow({
-  titleColor = "#1c2c42",
+  titleColor = "#214677",
   title,
   subtitle,
   circleColor,
@@ -640,7 +640,7 @@ export default function TutorialStaticReminderList({
                   subtitle={SMART_REMINDER_SUBTITLE}
                   circleColor={SMART_REMINDER_CIRCLE_COLOR}
                   showSmartReminderIcon
-                  titleColor={insertHighlightId === SMART_REMINDER_ID ? SMART_REMINDER_CIRCLE_COLOR : "#1c2c42"}
+                  titleColor={insertHighlightId === SMART_REMINDER_ID ? SMART_REMINDER_CIRCLE_COLOR : "#214677"}
                 />
               </motion.div>
             )}
@@ -658,7 +658,7 @@ export default function TutorialStaticReminderList({
                       subtitle={mode === "lists" ? (item as TutorialList).subtitle : getTutorialReminderSubtitle(item as TutorialReminder)}
                     circleColor={(item as TutorialReminder | TutorialList).circleColor}
                     showRepeatIcon={mode === "reminders" && Boolean((item as TutorialReminder).repeatRule)}
-                    titleColor={isHighlighted ? item.circleColor : "#1c2c42"}
+                    titleColor={isHighlighted ? item.circleColor : "#214677"}
                     isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
                     showMenuButton={!isDoneReminder}
@@ -695,7 +695,7 @@ export default function TutorialStaticReminderList({
                     subtitle={mode === "lists" ? (item as TutorialList).subtitle : getTutorialReminderSubtitle(item as TutorialReminder)}
                     circleColor={(item as TutorialReminder | TutorialList).circleColor}
                     showRepeatIcon={mode === "reminders" && Boolean((item as TutorialReminder).repeatRule)}
-                    titleColor={isHighlighted ? item.circleColor : "#1c2c42"}
+                    titleColor={isHighlighted ? item.circleColor : "#214677"}
                     isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
                     showMenuButton={!isDoneReminder}

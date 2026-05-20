@@ -7,7 +7,7 @@ export default function ListItem({ name = "Carrot", editable, onChange, complete
   const [hasTypedSinceFocus, setHasTypedSinceFocus] = useState(false);
 
   const showGrey = editable && isFocused && !hasTypedSinceFocus;
-  const textColor = isHighlighted ? '#00AFEE' : (completed ? '#1C2C42' : (showGrey ? '#B7B7B7' : '#1c2c42'));
+  const textColor = isHighlighted ? '#00AFEE' : (completed ? '#214677' : (showGrey ? '#B7B7B7' : '#214677'));
   const circleColor = isHighlighted ? '#00AFEE' : '#BABABA';
 
   return (
@@ -17,8 +17,8 @@ export default function ListItem({ name = "Carrot", editable, onChange, complete
           <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
             {completed ? (
               <g>
-                <rect fill="#1C2C42" height="23" rx="11.5" width="23" x="1" y="1" />
-                <rect height="23" rx="11.5" stroke="#1C2C42" strokeWidth="2" width="23" x="1" y="1" />
+                <rect fill="#214677" height="23" rx="11.5" width="23" x="1" y="1" />
+                <rect height="23" rx="11.5" stroke="#214677" strokeWidth="2" width="23" x="1" y="1" />
                 <path d={DONE_TICK_PATH} fill="white" />
               </g>
             ) : (
@@ -34,7 +34,7 @@ export default function ListItem({ name = "Carrot", editable, onChange, complete
               onFocus={() => { setIsFocused(true); setHasTypedSinceFocus(false); }}
               onBlur={() => { setIsFocused(false); setHasTypedSinceFocus(false); }}
               onChange={(e) => { if (!hasTypedSinceFocus) setHasTypedSinceFocus(true); onChange?.(e.target.value); }}
-              className={`font-['Lato:Bold',sans-serif] not-italic text-[17px] w-full bg-transparent border-none outline-none leading-[normal] overflow-hidden caret-[#1c2c42]${completed ? ' line-through' : ''}`}
+              className={`font-['Lato:Bold',sans-serif] not-italic text-[17px] w-full bg-transparent border-none outline-none leading-[normal] overflow-hidden caret-[#214677]${completed ? ' line-through' : ''}`}
               style={{ color: textColor, transition: 'color 300ms' }}
             />
           ) : (

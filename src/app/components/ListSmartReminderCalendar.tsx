@@ -83,12 +83,12 @@ export default function ListSmartReminderCalendar({
       <div className="relative shrink-0 w-full pt-[20px] pb-[16px] px-[4px]">
         <div className="flex flex-row items-center justify-between size-full">
           <div className="content-stretch flex gap-[3px] items-center relative shrink-0">
-            <p className="font-['Lato:Bold',sans-serif] leading-[normal] relative shrink-0 text-[17px] text-[#1C2C42] tracking-[-0.2px]">
+            <p className="font-['Lato:Bold',sans-serif] leading-[normal] relative shrink-0 text-[17px] text-[#214677] tracking-[-0.2px]">
               {formatMonthYear(viewYear, viewMonth)}
             </p>
           </div>
           <div
-            className="content-stretch flex items-center justify-end gap-[32px] leading-[normal] ml-auto relative shrink-0 text-[#1C2C42] text-nowrap"
+            className="content-stretch flex items-center justify-end gap-[32px] leading-[normal] ml-auto relative shrink-0 text-[#214677] text-nowrap"
           >
             <button
               onClick={handlePrevMonth}
@@ -98,7 +98,7 @@ export default function ListSmartReminderCalendar({
               aria-label="Previous month"
             >
               <svg width="9" height="15" viewBox="0 0 11 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8.9209 0C9.1875 0 9.43066 0.0654297 9.64941 0.195312C9.87472 0.318336 10.0528 0.489446 10.1826 0.708008C10.3123 0.926614 10.377 1.17309 10.377 1.44629C10.3768 1.84257 10.2235 2.19153 9.91602 2.49219L3.4248 8.80859L9.91602 15.1143C10.2235 15.4218 10.377 15.7775 10.377 16.1807C10.377 16.4473 10.3125 16.6904 10.1826 16.9092C10.0528 17.1277 9.87478 17.3018 9.64941 17.4316C9.43066 17.5615 9.1875 17.627 8.9209 17.627C8.51782 17.627 8.1796 17.4899 7.90625 17.2168L0.523438 9.97754C0.338867 9.7998 0.205078 9.61816 0.123047 9.43359C0.0410748 9.24233 5.91461e-05 9.03399 0 8.80859C0 8.58317 0.0411364 8.37782 0.123047 8.19336C0.205078 8.00195 0.338867 7.81738 0.523438 7.63965L7.90625 0.410156C8.17964 0.136882 8.5177 0 8.9209 0Z" fill="#1C2C42"/>
+                <path d="M8.9209 0C9.1875 0 9.43066 0.0654297 9.64941 0.195312C9.87472 0.318336 10.0528 0.489446 10.1826 0.708008C10.3123 0.926614 10.377 1.17309 10.377 1.44629C10.3768 1.84257 10.2235 2.19153 9.91602 2.49219L3.4248 8.80859L9.91602 15.1143C10.2235 15.4218 10.377 15.7775 10.377 16.1807C10.377 16.4473 10.3125 16.6904 10.1826 16.9092C10.0528 17.1277 9.87478 17.3018 9.64941 17.4316C9.43066 17.5615 9.1875 17.627 8.9209 17.627C8.51782 17.627 8.1796 17.4899 7.90625 17.2168L0.523438 9.97754C0.338867 9.7998 0.205078 9.61816 0.123047 9.43359C0.0410748 9.24233 5.91461e-05 9.03399 0 8.80859C0 8.58317 0.0411364 8.37782 0.123047 8.19336C0.205078 8.00195 0.338867 7.81738 0.523438 7.63965L7.90625 0.410156C8.17964 0.136882 8.5177 0 8.9209 0Z" fill="#214677"/>
               </svg>
             </button>
             <button
@@ -110,7 +110,7 @@ export default function ListSmartReminderCalendar({
             >
               <svg width="9" height="15" viewBox="0 0 11 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g transform="translate(11 0) scale(-1 1)">
-                  <path d="M8.9209 0C9.1875 0 9.43066 0.0654297 9.64941 0.195312C9.87472 0.318336 10.0528 0.489446 10.1826 0.708008C10.3123 0.926614 10.377 1.17309 10.377 1.44629C10.3768 1.84257 10.2235 2.19153 9.91602 2.49219L3.4248 8.80859L9.91602 15.1143C10.2235 15.4218 10.377 15.7775 10.377 16.1807C10.377 16.4473 10.3125 16.6904 10.1826 16.9092C10.0528 17.1277 9.87478 17.3018 9.64941 17.4316C9.43066 17.5615 9.1875 17.627 8.9209 17.627C8.51782 17.627 8.1796 17.4899 7.90625 17.2168L0.523438 9.97754C0.338867 9.7998 0.205078 9.61816 0.123047 9.43359C0.0410748 9.24233 5.91461e-05 9.03399 0 8.80859C0 8.58317 0.0411364 8.37782 0.123047 8.19336C0.205078 8.00195 0.338867 7.81738 0.523438 7.63965L7.90625 0.410156C8.17964 0.136882 8.5177 0 8.9209 0Z" fill="#1C2C42"/>
+                  <path d="M8.9209 0C9.1875 0 9.43066 0.0654297 9.64941 0.195312C9.87472 0.318336 10.0528 0.489446 10.1826 0.708008C10.3123 0.926614 10.377 1.17309 10.377 1.44629C10.3768 1.84257 10.2235 2.19153 9.91602 2.49219L3.4248 8.80859L9.91602 15.1143C10.2235 15.4218 10.377 15.7775 10.377 16.1807C10.377 16.4473 10.3125 16.6904 10.1826 16.9092C10.0528 17.1277 9.87478 17.3018 9.64941 17.4316C9.43066 17.5615 9.1875 17.627 8.9209 17.627C8.51782 17.627 8.1796 17.4899 7.90625 17.2168L0.523438 9.97754C0.338867 9.7998 0.205078 9.61816 0.123047 9.43359C0.0410748 9.24233 5.91461e-05 9.03399 0 8.80859C0 8.58317 0.0411364 8.37782 0.123047 8.19336C0.205078 8.00195 0.338867 7.81738 0.523438 7.63965L7.90625 0.410156C8.17964 0.136882 8.5177 0 8.9209 0Z" fill="#214677"/>
                 </g>
               </svg>
             </button>
@@ -145,11 +145,11 @@ export default function ListSmartReminderCalendar({
             <button
               key={day}
               onClick={() => handleDayClick(day)}
-              className={`${isSelected ? "bg-[#1C2C42]" : ""} content-stretch flex flex-col h-[35px] items-center justify-center justify-self-stretch relative rounded-[99px] shrink-0 cursor-pointer`}
+              className={`${isSelected ? "bg-[#214677]" : ""} content-stretch flex flex-col h-[35px] items-center justify-center justify-self-stretch relative rounded-[99px] shrink-0 cursor-pointer`}
               style={{ gridColumn: col, gridRow: row }}
               data-name="datepicker-day"
             >
-              <p className={`font-['Lato:Bold',sans-serif] leading-[normal] relative shrink-0 text-[17px] text-center ${isSelected ? "text-white" : "text-[#1C2C42]"}`}>
+              <p className={`font-['Lato:Bold',sans-serif] leading-[normal] relative shrink-0 text-[17px] text-center ${isSelected ? "text-white" : "text-[#214677]"}`}>
                 {day}
               </p>
             </button>

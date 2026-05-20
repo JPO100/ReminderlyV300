@@ -115,7 +115,7 @@ function DoneTickBlue() {
     <div className="relative shrink-0 size-[17.4px]" data-name="Done tick">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4 17.4">
         <g id="Done tick">
-          <rect fill="var(--fill-0, #1C2C42)" height="17.4" rx="8.7" width="17.4" />
+          <rect fill="var(--fill-0, #214677)" height="17.4" rx="8.7" width="17.4" />
           <path d={doneSvgPaths.p33bb1d80} fill="var(--fill-0, white)" id="Union" />
         </g>
       </svg>
@@ -128,7 +128,7 @@ function DoneTickPink() {
     <div className="relative shrink-0 size-[17.4px]" data-name="Done tick">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4 17.4">
         <g id="Done tick">
-          <rect fill="var(--fill-0, #1C2C42)" height="17.4" rx="8.7" width="17.4" />
+          <rect fill="var(--fill-0, #214677)" height="17.4" rx="8.7" width="17.4" />
           <path d={doneSvgPaths.p33bb1d80} fill="var(--fill-0, white)" id="Union" />
         </g>
       </svg>
@@ -141,7 +141,7 @@ function DoneTickOrange() {
     <div className="relative shrink-0 size-[17.4px]" data-name="Done tick">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4 17.4">
         <g id="Done tick">
-          <rect fill="var(--fill-0, #1C2C42)" height="17.4" rx="8.7" width="17.4" />
+          <rect fill="var(--fill-0, #214677)" height="17.4" rx="8.7" width="17.4" />
           <path d={doneSvgPaths.p33bb1d80} fill="var(--fill-0, white)" id="Union" />
         </g>
       </svg>
@@ -154,7 +154,7 @@ function DoneTickGrey() {
     <div className="relative shrink-0 size-[17.4px]" data-name="Done tick">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4 17.4">
         <g id="Done tick">
-          <rect fill="var(--fill-0, #1C2C42)" height="17.4" rx="8.7" width="17.4" />
+          <rect fill="var(--fill-0, #214677)" height="17.4" rx="8.7" width="17.4" />
           <path d={doneSvgPaths.p33bb1d80} fill="var(--fill-0, white)" id="Union" />
         </g>
       </svg>
@@ -207,18 +207,18 @@ function ReminderList({ animationKey }: { animationKey: number }) {
                   <div className="content-stretch flex gap-[11.138px] items-start pl-0 pr-[11.138px] py-0 relative w-full">
                     <div style={{ marginTop: '2px' }}>{doneStates[0] ? <DoneTickBlue /> : <UndoneTickBlue />}</div>
                     <div
-                      className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#1c2c42] text-[11.834px] ${doneStates[0] ? 'line-through' : ''}`}
+                      className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px] ${doneStates[0] ? 'line-through' : ''}`}
                       style={{ gap: '2px' }}
                     >
                       <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Pick the milk up</p>
-                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: doneStates[0] ? '#1c2c42' : '#BABABA' }}>Today at 2:00 PM</p>
+                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: doneStates[0] ? '#214677' : '#BABABA' }}>Today at 2:00 PM</p>
                     </div>
                     {showDoneText[0] && (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
-                        className="css-g0mm18 flex flex-col font-['Lato'] font-bold justify-center leading-[0] italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[11.834px] text-ellipsis text-right"
+                        className="css-g0mm18 flex flex-col font-['Lato'] font-bold justify-center leading-[0] italic overflow-hidden relative shrink-0 text-[#214677] text-[11.834px] text-ellipsis text-right"
                       >
                         <p className="css-ew64yg leading-[normal] overflow-hidden">(done)</p>
                       </motion.div>
@@ -238,18 +238,18 @@ function ReminderList({ animationKey }: { animationKey: number }) {
                   <div className="content-stretch flex gap-[11.138px] items-start pl-0 pr-[11.138px] py-0 relative w-full">
                     <div style={{ marginTop: '2px' }}>{doneStates[1] ? <DoneTickPink /> : <UndoneTickPink />}</div>
                     <div
-                      className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#1c2c42] text-[11.834px] ${doneStates[1] ? 'line-through' : ''}`}
+                      className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px] ${doneStates[1] ? 'line-through' : ''}`}
                       style={{ gap: '2px' }}
                     >
                       <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Put the bins out</p>
-                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: doneStates[1] ? '#1c2c42' : '#BABABA' }}>Thursday</p>
+                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: doneStates[1] ? '#214677' : '#BABABA' }}>Thursday</p>
                     </div>
                     {showDoneText[1] && (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
-                        className="css-g0mm18 flex flex-col font-['Lato'] font-bold justify-center leading-[0] italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[11.834px] text-ellipsis text-right"
+                        className="css-g0mm18 flex flex-col font-['Lato'] font-bold justify-center leading-[0] italic overflow-hidden relative shrink-0 text-[#214677] text-[11.834px] text-ellipsis text-right"
                       >
                         <p className="css-ew64yg leading-[normal] overflow-hidden">(done)</p>
                       </motion.div>
@@ -269,18 +269,18 @@ function ReminderList({ animationKey }: { animationKey: number }) {
                   <div className="content-stretch flex gap-[11.138px] items-start pl-0 pr-[11.138px] py-0 relative w-full">
                     <div style={{ marginTop: '2px' }}>{doneStates[2] ? <DoneTickOrange /> : <UndoneTickOrange />}</div>
                     <div
-                      className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#1c2c42] text-[11.834px] ${doneStates[2] ? 'line-through' : ''}`}
+                      className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px] ${doneStates[2] ? 'line-through' : ''}`}
                       style={{ gap: '2px' }}
                     >
                       <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Water house plants</p>
-                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: doneStates[2] ? '#1c2c42' : '#BABABA' }}>25th March</p>
+                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: doneStates[2] ? '#214677' : '#BABABA' }}>25th March</p>
                     </div>
                     {showDoneText[2] && (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
-                        className="css-g0mm18 flex flex-col font-['Lato'] font-bold justify-center leading-[0] italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[11.834px] text-ellipsis text-right"
+                        className="css-g0mm18 flex flex-col font-['Lato'] font-bold justify-center leading-[0] italic overflow-hidden relative shrink-0 text-[#214677] text-[11.834px] text-ellipsis text-right"
                       >
                         <p className="css-ew64yg leading-[normal] overflow-hidden">(done)</p>
                       </motion.div>
@@ -300,18 +300,18 @@ function ReminderList({ animationKey }: { animationKey: number }) {
                   <div className="content-stretch flex gap-[11.138px] items-start pl-0 pr-[11.138px] py-0 relative w-full">
                     <div style={{ marginTop: '2px' }}>{doneStates[3] ? <DoneTickGrey /> : <UndoneTickGrey />}</div>
                     <div
-                      className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#1c2c42] text-[11.834px] ${doneStates[3] ? 'line-through' : ''}`}
+                      className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px] ${doneStates[3] ? 'line-through' : ''}`}
                       style={{ gap: '2px' }}
                     >
                       <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Organise family photos</p>
-                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: doneStates[3] ? '#1c2c42' : '#BABABA' }}>No date / time set</p>
+                      <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: doneStates[3] ? '#214677' : '#BABABA' }}>No date / time set</p>
                     </div>
                     {showDoneText[3] && (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
-                        className="css-g0mm18 flex flex-col font-['Lato'] font-bold justify-center leading-[0] italic overflow-hidden relative shrink-0 text-[#1c2c42] text-[11.834px] text-ellipsis text-right"
+                        className="css-g0mm18 flex flex-col font-['Lato'] font-bold justify-center leading-[0] italic overflow-hidden relative shrink-0 text-[#214677] text-[11.834px] text-ellipsis text-right"
                       >
                         <p className="css-ew64yg leading-[normal] overflow-hidden">(done)</p>
                       </motion.div>

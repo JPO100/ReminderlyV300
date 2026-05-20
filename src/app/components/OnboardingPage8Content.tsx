@@ -102,7 +102,7 @@ export function OnboardingPage8BackButton({ highlighted }: { highlighted?: boole
     >
       <div aria-hidden="true" className="absolute border-[0.697px] border-solid border-white inset-0 pointer-events-none rounded-[69.652px]" />
       <svg className="block" style={{ width: '5.6px', height: '9.1px' }} fill="none" viewBox="20.88 13.38 7.76 13.24">
-        <path d={backArrowPaths.p17336800} fill={highlighted ? '#1C2C42' : 'white'} />
+        <path d={backArrowPaths.p17336800} fill={highlighted ? '#214677' : 'white'} />
       </svg>
     </div>
   );

@@ -5,9 +5,9 @@ Do only the items below. Do not refactor, generalise, or build reusable systems.
 Active text colour for Done and Deleted buttons only
 In done/deleted view only:
 
-When Done is active, its label text colour must be reminderly dark blue.
+When Done is active, its label text colour must be List blue.
 
-When Deleted is active, its label text colour must be reminderly dark blue.
+When Deleted is active, its label text colour must be List blue.
 
 Inactive state stays unchanged.
 

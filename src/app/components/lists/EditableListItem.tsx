@@ -54,7 +54,7 @@ export default function EditableListItem({
     const [hasCompletedMarqueeScroll, setHasCompletedMarqueeScroll] = useState(false);
 
     const showGrey = editable && isFocused && !hasTypedSinceFocus;
-    const textColor = isDeleteRevealed ? "#FF1E0A" : isHighlighted ? accentColor : completed ? "#1C2C42" : showGrey ? "#B7B7B7" : "#1c2c42";
+    const textColor = isDeleteRevealed ? "#FF1E0A" : isHighlighted ? accentColor : completed ? "#214677" : showGrey ? "#B7B7B7" : "#214677";
     const circleColor = isHighlighted ? accentColor : accentColor;
 
     useEffect(() => {
@@ -283,8 +283,8 @@ export default function EditableListItem({
                             }}
                         >
                             <g>
-                                <rect fill="#1C2C42" height="23" rx="11.5" width="23" x="1" y="1" />
-                                <rect height="23" rx="11.5" stroke="#1C2C42" strokeWidth="2" width="23" x="1" y="1" />
+                                <rect fill="#214677" height="23" rx="11.5" width="23" x="1" y="1" />
+                                <rect height="23" rx="11.5" stroke="#214677" strokeWidth="2" width="23" x="1" y="1" />
                                 <path d={DONE_TICK_PATH} fill="white" />
                             </g>
                         </svg>
@@ -329,7 +329,7 @@ export default function EditableListItem({
                                 commitDraft();
                                 event.currentTarget.blur();
                             }}
-                            className={`font-['Lato:Bold',sans-serif] w-full min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent text-[17px] not-italic leading-[normal] caret-[#1c2c42] outline-none${completed ? " line-through" : ""}`}
+                            className={`font-['Lato:Bold',sans-serif] w-full min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent text-[17px] not-italic leading-[normal] caret-[#214677] outline-none${completed ? " line-through" : ""}`}
                             style={{ color: textColor, transition: "color 300ms" }}
                         />
                     ) : (

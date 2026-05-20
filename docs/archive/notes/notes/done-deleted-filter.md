@@ -53,14 +53,14 @@ Click 1 (confirm)
 
 * Label: Clear list?
 * Fill: #ffffff
-* Text colour: reminderly dark blue (use the existing constant used elsewhere for "dark blue", do not invent a new colour name without checking existing constants first)
+* Text colour: List blue (use the existing constant used elsewhere for "dark blue", do not invent a new colour name without checking existing constants first)
 * No list changes yet
 
 Click 2 (execute)
 
 * Label: Cleared!
 * Fill: #ffffff
-* Text colour: reminderly dark blue
+* Text colour: List blue
 * Immediately clear the done/deleted list (as defined above)
 * Empty placeholder text should show immediately after clearing (existing empty state behaviour)
 
@@ -99,7 +99,7 @@ Non-scope
 
 * No changes to the active list filter menu.
 * No changes to done/delete cadence logic.
-* No new colours beyond #ffffff fill and existing reminderly dark blue text for the two transient states.
+* No new colours beyond #ffffff fill and existing List blue text for the two transient states.
 * No new empty state copy.
 
 Deliverables

@@ -313,7 +313,7 @@ Note: The `yearly` frequency is not available as a button in the RepeatsOverlay.
 | State | Background | Text Colour |
 |-------|-----------|-------------|
 | Inactive | `#F5F5F5` | `#939393` |
-| Active | `#E4E4E4` | `#1C2C42` |
+| Active | `#E4E4E4` | `#214677` |
 
 **Drawer pattern**: Each frequency button has a collapsible drawer below it using `max-height` transitions (300ms ease-in-out). Only one frequency can be active at a time (selecting a new one deselects the previous).
 
@@ -339,7 +339,7 @@ Each counter drawer contains: **minus button** | **label text** | **plus button*
 - Checkboxes use Figma-imported SVGs:
   - **Unchecked**: Grey circle outline (`#939393` stroke, white fill)
   - **Checked**: Blue filled circle (`#4784F8`) with cream checkmark (`#FEF6EA`)
-- Text colour: `#939393` (unchecked) / `#1C2C42` (checked)
+- Text colour: `#939393` (unchecked) / `#214677` (checked)
 - Multiple days selectable
 - Container uses `w-fit mx-auto` for centred-but-left-aligned layout
 - Rows have `gap-[25px]` vertical spacing
@@ -467,7 +467,7 @@ Each `icon-details` container uses `min-w-0 flex-1` to enable truncation within 
 | State | Colour |
 |-------|--------|
 | Toggle OFF | `#B7B7B7` |
-| Toggle ON | `#1C2C42` |
+| Toggle ON | `#214677` |
 
 Both icons use the same colour variable driven by their respective toggle state.
 
@@ -478,7 +478,7 @@ Both icons use the same colour variable driven by their respective toggle state.
 | Element | Colour | Usage |
 |---------|--------|-------|
 | `#4784F8` | Primary blue | Toggle ON fill, indicator text, submit button active, plus buttons |
-| `#1C2C42` | Dark navy | Icon ON state, text headings, active frequency button text, checked day text |
+| `#214677` | Dark navy | Icon ON state, text headings, active frequency button text, checked day text |
 | `#B7B7B7` | Medium grey | Icon OFF state |
 | `#939393` | Dark grey | Inactive frequency button text, unchecked day text, unchecked checkbox stroke |
 | `#F5F5F5` | Light grey | Inactive button fill, disabled minus button fill, submit button inactive fill |

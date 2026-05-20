@@ -36,7 +36,7 @@ export function TutorialReminderInfoOverlay({ reminder }: { reminder: typeof CAL
       style={{ pointerEvents: 'none' }}
     >
       <div className="bg-white rounded-[20px] shadow-lg w-[300px] p-6 flex flex-col gap-4">
-        <div className="text-[18px] font-semibold text-[#1C2C42]">
+        <div className="text-[18px] font-semibold text-[#214677]">
           {reminder.displayText}
         </div>
         <div className="text-[14px] text-gray-600">
@@ -46,7 +46,7 @@ export function TutorialReminderInfoOverlay({ reminder }: { reminder: typeof CAL
           <button className="bg-[#4784F8] text-white py-3 px-4 rounded-[10px] font-semibold">
             Mark as done
           </button>
-          <button className="bg-gray-100 text-[#1C2C42] py-3 px-4 rounded-[10px] font-semibold">
+          <button className="bg-gray-100 text-[#214677] py-3 px-4 rounded-[10px] font-semibold">
             Edit reminder
           </button>
           <button className="bg-gray-100 text-red-600 py-3 px-4 rounded-[10px] font-semibold">
@@ -152,7 +152,7 @@ export default function OnboardingPage4Content({
             {/* Pick up milk */}
             <div className="bg-white rounded-[8px] p-[12px] flex items-center justify-between shadow-sm">
               <div className="flex flex-col gap-[2px] flex-1">
-                <div className="text-[15px] text-[#1C2C42] font-medium">
+                <div className="text-[15px] text-[#214677] font-medium">
                   Pick up milk
                 </div>
                 <div className="text-[12px] text-gray-500">
@@ -165,7 +165,7 @@ export default function OnboardingPage4Content({
             {/* Call the dentist - with attention circle */}
             <div className="bg-white rounded-[8px] p-[12px] flex items-center justify-between shadow-sm relative">
               <div className="flex flex-col gap-[2px] flex-1">
-                <div className="text-[15px] text-[#1C2C42] font-medium">
+                <div className="text-[15px] text-[#214677] font-medium">
                   Call the dentist
                 </div>
                 <div className="text-[12px] text-gray-500">
@@ -193,7 +193,7 @@ export default function OnboardingPage4Content({
           </div>
           <div className="bg-white rounded-[8px] p-[12px] flex items-center justify-between shadow-sm">
             <div className="flex flex-col gap-[2px] flex-1">
-              <div className="text-[15px] text-[#1C2C42] font-medium">
+              <div className="text-[15px] text-[#214677] font-medium">
                 Pay credit card
               </div>
               <div className="text-[12px] text-gray-500">
@@ -212,7 +212,7 @@ export default function OnboardingPage4Content({
           <div className="flex flex-col gap-[8px]">
             <div className="bg-white rounded-[8px] p-[12px] flex items-center justify-between shadow-sm">
               <div className="flex flex-col gap-[2px] flex-1">
-                <div className="text-[15px] text-[#1C2C42] font-medium">
+                <div className="text-[15px] text-[#214677] font-medium">
                   Submit expenses
                 </div>
                 <div className="text-[12px] text-gray-500">
@@ -223,7 +223,7 @@ export default function OnboardingPage4Content({
             </div>
             <div className="bg-white rounded-[8px] p-[12px] flex items-center justify-between shadow-sm">
               <div className="flex flex-col gap-[2px] flex-1">
-                <div className="text-[15px] text-[#1C2C42] font-medium">
+                <div className="text-[15px] text-[#214677] font-medium">
                   Put the bins out
                 </div>
                 <div className="text-[12px] text-gray-500">
@@ -242,7 +242,7 @@ export default function OnboardingPage4Content({
           </div>
           <div className="bg-white rounded-[8px] p-[12px] flex items-center justify-between shadow-sm">
             <div className="flex flex-col gap-[2px] flex-1">
-              <div className="text-[15px] text-[#1C2C42] font-medium">
+              <div className="text-[15px] text-[#214677] font-medium">
                 Organise family photo
               </div>
               <div className="text-[12px] text-gray-500">

@@ -17,7 +17,7 @@ function AddTickButton({
         >
             <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 35 35">
                 <g id="add-tick-btn">
-                    <rect fill={active ? "#1C2C42" : "#D9D9D9"} height="35" rx="17.5" width="35" />
+                    <rect fill={active ? "#214677" : "#D9D9D9"} height="35" rx="17.5" width="35" />
                     <path d="M17.5 25.5L17.5 9.5M9.5 17.5H25.5" id="Vector" stroke="white" strokeLinecap="round" strokeWidth="2" />
                 </g>
             </svg>
@@ -106,7 +106,7 @@ export default function AddListItemInput({
                             if (event.key === "Enter") handleAdd();
                         }}
                         placeholder={isEmpty ? emptyPlaceholder : nextPlaceholder}
-                        className="font-['Lato:Bold',sans-serif] w-full border-none bg-transparent text-[17px] not-italic text-[#1c2c42] caret-[#1c2c42] outline-none placeholder-[#D9D9D9]"
+                        className="font-['Lato:Bold',sans-serif] w-full border-none bg-transparent text-[17px] not-italic text-[#214677] caret-[#214677] outline-none placeholder-[#D9D9D9]"
                     />
                 </div>
                 <div className="flex items-center" onClick={handleAdd}>

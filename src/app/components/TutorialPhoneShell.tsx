@@ -9,7 +9,7 @@ export default function TutorialPhoneShell({
   overlay,
   blankBody = false,
   shellColor,
-  bezelColor = "#1c2c42",
+  bezelColor = "#214677",
   showHeaderMenu = true,
   headerProps,
   remindersLabel,
@@ -27,7 +27,7 @@ export default function TutorialPhoneShell({
   remindersLabel?: string;
   listsLabel?: string;
 }) {
-  const resolvedShellColor = shellColor ?? (activeMainTab === "lists" ? "#1C2C42" : "#4784f8");
+  const resolvedShellColor = shellColor ?? (activeMainTab === "lists" ? "#214677" : "#4784f8");
 
   return (
     <div className="relative shrink-0 h-full w-full max-w-[308px] [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]">

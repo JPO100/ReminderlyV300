@@ -13,7 +13,7 @@ Scope
 * The icon has two visual states:
 
   * Inactive: grey
-  * Active: reminderly dark blue
+  * Active: List blue
 * The icon is clickable and toggles active/inactive for that reminder type row.
 
 2. Behaviour

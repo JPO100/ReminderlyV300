@@ -6,7 +6,7 @@ function AddTickBtn({ active, onClick }: { active: boolean; onClick?: () => void
     <button className={`block relative shrink-0 size-[50px] ${active ? 'cursor-pointer' : 'cursor-default'}`} data-name="add-tick-btn" disabled={!active} onClick={active ? onClick : undefined}>
       <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
         <g id="add-tick-btn">
-          <rect fill={active ? "#1C2C42" : "#F5F5F5"} height="50" rx="25" width="50" />
+          <rect fill={active ? "#214677" : "#F5F5F5"} height="50" rx="25" width="50" />
           <path d={svgPaths.p1635b2f0} fill={active ? "#F0FAFE" : "#D5D5D5"} id="tick-icon" />
         </g>
       </svg>
@@ -81,7 +81,7 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
   const lastCommittedValueRef = useRef(value);
 
   const showGrey = isEditMode && isFocused && !hasTypedSinceFocus;
-  const textColor = showGrey ? '#B7B7B7' : '#1c2c42';
+  const textColor = showGrey ? '#B7B7B7' : '#214677';
 
   useEffect(() => {
     if (isFocused) return;
@@ -121,7 +121,7 @@ export default function Header({ value, onChange, active, onSubmit, isEditMode, 
               event.currentTarget.blur();
             }}
             placeholder=""
-            className="font-['Lato',sans-serif] not-italic text-[20px] leading-[23px] whitespace-nowrap bg-transparent border-none outline-none w-full min-w-0 p-0 m-0 placeholder-[#bababa] caret-[#1c2c42]"
+            className="font-['Lato',sans-serif] not-italic text-[20px] leading-[23px] whitespace-nowrap bg-transparent border-none outline-none w-full min-w-0 p-0 m-0 placeholder-[#bababa] caret-[#214677]"
             style={{ color: textColor, transition: "color 300ms", fontWeight: 700 }}
           />
         </div>

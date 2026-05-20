@@ -12,7 +12,7 @@ function ReminderDetails() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #00AFEE)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#1c2c42] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Pick the milk up</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>Today at 2:00 PM</p>
           </div>
@@ -69,7 +69,7 @@ function ReminderDetails1() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #DF4DFC)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#1c2c42] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Put the bins out</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>Thursday</p>
           </div>
@@ -80,7 +80,7 @@ function ReminderDetails1() {
 }
 
 function Group({ isActive }: { isActive?: boolean }) {
-  const color = isActive ? "#1C2C42" : "#BABABA";
+  const color = isActive ? "#214677" : "#BABABA";
   
   return (
     <div className="absolute h-[17.452px] left-0 top-0 w-[17.404px]">
@@ -136,7 +136,7 @@ function ReminderDetails2() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #FAA429)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#1c2c42] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Water the house plants</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>25th March</p>
           </div>
@@ -201,7 +201,7 @@ function ReminderDetails3() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #939393)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#1c2c42] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#214677] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Organise the family photos</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>No date / time set</p>
           </div>

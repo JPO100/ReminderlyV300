@@ -20,7 +20,7 @@ function Frame1() {
   return (
     <div className="content-stretch flex flex-col gap-[29px] items-center relative shrink-0">
       <Group />
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[22px] text-center whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[22px] text-center whitespace-nowrap">
         <p className="leading-[normal]">Log-in to Reminderly</p>
       </div>
     </div>

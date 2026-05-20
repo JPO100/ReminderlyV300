@@ -9,7 +9,7 @@ import repeatIconPaths from "../../imports/svg-6b7xc4ifcd";
 function Header({ onClose }: { onClose: () => void }) {
   return (
     <div className="content-stretch flex items-center justify-between relative shrink-0 w-full" data-name="header">
-      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1c2c42] text-[20px] whitespace-nowrap">
+      <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#214677] text-[20px] whitespace-nowrap">
         <p className="leading-[normal]">Settings</p>
       </div>
       <button
@@ -20,7 +20,7 @@ function Header({ onClose }: { onClose: () => void }) {
         <div className="flex-none rotate-45">
           <div className="relative size-[18px]" data-name="Union">
             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 18">
-              <path d={svgPaths.p1cbc7100} fill="var(--fill-0, #1C2C42)" id="Union" />
+              <path d={svgPaths.p1cbc7100} fill="var(--fill-0, #214677)" id="Union" />
             </svg>
           </div>
         </div>
@@ -45,17 +45,17 @@ export default function SettingsOverlay({ onClose, showDateAndTimeSubtitles, onS
                   <div className="h-[24px] relative shrink-0 w-[22.9px] [@media(max-height:667px)]:hidden" data-name="Union" style={{ transform: 'translateY(3px)' }}>
                     <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.9004 24">
                       <g id="Union">
-                        <path d={settingsIconPaths.p10ad3640} fill={showDateAndTimeSubtitles ? "#1C2C42" : "#D9D9D9"} />
-                        <path d={settingsIconPaths.pe9ba000} fill={showDateAndTimeSubtitles ? "#1C2C42" : "#D9D9D9"} />
-                        <path d={settingsIconPaths.p1ffae300} fill={showDateAndTimeSubtitles ? "#1C2C42" : "#D9D9D9"} />
-                        <path d={settingsIconPaths.paf45580} fill={showDateAndTimeSubtitles ? "#1C2C42" : "#D9D9D9"} />
-                        <path d={settingsIconPaths.pc271000} fill={showDateAndTimeSubtitles ? "#1C2C42" : "#D9D9D9"} />
-                        <path clipRule="evenodd" d={settingsIconPaths.pd7cba80} fill={showDateAndTimeSubtitles ? "#1C2C42" : "#D9D9D9"} fillRule="evenodd" />
+                        <path d={settingsIconPaths.p10ad3640} fill={showDateAndTimeSubtitles ? "#214677" : "#D9D9D9"} />
+                        <path d={settingsIconPaths.pe9ba000} fill={showDateAndTimeSubtitles ? "#214677" : "#D9D9D9"} />
+                        <path d={settingsIconPaths.p1ffae300} fill={showDateAndTimeSubtitles ? "#214677" : "#D9D9D9"} />
+                        <path d={settingsIconPaths.paf45580} fill={showDateAndTimeSubtitles ? "#214677" : "#D9D9D9"} />
+                        <path d={settingsIconPaths.pc271000} fill={showDateAndTimeSubtitles ? "#214677" : "#D9D9D9"} />
+                        <path clipRule="evenodd" d={settingsIconPaths.pd7cba80} fill={showDateAndTimeSubtitles ? "#214677" : "#D9D9D9"} fillRule="evenodd" />
                       </g>
                     </svg>
                   </div>
                   <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[4px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative text-ellipsis whitespace-nowrap">
-                    <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[17px] w-full" style={{ color: showDateAndTimeSubtitles ? '#1c2c42' : '#D9D9D9' }}>
+                    <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[17px] w-full" style={{ color: showDateAndTimeSubtitles ? '#214677' : '#D9D9D9' }}>
                       <p className="leading-[normal] overflow-hidden truncate">Show date and time subtitles</p>
                     </div>
                     <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[13.5px] w-full [@media(max-height:667px)]:hidden" style={{ fontWeight: 600, fontFamily: "'Lato', sans-serif", color: showDateAndTimeSubtitles ? '#bababa' : '#D9D9D9' }}>
@@ -91,7 +91,7 @@ export default function SettingsOverlay({ onClose, showDateAndTimeSubtitles, onS
                     </svg>
                   </div>
                   <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[4px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative text-ellipsis whitespace-nowrap">
-                    <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[17px] w-full" style={{ color: isOnboardingTutorialEnabled ? '#1c2c42' : '#939393' }}>
+                    <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[17px] w-full" style={{ color: isOnboardingTutorialEnabled ? '#214677' : '#939393' }}>
                       <p className="leading-[normal] overflow-hidden truncate">Reminderly tutorial</p>
                     </div>
                     <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[15px] w-full [@media(max-height:667px)]:hidden" style={{ fontWeight: 600, fontFamily: "'Lato', sans-serif", color: isOnboardingTutorialEnabled ? '#bababa' : '#939393' }}>

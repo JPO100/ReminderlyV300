@@ -9,7 +9,7 @@ These styles use Lato and numeric font weights.
 - Font family: `Lato`
 - Font weight: `700`
 - Font size: `20`
-- Colour: `#1C2C42` (Reminderly dark blue)
+- Colour: `#214677` (List blue)
 - Line height: auto / standard
 - Letter spacing: auto / standard
 
@@ -27,7 +27,7 @@ These styles use Lato and numeric font weights.
 - Font family: `Lato`
 - Font weight: `700`
 - Font size: `17`
-- Colour: `#1C2C42` (Reminderly dark blue)
+- Colour: `#214677` (List blue)
 - Line height: auto / standard
 - Letter spacing: auto / standard
 
