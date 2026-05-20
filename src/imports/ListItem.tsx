@@ -7,7 +7,7 @@ export default function ListItem({ name = "Carrot", editable, onChange, complete
   const [hasTypedSinceFocus, setHasTypedSinceFocus] = useState(false);
 
   const showGrey = editable && isFocused && !hasTypedSinceFocus;
-  const textColor = isHighlighted ? '#00AFEE' : (completed ? '#214677' : (showGrey ? '#B7B7B7' : '#214677'));
+  const textColor = isHighlighted ? '#00AFEE' : (completed ? '#1C2C42' : (showGrey ? '#B7B7B7' : '#1C2C42'));
   const circleColor = isHighlighted ? '#00AFEE' : '#BABABA';
 
   return (
@@ -34,7 +34,7 @@ export default function ListItem({ name = "Carrot", editable, onChange, complete
               onFocus={() => { setIsFocused(true); setHasTypedSinceFocus(false); }}
               onBlur={() => { setIsFocused(false); setHasTypedSinceFocus(false); }}
               onChange={(e) => { if (!hasTypedSinceFocus) setHasTypedSinceFocus(true); onChange?.(e.target.value); }}
-              className={`font-['Lato:Bold',sans-serif] not-italic text-[17px] w-full bg-transparent border-none outline-none leading-[normal] overflow-hidden caret-[#214677]${completed ? ' line-through' : ''}`}
+              className={`font-['Lato:Bold',sans-serif] not-italic text-[17px] w-full bg-transparent border-none outline-none leading-[normal] overflow-hidden caret-[#1C2C42]${completed ? ' line-through' : ''}`}
               style={{ color: textColor, transition: 'color 300ms' }}
             />
           ) : (

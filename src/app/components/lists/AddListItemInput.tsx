@@ -106,7 +106,7 @@ export default function AddListItemInput({
                             if (event.key === "Enter") handleAdd();
                         }}
                         placeholder={isEmpty ? emptyPlaceholder : nextPlaceholder}
-                        className="font-['Lato:Bold',sans-serif] w-full border-none bg-transparent text-[17px] not-italic text-[#214677] caret-[#214677] outline-none placeholder-[#D9D9D9]"
+                        className="font-['Lato:Bold',sans-serif] w-full border-none bg-transparent text-[17px] not-italic text-[#1C2C42] caret-[#1C2C42] outline-none placeholder-[#D9D9D9]"
                     />
                 </div>
                 <div className="flex items-center" onClick={handleAdd}>

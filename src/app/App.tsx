@@ -3838,7 +3838,7 @@ export default function App() {
                                   )}
                                 </button>
                                 <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
-                                  <div className={`overflow-hidden whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#214677'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#214677'), height: '17px', maxWidth: '100%', minWidth: 0 }} onClick={() => openListEditor(list)}>
+                                  <div className={`overflow-hidden whitespace-nowrap cursor-pointer${isPendingAwayList ? ' line-through' : ''}`} style={{ color: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1C2C42'), textDecorationColor: isPendingAwayList ? DELETED_GREY : (isHighlighted ? catColor : '#1C2C42'), height: '17px', maxWidth: '100%', minWidth: 0 }} onClick={() => openListEditor(list)}>
                                     {isPinnedList ? (
                                       <div className="flex h-full items-center min-w-0" style={{ gap: '8px' }}>
                                         <div className="flex h-[13px] w-[13px] shrink-0 items-center justify-center">
@@ -3987,7 +3987,7 @@ export default function App() {
                                       <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
                                         <div
                                           className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer${isPendingDeletedSavedList ? ' line-through' : ''}`}
-                                          style={{ color: isPendingDeletedSavedList ? deletedSavedListColor : '#214677', textDecorationColor: isPendingDeletedSavedList ? deletedSavedListColor : '#214677', clipPath: 'inset(0 0 -4px 0)' }}
+                                          style={{ color: isPendingDeletedSavedList ? deletedSavedListColor : '#1C2C42', textDecorationColor: isPendingDeletedSavedList ? deletedSavedListColor : '#1C2C42', clipPath: 'inset(0 0 -4px 0)' }}
                                           onClick={() => openSavedListEditor(list)}
                                         >
                                           <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>
@@ -4259,7 +4259,7 @@ export default function App() {
                                 const isDeleted = item.deletedAt != null;
                                 const overdue = isOverdue(item, now);
                                 const isSmartReminder = item.isSmartReminder === true;
-                                const textCol = isPendingRestore ? (overdue ? OVERDUE_COLOUR : (isListsEnabled ? '#3F3F3F' : "#214677")) : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : "#214677"));
+                                const textCol = isPendingRestore ? (overdue ? OVERDUE_COLOUR : (isListsEnabled ? '#3F3F3F' : APP_TEXT_DARK_BLUE)) : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : APP_TEXT_DARK_BLUE));
                                 const subtitleCol = isPendingRestore ? '#BABABA' : (isDeleted ? DELETED_GREY : (isListsEnabled ? '#3F3F3F' : DONE_BLUE));
                                 return (
                                   <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ color: textCol, gap: '9px', minHeight: '38px' }}>
@@ -4348,7 +4348,7 @@ export default function App() {
                   const overdue = isOverdue(reminder, now);
                   const circleColour = overdue ? OVERDUE_COLOUR : CATEGORY_COLOURS[category] ?? "#939393";
                   const isHighlighted = insertHighlightId === reminder.id;
-                  const textColour = isPendingAway ? "#BABABA" : (isHighlighted ? circleColour : (overdue ? OVERDUE_COLOUR : "#214677"));
+                  const textColour = isPendingAway ? "#BABABA" : (isHighlighted ? circleColour : (overdue ? OVERDUE_COLOUR : APP_TEXT_DARK_BLUE));
                   const isReinserted = reinsertedId === reminder.id;
                   const isSmartReminder = reminder.isSmartReminder === true;
                   return (

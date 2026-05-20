@@ -211,7 +211,7 @@ function RepeatReminderIndicator({ color = "#BABABA" }: { color?: string }) {
 }
 
 function TutorialStaticReminderRow({
-  titleColor = "#214677",
+  titleColor = "#1C2C42",
   title,
   subtitle,
   circleColor,
@@ -640,7 +640,7 @@ export default function TutorialStaticReminderList({
                   subtitle={SMART_REMINDER_SUBTITLE}
                   circleColor={SMART_REMINDER_CIRCLE_COLOR}
                   showSmartReminderIcon
-                  titleColor={insertHighlightId === SMART_REMINDER_ID ? SMART_REMINDER_CIRCLE_COLOR : "#214677"}
+                  titleColor={insertHighlightId === SMART_REMINDER_ID ? SMART_REMINDER_CIRCLE_COLOR : "#1C2C42"}
                 />
               </motion.div>
             )}
@@ -658,7 +658,7 @@ export default function TutorialStaticReminderList({
                       subtitle={mode === "lists" ? (item as TutorialList).subtitle : getTutorialReminderSubtitle(item as TutorialReminder)}
                     circleColor={(item as TutorialReminder | TutorialList).circleColor}
                     showRepeatIcon={mode === "reminders" && Boolean((item as TutorialReminder).repeatRule)}
-                    titleColor={isHighlighted ? item.circleColor : "#214677"}
+                    titleColor={isHighlighted ? item.circleColor : "#1C2C42"}
                     isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
                     showMenuButton={!isDoneReminder}
@@ -695,7 +695,7 @@ export default function TutorialStaticReminderList({
                     subtitle={mode === "lists" ? (item as TutorialList).subtitle : getTutorialReminderSubtitle(item as TutorialReminder)}
                     circleColor={(item as TutorialReminder | TutorialList).circleColor}
                     showRepeatIcon={mode === "reminders" && Boolean((item as TutorialReminder).repeatRule)}
-                    titleColor={isHighlighted ? item.circleColor : "#214677"}
+                    titleColor={isHighlighted ? item.circleColor : "#1C2C42"}
                     isDone={isDoneReminder}
                     isPendingDone={isPendingDone}
                     showMenuButton={!isDoneReminder}
