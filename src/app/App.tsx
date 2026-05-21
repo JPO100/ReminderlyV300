@@ -3618,7 +3618,7 @@ export default function App() {
             <div className="flex flex-row items-center justify-center size-full">
               <div className="content-stretch flex items-center justify-center px-[30px] relative size-full">
                 <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] whitespace-nowrap ${activeMainTab === 'lists' ? 'text-[#4784F8]' : 'text-white'}`}>
-                  <p className="leading-[normal]">{viewMode === 'lists-done' ? 'Done lists' : 'Lists'}</p>
+                  <p className="leading-[normal]">{viewMode === 'lists-done' ? 'Done lists' : savedListsPanelOpen ? 'List templates' : 'Lists'}</p>
                 </div>
               </div>
             </div>
@@ -4121,21 +4121,22 @@ export default function App() {
                   style={{ zIndex: 2, pointerEvents: savedListsPanelOpen ? 'auto' : 'none' }}
                 >
                   <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[0px]">
-                    <div className="filters-menu flex items-center relative shrink-0 w-full h-[40px]" style={{ gap: '17px' }}>
+                    <div className="filters-menu flex items-center relative shrink-0 w-full h-[40px]">
                       <button
-                        className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center cursor-pointer"
+                        className="bg-[#4784F8] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer"
                         type="button"
-                        style={{ width: '18px', height: '33px' }}
                         onClick={() => setSavedListsPanelOpen(false)}
                         aria-label="Back to lists"
                       >
-                        <svg width="9" height="16" viewBox="0 0 9 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="block">
-                          <path d="M6.13811 0.430456C6.6468 -0.143485 7.47168 -0.143485 7.98037 0.430456C8.48897 1.00439 8.48899 1.93474 7.98037 2.50866L3.16754 7.93846L8.08913 13.4913C8.59774 14.0653 8.59774 14.9956 8.08913 15.5695C7.58044 16.1435 6.75556 16.1435 6.24687 15.5695L0.60879 9.20828C0.528196 9.15093 0.451622 9.08298 0.381409 9.00376C-0.127153 8.42986 -0.12712 7.49948 0.381409 6.92556L6.13811 0.430456Z" fill="#1C2C42"/>
-                        </svg>
+                        <div className="content-stretch flex items-center justify-center gap-[8px] relative">
+                          <svg className="block shrink-0" width="7" height="10" viewBox="0 0 7 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ transform: 'scaleX(-1)' }}>
+                            <path d="M1.72101 0.269035C1.34568 -0.0896783 0.737045 -0.0896783 0.361708 0.269035C-0.0135638 0.627741 -0.0135771 1.20921 0.361708 1.56791L3.91284 4.96154L0.281458 8.43209C-0.0938212 8.79079 -0.0938182 9.37226 0.281458 9.73096C0.656796 10.0897 1.26543 10.0897 1.64076 9.73096L5.80081 5.75517C5.86027 5.71933 5.91677 5.67686 5.96858 5.62735C6.34382 5.26866 6.3438 4.68717 5.96858 4.32847L1.72101 0.269035Z" fill="white"/>
+                          </svg>
+                          <div className="font-['Lato',sans-serif] font-bold text-[14px] text-white whitespace-nowrap">
+                            Back
+                          </div>
+                        </div>
                       </button>
-                      <div className="font-['Lato',sans-serif] font-bold text-[20px] text-[#1C2C42] whitespace-nowrap">
-                        List templates
-                      </div>
                     </div>
                     <div className="relative w-full max-w-[768px] flex-1 min-h-0">
                       <div className="content-stretch flex flex-col items-center justify-start overflow-x-clip w-full" style={{ position: 'relative', flex: 1, minHeight: 0, overflowY: savedListsPanelOpen ? 'auto' : 'hidden', height: '100%' }}>
