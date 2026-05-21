@@ -167,8 +167,8 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
     const dx = e.changedTouches[0].clientX - touchStartXRef.current;
     touchStartXRef.current = null;
     if (Math.abs(dx) < 50) return;
-    if (dx > 0) handleNextMonth();
-    else handlePrevMonth();
+    if (dx > 0) handlePrevMonth();
+    else handleNextMonth();
   };
 
   const handleDayClick = (day: number) => {
