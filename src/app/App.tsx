@@ -15,7 +15,7 @@ import type { NlcMode } from "./utils/nlc-interaction";
 import type { NlcRecognitionConfig } from "./utils/nlc-parser";
 import { renderReminderText, getDisplayTitle } from "./utils/render-text";
 import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow, formatReminderNextOccurrenceLabel, formatRepeatRuleText } from "./reminder-utils";
-import { parseTokens } from "./utils/nlc-parser";
+import { parseTokens, MONTH_NAME_TO_NUMBER } from "./utils/nlc-parser";
 import { computeAutoApplyResult, computeTokenClickResult } from "./utils/nlc-interaction";
 import { normaliseReminderText } from "./utils/normalise-text";
 import { repeatConfigToRule } from "./utils/repeat-conversion";
@@ -1838,6 +1838,24 @@ export default function App() {
       };
       const toHhMm = (h: number, min: number) =>
         `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+
+      // Fallback: extract absolute month-name dates the NLC parser doesn't handle
+      if (!selectedDate) {
+        const mdMatch = text.match(/\b(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s+(\d{4}))?\b/i);
+        const dmMatch = !mdMatch ? text.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)(?:\s+(\d{4}))?\b/i) : null;
+        const absMatch = mdMatch || dmMatch;
+        if (absMatch) {
+          const monthStr = mdMatch ? absMatch[1] : absMatch[2];
+          const dayStr = mdMatch ? absMatch[2] : absMatch[1];
+          const yearStr = absMatch[3];
+          const month = MONTH_NAME_TO_NUMBER[monthStr.toLowerCase()];
+          const day = parseInt(dayStr, 10);
+          if (month && day >= 1 && day <= 31) {
+            const year = yearStr ? parseInt(yearStr, 10) : new Date().getFullYear();
+            selectedDate = new Date(year, month - 1, day);
+          }
+        }
+      }
 
       if (!selectedDate && selectedTime) {
         selectedDate = new Date();
