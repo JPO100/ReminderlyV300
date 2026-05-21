@@ -93,18 +93,17 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
       <div className="flex flex-col h-full relative w-full max-w-[768px]" data-name="repeats-content">
         <div className="flex flex-col items-start pt-[30px] px-[24px] pb-[24px] relative w-full flex-1 min-h-0">
           <div className="bg-white w-full flex-1 min-h-0 flex flex-col">
-            <div className="flex items-center w-full shrink-0">
+            <div className="flex items-center justify-between w-full shrink-0">
               <button
                 onClick={() => onClose()}
-                className="block cursor-pointer shrink-0 flex items-center justify-center size-[50px]"
+                className="flex items-center gap-[20px] cursor-pointer shrink-0 bg-transparent border-none p-0"
                 data-name="cancel-button"
               >
-                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
-                  <rect fill="#939393" height="50" rx="25" width="50" />
-                  <path d={svgPaths.p2a78d200} fill="white" />
+                <svg width="18" height="33" viewBox="0 0 18 33" fill="none" xmlns="http://www.w3.org/2000/svg" className="block shrink-0">
+                  <path d="M6.13811 8.87479C6.6468 8.30085 7.47168 8.30085 7.98037 8.87479C8.48897 9.44872 8.48899 10.3791 7.98037 10.953L3.16754 16.3828L8.08913 21.9357C8.59774 22.5096 8.59774 23.44 8.08913 24.0139C7.58044 24.5878 6.75556 24.5878 6.24687 24.0139L0.60879 17.6526C0.528196 17.5953 0.451622 17.5273 0.381409 17.4481C-0.127153 16.8742 -0.12712 15.9438 0.381409 15.3699L6.13811 8.87479Z" fill="#1C2C42"/>
                 </svg>
+                <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Reminder repeats</span>
               </button>
-              <span className="flex-1 text-center font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Reminder repeats</span>
               <button
                 onClick={getCurrentConfig() !== null ? () => onClose(getCurrentConfig()) : undefined}
                 disabled={getCurrentConfig() === null}
