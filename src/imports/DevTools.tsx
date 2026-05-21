@@ -130,6 +130,7 @@ export default function DevTools({
   onNavigateReminderSettings,
   onNavigateListSettings,
   onNavigatePaywall,
+  onNavigateNotifications,
   settingsMenuEnabled,
   onSettingsMenuEnabledChange,
   nlcEnabled,
@@ -149,6 +150,7 @@ export default function DevTools({
   onNavigateReminderSettings: () => void;
   onNavigateListSettings: () => void;
   onNavigatePaywall: () => void;
+  onNavigateNotifications: () => void;
   settingsMenuEnabled: boolean;
   onSettingsMenuEnabledChange: (enabled: boolean) => void;
   nlcEnabled: boolean;
@@ -323,6 +325,7 @@ export default function DevTools({
                 </div>
               </button>
               <NavRow label="Dev tools password" onClick={onNavigateDevToolsPassword} plain />
+              <NavRow label="Notifications" onClick={onNavigateNotifications} plain />
               <div />
             </div>
           </div>

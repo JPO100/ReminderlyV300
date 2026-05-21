@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { registerPlugin } from "@capacitor/core";
+import { Badge } from "@capawesome/capacitor-badge";
 import { motion, AnimatePresence, useDragControls } from "motion/react";
 import svgPaths from "../imports/svg-tzdfx9foxi";
 import doneTickPaths from "../imports/svg-c9judk5sbu";
@@ -560,7 +561,7 @@ function DelayedEmptyState({ message }: { message: string }) {
 
 export default function App() {
   const [reminders, setReminders] = useState<Reminder[]>(() => loadReminders());
-  const [, setTimeRefreshTick] = useState(0);
+  const [timeRefreshTick, setTimeRefreshTick] = useState(0);
   const [activeFilter, setActiveFilter] = useState<ReminderCategory | "all">("all");
   const [activeListFilter, setActiveListFilter] = useState<"all" | "complete" | "almost" | "started" | "todo" | "grouped-todo">("all");
   const [savedListsPanelOpen, setSavedListsPanelOpen] = useState(false);
@@ -916,6 +917,33 @@ export default function App() {
   const [isDevToolsPasswordRequired, setIsDevToolsPasswordRequired] = useState<boolean>(() => {
     try {
       const stored = localStorage.getItem('reminderly-dev-tools-password-required');
+      if (stored === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+  const [notifReminderAlerts, setNotifReminderAlerts] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-notif-reminder-alerts');
+      if (stored === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+  const [notifAppBadge, setNotifAppBadge] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-notif-app-badge');
+      if (stored === 'false') return false;
+      return true;
+    } catch {
+      return true;
+    }
+  });
+  const [notifIncludeTodayInBadge, setNotifIncludeTodayInBadge] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('reminderly-notif-include-today-in-badge');
       if (stored === 'false') return false;
       return true;
     } catch {
@@ -1448,6 +1476,48 @@ export default function App() {
       // Fail silently
     }
   }, [isDevToolsPasswordRequired]);
+
+  useEffect(() => {
+    try {
+      persistStringIfChanged('reminderly-notif-reminder-alerts', String(notifReminderAlerts));
+    } catch {
+      // Fail silently
+    }
+  }, [notifReminderAlerts]);
+
+  useEffect(() => {
+    try {
+      persistStringIfChanged('reminderly-notif-app-badge', String(notifAppBadge));
+    } catch {
+      // Fail silently
+    }
+  }, [notifAppBadge]);
+
+  useEffect(() => {
+    try {
+      persistStringIfChanged('reminderly-notif-include-today-in-badge', String(notifIncludeTodayInBadge));
+    } catch {
+      // Fail silently
+    }
+  }, [notifIncludeTodayInBadge]);
+
+  useEffect(() => {
+    if (!notifAppBadge) {
+      void Badge.clear();
+      return;
+    }
+    const now = new Date();
+    let count = 0;
+    for (const r of reminders) {
+      if (r.completedAt || r.deletedAt || r.schedule.kind !== 'scheduled') continue;
+      if (isOverdue(r, now)) {
+        count++;
+      } else if (notifIncludeTodayInBadge && categoriseReminder(r, now) === 'today') {
+        count++;
+      }
+    }
+    void Badge.set({ count });
+  }, [reminders, notifAppBadge, notifIncludeTodayInBadge, timeRefreshTick]);
 
   // Persist filters menu variant to localStorage
   useEffect(() => {
@@ -5205,7 +5275,7 @@ export default function App() {
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
-              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} nlcRecognition={nlcRecognition} onNlcRecognitionChange={setNlcRecognition} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} savedListsEnabled={savedListsFeatureEnabled} onSavedListsEnabledChange={handleSavedListsFeatureEnabledChange} pinnedListsEnabled={pinnedListsFeatureEnabled} onPinnedListsEnabledChange={setPinnedListsFeatureEnabled} settingsMenuEnabled={settingsMenuFeatureEnabled} onSettingsMenuEnabledChange={setSettingsMenuFeatureEnabled} useDefaultTemplatesInCleanState={useDefaultTemplatesInCleanState} onUseDefaultTemplatesInCleanStateChange={setUseDefaultTemplatesInCleanState} onClearLists={(useDefaultTemplatesInCleanState) => {
+              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} nlcRecognition={nlcRecognition} onNlcRecognitionChange={setNlcRecognition} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} savedListsEnabled={savedListsFeatureEnabled} onSavedListsEnabledChange={handleSavedListsFeatureEnabledChange} pinnedListsEnabled={pinnedListsFeatureEnabled} onPinnedListsEnabledChange={setPinnedListsFeatureEnabled} settingsMenuEnabled={settingsMenuFeatureEnabled} onSettingsMenuEnabledChange={setSettingsMenuFeatureEnabled} notifReminderAlerts={notifReminderAlerts} onNotifReminderAlertsChange={setNotifReminderAlerts} notifAppBadge={notifAppBadge} onNotifAppBadgeChange={setNotifAppBadge} notifIncludeTodayInBadge={notifIncludeTodayInBadge} onNotifIncludeTodayInBadgeChange={setNotifIncludeTodayInBadge} useDefaultTemplatesInCleanState={useDefaultTemplatesInCleanState} onUseDefaultTemplatesInCleanStateChange={setUseDefaultTemplatesInCleanState} onClearLists={(useDefaultTemplatesInCleanState) => {
                 setCreatedLists([]);
                 setSavedLists(
                   useDefaultTemplatesInCleanState
