@@ -93,18 +93,18 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
         <div className="flex flex-col items-start pt-[30px] px-[24px] pb-[24px] relative w-full flex-1 min-h-0">
           <div className="bg-white w-full flex-1 min-h-0 flex flex-col">
             <div className="relative flex items-center justify-center w-full shrink-0" style={{ height: 50 }}>
+              <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Reminder repeats</span>
               <button
                 onClick={() => onClose(getCurrentConfig())}
-                className="absolute left-0 block cursor-pointer shrink-0 flex items-center justify-center"
+                className="absolute right-0 block cursor-pointer shrink-0 flex items-center justify-center"
                 style={{ width: 50, height: 50 }}
-                data-name="back-button"
+                data-name="done-button"
               >
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
                   <rect fill="#4784F8" height="50" rx="25" width="50" />
-                  <path d={svgPaths.p2a78d200} fill="white" />
+                  <path d="M21.5 31.5L14 24l-1.5 1.5 9 9 19-19L39 14z" fill="white" />
                 </svg>
               </button>
-              <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Reminder repeats</span>
             </div>
             <div className="mt-[34px] w-full flex flex-col gap-[30px] overflow-y-auto flex-1 min-h-0 pb-[10px]">
               {/* Custom Days */}
