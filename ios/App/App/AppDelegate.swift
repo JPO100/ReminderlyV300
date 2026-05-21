@@ -7,30 +7,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
         return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        // Called when the app was launched with a url. Feel free to add additional processing here,
-        // but if you want the App API to support tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        // Called when the app was launched with an activity, including Universal Links.
-        // Feel free to add additional processing here, but if you want the App API to support
-        // tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        guard let url = URLContexts.first?.url else { return }
-        _ = ApplicationDelegateProxy.shared.application(
-            UIApplication.shared,
-            open: url,
-            options: [:]
-        )
+        guard let url = URLContexts.first?.url,
+              url.scheme == "reminderly",
+              url.host == "add",
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let text = components.queryItems?.first(where: { $0.name == "text" })?.value
+        else { return }
+
+        let escaped = text
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "'", with: "\\'")
+            .replacingOccurrences(of: "\n", with: "\\n")
+
+        let js = "localStorage.setItem('reminderly.pendingSiriText','\(escaped)');window.dispatchEvent(new CustomEvent('reminderly:siri-add'));"
+
+        if let windowScene = scene as? UIWindowScene,
+           let vc = windowScene.windows.first?.rootViewController as? CAPBridgeViewController {
+            vc.bridge?.webView?.evaluateJavaScript(js, completionHandler: nil)
+        }
     }
 
 }
