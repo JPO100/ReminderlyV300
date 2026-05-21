@@ -93,6 +93,17 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
         <div className="flex flex-col items-start pt-[30px] px-[24px] pb-[24px] relative w-full flex-1 min-h-0">
           <div className="bg-white w-full flex-1 min-h-0 flex flex-col">
             <div className="relative flex items-center justify-center w-full shrink-0" style={{ height: 50 }}>
+              <button
+                onClick={() => onClose()}
+                className="absolute left-0 block cursor-pointer shrink-0 flex items-center justify-center"
+                style={{ width: 50, height: 50 }}
+                data-name="cancel-button"
+              >
+                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
+                  <rect fill="#939393" height="50" rx="25" width="50" />
+                  <path d={svgPaths.p2a78d200} fill="white" />
+                </svg>
+              </button>
               <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Reminder repeats</span>
               <button
                 onClick={() => onClose(getCurrentConfig())}
