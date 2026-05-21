@@ -15,6 +15,10 @@ import type { NlcMode } from "./utils/nlc-interaction";
 import type { NlcRecognitionConfig } from "./utils/nlc-parser";
 import { renderReminderText, getDisplayTitle } from "./utils/render-text";
 import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow, formatReminderNextOccurrenceLabel, formatRepeatRuleText } from "./reminder-utils";
+import { parseTokens } from "./utils/nlc-parser";
+import { computeAutoApplyResult, computeTokenClickResult } from "./utils/nlc-interaction";
+import { normaliseReminderText } from "./utils/normalise-text";
+import { repeatConfigToRule } from "./utils/repeat-conversion";
 import type { Reminder, ReminderCategory, ReminderSchedule, RepeatConfig, ViewMode, FiltersMenuVariant } from "./reminder-utils";
 import { formatTime12h } from "./utils/normalise-text";
 import { scheduleEquality } from "./utils/schedule";
@@ -1101,6 +1105,13 @@ export default function App() {
       return true;
     }
   });
+  const [siriShortcutsEnabled, setSiriShortcutsEnabled] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('reminderly-ff-siri-shortcuts') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [useDefaultTemplatesInCleanState, setUseDefaultTemplatesInCleanState] = useState<boolean>(() => {
     try {
       return localStorage.getItem(DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY) === 'true';
@@ -1409,6 +1420,14 @@ export default function App() {
 
   useEffect(() => {
     try {
+      persistStringIfChanged('reminderly-ff-siri-shortcuts', String(siriShortcutsEnabled));
+    } catch {
+      // Fail silently
+    }
+  }, [siriShortcutsEnabled]);
+
+  useEffect(() => {
+    try {
       persistStringIfChanged(DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY, String(useDefaultTemplatesInCleanState));
     } catch {
       // Fail silently
@@ -1461,6 +1480,7 @@ export default function App() {
       void listener.then((handle) => handle.remove());
     };
   }, []);
+
 
   useEffect(() => {
     if (!isListsEnabled) {
@@ -1783,6 +1803,74 @@ export default function App() {
       }, INSERT_HIGHLIGHT_MS);
     }, NEW_REMINDER_INSERT_DELAY);
   }, []);
+
+  useEffect(() => {
+    const PENDING_SIRI_TEXT_KEY = 'reminderly.pendingSiriText';
+    const SIRI_ADD_EVENT = 'reminderly:siri-add';
+
+    const handleSiriAdd = () => {
+      const text = localStorage.getItem(PENDING_SIRI_TEXT_KEY);
+      if (!text) return;
+      localStorage.removeItem(PENDING_SIRI_TEXT_KEY);
+
+      if (!siriShortcutsEnabled) return;
+
+      const tokens = parseTokens(text);
+      const actions = computeAutoApplyResult(tokens, { date: false, time: false, repeats: false });
+
+      let selectedDate: Date | null = null;
+      let selectedTime: { hour: number; minute: number } | null = null;
+      let repeatConfig: import("./reminder-utils").RepeatConfig = null;
+
+      for (const action of actions) {
+        const result = computeTokenClickResult(action.token);
+        if (!result) continue;
+        if (result.dateValue) selectedDate = result.dateValue;
+        if (result.timeValue) selectedTime = result.timeValue;
+        if (result.repeatConfig) repeatConfig = result.repeatConfig;
+      }
+
+      const toYyyyMmDd = (d: Date) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${dd}`;
+      };
+      const toHhMm = (h: number, min: number) =>
+        `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+
+      let schedule: import("./reminder-utils").ReminderSchedule;
+      if (selectedDate) {
+        schedule = {
+          kind: 'scheduled',
+          date: toYyyyMmDd(selectedDate),
+          ...(selectedTime ? { time: toHhMm(selectedTime.hour, selectedTime.minute) } : {}),
+        };
+      } else {
+        schedule = { kind: 'sometime' };
+      }
+
+      const repeatRule = repeatConfigToRule(repeatConfig);
+      const now = new Date();
+      const displayText = schedule.kind === 'scheduled'
+        ? normaliseReminderText(text, schedule, repeatRule, now)
+        : text;
+
+      const reminder: Reminder = {
+        id: crypto.randomUUID(),
+        originalText: text,
+        displayText,
+        createdAt: Date.now(),
+        schedule,
+        repeatRule,
+      };
+      addReminder(reminder);
+    };
+
+    handleSiriAdd();
+    window.addEventListener(SIRI_ADD_EVENT, handleSiriAdd);
+    return () => window.removeEventListener(SIRI_ADD_EVENT, handleSiriAdd);
+  }, [siriShortcutsEnabled, addReminder]);
 
   const addReminders = useCallback((newReminders: Reminder[]) => {
     // Cancel any pending insert timer (last-one-wins)
@@ -5275,7 +5363,7 @@ export default function App() {
               className="fixed left-0 right-0 z-50 mx-auto w-full"
               style={{ bottom: 0 }}
             >
-              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} nlcRecognition={nlcRecognition} onNlcRecognitionChange={setNlcRecognition} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} savedListsEnabled={savedListsFeatureEnabled} onSavedListsEnabledChange={handleSavedListsFeatureEnabledChange} pinnedListsEnabled={pinnedListsFeatureEnabled} onPinnedListsEnabledChange={setPinnedListsFeatureEnabled} settingsMenuEnabled={settingsMenuFeatureEnabled} onSettingsMenuEnabledChange={setSettingsMenuFeatureEnabled} notifReminderAlerts={notifReminderAlerts} onNotifReminderAlertsChange={setNotifReminderAlerts} notifAppBadge={notifAppBadge} onNotifAppBadgeChange={setNotifAppBadge} notifIncludeTodayInBadge={notifIncludeTodayInBadge} onNotifIncludeTodayInBadgeChange={setNotifIncludeTodayInBadge} useDefaultTemplatesInCleanState={useDefaultTemplatesInCleanState} onUseDefaultTemplatesInCleanStateChange={setUseDefaultTemplatesInCleanState} onClearLists={(useDefaultTemplatesInCleanState) => {
+              <DevToolsOverlay onClose={() => setIsDevToolsOpen(false)} onClearReminders={() => setReminders([])} addReminder={addReminder} addReminders={addReminders} nlcMode={nlcMode} onNlcModeChange={setNlcMode} nlcEnabled={nlcEnabled} onNlcEnabledChange={setNlcEnabled} nlcRecognition={nlcRecognition} onNlcRecognitionChange={setNlcRecognition} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={handleFiltersMenuVariantChange} hideOverdue={hideOverdue} onHideOverdueChange={setHideOverdue} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={setIsOnboardingTutorialEnabled} isListsEnabled={isListsEnabled} onListsEnabledChange={setIsListsEnabled} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={setShowTutorialOnFirstLaunch} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={setShowTutorialOnEveryStart} isDevToolsUnlocked={isDevToolsUnlocked} onDevToolsUnlock={() => setIsDevToolsUnlocked(true)} isDevToolsPasswordRequired={isDevToolsPasswordRequired} onDevToolsPasswordRequiredChange={setIsDevToolsPasswordRequired} useOneMinuteIncrements={useOneMinuteTimeIncrements} onUseOneMinuteIncrementsChange={setUseOneMinuteTimeIncrements} smartRemindersEnabled={smartRemindersFeatureEnabled} onSmartRemindersEnabledChange={setSmartRemindersFeatureEnabled} savedListsEnabled={savedListsFeatureEnabled} onSavedListsEnabledChange={handleSavedListsFeatureEnabledChange} pinnedListsEnabled={pinnedListsFeatureEnabled} onPinnedListsEnabledChange={setPinnedListsFeatureEnabled} settingsMenuEnabled={settingsMenuFeatureEnabled} onSettingsMenuEnabledChange={setSettingsMenuFeatureEnabled} notifReminderAlerts={notifReminderAlerts} onNotifReminderAlertsChange={setNotifReminderAlerts} notifAppBadge={notifAppBadge} onNotifAppBadgeChange={setNotifAppBadge} notifIncludeTodayInBadge={notifIncludeTodayInBadge} onNotifIncludeTodayInBadgeChange={setNotifIncludeTodayInBadge} siriShortcutsEnabled={siriShortcutsEnabled} onSiriShortcutsEnabledChange={setSiriShortcutsEnabled} useDefaultTemplatesInCleanState={useDefaultTemplatesInCleanState} onUseDefaultTemplatesInCleanStateChange={setUseDefaultTemplatesInCleanState} onClearLists={(useDefaultTemplatesInCleanState) => {
                 setCreatedLists([]);
                 setSavedLists(
                   useDefaultTemplatesInCleanState
