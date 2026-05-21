@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { registerPlugin } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
+import { App as CapacitorApp } from '@capacitor/app'
 import App from './app/App'
 import './styles/index.css'
 
@@ -19,8 +19,7 @@ void LocalNotifications.addListener('localNotificationActionPerformed', (event) 
   window.dispatchEvent(new CustomEvent(NOTIFICATION_TAP_EVENT))
 })
 
-const CapacitorApp = registerPlugin('App')
-void (CapacitorApp as any).addListener('appUrlOpen', (data: { url: string }) => {
+void CapacitorApp.addListener('appUrlOpen', (data) => {
   try {
     const url = new URL(data.url)
     if (url.protocol === 'reminderly:' && url.hostname === 'add') {
