@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import svgPaths from "../../imports/svg-prkucc25l";
+import tickSvgPaths from "../../imports/svg-k8owpv3rm6";
 import repeatSvg from "../../imports/svg-upkw3rt5ea";
 import checkSvg from "../../imports/svg-w98xpyjjva";
 import type { RepeatConfig } from "../reminder-utils";
@@ -113,7 +114,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
                 <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
                   <g>
                     <rect fill={getCurrentConfig() !== null ? "#4784F8" : "#F5F5F5"} height="50" rx="25" width="50" />
-                    <path d={svgPaths.p1635b2f0} fill={getCurrentConfig() !== null ? "#F0FAFE" : "#D5D5D5"} id="tick-icon" />
+                    <path d={tickSvgPaths.p1635b2f0} fill={getCurrentConfig() !== null ? "#F0FAFE" : "#D5D5D5"} id="tick-icon" />
                   </g>
                 </svg>
               </button>
