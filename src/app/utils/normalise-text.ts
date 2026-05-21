@@ -138,8 +138,8 @@ export function normaliseReminderText(
   // redundant "on Sunday" after the user already wrote "March 1".
   let strippedExplicitAbsoluteDate = false;
   const absoluteDatePatterns: RegExp[] = [
-    /\b(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\s+\d{1,2}(?:st|nd|rd|th)?(?:\s+\d{4})?\b/gi,
-    /\b\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)(?:\s+\d{4})?\b/gi,
+    /\b(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\s+\d{1,2}(?:st|nd|rd|th)?(?!\s*(?:am|pm)\b)(?:\s+\d{4})?\b/gi,
+    /\b\d{1,2}(?:st|nd|rd|th)?\s+(?:of\s+)?(?:january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)(?:\s+\d{4})?\b/gi,
   ];
   for (const pattern of absoluteDatePatterns) {
     pattern.lastIndex = 0;
