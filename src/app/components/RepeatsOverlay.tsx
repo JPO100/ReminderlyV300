@@ -106,14 +106,14 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
               </button>
               <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Reminder repeats</span>
               <button
-                onClick={() => onClose(getCurrentConfig())}
-                className="absolute right-0 block cursor-pointer shrink-0 flex items-center justify-center"
-                style={{ width: 50, height: 50 }}
+                onClick={getCurrentConfig() !== null ? () => onClose(getCurrentConfig()) : undefined}
+                disabled={getCurrentConfig() === null}
+                className={`absolute right-0 flex items-center justify-center relative shrink-0 size-[50px] ${getCurrentConfig() !== null ? 'cursor-pointer' : 'cursor-default'}`}
                 data-name="done-button"
               >
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
-                  <rect fill="#4784F8" height="50" rx="25" width="50" />
-                  <path d="M21.5 31.5L14 24l-1.5 1.5 9 9 19-19L39 14z" fill="white" />
+                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
+                  <rect fill={getCurrentConfig() !== null ? "#4784F8" : "#F5F5F5"} height="50" rx="25" width="50" />
+                  <path d={svgPaths.p1635b2f0} fill={getCurrentConfig() !== null ? "#F0FAFE" : "#D5D5D5"} />
                 </svg>
               </button>
             </div>
