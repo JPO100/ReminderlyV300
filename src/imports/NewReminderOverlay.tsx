@@ -18,20 +18,10 @@ import type { RepeatConfig } from "../app/reminder-utils";
 import type { Reminder } from "../app/reminder-utils";
 import type { ReminderSchedule } from "../app/reminder-utils";
 import type { RepeatRule } from "../app/types/reminder";
+import { repeatConfigToRule } from "../app/utils/repeat-conversion";
 import { formatShortMonthDay } from "../app/utils/date-display";
 import { buildSmartReminderText, getSmartReminderTime, storageStringToDate, type CreatedList } from "../app/utils/list-utils";
 import { normaliseReminderText } from "../app/utils/normalise-text";
-
-// Day name → two-letter abbreviation mapping for RepeatRule.byDay
-const DAY_ABBREV: Record<string, 'mo' | 'tu' | 'we' | 'th' | 'fr' | 'sa' | 'su'> = {
-  'Monday': 'mo',
-  'Tuesday': 'tu',
-  'Wednesday': 'we',
-  'Thursday': 'th',
-  'Friday': 'fr',
-  'Saturday': 'sa',
-  'Sunday': 'su',
-};
 
 // Minimal id generator (local to overlay, matches App.tsx pattern)
 function generateId(): string {
@@ -168,6 +158,19 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
     }
   };
   
+  const touchStartXRef = useRef<number | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartXRef.current;
+    touchStartXRef.current = null;
+    if (Math.abs(dx) < 50) return;
+    if (dx > 0) handlePrevMonth();
+    else handleNextMonth();
+  };
+
   const handleDayClick = (day: number) => {
     const date = new Date(viewYear, viewMonth, day);
     date.setHours(0, 0, 0, 0);
@@ -223,7 +226,7 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
       </div>
 
       {/* Month - Calendar Grid */}
-      <div className="gap-[8px] grid grid-cols-7 pt-[9px] relative shrink-0 w-full max-w-[340px] min-w-[280px]" data-name="month" style={{ gridTemplateRows: gridRowsValue }}>
+      <div className="gap-[8px] grid grid-cols-7 pt-[9px] relative shrink-0 w-full max-w-[340px] min-w-[280px]" data-name="month" style={{ gridTemplateRows: gridRowsValue, touchAction: 'pan-y' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         {/* Day headers */}
         {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day, i) => (
           <p key={day} className="font-['Lato',sans-serif] font-[600] justify-self-center leading-[normal] relative self-start shrink-0 text-[13px] text-[rgba(0,0,0,0.2)] text-center" style={{ gridColumn: i + 1, gridRow: 1 }}>
@@ -1116,24 +1119,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       schedule = { kind: 'sometime' };
     }
 
-    // Convert RepeatConfig → RepeatRule for persistence
-    let repeatRule: RepeatRule | null = null;
-    if (isRepeatsOn && repeatConfig) {
-      if (repeatConfig.frequency === 'custom-days') {
-        const byDay = (repeatConfig.selectedDays ?? [])
-          .map(d => DAY_ABBREV[d])
-          .filter((d): d is NonNullable<typeof d> => d != null);
-        if (byDay.length > 0) {
-          repeatRule = { frequency: 'weekly', interval: 1, byDay };
-        }
-      } else {
-        repeatRule = {
-          frequency: repeatConfig.frequency,
-          interval: repeatConfig.interval ?? 1,
-          byDay: null,
-        };
-      }
-    }
+    const repeatRule = isRepeatsOn ? repeatConfigToRule(repeatConfig) : null;
 
     const now = new Date();
 
