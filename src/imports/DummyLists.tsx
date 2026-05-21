@@ -11,7 +11,7 @@ function Header({ onBack, onClose }: { onBack: () => void; onClose: () => void }
         <button onClick={onBack} className="cursor-pointer shrink-0" aria-label="Back">
           <div className="h-[17px] relative shrink-0 w-[9px]" data-name="Union">
             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 9 17">
-              <path d={svgPaths.p347e8980} fill="var(--fill-0, #2B5DA0)" id="Union" />
+              <path d={svgPaths.p347e8980} fill="var(--fill-0, #4784F8)" id="Union" />
             </svg>
           </div>
         </button>
@@ -28,7 +28,7 @@ function Header({ onBack, onClose }: { onBack: () => void; onClose: () => void }
         <div className="flex-none rotate-45">
           <div className="relative size-[18px]" data-name="Union">
             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 18">
-              <path d={svgPaths.p1cbc7100} fill="var(--fill-0, #2B5DA0)" id="Union" />
+              <path d={svgPaths.p1cbc7100} fill="var(--fill-0, #4784F8)" id="Union" />
             </svg>
           </div>
         </div>
@@ -77,7 +77,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
 
   const clearBgColor =
     clearState === 'cleared' ? '#2A4466' :
-    clearState === 'confirming' ? '#35506E' : '#2B5DA0';
+    clearState === 'confirming' ? '#35506E' : '#4784F8';
 
   const parseCount = (val: string): number => {
     const n = parseInt(val, 10);
@@ -109,7 +109,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
           <div className="h-[51px] relative shrink-0 w-full">
             <div className="flex flex-row items-center size-full">
               <div className="content-stretch flex items-center justify-between px-px py-[13px] relative size-full">
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#2B5DA0] text-[17px] whitespace-nowrap">
+                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#4784F8] text-[17px] whitespace-nowrap">
                   <p className="leading-[normal]">Number of lists</p>
                 </div>
                 <div className="bg-white content-stretch flex h-[36px] items-center justify-center p-[13px] relative rounded-[4px] shrink-0 w-[60px]" data-name="text-box">
@@ -119,7 +119,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
                     inputMode="numeric"
                     value={numberOfLists}
                     onChange={(e) => setNumberOfLists(e.target.value)}
-                    className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#2B5DA0] text-[17px] p-0 m-0"
+                    className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#4784F8] text-[17px] p-0 m-0"
                   />
                 </div>
               </div>
@@ -129,7 +129,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
           <div className="h-[51px] relative shrink-0 w-full">
             <div className="flex flex-row items-center size-full">
               <div className="content-stretch flex items-center justify-between px-px py-[13px] relative size-full">
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#2B5DA0] text-[17px] whitespace-nowrap">
+                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#4784F8] text-[17px] whitespace-nowrap">
                   <p className="leading-[normal]">Max number of list items</p>
                 </div>
                 <div className="bg-white content-stretch flex h-[36px] items-center justify-center p-[13px] relative rounded-[4px] shrink-0 w-[60px]" data-name="text-box">
@@ -139,7 +139,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
                     inputMode="numeric"
                     value={maxListItems}
                     onChange={(e) => setMaxListItems(e.target.value)}
-                    className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#2B5DA0] text-[17px] p-0 m-0"
+                    className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#4784F8] text-[17px] p-0 m-0"
                   />
                 </div>
               </div>
@@ -151,7 +151,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
             className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
           >
             <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeDone ? '#2B5DA0' : '#C9C9C9' }}>Include done list items</p>
+              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeDone ? '#4784F8' : '#C9C9C9' }}>Include done list items</p>
             </div>
             <div
               className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeDone ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
@@ -168,7 +168,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
             className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
           >
             <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSmartReminderLists ? '#2B5DA0' : '#C9C9C9' }}>Include smart reminder lists</p>
+              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSmartReminderLists ? '#4784F8' : '#C9C9C9' }}>Include smart reminder lists</p>
             </div>
             <div
               className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSmartReminderLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
@@ -185,7 +185,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
             className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
           >
             <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSavedLists ? '#2B5DA0' : '#C9C9C9' }}>Include List templates</p>
+              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSavedLists ? '#4784F8' : '#C9C9C9' }}>Include List templates</p>
             </div>
             <div
               className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSavedLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}

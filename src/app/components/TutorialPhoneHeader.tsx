@@ -128,8 +128,8 @@ function TutorialWordmark({
             <g clipPath="url(#clip0_default_header_done_tick)">
               <path d={tickPaths.p9b9c500} fill="#FFFFFF" />
               <g>
-                <path d={tickPaths.p1d837f80} fill="#2B5DA0" />
-                <path d={tickPaths.p1d2e7380} fill="#2B5DA0" />
+                <path d={tickPaths.p1d837f80} fill="#4784F8" />
+                <path d={tickPaths.p1d2e7380} fill="#4784F8" />
               </g>
             </g>
             <defs>
@@ -177,8 +177,8 @@ function Page8DoneTick() {
         <g clipPath="url(#clip0_page8_header)" id="Group 14">
           <path d={tickPaths.p9b9c500} fill="#FFFFFF" id="Ellipse 74 (Stroke)" />
           <g id="Group 11">
-            <path d={tickPaths.p1d837f80} fill="#2B5DA0" id="Line 39 (Stroke)" />
-            <path d={tickPaths.p1d2e7380} fill="#2B5DA0" id="Line 40 (Stroke)" />
+            <path d={tickPaths.p1d837f80} fill="#4784F8" id="Line 39 (Stroke)" />
+            <path d={tickPaths.p1d2e7380} fill="#4784F8" id="Line 40 (Stroke)" />
           </g>
         </g>
         <defs>
@@ -226,15 +226,15 @@ export default function TutorialPhoneHeader({
   backgroundColor,
   showMenuIcon = true,
   variant = "default",
-  indicatorColor = "#2B5DA0",
+  indicatorColor = "#4784F8",
   tickDone = false,
   tickFlash = false,
   showDone = false,
   logoTickHighlight = false,
   logoTickDone = false,
 }: TutorialPhoneHeaderProps) {
-  const resolvedBackgroundColor = backgroundColor ?? (activeMainTab === "lists" ? "#2B5DA0" : "#4784f8");
-  const defaultSensorColor = activeMainTab === "lists" ? "#000000" : "#2B5DA0";
+  const resolvedBackgroundColor = backgroundColor ?? (activeMainTab === "lists" ? "#4784F8" : "#4784f8");
+  const defaultSensorColor = activeMainTab === "lists" ? "#000000" : "#4784F8";
 
   if (variant === "page8") {
     return (

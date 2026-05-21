@@ -48,7 +48,7 @@ interface TutorialOnboardingContentProps {
 const LIST_TUTORIAL_TOTAL_PAGES = 8;
 const REMINDER_TUTORIAL_BASE_TOTAL_PAGES = 5;
 const REMINDER_TUTORIAL_SETTINGS_TOTAL_PAGES = 6;
-const LIST_BLUE = "#2B5DA0";
+const LIST_BLUE = "#4784F8";
 const REMINDERLY_LIGHT_BLUE = "#4784F8";
 const TUTORIAL_PHONE_GAP_TOP_CLASSNAME = "mt-[35px]";
 const TUTORIAL_PHONE_GAP_BOTTOM_CLASSNAME = "pb-[45px]";
@@ -105,20 +105,20 @@ const PAGE_5_THROB_TOTAL_MS = (TUTORIAL_ATTENTION_THROB_DELAY + TUTORIAL_ATTENTI
 function TutorialSavedListTemplateIcon() {
   return (
     <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="block size-full">
-      <path d="M18.2471 22.9885C18.8026 22.9885 19.2529 23.4388 19.2529 23.9943C19.2529 24.5497 18.8026 25 18.2471 25H14.7989C14.2434 25 13.7931 24.5497 13.7931 23.9943C13.7931 23.4388 14.2434 22.9885 14.7989 22.9885H18.2471Z" fill="#2B5DA0"/>
-      <path d="M8.85417 20.7099C9.39861 20.6007 9.92791 20.9534 10.0373 21.4978C10.1434 22.0259 10.3097 22.2927 10.5592 22.498C10.8351 22.7249 11.2415 22.8966 12.0106 22.9975C12.5611 23.0697 12.949 23.574 12.8772 24.1245C12.8049 24.6752 12.2998 25.0632 11.7491 24.991C10.7987 24.8664 9.96869 24.6154 9.28183 24.0504C8.58377 23.4761 8.23731 22.7449 8.06618 21.893C7.95704 21.3485 8.30971 20.8192 8.85417 20.7099Z" fill="#2B5DA0"/>
-      <path d="M23.0087 21.4978C23.1181 20.9534 23.6474 20.6007 24.1918 20.7099C24.7363 20.8192 25.0889 21.3485 24.9798 21.893C24.8087 22.7449 24.4622 23.4761 23.7641 24.0504C23.0773 24.6154 22.2473 24.8664 21.2969 24.991C20.7462 25.0632 20.241 24.6752 20.1688 24.1245C20.0969 23.574 20.4849 23.0697 21.0354 22.9975C21.8044 22.8966 22.2109 22.7249 22.4868 22.498C22.7363 22.2927 22.9026 22.0259 23.0087 21.4978Z" fill="#2B5DA0"/>
-      <path d="M9.62644 1.83515e-06C11.4911 1.97217e-06 12.9782 -0.00210536 14.1545 0.136945C15.3531 0.278622 16.3596 0.578533 17.2043 1.27178C17.4881 1.50462 17.7483 1.76481 17.9811 2.04854C18.638 2.84898 18.9418 3.79466 19.0924 4.912C19.2399 6.00698 19.2515 7.36839 19.2529 9.0506C19.2529 9.34636 19.1238 9.61191 18.9206 9.79593C18.8936 9.8204 18.866 9.84408 18.8364 9.86553C18.723 9.94779 18.5925 10.0081 18.4503 10.0373C18.3851 10.0507 18.3174 10.0574 18.2482 10.0575L18.2471 10.0563L14.7989 10.0575C14.2434 10.0575 13.7931 9.60718 13.7931 9.05172C13.7931 8.49627 14.2434 8.04598 14.7989 8.04598H17.2369C17.228 6.84247 17.1988 5.92324 17.0988 5.18139C16.9757 4.26764 16.7587 3.72976 16.4265 3.3248C16.2772 3.14293 16.1099 2.97568 15.9281 2.82642C15.5012 2.4762 14.9271 2.25419 13.9188 2.13497C12.8879 2.01311 11.5404 2.0115 9.62644 2.0115C7.71245 2.0115 6.36494 2.01311 5.33405 2.13497C4.32582 2.25419 3.75166 2.4762 3.3248 2.82642C3.14293 2.97568 2.97568 3.14293 2.82642 3.3248C2.4762 3.75166 2.25419 4.32582 2.13497 5.33405C2.01311 6.36494 2.0115 7.71245 2.0115 9.62644C2.0115 11.5404 2.01312 12.8879 2.13497 13.9188C2.25419 14.9271 2.4762 15.5012 2.82642 15.9281C2.97568 16.1099 3.14293 16.2772 3.3248 16.4265C3.72976 16.7587 4.26764 16.9757 5.18139 17.0988C5.92323 17.1988 6.84248 17.2269 8.04598 17.2358V14.7989C8.04598 14.2434 8.49627 13.7931 9.05172 13.7931C9.60718 13.7931 10.0575 14.2434 10.0575 14.7989V18.2471C10.0575 18.4206 10.0136 18.584 9.93624 18.7264C9.89781 18.7972 9.84956 18.8614 9.79593 18.9206C9.76531 18.9544 9.73319 18.9866 9.69828 19.016C9.68951 19.0234 9.68036 19.0303 9.67134 19.0374C9.5004 19.1716 9.28591 19.2529 9.05172 19.2529L9.0506 19.2518C7.36838 19.2504 6.00698 19.2399 4.912 19.0924C3.79466 18.9418 2.84898 18.638 2.04854 17.9811C1.76481 17.7483 1.50462 17.4881 1.27178 17.2043C0.578533 16.3596 0.278622 15.3531 0.136945 14.1545C-0.00210535 12.9782 1.69723e-06 11.4911 1.83489e-06 9.62644C1.97026e-06 7.76173 -0.0021054 6.27471 0.136945 5.09833C0.278623 3.89974 0.578532 2.89326 1.27178 2.04854C1.50462 1.76481 1.76481 1.50462 2.04854 1.27178C2.89326 0.578533 3.89974 0.278622 5.09833 0.136945C6.27471 -0.00210546 7.76173 1.69748e-06 9.62644 1.83515e-06Z" fill="#2B5DA0"/>
-      <path d="M23.9943 13.7931C24.5497 13.7931 25 14.2434 25 14.7989V18.2471C25 18.8026 24.5497 19.2529 23.9943 19.2529C23.4388 19.2529 22.9885 18.8026 22.9885 18.2471V14.7989C22.9885 14.2434 23.4388 13.7931 23.9943 13.7931Z" fill="#2B5DA0"/>
-      <path d="M11.7491 8.05496C12.2998 7.98274 12.8049 8.37077 12.8772 8.92152C12.949 9.47202 12.5611 9.97626 12.0106 10.0485C11.2415 10.1493 10.8351 10.3211 10.5592 10.548C10.3097 10.7533 10.1434 11.0201 10.0373 11.5481C9.92791 12.0926 9.39861 12.4453 8.85417 12.3361C8.30971 12.2268 7.95704 11.6975 8.06618 11.153C8.23731 10.3011 8.58377 9.56989 9.28183 8.9956C9.96869 8.43057 10.7987 8.17958 11.7491 8.05496Z" fill="#2B5DA0"/>
-      <path d="M21.2969 8.05496C22.2473 8.17958 23.0773 8.43057 23.7641 8.9956C24.4622 9.5699 24.8087 10.3011 24.9798 11.153C25.0889 11.6975 24.7363 12.2268 24.1918 12.3361C23.6474 12.4453 23.1181 12.0926 23.0087 11.5481C22.9026 11.0201 22.7363 10.7533 22.4868 10.548C22.2109 10.3211 21.8044 10.1493 21.0354 10.0485C20.4849 9.97626 20.0969 9.47202 20.1688 8.92152C20.241 8.37077 20.7462 7.98274 21.2969 8.05496Z" fill="#2B5DA0"/>
+      <path d="M18.2471 22.9885C18.8026 22.9885 19.2529 23.4388 19.2529 23.9943C19.2529 24.5497 18.8026 25 18.2471 25H14.7989C14.2434 25 13.7931 24.5497 13.7931 23.9943C13.7931 23.4388 14.2434 22.9885 14.7989 22.9885H18.2471Z" fill="#4784F8"/>
+      <path d="M8.85417 20.7099C9.39861 20.6007 9.92791 20.9534 10.0373 21.4978C10.1434 22.0259 10.3097 22.2927 10.5592 22.498C10.8351 22.7249 11.2415 22.8966 12.0106 22.9975C12.5611 23.0697 12.949 23.574 12.8772 24.1245C12.8049 24.6752 12.2998 25.0632 11.7491 24.991C10.7987 24.8664 9.96869 24.6154 9.28183 24.0504C8.58377 23.4761 8.23731 22.7449 8.06618 21.893C7.95704 21.3485 8.30971 20.8192 8.85417 20.7099Z" fill="#4784F8"/>
+      <path d="M23.0087 21.4978C23.1181 20.9534 23.6474 20.6007 24.1918 20.7099C24.7363 20.8192 25.0889 21.3485 24.9798 21.893C24.8087 22.7449 24.4622 23.4761 23.7641 24.0504C23.0773 24.6154 22.2473 24.8664 21.2969 24.991C20.7462 25.0632 20.241 24.6752 20.1688 24.1245C20.0969 23.574 20.4849 23.0697 21.0354 22.9975C21.8044 22.8966 22.2109 22.7249 22.4868 22.498C22.7363 22.2927 22.9026 22.0259 23.0087 21.4978Z" fill="#4784F8"/>
+      <path d="M9.62644 1.83515e-06C11.4911 1.97217e-06 12.9782 -0.00210536 14.1545 0.136945C15.3531 0.278622 16.3596 0.578533 17.2043 1.27178C17.4881 1.50462 17.7483 1.76481 17.9811 2.04854C18.638 2.84898 18.9418 3.79466 19.0924 4.912C19.2399 6.00698 19.2515 7.36839 19.2529 9.0506C19.2529 9.34636 19.1238 9.61191 18.9206 9.79593C18.8936 9.8204 18.866 9.84408 18.8364 9.86553C18.723 9.94779 18.5925 10.0081 18.4503 10.0373C18.3851 10.0507 18.3174 10.0574 18.2482 10.0575L18.2471 10.0563L14.7989 10.0575C14.2434 10.0575 13.7931 9.60718 13.7931 9.05172C13.7931 8.49627 14.2434 8.04598 14.7989 8.04598H17.2369C17.228 6.84247 17.1988 5.92324 17.0988 5.18139C16.9757 4.26764 16.7587 3.72976 16.4265 3.3248C16.2772 3.14293 16.1099 2.97568 15.9281 2.82642C15.5012 2.4762 14.9271 2.25419 13.9188 2.13497C12.8879 2.01311 11.5404 2.0115 9.62644 2.0115C7.71245 2.0115 6.36494 2.01311 5.33405 2.13497C4.32582 2.25419 3.75166 2.4762 3.3248 2.82642C3.14293 2.97568 2.97568 3.14293 2.82642 3.3248C2.4762 3.75166 2.25419 4.32582 2.13497 5.33405C2.01311 6.36494 2.0115 7.71245 2.0115 9.62644C2.0115 11.5404 2.01312 12.8879 2.13497 13.9188C2.25419 14.9271 2.4762 15.5012 2.82642 15.9281C2.97568 16.1099 3.14293 16.2772 3.3248 16.4265C3.72976 16.7587 4.26764 16.9757 5.18139 17.0988C5.92323 17.1988 6.84248 17.2269 8.04598 17.2358V14.7989C8.04598 14.2434 8.49627 13.7931 9.05172 13.7931C9.60718 13.7931 10.0575 14.2434 10.0575 14.7989V18.2471C10.0575 18.4206 10.0136 18.584 9.93624 18.7264C9.89781 18.7972 9.84956 18.8614 9.79593 18.9206C9.76531 18.9544 9.73319 18.9866 9.69828 19.016C9.68951 19.0234 9.68036 19.0303 9.67134 19.0374C9.5004 19.1716 9.28591 19.2529 9.05172 19.2529L9.0506 19.2518C7.36838 19.2504 6.00698 19.2399 4.912 19.0924C3.79466 18.9418 2.84898 18.638 2.04854 17.9811C1.76481 17.7483 1.50462 17.4881 1.27178 17.2043C0.578533 16.3596 0.278622 15.3531 0.136945 14.1545C-0.00210535 12.9782 1.69723e-06 11.4911 1.83489e-06 9.62644C1.97026e-06 7.76173 -0.0021054 6.27471 0.136945 5.09833C0.278623 3.89974 0.578532 2.89326 1.27178 2.04854C1.50462 1.76481 1.76481 1.50462 2.04854 1.27178C2.89326 0.578533 3.89974 0.278622 5.09833 0.136945C6.27471 -0.00210546 7.76173 1.69748e-06 9.62644 1.83515e-06Z" fill="#4784F8"/>
+      <path d="M23.9943 13.7931C24.5497 13.7931 25 14.2434 25 14.7989V18.2471C25 18.8026 24.5497 19.2529 23.9943 19.2529C23.4388 19.2529 22.9885 18.8026 22.9885 18.2471V14.7989C22.9885 14.2434 23.4388 13.7931 23.9943 13.7931Z" fill="#4784F8"/>
+      <path d="M11.7491 8.05496C12.2998 7.98274 12.8049 8.37077 12.8772 8.92152C12.949 9.47202 12.5611 9.97626 12.0106 10.0485C11.2415 10.1493 10.8351 10.3211 10.5592 10.548C10.3097 10.7533 10.1434 11.0201 10.0373 11.5481C9.92791 12.0926 9.39861 12.4453 8.85417 12.3361C8.30971 12.2268 7.95704 11.6975 8.06618 11.153C8.23731 10.3011 8.58377 9.56989 9.28183 8.9956C9.96869 8.43057 10.7987 8.17958 11.7491 8.05496Z" fill="#4784F8"/>
+      <path d="M21.2969 8.05496C22.2473 8.17958 23.0773 8.43057 23.7641 8.9956C24.4622 9.5699 24.8087 10.3011 24.9798 11.153C25.0889 11.6975 24.7363 12.2268 24.1918 12.3361C23.6474 12.4453 23.1181 12.0926 23.0087 11.5481C22.9026 11.0201 22.7363 10.7533 22.4868 10.548C22.2109 10.3211 21.8044 10.1493 21.0354 10.0485C20.4849 9.97626 20.0969 9.47202 20.1688 8.92152C20.241 8.37077 20.7462 7.98274 21.2969 8.05496Z" fill="#4784F8"/>
     </svg>
   );
 }
 
 function TemplatesTutorialButton() {
   return (
-    <div className="bg-[#2B5DA0] content-stretch flex items-center justify-center px-[11.487px] h-[28.718px] relative rounded-[71.795px] shrink-0">
+    <div className="bg-[#4784F8] content-stretch flex items-center justify-center px-[11.487px] h-[28.718px] relative rounded-[71.795px] shrink-0">
       <div className="content-stretch flex items-center justify-center gap-[5.744px] relative">
         <div className="font-['Lato',sans-serif] font-bold text-[10.051px] text-white whitespace-nowrap">
           Templates
@@ -195,7 +195,7 @@ function Page5DoneDeletedFilters() {
         <div className="flex items-center gap-[8px]">
           <div
             className="bg-white content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0"
-            style={{ boxShadow: "inset 0 0 0 1.392px #2B5DA0", color: "#2B5DA0" }}
+            style={{ boxShadow: "inset 0 0 0 1.392px #4784F8", color: "#4784F8" }}
           >
             <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
               Done
@@ -210,7 +210,7 @@ function Page5DoneDeletedFilters() {
             </div>
           </div>
         </div>
-        <div className="content-stretch flex items-center justify-center h-[28px] w-[66px] relative rounded-[69.652px] shrink-0 border border-solid border-[#2B5DA0] text-[#2B5DA0]">
+        <div className="content-stretch flex items-center justify-center h-[28px] w-[66px] relative rounded-[69.652px] shrink-0 border border-solid border-[#4784F8] text-[#4784F8]">
           <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
             Clear all
           </div>
@@ -514,7 +514,7 @@ function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange, onAd
                       }}
                     >
                       <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
-                        <circle cx="25" cy="25" r="23.5" stroke="#2B5DA0" strokeWidth="3" />
+                        <circle cx="25" cy="25" r="23.5" stroke="#4784F8" strokeWidth="3" />
                       </svg>
                     </motion.div>
                   )}
@@ -539,7 +539,7 @@ function ListsTutorialOpenListOverlay({ open, mode, onSmartFlowPhaseChange, onAd
                       }}
                     >
                       <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
-                        <circle cx="17.5" cy="17.5" r="16" stroke="#2B5DA0" strokeWidth="3" />
+                        <circle cx="17.5" cy="17.5" r="16" stroke="#4784F8" strokeWidth="3" />
                       </svg>
                     </motion.div>
                   )}
@@ -669,7 +669,7 @@ function SmartReminderSheetOverlay({ visible, showTickThrob, onExitComplete }: {
                   }}
                 >
                   <svg width={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE} height={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE} viewBox={`0 0 ${SMART_REMINDER_TICK_THROB_CIRCLE_SIZE} ${SMART_REMINDER_TICK_THROB_CIRCLE_SIZE}`} fill="none">
-                    <circle cx={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2} cy={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2} r={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2 - 1.5} stroke="#2B5DA0" strokeWidth="3" />
+                    <circle cx={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2} cy={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2} r={SMART_REMINDER_TICK_THROB_CIRCLE_SIZE / 2 - 1.5} stroke="#4784F8" strokeWidth="3" />
                   </svg>
                 </motion.div>
               )}
@@ -1166,7 +1166,7 @@ function ListsTutorialPlaceholderPage({
                         />
                         <AddListItemInput
                           isEmpty={false}
-                          accentColor="#2B5DA0"
+                          accentColor="#4784F8"
                           idleCircleColor="#D9D9D9"
                           nextPlaceholder="Add your next template item..."
                           demoValue={page5InputValue}
@@ -1196,7 +1196,7 @@ function ListsTutorialPlaceholderPage({
                             }}
                           >
                             <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
-                              <circle cx="25" cy="25" r="23.5" stroke="#2B5DA0" strokeWidth="3" />
+                              <circle cx="25" cy="25" r="23.5" stroke="#4784F8" strokeWidth="3" />
                             </svg>
                           </motion.div>
                         )}
@@ -1220,7 +1220,7 @@ function ListsTutorialPlaceholderPage({
                             }}
                           >
                             <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
-                              <circle cx="17.5" cy="17.5" r="16" stroke="#2B5DA0" strokeWidth="3" />
+                              <circle cx="17.5" cy="17.5" r="16" stroke="#4784F8" strokeWidth="3" />
                             </svg>
                           </motion.div>
                         )}
@@ -1245,7 +1245,7 @@ function ListsTutorialPlaceholderPage({
                                 <EditableListItem
                                   name={item.text}
                                   completed={false}
-                                  accentColor="#2B5DA0"
+                                  accentColor="#4784F8"
                                   isHighlighted={isHighlighted}
                                   leadingIcon={<TutorialSavedListCheckCircle />}
                                 />
@@ -1267,7 +1267,7 @@ function ListsTutorialPlaceholderPage({
                       <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>Weekly food shop</p>
                     </div>
                     <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
-                      <div className="h-[50px] relative rounded-[100px] shrink-0 w-full" style={{ backgroundColor: '#2B5DA0' }}>
+                      <div className="h-[50px] relative rounded-[100px] shrink-0 w-full" style={{ backgroundColor: '#4784F8' }}>
                         <div className="flex flex-row items-center justify-center size-full">
                           <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
                             <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -1329,7 +1329,7 @@ function ListsTutorialPlaceholderPage({
                 }}
               >
                 <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
-                  <circle cx="17.5" cy="17.5" r="16" stroke="#2B5DA0" strokeWidth="3" />
+                  <circle cx="17.5" cy="17.5" r="16" stroke="#4784F8" strokeWidth="3" />
                 </svg>
               </motion.div>
             )}
@@ -1386,7 +1386,7 @@ function ListsTutorialPlaceholderPage({
                                               <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-start min-h-px min-w-0 not-italic overflow-visible relative" style={{ gap: '9px', minHeight: '38px' }}>
                                                 <div
                                                   className="overflow-hidden text-ellipsis whitespace-nowrap"
-                                                  style={{ color: '#2B5DA0', textDecorationColor: '#2B5DA0', clipPath: 'inset(0 0 -4px 0)' }}
+                                                  style={{ color: '#4784F8', textDecorationColor: '#4784F8', clipPath: 'inset(0 0 -4px 0)' }}
                                                 >
                                                   <p style={{ fontSize: '17px', fontWeight: 700, lineHeight: 1, overflow: 'visible', transform: 'translateY(-1px)' }}>
                                                     {tpl.title}
@@ -1437,7 +1437,7 @@ function ListsTutorialPlaceholderPage({
                 }}
               >
                 <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
-                  <circle cx="25" cy="25" r="23.5" stroke="#2B5DA0" strokeWidth="3" />
+                  <circle cx="25" cy="25" r="23.5" stroke="#4784F8" strokeWidth="3" />
                 </svg>
               </motion.div>
             )}
@@ -1460,7 +1460,7 @@ function ListsTutorialPlaceholderPage({
                 }}
               >
                 <svg width="35" height="35" viewBox="0 0 35 35" fill="none">
-                  <circle cx="17.5" cy="17.5" r="16" stroke="#2B5DA0" strokeWidth="3" />
+                  <circle cx="17.5" cy="17.5" r="16" stroke="#4784F8" strokeWidth="3" />
                 </svg>
               </motion.div>
             )}

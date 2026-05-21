@@ -40,22 +40,22 @@ When a reminder is marked as done (during the 350ms pending window), the followi
 
 | Element | Active (normal) | Pending done |
 |---|---|---|
-| Circle checkbox | Category-coloured outline, no fill | Filled dark blue `#2B5DA0` with white tick (DoneTick SVG) |
-| Reminder text | Dark blue `#2B5DA0`, no decoration | Dark blue `#2B5DA0`, `line-through` text decoration |
-| Status icon | Grey `#BABABA` | Dark blue `#2B5DA0` |
+| Circle checkbox | Category-coloured outline, no fill | Filled dark blue `#4784F8` with white tick (DoneTick SVG) |
+| Reminder text | Dark blue `#4784F8`, no decoration | Dark blue `#4784F8`, `line-through` text decoration |
+| Status icon | Grey `#BABABA` | Dark blue `#4784F8` |
 
 ### Colour derivation
 
 ```
 circleColour = overdue ? OVERDUE_COLOUR : CATEGORY_COLOURS[category]
-textColour   = isPendingDone ? "#BABABA" : (overdue ? OVERDUE_COLOUR : "#2B5DA0")
+textColour   = isPendingDone ? "#BABABA" : (overdue ? OVERDUE_COLOUR : "#4784F8")
 iconColour   = isPendingDone ? DONE_BLUE : (overdue ? OVERDUE_COLOUR : "#BABABA")
 ```
 
 When `isPendingDone` is true:
 - The text container colour fades to `#BABABA`.
-- The `<p>` element itself gets `line-through` and inline `color: #2B5DA0`.
-- The status icon switches to `#2B5DA0`.
+- The `<p>` element itself gets `line-through` and inline `color: #4784F8`.
+- The status icon switches to `#4784F8`.
 - The circle renders as a filled dark blue circle with a white tick.
 
 ---

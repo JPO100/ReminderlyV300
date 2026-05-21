@@ -5,7 +5,7 @@ function DoneTick() {
     <div className="relative shrink-0 size-[17.4px]" data-name="Done tick">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4 17.4">
         <g id="Done tick">
-          <rect fill="var(--fill-0, #2B5DA0)" height="17.4" rx="8.7" width="17.4" />
+          <rect fill="var(--fill-0, #4784F8)" height="17.4" rx="8.7" width="17.4" />
           <path d={svgPaths.p33bb1d80} fill="var(--fill-0, white)" id="Union" />
         </g>
       </svg>
@@ -19,9 +19,9 @@ function ReminderDetails() {
       <div className="flex flex-row items-start size-full">
         <div className="content-stretch flex gap-[11.138px] items-start pl-0 pr-[11.138px] py-0 relative w-full">
           <DoneTick />
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px', marginTop: '1px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[11.834px]" style={{ gap: '2px', marginTop: '1px' }}>
             <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap">Review Q1 roadmap</p>
-            <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#2B5DA0' }}>Yesterday at 10:00 AM</p>
+            <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#4784F8' }}>Yesterday at 10:00 AM</p>
           </div>
         </div>
       </div>
@@ -36,8 +36,8 @@ function SetTimeClock() {
         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4033 17.453">
           <g id="Set time clock">
             <rect fill="white" height="17.4033" transform="translate(0 0.0497238)" width="17.4033" />
-            <circle cx="8.70166" cy="8.70166" id="Ellipse 1116" r="8.00552" stroke="var(--stroke-0, #2B5DA0)" strokeWidth="1.39227" />
-            <path d={svgPaths.p1a0aa740} id="Vector" stroke="var(--stroke-0, #2B5DA0)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.39227" />
+            <circle cx="8.70166" cy="8.70166" id="Ellipse 1116" r="8.00552" stroke="var(--stroke-0, #4784F8)" strokeWidth="1.39227" />
+            <path d={svgPaths.p1a0aa740} id="Vector" stroke="var(--stroke-0, #4784F8)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.39227" />
           </g>
         </svg>
       </div>
@@ -71,7 +71,7 @@ function DoneTick1() {
     <div className="relative shrink-0 size-[17.4px]" data-name="Done tick">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4 17.4">
         <g id="Done tick">
-          <rect fill="var(--fill-0, #2B5DA0)" height="17.4" rx="8.7" width="17.4" />
+          <rect fill="var(--fill-0, #4784F8)" height="17.4" rx="8.7" width="17.4" />
           <path d={svgPaths.p33bb1d80} fill="var(--fill-0, white)" id="Union" />
         </g>
       </svg>
@@ -85,9 +85,9 @@ function ReminderDetails1() {
       <div className="flex flex-row items-start size-full">
         <div className="content-stretch flex gap-[11.138px] items-start pl-0 pr-[11.138px] py-0 relative w-full">
           <DoneTick1 />
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px', marginTop: '1px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[11.834px]" style={{ gap: '2px', marginTop: '1px' }}>
             <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap">Collect cake for party</p>
-            <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#2B5DA0' }}>Tuesday at 3:00 PM</p>
+            <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#4784F8' }}>Tuesday at 3:00 PM</p>
           </div>
         </div>
       </div>
@@ -102,8 +102,8 @@ function SetTimeClock1() {
         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4033 17.453">
           <g id="Set time clock">
             <rect fill="white" height="17.4033" transform="translate(0 0.0497238)" width="17.4033" />
-            <circle cx="8.70166" cy="8.70166" id="Ellipse 1116" r="8.00552" stroke="var(--stroke-0, #2B5DA0)" strokeWidth="1.39227" />
-            <path d={svgPaths.p1a0aa740} id="Vector" stroke="var(--stroke-0, #2B5DA0)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.39227" />
+            <circle cx="8.70166" cy="8.70166" id="Ellipse 1116" r="8.00552" stroke="var(--stroke-0, #4784F8)" strokeWidth="1.39227" />
+            <path d={svgPaths.p1a0aa740} id="Vector" stroke="var(--stroke-0, #4784F8)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.39227" />
           </g>
         </svg>
       </div>
@@ -137,7 +137,7 @@ function DoneTick2() {
     <div className="relative shrink-0 size-[17.4px]" data-name="Done tick">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4 17.4">
         <g id="Done tick">
-          <rect fill="var(--fill-0, #2B5DA0)" height="17.4" rx="8.7" width="17.4" />
+          <rect fill="var(--fill-0, #4784F8)" height="17.4" rx="8.7" width="17.4" />
           <path d={svgPaths.p33bb1d80} fill="var(--fill-0, white)" id="Union" />
         </g>
       </svg>
@@ -151,9 +151,9 @@ function ReminderDetails2() {
       <div className="flex flex-row items-start size-full">
         <div className="content-stretch flex gap-[11.138px] items-start pl-0 pr-[11.138px] py-0 relative w-full">
           <DoneTick2 />
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px', marginTop: '1px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[11.834px]" style={{ gap: '2px', marginTop: '1px' }}>
             <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap">Take bins out every Wednesday</p>
-            <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#2B5DA0' }}>Every Wednesday</p>
+            <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#4784F8' }}>Every Wednesday</p>
           </div>
         </div>
       </div>
@@ -167,10 +167,10 @@ function Group() {
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4035 17.4527">
         <g id="Group 23">
           <g id="Group 20">
-            <path d={svgPaths.p3f72ea80} fill="var(--fill-0, #2B5DA0)" id="Vector" />
-            <path d={svgPaths.p20bae400} fill="var(--fill-0, #2B5DA0)" id="Union" />
+            <path d={svgPaths.p3f72ea80} fill="var(--fill-0, #4784F8)" id="Vector" />
+            <path d={svgPaths.p20bae400} fill="var(--fill-0, #4784F8)" id="Union" />
           </g>
-          <path d={svgPaths.p380e0c00} id="Vector_2" stroke="var(--stroke-0, #2B5DA0)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.39227" />
+          <path d={svgPaths.p380e0c00} id="Vector_2" stroke="var(--stroke-0, #4784F8)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.39227" />
         </g>
       </svg>
     </div>
@@ -211,7 +211,7 @@ function DoneTick3() {
     <div className="relative shrink-0 size-[17.4px]" data-name="Done tick">
       <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4 17.4">
         <g id="Done tick">
-          <rect fill="var(--fill-0, #2B5DA0)" height="17.4" rx="8.7" width="17.4" />
+          <rect fill="var(--fill-0, #4784F8)" height="17.4" rx="8.7" width="17.4" />
           <path d={svgPaths.p33bb1d80} fill="var(--fill-0, white)" id="Union" />
         </g>
       </svg>
@@ -225,9 +225,9 @@ function ReminderDetails3() {
       <div className="flex flex-row items-start size-full">
         <div className="content-stretch flex gap-[11.138px] items-start pl-0 pr-[11.138px] py-0 relative w-full">
           <DoneTick3 />
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px', marginTop: '1px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[11.834px]" style={{ gap: '2px', marginTop: '1px' }}>
             <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap">Buy dog food on way home</p>
-            <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#2B5DA0' }}>Today at 5:30 PM</p>
+            <p className="[text-decoration-skip-ink:none] leading-[normal] line-through overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#4784F8' }}>Today at 5:30 PM</p>
           </div>
         </div>
       </div>
@@ -242,8 +242,8 @@ function SetTimeClock2() {
         <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.4033 17.453">
           <g id="Set time clock">
             <rect fill="white" height="17.4033" transform="translate(0 0.0497238)" width="17.4033" />
-            <circle cx="8.70166" cy="8.70166" id="Ellipse 1116" r="8.00552" stroke="var(--stroke-0, #2B5DA0)" strokeWidth="1.39227" />
-            <path d={svgPaths.p1a0aa740} id="Vector" stroke="var(--stroke-0, #2B5DA0)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.39227" />
+            <circle cx="8.70166" cy="8.70166" id="Ellipse 1116" r="8.00552" stroke="var(--stroke-0, #4784F8)" strokeWidth="1.39227" />
+            <path d={svgPaths.p1a0aa740} id="Vector" stroke="var(--stroke-0, #4784F8)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.39227" />
           </g>
         </svg>
       </div>

@@ -90,9 +90,9 @@ See [New Reminder Overlay](../01-core-surfaces/new-reminder-overlay.md) for edit
 1. Guard: if completion timer already exists for this ID, no-op
 2. Immediate visual commit: add `reminderId` to `pendingDoneIds`
 3. Visual changes apply instantly:
-   - Circle: filled dark blue `#2B5DA0` with white tick
-   - Text: `#BABABA` container, dark blue `#2B5DA0` with `line-through`
-   - Status icon: dark blue `#2B5DA0`
+   - Circle: filled dark blue `#4784F8` with white tick
+   - Text: `#BABABA` container, dark blue `#4784F8` with `line-through`
+   - Status icon: dark blue `#4784F8`
 4. After 350ms (`COMPLETION_DELAY`):
    - Set `completedAt = Date.now()`
    - Remove from `pendingDoneIds`

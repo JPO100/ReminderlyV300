@@ -13,7 +13,7 @@ function ReminderDetails() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #00AFEE)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Reminder with a date / time set</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>Today at 9:30 AM</p>
           </div>
@@ -24,7 +24,7 @@ function ReminderDetails() {
 }
 
 function SetTimeClock({ isActive }: { isActive: boolean }) {
-  const color = isActive ? "#2B5DA0" : "#BABABA";
+  const color = isActive ? "#4784F8" : "#BABABA";
   
   return (
     <div className="relative shrink-0 size-[17.403px]" data-name="Set time clock">
@@ -72,7 +72,7 @@ function ReminderDetails1() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #FAA429)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Reminder with a recurring date set</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>Every Monday</p>
           </div>
@@ -83,7 +83,7 @@ function ReminderDetails1() {
 }
 
 function Group({ isActive }: { isActive: boolean }) {
-  const color = isActive ? "#2B5DA0" : "#BABABA";
+  const color = isActive ? "#4784F8" : "#BABABA";
   
   return (
     <div className="absolute h-[17.452px] left-0 top-0 w-[17.404px]">
@@ -139,7 +139,7 @@ function ReminderDetails2() {
               <circle cx="8.70166" cy="8.70166" fill="var(--fill-0, white)" id="Tick box" r="8.00552" stroke="var(--stroke-0, #939393)" strokeWidth="1.39227" />
             </svg>
           </div>
-          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[11.834px]" style={{ gap: '2px' }}>
+          <div className="flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[11.834px]" style={{ gap: '2px' }}>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap">Reminder with no date set</p>
             <p className="leading-[normal] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: '9.4px', fontWeight: 600, fontFamily: "'Lato', sans-serif", color: '#BABABA' }}>No date / time set</p>
           </div>
@@ -150,7 +150,7 @@ function ReminderDetails2() {
 }
 
 function NoTimeClock({ isActive }: { isActive: boolean }) {
-  const color = isActive ? "#2B5DA0" : "#BABABA";
+  const color = isActive ? "#4784F8" : "#BABABA";
   
   return (
     <div className="relative shrink-0 size-[17.403px]" data-name="No time clock">

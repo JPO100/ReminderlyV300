@@ -54,7 +54,7 @@ The logo tick icon in the header toggles between views:
 ### Logo tick visual state
 
 - **List mode**: White circular tick icon visible in the logo area.
-- **Done/deleted mode**: Header background changes to `#2B5DA0`. White-filled tick icon with `#2B5DA0` checkmark overlaid at the same position.
+- **Done/deleted mode**: Header background changes to `#4784F8`. White-filled tick icon with `#4784F8` checkmark overlaid at the same position.
 
 ---
 
@@ -83,9 +83,9 @@ A `Map<string, number>` ref holding one `setTimeout` handle per pending reminder
 
 | Element | Normal (active) | Pending done |
 |---------|----------------|--------------|
-| Circle | Category-coloured outline, no fill | Filled `#2B5DA0` with white tick |
-| Text | `#2B5DA0`, no decoration | `#BABABA` container colour, `line-through`, inline `#2B5DA0` |
-| Status icon | `#BABABA` | `#2B5DA0` |
+| Circle | Category-coloured outline, no fill | Filled `#4784F8` with white tick |
+| Text | `#4784F8`, no decoration | `#BABABA` container colour, `line-through`, inline `#4784F8` |
+| Status icon | `#BABABA` | `#4784F8` |
 
 ---
 
@@ -117,7 +117,7 @@ A `Map<string, number>` ref holding one `setTimeout` handle per pending reminder
 | Element | Normal (active) | Pending delete |
 |---------|----------------|----------------|
 | Circle | Category-coloured outline | Filled `#939393` with white tick |
-| Text | `#2B5DA0`, no decoration | `#939393`, `line-through` |
+| Text | `#4784F8`, no decoration | `#939393`, `line-through` |
 | Status icon | `#BABABA` | `#939393` |
 
 ### Empty-state delay
@@ -183,7 +183,7 @@ const [doneDeletedFilter, setDoneDeletedFilter] = useState<'all' | 'done' | 'del
 
 - Clicking "Done" when inactive: sets filter to `'done'`. Clicking again: resets to `'all'`.
 - Clicking "Deleted" when inactive: sets filter to `'deleted'`. Clicking again: resets to `'all'`.
-- Active button renders with white background and `#2B5DA0` text. Inactive: translucent background and white text.
+- Active button renders with white background and `#4784F8` text. Inactive: translucent background and white text.
 
 ### Back button
 
@@ -202,8 +202,8 @@ const [clearListStep, setClearListStep] = useState<0 | 1 | 2>(0);
 | Step | Label | Visual |
 |------|-------|--------|
 | 0 | "Clear all" | Translucent background, white text |
-| 1 | "Clear all?" | White background, `#2B5DA0` text |
-| 2 | "Cleared!" | White background, `#2B5DA0` text |
+| 1 | "Clear all?" | White background, `#4784F8` text |
+| 2 | "Cleared!" | White background, `#4784F8` text |
 
 ### Flow
 
@@ -267,9 +267,9 @@ The done/deleted view renders the same three status icon variants as the active 
 
 | Condition | Icon | Normal colour | Pending restore colour |
 |-----------|------|--------------|----------------------|
-| `repeatRule` exists | Repeats (circular arrows) | `#2B5DA0` (done) or `#939393` (deleted) | `#BABABA` or overdue red |
-| `schedule.kind === "scheduled"` | Clock | `#2B5DA0` (done) or `#939393` (deleted) | `#BABABA` or overdue red |
-| `schedule.kind === "sometime"` | No-time | `#2B5DA0` (done) or `#939393` (deleted) | `#BABABA` or overdue red |
+| `repeatRule` exists | Repeats (circular arrows) | `#4784F8` (done) or `#939393` (deleted) | `#BABABA` or overdue red |
+| `schedule.kind === "scheduled"` | Clock | `#4784F8` (done) or `#939393` (deleted) | `#BABABA` or overdue red |
+| `schedule.kind === "sometime"` | No-time | `#4784F8` (done) or `#939393` (deleted) | `#BABABA` or overdue red |
 
 ---
 

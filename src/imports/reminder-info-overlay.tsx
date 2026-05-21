@@ -194,7 +194,7 @@ export default function ReminderInfoOverlay({
   const dueLine = formatDueLine(reminder);
   const repeatsLine = formatRepeatsLine(reminder.repeatRule);
   const overdue = isOverdue(reminder, new Date());
-  const dueLineColour = overdue ? "#FF0000" : "#2B5DA0";
+  const dueLineColour = overdue ? "#FF0000" : "#4784F8";
 
   return (
     <>
@@ -216,7 +216,7 @@ export default function ReminderInfoOverlay({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Reminder text in single quotes */}
-          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#2B5DA0] text-[17px] text-center">
+          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#4784F8] text-[17px] text-center">
             <p className="leading-[normal] whitespace-pre-wrap">'{reminder.displayText}'</p>
           </div>
 
@@ -227,7 +227,7 @@ export default function ReminderInfoOverlay({
 
           {/* Repeats line (optional) */}
           {repeatsLine && (
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[#2B5DA0] text-[17px] text-center w-[min-content]">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-w-full not-italic relative shrink-0 text-[#4784F8] text-[17px] text-center w-[min-content]">
               <p className="leading-[normal] whitespace-pre-wrap">{repeatsLine}</p>
             </div>
           )}
@@ -235,7 +235,7 @@ export default function ReminderInfoOverlay({
           {/* Buttons */}
           <div className="content-stretch flex flex-col gap-[30px] items-start relative shrink-0 w-full">
             <button
-              className="bg-[#2B5DA0] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
+              className="bg-[#4784F8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full"
               onClick={onMarkAsDone}
             >
               <div className="flex flex-row items-center justify-center size-full">

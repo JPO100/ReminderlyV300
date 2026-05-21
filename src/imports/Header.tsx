@@ -6,7 +6,7 @@ function AddTickBtn({ active, onClick }: { active: boolean; onClick?: () => void
     <button className={`block relative shrink-0 size-[50px] ${active ? 'cursor-pointer' : 'cursor-default'}`} data-name="add-tick-btn" disabled={!active} onClick={active ? onClick : undefined}>
       <svg className="absolute inset-0 block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 50 50">
         <g id="add-tick-btn">
-          <rect fill={active ? "#2B5DA0" : "#F5F5F5"} height="50" rx="25" width="50" />
+          <rect fill={active ? "#4784F8" : "#F5F5F5"} height="50" rx="25" width="50" />
           <path d={svgPaths.p1635b2f0} fill={active ? "#F0FAFE" : "#D5D5D5"} id="tick-icon" />
         </g>
       </svg>

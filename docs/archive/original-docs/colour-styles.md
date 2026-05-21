@@ -2,7 +2,7 @@
 
 ## Primary Colours
 - **Reminderly blue**: `#4784F8` - header background, primary buttons, active filter text, toggle track (on)
-- **List blue**: `#2B5DA0` - done/deleted header background, done circle fill, reminder text, setting row text (on)
+- **List blue**: `#4784F8` - done/deleted header background, done circle fill, reminder text, setting row text (on)
 
 ## Category Colours
 - **Today blue**: `#00AFEE` - today category circle stroke
@@ -24,4 +24,4 @@
 - **Filter button inactive**: `rgba(255,255,255,0.15)` background, white text
 - **Filter button border**: white, 1px solid
 - **Clear all button (step 0)**: `rgba(255,255,255,0.15)` background, white text
-- **Clear all button (step 1-2)**: white background, `#2B5DA0` text
+- **Clear all button (step 1-2)**: white background, `#4784F8` text

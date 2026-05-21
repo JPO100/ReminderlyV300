@@ -20,7 +20,7 @@ function Frame3() {
   return (
     <div className="content-stretch flex flex-col gap-[20.896px] items-center relative shrink-0">
       <Group1 />
-      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#2B5DA0] text-[15.323px] text-center">
+      <div className="css-g0mm18 flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#4784F8] text-[15.323px] text-center">
         <p className="css-ew64yg leading-[normal]">Welcome to Reminderly!</p>
       </div>
     </div>
@@ -41,8 +41,8 @@ function Frame9() {
 function Frame7() {
   return (
     <div className="content-stretch flex gap-[2.786px] items-center relative shrink-0">
-      <div className="bg-[#2B5DA0] h-[4.876px] rounded-[6.965px] shrink-0 w-[16.716px]" />
-      <div className="bg-[#2B5DA0] rounded-[6.965px] shrink-0 size-[4.876px]" />
+      <div className="bg-[#4784F8] h-[4.876px] rounded-[6.965px] shrink-0 w-[16.716px]" />
+      <div className="bg-[#4784F8] rounded-[6.965px] shrink-0 size-[4.876px]" />
     </div>
   );
 }
@@ -168,7 +168,7 @@ function ReminderDetails() {
               <circle cx="6.06086" cy="6.06086" fill="var(--fill-0, white)" id="Tick box" r="5.57599" stroke="var(--stroke-0, #00AFEE)" strokeWidth="0.969737" />
             </svg>
           </div>
-          <div className="css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[8.243px] text-ellipsis">
+          <div className="css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[8.243px] text-ellipsis">
             <p className="css-g0mm18 overflow-hidden">
               <span className="leading-[normal]">{`Blue reminders - `}</span>
               <span className="leading-[normal] text-[#00afee]">Today</span>
@@ -207,7 +207,7 @@ function ReminderDetails1() {
               <circle cx="6.06086" cy="6.06086" fill="var(--fill-0, white)" id="Tick box" r="5.57599" stroke="var(--stroke-0, #DF4DFC)" strokeWidth="0.969737" />
             </svg>
           </div>
-          <div className="css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[8.243px] text-ellipsis">
+          <div className="css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[8.243px] text-ellipsis">
             <p className="css-g0mm18 overflow-hidden">
               <span className="leading-[normal]">{`Pink reminders - `}</span>
               <span className="leading-[normal] text-[#df4dfc]">This week</span>
@@ -241,7 +241,7 @@ function ReminderDetails2() {
               <circle cx="6.06086" cy="6.06086" fill="var(--fill-0, white)" id="Tick box" r="5.57599" stroke="var(--stroke-0, #FAA429)" strokeWidth="0.969737" />
             </svg>
           </div>
-          <div className="css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[8.243px] text-ellipsis">
+          <div className="css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[8.243px] text-ellipsis">
             <p className="css-g0mm18 overflow-hidden">
               <span className="leading-[normal]">{`Orange reminders - `}</span>
               <span className="leading-[normal] text-[#faa429]">Later (in the future)</span>
@@ -275,7 +275,7 @@ function ReminderDetails3() {
               <circle cx="6.06086" cy="6.06086" fill="var(--fill-0, white)" id="Tick box" r="5.57599" stroke="var(--stroke-0, #939393)" strokeWidth="0.969737" />
             </svg>
           </div>
-          <div className="css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#2B5DA0] text-[8.243px] text-ellipsis">
+          <div className="css-g0mm18 flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[#4784F8] text-[8.243px] text-ellipsis">
             <p className="css-g0mm18 overflow-hidden">
               <span className="leading-[normal]">{`Grey reminders - `}</span>
               <span className="leading-[normal] text-[#939393]">Sometime (no date)</span>
@@ -359,7 +359,7 @@ function NusBlank() {
 function ReminderColours() {
   return (
     <div className="h-[229.154px] relative rounded-tl-[20px] rounded-tr-[20px] shrink-0 w-[195.025px]" data-name="Reminder colours">
-      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[20px] rounded-tr-[20px]" style={{ paddingTop: '9.751px', paddingLeft: '9.751px', paddingRight: '9.751px', boxSizing: 'border-box' }}>
+      <div className="bg-[#4784F8] h-full w-full rounded-tl-[20px] rounded-tr-[20px]" style={{ paddingTop: '9.751px', paddingLeft: '9.751px', paddingRight: '9.751px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] relative rounded-tl-[10.249px] rounded-tr-[10.249px] h-full w-full overflow-hidden">
           <NusBlank />
         </div>

@@ -3,7 +3,7 @@ import svgPaths from "./svg-orocxqk06z";
 function Frame2() {
   return (
     <div className="content-stretch flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] gap-[11px] items-start justify-center leading-[0] min-h-px min-w-px not-italic relative text-ellipsis whitespace-nowrap">
-      <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[#2B5DA0] text-[17px] w-full">
+      <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[#4784F8] text-[17px] w-full">
         <p className="leading-[normal] overflow-hidden">Reminderly tutorial</p>
       </div>
       <div className="flex flex-col justify-center overflow-hidden relative shrink-0 text-[#bababa] text-[15px] w-full">

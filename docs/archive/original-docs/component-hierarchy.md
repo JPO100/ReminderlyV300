@@ -9,7 +9,7 @@
 
 ```
 App Container
-  (background: #4784f8 in list mode, #2B5DA0 in done-deleted mode)
+  (background: #4784f8 in list mode, #4784F8 in done-deleted mode)
   (full screen height, flex column, overflow hidden)
   onPointerDownCapture handler for clear-all outside-click cancellation
 
@@ -24,7 +24,7 @@ App Container
 
         Reminderly SVG Logo (209.653px x 35.653px)
           - List mode: white text + white tick circle
-          - Done/deleted mode: white text + white-filled tick with #2B5DA0 checkmark
+          - Done/deleted mode: white text + white-filled tick with #4784F8 checkmark
 
         Tick click area (left 0-22%): toggles done/deleted view
         Text click area (left 25%-100%): dev tools triple-tap counter
@@ -68,7 +68,7 @@ App Container
             Row layout (flex, gap 22px between rows)
               Circle checkbox (25px, clickable - mark as done)
                 Normal: category-coloured outline
-                Pending done: filled #2B5DA0 with white tick
+                Pending done: filled #4784F8 with white tick
                 Pending delete: filled #939393 with white tick
 
               Text column (flex column, gap 4px when subtitles shown)
@@ -98,14 +98,14 @@ App Container
 
             Row layout (same structure as active items)
               Circle checkbox (clickable - uncomplete/undelete)
-                Done: filled #2B5DA0 with white tick
+                Done: filled #4784F8 with white tick
                 Deleted: filled #939393 with white tick
                 Pending restore: category-coloured outline
 
               Text column (same structure, with line-through when not pending restore)
-                Done text colour: #2B5DA0
+                Done text colour: #4784F8
                 Deleted text colour: #939393
-                Pending restore: #2B5DA0 or overdue red
+                Pending restore: #4784F8 or overdue red
 
               Status icon (not clickable in done/deleted view)
 

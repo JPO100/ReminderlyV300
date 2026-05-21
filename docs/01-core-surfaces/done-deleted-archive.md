@@ -8,12 +8,12 @@ The done/deleted archive view displays all reminders where `completedAt != null`
 
 Click the logo tick icon in the header to toggle between the active list and done/deleted view. The tick icon visual state changes when in done/deleted mode:
 - List mode: White circular tick icon
-- Done/deleted mode: Header background `#2B5DA0`, white-filled tick with `#2B5DA0` checkmark overlay
+- Done/deleted mode: Header background `#4784F8`, white-filled tick with `#4784F8` checkmark overlay
 
 ## Header
 
 ### Logo Tick State
-The logo tick visual indicates the current view mode. In done/deleted mode, the header background changes to dark blue `#2B5DA0` and the tick becomes a filled white circle with a dark blue checkmark.
+The logo tick visual indicates the current view mode. In done/deleted mode, the header background changes to dark blue `#4784F8` and the tick becomes a filled white circle with a dark blue checkmark.
 
 ### Sub-Filter Buttons
 
@@ -28,7 +28,7 @@ Three buttons control archive filtering:
 **Done Button**
 - Shows only reminders with `completedAt != null` and `deletedAt == null`
 - Plus items in `pendingUncompleteIds` during their 350ms transition
-- Active state: white background, dark blue `#2B5DA0` text
+- Active state: white background, dark blue `#4784F8` text
 - Inactive state: translucent background, white text
 - Toggle: click inactive to activate, click again to reset to "all"
 
@@ -51,12 +51,12 @@ Default state is "all" (both buttons inactive), showing all items where `complet
 
 **Step 1 (confirmation)**
 - Label: "Clear all?"
-- Visual: white background, dark blue `#2B5DA0` text
+- Visual: white background, dark blue `#4784F8` text
 - Click: advance to step 2 and execute clear
 
 **Step 2 (confirmed)**
 - Label: "Cleared!"
-- Visual: white background, dark blue `#2B5DA0` text
+- Visual: white background, dark blue `#4784F8` text
 - Auto-reset to step 0 after 500ms
 
 ### Outside-Click Cancellation
@@ -80,7 +80,7 @@ Same structure as active list rows (51px height, 13px 1px padding, 16px gap, 100
 ### Circle State
 
 **Done Reminder**
-- Filled dark blue `#2B5DA0` circle with white tick
+- Filled dark blue `#4784F8` circle with white tick
 - Clickable: triggers uncomplete action
 
 **Deleted Reminder**
@@ -100,8 +100,8 @@ Same structure as active list rows (51px height, 13px 1px padding, 16px gap, 100
 ### Text Styling
 
 **Done**
-- Title: dark blue `#2B5DA0`, no decoration
-- Subtitle: dark blue `#2B5DA0` or grey `#BABABA` (depending on state)
+- Title: dark blue `#4784F8`, no decoration
+- Subtitle: dark blue `#4784F8` or grey `#BABABA` (depending on state)
 
 **Deleted**
 - Title: grey `#939393`, no decoration
@@ -116,7 +116,7 @@ Same structure as active list rows (51px height, 13px 1px padding, 16px gap, 100
 Same icons as active list (schedule-set, repeats, schedule-unset):
 
 **Normal Done**
-- Icon colour: dark blue `#2B5DA0`
+- Icon colour: dark blue `#4784F8`
 
 **Normal Deleted**
 - Icon colour: grey `#939393`

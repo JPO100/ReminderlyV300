@@ -49,8 +49,8 @@ function Frame8() {
 function Frame6() {
   return (
     <div className="content-stretch flex gap-[4px] items-center relative shrink-0">
-      <div className="bg-[#2B5DA0] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
-      <div className="bg-[#2B5DA0] rounded-[10px] shrink-0 size-[7px]" />
+      <div className="bg-[#4784F8] h-[7px] rounded-[10px] shrink-0 w-[24px]" />
+      <div className="bg-[#4784F8] rounded-[10px] shrink-0 size-[7px]" />
     </div>
   );
 }
@@ -214,7 +214,7 @@ function NusBlank({ isDarkBlue }: { isDarkBlue?: boolean }) {
 function ReminderColours({ isDarkBlue, showOverlay }: { isDarkBlue?: boolean; showOverlay?: boolean }) {
   return (
     <div className="h-[361px] relative shrink-0 w-full max-w-[308px] overflow-hidden [@media(max-height:570px)]:scale-[0.7] [@media(max-height:570px)]:origin-top [@media(max-height:570px)]:-mb-[108px]" data-name="Reminder colours">
-      <div className="bg-[#2B5DA0] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
+      <div className="bg-[#4784F8] h-full w-full rounded-tl-[40px] rounded-tr-[40px]" style={{ paddingTop: '14px', paddingLeft: '14px', paddingRight: '14px', boxSizing: 'border-box' }}>
         <div className="bg-[#4784f8] relative rounded-tl-[26px] rounded-tr-[26px] h-[calc(100%+2px)] w-full overflow-hidden">
           <NusBlank isDarkBlue={isDarkBlue} />
         </div>

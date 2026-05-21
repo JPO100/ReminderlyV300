@@ -339,13 +339,13 @@ Hidden below 390px to save space for the Done/Deleted/Clear all buttons.
 
 ```tsx
 <div className="... h-screen w-full overflow-hidden"
-     style={{ backgroundColor: viewMode === "done-deleted" ? "#2B5DA0" : "#4784f8" }}>
+     style={{ backgroundColor: viewMode === "done-deleted" ? "#4784F8" : "#4784f8" }}>
 ```
 
 **Key classes**:
 - `h-screen`: Full viewport height
 - `overflow-hidden`: Prevents scroll on root
-- Background: `#4784f8` (list mode) or `#2B5DA0` (done/deleted mode)
+- Background: `#4784f8` (list mode) or `#4784F8` (done/deleted mode)
 
 ### White Card Container
 
