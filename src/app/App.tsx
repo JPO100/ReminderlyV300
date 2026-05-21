@@ -3941,7 +3941,7 @@ export default function App() {
                   style={{ zIndex: 2, pointerEvents: savedListsPanelOpen ? 'auto' : 'none' }}
                 >
                   <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[0px]">
-                    <div className="filters-menu flex items-center relative shrink-0 w-full h-[40px]" style={{ gap: '10px' }}>
+                    <div className="filters-menu flex items-center relative shrink-0 w-full h-[40px]" style={{ gap: '17px' }}>
                       <button
                         className="relative shrink-0 p-0 m-0 border-none bg-transparent flex items-center justify-center self-center cursor-pointer"
                         type="button"
