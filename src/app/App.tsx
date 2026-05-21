@@ -1839,6 +1839,10 @@ export default function App() {
       const toHhMm = (h: number, min: number) =>
         `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
 
+      if (!selectedDate && selectedTime) {
+        selectedDate = new Date();
+      }
+
       let schedule: import("./reminder-utils").ReminderSchedule;
       if (selectedDate) {
         schedule = {
