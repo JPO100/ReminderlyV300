@@ -41,8 +41,8 @@ Current list category colours in `App.tsx`:
 
 Pinned lists override category-colour treatment in the active `All` list view:
 
-- list check circle: `#4784F8`
-- pin icon: `#4784F8`
+- list check circle: `#1C2C42`
+- pin icon: `#1C2C42`
 
 ## State Colours
 

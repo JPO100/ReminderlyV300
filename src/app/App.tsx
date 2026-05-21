@@ -276,7 +276,7 @@ function RowMenuButton({ onClick }: { onClick?: () => void }) {
   );
 }
 
-function PinnedListIcon({ color = "#4784F8" }: { color?: string }) {
+function PinnedListIcon({ color = "#1C2C42" }: { color?: string }) {
   return (
     <svg className="block" width="13" height="13" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <path d="M0.875 13.8753L4.48541 10.2642" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
@@ -3801,7 +3801,7 @@ export default function App() {
                     const isPinnedList = pinnedListsFeatureEnabled && typeof list.pinnedAt === 'number';
                     const pendingListColour = isPendingDeletedList ? DELETED_LIST_COLOUR : DONE_LIST_COLOUR;
                     const visibleCompletedCount = isPendingDoneList ? list.items.length : list.items.filter(i => i.completed).length;
-                    const catColor = isPinnedList ? DONE_BLUE : (listCategoryColor[categoriseList(list)] || "#BABABA");
+                    const catColor = isPinnedList ? "#1C2C42" : (listCategoryColor[categoriseList(list)] || "#BABABA");
                     return (
                       <motion.div
                         key={list.id}
@@ -3842,7 +3842,7 @@ export default function App() {
                                     {isPinnedList ? (
                                       <div className="flex h-full items-center min-w-0" style={{ gap: '8px' }}>
                                         <div className="flex h-[13px] w-[13px] shrink-0 items-center justify-center">
-                                          <PinnedListIcon color="#4784F8" />
+                                          <PinnedListIcon color="#1C2C42" />
                                         </div>
                                         <div className="min-w-0 overflow-hidden">
                                           <p style={{ display: 'block', width: '100%', minWidth: 0, fontSize: '17px', fontWeight: 700, lineHeight: '17px', transform: 'translateY(-1px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingBottom: '2px', boxSizing: 'content-box' }}>{list.title}</p>
