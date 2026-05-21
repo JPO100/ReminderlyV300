@@ -1857,7 +1857,7 @@ export default function App() {
       const repeatRule = repeatConfigToRule(repeatConfig);
       const now = new Date();
       const displayText = schedule.kind === 'scheduled'
-        ? normaliseReminderText(text, schedule, repeatRule, now, { skipDateInjection: true })
+        ? normaliseReminderText(text, schedule, repeatRule, now, { skipDateInjection: true, skipTimeInjection: true })
         : text;
 
       const reminder: Reminder = {

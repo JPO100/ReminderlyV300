@@ -120,7 +120,7 @@ export function normaliseReminderText(
   schedule: ReminderSchedule,
   repeatRule: RepeatRule | null | undefined,
   now: Date,
-  options?: { skipDateInjection?: boolean },
+  options?: { skipDateInjection?: boolean; skipTimeInjection?: boolean },
 ): string {
   if (schedule.kind !== 'scheduled') return originalText;
 
@@ -223,9 +223,13 @@ export function normaliseReminderText(
 
   // Inject time label if schedule has time and text doesn't already contain a time expression
   if (schedule.time) {
-    const hasExplicitTime = /\d{1,2}(?::\d{2})?\s*(?:am|pm)\b/i.test(result);
-    if (!hasExplicitTime) {
-      result = `${result} at ${formatTime12h(schedule.time)}`;
+    if (options?.skipTimeInjection) {
+      result = result.replace(/\b(?:at\s+)?\d{1,2}(?::\d{2})?\s*(?:am|pm)\b/gi, '');
+    } else {
+      const hasExplicitTime = /\d{1,2}(?::\d{2})?\s*(?:am|pm)\b/i.test(result);
+      if (!hasExplicitTime) {
+        result = `${result} at ${formatTime12h(schedule.time)}`;
+      }
     }
   }
 
