@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { registerPlugin } from '@capacitor/core'
 import { LocalNotifications } from '@capacitor/local-notifications'
 import App from './app/App'
 import './styles/index.css'
@@ -18,23 +19,21 @@ void LocalNotifications.addListener('localNotificationActionPerformed', (event) 
   window.dispatchEvent(new CustomEvent(NOTIFICATION_TAP_EVENT))
 })
 
-const CapacitorPlugins = (window as any).Capacitor?.Plugins?.App;
-if (CapacitorPlugins) {
-  void CapacitorPlugins.addListener('appUrlOpen', (data: { url: string }) => {
-    try {
-      const url = new URL(data.url)
-      if (url.protocol === 'reminderly:' && url.hostname === 'add') {
-        const text = url.searchParams.get('text')
-        if (text) {
-          localStorage.setItem(PENDING_SIRI_TEXT_KEY, text)
-          window.dispatchEvent(new CustomEvent(SIRI_ADD_EVENT))
-        }
+const CapacitorApp = registerPlugin('App')
+void (CapacitorApp as any).addListener('appUrlOpen', (data: { url: string }) => {
+  try {
+    const url = new URL(data.url)
+    if (url.protocol === 'reminderly:' && url.hostname === 'add') {
+      const text = url.searchParams.get('text')
+      if (text) {
+        localStorage.setItem(PENDING_SIRI_TEXT_KEY, text)
+        window.dispatchEvent(new CustomEvent(SIRI_ADD_EVENT))
       }
-    } catch {
-      // Ignore malformed URLs
     }
-  })
-}
+  } catch {
+    // Ignore malformed URLs
+  }
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
