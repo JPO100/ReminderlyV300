@@ -96,7 +96,7 @@ export default function RepeatsOverlay({ onClose, initialConfig }: RepeatsOverla
             <div className="flex items-center justify-between w-full shrink-0">
               <button
                 onClick={() => onClose()}
-                className="flex items-center gap-[20px] cursor-pointer shrink-0 bg-transparent border-none p-0"
+                className="flex items-center gap-[10px] cursor-pointer shrink-0 bg-transparent border-none p-0"
                 data-name="cancel-button"
               >
                 <svg width="18" height="33" viewBox="0 0 18 33" fill="none" xmlns="http://www.w3.org/2000/svg" className="block shrink-0">
