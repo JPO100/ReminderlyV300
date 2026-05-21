@@ -6,8 +6,7 @@ struct AppShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: AddReminderIntent(),
             phrases: [
-                "Open \(.applicationName) to add",
-                "New \(.applicationName) reminder",
+                "Add to \(.applicationName) app",
             ],
             shortTitle: "Add Reminder",
             systemImageName: "bell.badge"
