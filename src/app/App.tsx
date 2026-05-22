@@ -3618,7 +3618,7 @@ export default function App() {
             <div className="flex flex-row items-center justify-center size-full">
               <div className="content-stretch flex items-center justify-center px-[30px] relative size-full">
                 <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] whitespace-nowrap ${activeMainTab === 'lists' ? 'text-[#4784F8]' : 'text-white'}`}>
-                  <p className="leading-[normal]">{viewMode === 'lists-done' ? 'Done lists' : savedListsPanelOpen ? 'List templates' : 'Lists'}</p>
+                  <p className="leading-[normal]">{viewMode === 'lists-done' ? 'Done lists' : (savedListsPanelOpen || restoreSavedListsPanelAfterOverlayClose) ? 'List templates' : 'Lists'}</p>
                 </div>
               </div>
             </div>
