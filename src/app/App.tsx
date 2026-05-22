@@ -4131,7 +4131,7 @@ export default function App() {
                         <svg width="18" height="33" viewBox="0 0 18 33" fill="none" xmlns="http://www.w3.org/2000/svg" className="block shrink-0">
                           <path d="M6.13811 8.87479C6.6468 8.30085 7.47168 8.30085 7.98037 8.87479C8.48897 9.44872 8.48899 10.3791 7.98037 10.953L3.16754 16.3828L8.08913 21.9357C8.59774 22.5096 8.59774 23.44 8.08913 24.0139C7.58044 24.5878 6.75556 24.5878 6.24687 24.0139L0.60879 17.6526C0.528196 17.5953 0.451622 17.5273 0.381409 17.4481C-0.127153 16.8742 -0.12712 15.9438 0.381409 15.3699L6.13811 8.87479Z" fill="#1C2C42"/>
                         </svg>
-                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Templates</span>
+                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">List templates</span>
                       </button>
                     </div>
                     <div className="relative w-full max-w-[768px] flex-1 min-h-0">
