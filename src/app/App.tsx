@@ -4121,21 +4121,17 @@ export default function App() {
                   style={{ zIndex: 2, pointerEvents: savedListsPanelOpen ? 'auto' : 'none' }}
                 >
                   <div className="relative flex flex-col gap-[24px] w-full h-full min-h-0 pt-[0px]">
-                    <div className="filters-menu flex items-center relative shrink-0 w-full h-[40px]">
+                    <div className="flex items-center shrink-0 w-full">
                       <button
-                        className="bg-[#4784F8] content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer"
+                        className="flex items-center gap-[10px] cursor-pointer shrink-0 bg-transparent border-none p-0"
                         type="button"
                         onClick={() => setSavedListsPanelOpen(false)}
                         aria-label="Back to lists"
                       >
-                        <div className="content-stretch flex items-center justify-center gap-[8px] relative">
-                          <svg className="block shrink-0" width="7" height="10" viewBox="0 0 7 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ transform: 'scaleX(-1)' }}>
-                            <path d="M1.72101 0.269035C1.34568 -0.0896783 0.737045 -0.0896783 0.361708 0.269035C-0.0135638 0.627741 -0.0135771 1.20921 0.361708 1.56791L3.91284 4.96154L0.281458 8.43209C-0.0938212 8.79079 -0.0938182 9.37226 0.281458 9.73096C0.656796 10.0897 1.26543 10.0897 1.64076 9.73096L5.80081 5.75517C5.86027 5.71933 5.91677 5.67686 5.96858 5.62735C6.34382 5.26866 6.3438 4.68717 5.96858 4.32847L1.72101 0.269035Z" fill="white"/>
-                          </svg>
-                          <div className="font-['Lato',sans-serif] font-bold text-[14px] text-white whitespace-nowrap">
-                            Back
-                          </div>
-                        </div>
+                        <svg width="18" height="33" viewBox="0 0 18 33" fill="none" xmlns="http://www.w3.org/2000/svg" className="block shrink-0">
+                          <path d="M6.13811 8.87479C6.6468 8.30085 7.47168 8.30085 7.98037 8.87479C8.48897 9.44872 8.48899 10.3791 7.98037 10.953L3.16754 16.3828L8.08913 21.9357C8.59774 22.5096 8.59774 23.44 8.08913 24.0139C7.58044 24.5878 6.75556 24.5878 6.24687 24.0139L0.60879 17.6526C0.528196 17.5953 0.451622 17.5273 0.381409 17.4481C-0.127153 16.8742 -0.12712 15.9438 0.381409 15.3699L6.13811 8.87479Z" fill="#1C2C42"/>
+                        </svg>
+                        <span className="font-['Lato:Bold',sans-serif] not-italic text-[#1C2C42] text-[20px] whitespace-nowrap">Templates</span>
                       </button>
                     </div>
                     <div className="relative w-full max-w-[768px] flex-1 min-h-0">
