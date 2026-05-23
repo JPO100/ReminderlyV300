@@ -1298,11 +1298,38 @@ function TestingPage({ onBack, onClose, onNavigateAutomatedTests, onNavigateTest
 }
 
 function RemindersPage({ onBack, onClose, onNavigateReminderSettings, onNavigateFiltersMenu, onNavigateDummyReminders }: { onBack: () => void; onClose: () => void; onNavigateReminderSettings: () => void; onNavigateFiltersMenu: () => void; onNavigateDummyReminders: () => void }) {
+  const [repeatToggle, setRepeatToggle] = useState(true);
+
   return (
     <div className="flex flex-col h-full relative w-full" data-name="reminders-page">
       <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Reminders" onBack={onBack} onClose={onClose} />
+
+          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
+            <button
+              onClick={() => setRepeatToggle(prev => !prev)}
+              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
+            >
+              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
+                <p
+                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
+                  style={{ color: repeatToggle ? '#1C2C42' : '#C9C9C9' }}
+                >
+                  Repeat reminders
+                </p>
+              </div>
+              <div
+                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${repeatToggle ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+              >
+                <div className="relative shrink-0 size-[22.5px]">
+                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
+                  </svg>
+                </div>
+              </div>
+            </button>
+          </div>
 
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
             <div />
