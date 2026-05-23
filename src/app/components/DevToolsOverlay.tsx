@@ -239,15 +239,16 @@ function SelfChecks({ onBack, onClose }: { onBack: () => void; onClose: () => vo
   );
 }
 
-function TestDataPage({ onBack, onClose, onNavigateDummyReminders, onNavigateDummyLists }: { onBack: () => void; onClose: () => void; onNavigateDummyReminders: () => void; onNavigateDummyLists: () => void }) {
+function TestDataPage({ onBack, onClose, onNavigateReminders, onNavigateLists }: { onBack: () => void; onClose: () => void; onNavigateReminders: () => void; onNavigateLists: () => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="test-data-page">
       <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Test data" onBack={onBack} onClose={onClose} />
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
+            <div />
             <button
-              onClick={onNavigateDummyReminders}
+              onClick={onNavigateReminders}
               className="h-[60px] relative shrink-0 w-full cursor-pointer"
             >
               <div className="flex flex-row items-center size-full">
@@ -270,7 +271,7 @@ function TestDataPage({ onBack, onClose, onNavigateDummyReminders, onNavigateDum
               </div>
             </button>
             <button
-              onClick={onNavigateDummyLists}
+              onClick={onNavigateLists}
               className="h-[60px] relative shrink-0 w-full cursor-pointer"
             >
               <div className="flex flex-row items-center size-full">
@@ -1750,8 +1751,8 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
       <TestDataPage
         onBack={() => setPage('testing')}
         onClose={onClose}
-        onNavigateDummyReminders={() => setPage('dummy-reminders')}
-        onNavigateDummyLists={() => setPage('dummy-lists')}
+        onNavigateReminders={() => setPage('reminders')}
+        onNavigateLists={() => setPage('lists')}
       />
     );
   } else if (page === 'dummy-reminders') {
