@@ -804,6 +804,7 @@ function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnab
           </div>
 
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
+            <div />
             <button
               onClick={onNavigateDevToolsPassword}
               className="h-[60px] relative shrink-0 w-full cursor-pointer"
