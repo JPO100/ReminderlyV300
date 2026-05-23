@@ -772,7 +772,7 @@ function ListSettingsPage({ onBack, onClose, useDefaultTemplatesInCleanState, on
   );
 }
 
-function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnabledChange, onNavigateDevToolsPassword }: { onBack: () => void; onClose: () => void; siriShortcutsEnabled: boolean; onSiriShortcutsEnabledChange: (value: boolean) => void; onNavigateDevToolsPassword: () => void }) {
+function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnabledChange, settingsMenuEnabled, onSettingsMenuEnabledChange, onNavigateFiltersMenu, onNavigateDevToolsPassword }: { onBack: () => void; onClose: () => void; siriShortcutsEnabled: boolean; onSiriShortcutsEnabledChange: (value: boolean) => void; settingsMenuEnabled: boolean; onSettingsMenuEnabledChange: (value: boolean) => void; onNavigateFiltersMenu: () => void; onNavigateDevToolsPassword: () => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="system-page">
       <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
@@ -802,10 +802,56 @@ function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnab
                 </div>
               </div>
             </button>
+
+            <button
+              onClick={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)}
+              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
+            >
+              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
+                <p
+                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
+                  style={{ color: settingsMenuEnabled ? '#1C2C42' : '#C9C9C9' }}
+                >
+                  Settings menu
+                </p>
+              </div>
+              <div
+                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${settingsMenuEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+              >
+                <div className="relative shrink-0 size-[22.5px]">
+                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
+                  </svg>
+                </div>
+              </div>
+            </button>
           </div>
 
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
             <div />
+            <button
+              onClick={onNavigateFiltersMenu}
+              className="h-[60px] relative shrink-0 w-full cursor-pointer"
+            >
+              <div className="flex flex-row items-center size-full">
+                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
+                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
+                      <p className="leading-[normal] truncate">Filters menu</p>
+                    </div>
+                    <div className="flex items-center justify-center relative shrink-0">
+                      <div className="-scale-y-100 flex-none rotate-180">
+                        <div className="h-[13px] relative w-[7px]">
+                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
+                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
             <button
               onClick={onNavigateDevToolsPassword}
               className="h-[60px] relative shrink-0 w-full cursor-pointer"
@@ -963,7 +1009,7 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
   );
 }
 
-function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboardingTutorialEnabledChange, settingsMenuEnabled, onSettingsMenuEnabledChange, onNavigateOnboardingTutorial }: { onBack: () => void; onClose: () => void; isOnboardingTutorialEnabled: boolean; onOnboardingTutorialEnabledChange: (next: boolean) => void; settingsMenuEnabled: boolean; onSettingsMenuEnabledChange: (value: boolean) => void; onNavigateOnboardingTutorial: () => void }) {
+function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboardingTutorialEnabledChange, onNavigateOnboardingTutorial }: { onBack: () => void; onClose: () => void; isOnboardingTutorialEnabled: boolean; onOnboardingTutorialEnabledChange: (next: boolean) => void; onNavigateOnboardingTutorial: () => void }) {
   const [pendingOnboardingState, setPendingOnboardingState] = useState<boolean | null>(null);
 
   return (
@@ -987,29 +1033,6 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
               </div>
               <div
                 className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${isOnboardingTutorialEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <p
-                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
-                  style={{ color: settingsMenuEnabled ? '#1C2C42' : '#C9C9C9' }}
-                >
-                  Settings menu
-                </p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${settingsMenuEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
               >
                 <div className="relative shrink-0 size-[22.5px]">
                   <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
@@ -1297,7 +1320,7 @@ function TestingPage({ onBack, onClose, onNavigateAutomatedTests, onNavigateTest
   );
 }
 
-function RemindersPage({ onBack, onClose, onNavigateReminderSettings, onNavigateFiltersMenu, onNavigateDummyReminders }: { onBack: () => void; onClose: () => void; onNavigateReminderSettings: () => void; onNavigateFiltersMenu: () => void; onNavigateDummyReminders: () => void }) {
+function RemindersPage({ onBack, onClose, onNavigateReminderSettings, onNavigateDummyReminders }: { onBack: () => void; onClose: () => void; onNavigateReminderSettings: () => void; onNavigateDummyReminders: () => void }) {
   const [repeatToggle, setRepeatToggle] = useState(true);
 
   return (
@@ -1342,29 +1365,6 @@ function RemindersPage({ onBack, onClose, onNavigateReminderSettings, onNavigate
                   <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
                       <p className="leading-[normal] truncate">Reminder settings</p>
-                    </div>
-                    <div className="flex items-center justify-center relative shrink-0">
-                      <div className="-scale-y-100 flex-none rotate-180">
-                        <div className="h-[13px] relative w-[7px]">
-                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
-                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={onNavigateFiltersMenu}
-              className="h-[60px] relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="flex flex-row items-center size-full">
-                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
-                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                      <p className="leading-[normal] truncate">Filters menu</p>
                     </div>
                     <div className="flex items-center justify-center relative shrink-0">
                       <div className="-scale-y-100 flex-none rotate-180">
@@ -1857,7 +1857,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'reminders') {
     content = (
-      <RemindersPage onBack={() => setPage('home')} onClose={onClose} onNavigateReminderSettings={() => setPage('reminder-settings')} onNavigateFiltersMenu={() => setPage('filters-menu')} onNavigateDummyReminders={() => setPage('dummy-reminders')} />
+      <RemindersPage onBack={() => setPage('home')} onClose={onClose} onNavigateReminderSettings={() => setPage('reminder-settings')} onNavigateDummyReminders={() => setPage('dummy-reminders')} />
     );
   } else if (page === 'test-data') {
     content = (
@@ -1890,11 +1890,11 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'filters-menu') {
     content = (
-      <FiltersMenuPage onBack={() => setPage('reminders')} onClose={onClose} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={onFiltersMenuVariantChange} isListsEnabled={isListsEnabled} />
+      <FiltersMenuPage onBack={() => setPage('system')} onClose={onClose} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={onFiltersMenuVariantChange} isListsEnabled={isListsEnabled} />
     );
   } else if (page === 'onboarding') {
     content = (
-      <OnboardingPage onBack={() => setPage('home')} onClose={onClose} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={onOnboardingTutorialEnabledChange} settingsMenuEnabled={settingsMenuEnabled} onSettingsMenuEnabledChange={onSettingsMenuEnabledChange} onNavigateOnboardingTutorial={() => setPage('onboarding-tutorial')} />
+      <OnboardingPage onBack={() => setPage('home')} onClose={onClose} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={onOnboardingTutorialEnabledChange} onNavigateOnboardingTutorial={() => setPage('onboarding-tutorial')} />
     );
   } else if (page === 'onboarding-tutorial') {
     content = (
@@ -1902,7 +1902,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'system') {
     content = (
-      <SystemPage onBack={() => setPage('home')} onClose={onClose} siriShortcutsEnabled={siriShortcutsEnabled} onSiriShortcutsEnabledChange={onSiriShortcutsEnabledChange} onNavigateDevToolsPassword={() => setPage('dev-tools-password')} />
+      <SystemPage onBack={() => setPage('home')} onClose={onClose} siriShortcutsEnabled={siriShortcutsEnabled} onSiriShortcutsEnabledChange={onSiriShortcutsEnabledChange} settingsMenuEnabled={settingsMenuEnabled} onSettingsMenuEnabledChange={onSettingsMenuEnabledChange} onNavigateFiltersMenu={() => setPage('filters-menu')} onNavigateDevToolsPassword={() => setPage('dev-tools-password')} />
     );
   } else if (page === 'dev-tools-password') {
     content = (
