@@ -30,7 +30,7 @@ import passwordResetSvgPaths from "../../imports/svg-p8ebad7jx7";
 
 const DEV_TOOLS_PASSWORD = '123';
 
-type DevToolsPage = 'home' | 'tests' | 'test-data' | 'dummy-reminders' | 'dummy-lists' | 'nlc' | 'filters-menu' | 'onboarding-tutorial' | 'dev-tools-password' | 'reminder-settings' | 'list-settings' | 'paywall' | 'notifications' | 'system' | 'natural-language' | 'onboarding' | 'notifications-area';
+type DevToolsPage = 'home' | 'tests' | 'test-data' | 'dummy-reminders' | 'dummy-lists' | 'nlc' | 'filters-menu' | 'onboarding-tutorial' | 'dev-tools-password' | 'reminder-settings' | 'list-settings' | 'paywall' | 'notifications' | 'system' | 'natural-language' | 'onboarding' | 'notifications-area' | 'testing';
 
 function BackHeader({ title, onBack, onClose }: { title: string; onBack: () => void; onClose: () => void }) {
   return (
@@ -1233,6 +1233,69 @@ function NotificationsAreaPage({ onBack, onClose, onNavigateNotificationSettings
   );
 }
 
+function TestingPage({ onBack, onClose, onNavigateAutomatedTests, onNavigateTestData }: { onBack: () => void; onClose: () => void; onNavigateAutomatedTests: () => void; onNavigateTestData: () => void }) {
+  return (
+    <div className="flex flex-col h-full relative w-full" data-name="testing-page">
+      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
+        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
+          <BackHeader title="Testing" onBack={onBack} onClose={onClose} />
+
+          <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
+            <div />
+            <button
+              onClick={onNavigateAutomatedTests}
+              className="h-[60px] relative shrink-0 w-full cursor-pointer"
+            >
+              <div className="flex flex-row items-center size-full">
+                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
+                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
+                      <p className="leading-[normal] truncate">Automated tests</p>
+                    </div>
+                    <div className="flex items-center justify-center relative shrink-0">
+                      <div className="-scale-y-100 flex-none rotate-180">
+                        <div className="h-[13px] relative w-[7px]">
+                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
+                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+            <button
+              onClick={onNavigateTestData}
+              className="h-[60px] relative shrink-0 w-full cursor-pointer"
+            >
+              <div className="flex flex-row items-center size-full">
+                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
+                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
+                      <p className="leading-[normal] truncate">Test data</p>
+                    </div>
+                    <div className="flex items-center justify-center relative shrink-0">
+                      <div className="-scale-y-100 flex-none rotate-180">
+                        <div className="h-[13px] relative w-[7px]">
+                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
+                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+            <div />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ListsPage({ onBack, onClose, smartRemindersEnabled, onSmartRemindersEnabledChange, savedListsEnabled, onSavedListsEnabledChange, pinnedListsEnabled, onPinnedListsEnabledChange }: { onBack: () => void; onClose: () => void; smartRemindersEnabled: boolean; onSmartRemindersEnabledChange: (value: boolean) => void; savedListsEnabled: boolean; onSavedListsEnabledChange: (value: boolean) => void; pinnedListsEnabled: boolean; onPinnedListsEnabledChange: (value: boolean) => void }) {
   return (
     <div className="flex flex-col h-full relative w-full" data-name="lists-page">
@@ -1498,14 +1561,18 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
         onNavigateNlc={() => setPage('natural-language')}
         onNavigateNotifications={() => setPage('notifications-area')}
         onNavigateOnboarding={() => setPage('onboarding')}
-        onNavigateTesting={() => setPage('tests')}
+        onNavigateTesting={() => setPage('testing')}
         onNavigateSystem={() => setPage('system')}
       />
+    );
+  } else if (page === 'testing') {
+    content = (
+      <TestingPage onBack={() => setPage('home')} onClose={onClose} onNavigateAutomatedTests={() => setPage('tests')} onNavigateTestData={() => setPage('test-data')} />
     );
   } else if (page === 'test-data') {
     content = (
       <TestDataPage
-        onBack={() => setPage('home')}
+        onBack={() => setPage('testing')}
         onClose={onClose}
         onNavigateDummyReminders={() => setPage('dummy-reminders')}
         onNavigateDummyLists={() => setPage('dummy-lists')}
@@ -1570,7 +1637,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
   } else {
     content = (
       <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <SelfChecks onBack={() => setPage('home')} onClose={onClose} />
+        <SelfChecks onBack={() => setPage('testing')} onClose={onClose} />
       </div>
     );
   }
