@@ -1383,12 +1383,39 @@ function RemindersPage({ onBack, onClose, onNavigateReminderSettings, onNavigate
   );
 }
 
-function ListsAreaPage({ onBack, onClose, onNavigateListSettings, onNavigateListFeatures, onNavigateDummyLists }: { onBack: () => void; onClose: () => void; onNavigateListSettings: () => void; onNavigateListFeatures: () => void; onNavigateDummyLists: () => void }) {
+function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, onNavigateListSettings, onNavigateListFeatures, onNavigateDummyLists }: { onBack: () => void; onClose: () => void; isListsEnabled: boolean; onListsEnabledChange: (enabled: boolean) => void; onNavigateListSettings: () => void; onNavigateListFeatures: () => void; onNavigateDummyLists: () => void }) {
+  const [pendingListsState, setPendingListsState] = useState<boolean | null>(null);
+
   return (
     <div className="flex flex-col h-full relative w-full" data-name="lists-area-page">
       <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
         <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
           <BackHeader title="Lists" onBack={onBack} onClose={onClose} />
+
+          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
+            <button
+              onClick={() => setPendingListsState(!isListsEnabled)}
+              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
+            >
+              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
+                <p
+                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
+                  style={{ color: isListsEnabled ? '#1C2C42' : '#C9C9C9' }}
+                >
+                  Enable lists
+                </p>
+              </div>
+              <div
+                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${isListsEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+              >
+                <div className="relative shrink-0 size-[22.5px]">
+                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
+                  </svg>
+                </div>
+              </div>
+            </button>
+          </div>
 
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
             <div />
@@ -1465,6 +1492,65 @@ function ListsAreaPage({ onBack, onClose, onNavigateListSettings, onNavigateList
           </div>
         </div>
       </div>
+      {pendingListsState !== null && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-[60]"
+            onClick={() => setPendingListsState(null)}
+          />
+          <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+            <div
+              className="bg-white relative flex flex-col gap-[35px] items-center py-[40px] px-[34px] rounded-[32px] pointer-events-auto"
+              style={{ width: 322 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">
+                  {pendingListsState
+                    ? 'Turn on Lists?'
+                    : 'Turn off Lists?'}
+                </p>
+              </div>
+              <div className="flex flex-col font-['Lato:SemiBold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#939393] text-[17px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">
+                  {pendingListsState
+                    ? 'The Lists feature will be enabled, allowing full access to all features.'
+                    : 'The Lists feature will be disabled, restricting access to certain features.'}
+                </p>
+              </div>
+              <div className="flex gap-[16px] w-full justify-between">
+                <button
+                  onClick={() => setPendingListsState(null)}
+                  className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
+                  style={{ backgroundColor: '#BABABA' }}
+                >
+                  <div className="flex items-center justify-center size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Cancel</p>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    onListsEnabledChange(pendingListsState);
+                    setPendingListsState(null);
+                  }}
+                  className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
+                  style={{ backgroundColor: '#1C2C42' }}
+                >
+                  <div className="flex items-center justify-center size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">
+                        {pendingListsState ? 'Yes, turn on' : 'Yes, turn off'}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1761,7 +1847,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'lists') {
     content = (
-      <ListsAreaPage onBack={() => setPage('home')} onClose={onClose} onNavigateListSettings={() => setPage('list-settings')} onNavigateListFeatures={() => setPage('paywall')} onNavigateDummyLists={() => setPage('dummy-lists')} />
+      <ListsAreaPage onBack={() => setPage('home')} onClose={onClose} isListsEnabled={isListsEnabled} onListsEnabledChange={onListsEnabledChange} onNavigateListSettings={() => setPage('list-settings')} onNavigateListFeatures={() => setPage('paywall')} onNavigateDummyLists={() => setPage('dummy-lists')} />
     );
   } else if (page === 'dummy-lists') {
     content = (
