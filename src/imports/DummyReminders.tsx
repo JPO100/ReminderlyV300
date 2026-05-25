@@ -59,7 +59,7 @@ function ReminderRow({ label, color, defaultCount, value, onChange, textColor, i
                     )}
                   </svg>
                 </div>
-                <div className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[17px] text-ellipsis whitespace-nowrap${isDone || strikethrough ? ' line-through' : ''}`} style={{ color: textColor || '#4784F8' }}>
+                <div className={`flex flex-[1_0_0] flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] min-h-px min-w-px not-italic overflow-hidden relative text-[17px] text-ellipsis whitespace-nowrap${isDone || strikethrough ? ' line-through' : ''}`} style={{ color: textColor || '#1C2C42' }}>
                   <p className="leading-[normal] overflow-hidden">{label}</p>
                 </div>
               </div>
@@ -73,7 +73,7 @@ function ReminderRow({ label, color, defaultCount, value, onChange, textColor, i
                 inputMode="numeric"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#4784F8] text-[17px] p-0 m-0"
+                className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#1C2C42] text-[17px] p-0 m-0"
                 placeholder={defaultCount}
               />
             </div>
@@ -81,9 +81,9 @@ function ReminderRow({ label, color, defaultCount, value, onChange, textColor, i
             <button className="relative shrink-0 size-[25px] cursor-pointer bg-transparent border-none p-0 flex items-center justify-center" data-name="icon-repeats" onClick={onToggleRepeat} aria-label="Toggle repeat">
               <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25.0003 25.0708">
                 <g>
-                  <path d={repeatIconPaths.p19a7b000} fill={repeatActive ? "#4784F8" : "#BABABA"} />
-                  <path d={repeatIconPaths.p9f3c880} fill={repeatActive ? "#4784F8" : "#BABABA"} />
-                  <path d={repeatIconPaths.pf2d2300} fill={repeatActive ? "#4784F8" : "#BABABA"} />
+                  <path d={repeatIconPaths.p19a7b000} fill={repeatActive ? "#1C2C42" : "#BABABA"} />
+                  <path d={repeatIconPaths.p9f3c880} fill={repeatActive ? "#1C2C42" : "#BABABA"} />
+                  <path d={repeatIconPaths.pf2d2300} fill={repeatActive ? "#1C2C42" : "#BABABA"} />
                 </g>
               </svg>
             </button>
@@ -174,7 +174,7 @@ export default function DummyReminders({ onBack, onClose, addReminders, hideOver
             className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
           >
             <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: hideOverdue ? '#4784F8' : '#C9C9C9' }}>Hide overdue reminders</p>
+              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: hideOverdue ? '#1C2C42' : '#C9C9C9' }}>Hide overdue reminders</p>
             </div>
             <div
               className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${hideOverdue ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
