@@ -571,141 +571,77 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <div className="flex flex-col h-full relative w-full" data-name="dev-tools-password-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Dev tools password" onBack={onBack} onClose={onClose} />
-
-          {/* Content from Figma */}
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            {/* Password required toggle */}
-            <button
-              onClick={() => onPasswordRequiredChange(!passwordRequired)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="h-[21.75px] relative shrink-0 w-[17.75px]" data-name="Union">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17.75 21.75">
-                    {passwordRequired ? (
-                      <g id="Union">
-                        <path d={passwordPageSvgPaths.p1114c80} fill="#1C2C42" />
-                        <path d={passwordPageSvgPaths.p2688cce0} fill="#1C2C42" />
-                        <path clipRule="evenodd" d={passwordPageSvgPaths.pfc9c80} fill="#1C2C42" fillRule="evenodd" />
-                      </g>
-                    ) : (
-                      <g id="Union">
-                        <path d={passwordPageSvgPaths.p15d2f900} fill="#C9C9C9" />
-                        <path clipRule="evenodd" d={passwordPageSvgPaths.p1717ce00} fill="#C9C9C9" fillRule="evenodd" />
-                      </g>
-                    )}
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap" style={{ color: passwordRequired ? '#1C2C42' : '#C9C9C9' }}>Password required</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${passwordRequired ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-
-            {/* Password reset section */}
-            <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
-              {/* Password reset label with unlock icon */}
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="h-[21.75px] relative shrink-0 w-[19.75px]" data-name="Union">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 19.75 21.75">
-                    <g id="Union">
-                      <path clipRule="evenodd" d={passwordResetSvgPaths.pa8c9570} fill="#1C2C42" fillRule="evenodd" />
-                      <path d={passwordResetSvgPaths.p36396780} fill="#1C2C42" />
-                      <path clipRule="evenodd" d={passwordResetSvgPaths.p3c103600} fill="#1C2C42" fillRule="evenodd" />
-                    </g>
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#1C2C42] text-[17px] whitespace-nowrap">Password reset</p>
-              </div>
-
-              {/* New password row */}
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0 w-full">
-                <div className="w-[85px] shrink-0">
-                  <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#1C2C42] text-[17px] whitespace-nowrap">Password</p>
-                </div>
-                <div className="content-stretch flex items-center px-[20px] relative rounded-[100px] flex-1 min-w-0 h-[40px] group">
-                  <div aria-hidden="true" className="absolute border border-[#BABABA] group-focus-within:border-[#939393] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Password..."
-                    className="flex-1 bg-transparent outline-none font-['Lato:SemiBold',sans-serif] not-italic text-[16px] text-[#1C2C42] placeholder:text-[#C9C9C9] focus:placeholder:text-transparent placeholder-lato-semibold leading-[26px]"
-                  />
-                  {/* Eye icon - toggles password visibility */}
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-[20px] top-0 bottom-0 my-auto h-[15.5px] w-[21.5px] cursor-pointer flex items-center justify-center"
-                    aria-label={showNewPassword ? "Hide password" : "Show password"}
-                  >
-                    <svg className="block w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21.5 15.5">
-                      <g>
-                        <path clipRule="evenodd" d={loginSvgPaths.p11ad9280} fill={showNewPassword ? "#1C2C42" : "#C9C9C9"} fillRule="evenodd" />
-                        <path clipRule="evenodd" d={loginSvgPaths.pb9ed400} fill={showNewPassword ? "#1C2C42" : "#C9C9C9"} fillRule="evenodd" />
-                      </g>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm password row */}
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0 w-full">
-                <div className="w-[85px] shrink-0">
-                  <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#1C2C42] text-[17px] whitespace-nowrap">Confirm</p>
-                </div>
-                <div className="content-stretch flex items-center px-[20px] relative rounded-[100px] flex-1 min-w-0 h-[40px] group">
-                  <div aria-hidden="true" className="absolute border border-[#BABABA] group-focus-within:border-[#939393] border-solid inset-0 pointer-events-none rounded-[100px]" />
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Password..."
-                    className="flex-1 bg-transparent outline-none font-['Lato:SemiBold',sans-serif] not-italic text-[16px] text-[#1C2C42] placeholder:text-[#C9C9C9] focus:placeholder:text-transparent placeholder-lato-semibold leading-[26px]"
-                  />
-                  {/* Eye icon - toggles password visibility */}
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-[20px] top-0 bottom-0 my-auto h-[15.5px] w-[21.5px] cursor-pointer flex items-center justify-center"
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                  >
-                    <svg className="block w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21.5 15.5">
-                      <g>
-                        <path clipRule="evenodd" d={loginSvgPaths.p11ad9280} fill={showConfirmPassword ? "#1C2C42" : "#C9C9C9"} fillRule="evenodd" />
-                        <path clipRule="evenodd" d={loginSvgPaths.pb9ed400} fill={showConfirmPassword ? "#1C2C42" : "#C9C9C9"} fillRule="evenodd" />
-                      </g>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {/* Reset button */}
-              <div className="bg-[#4784f8] h-[40px] relative rounded-[100px] shrink-0 w-full cursor-pointer">
-                <div className="flex flex-row items-center justify-center size-full">
-                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
-                      <p className="leading-[normal]">Reset</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+    <PageShell title="Dev tools password" onBack={onBack} onClose={onClose}>
+      <SectionSubtitle text="Settings" />
+      <ToggleRow label="Password required" isOn={passwordRequired} onToggle={() => onPasswordRequiredChange(!passwordRequired)} />
+      <KeyLine />
+      <SectionSubtitle text="Password reset" />
+      <div className="content-stretch flex gap-[16px] items-center relative shrink-0 w-full">
+        <div className="w-[85px] shrink-0">
+          <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#1C2C42] text-[17px] whitespace-nowrap">Password</p>
+        </div>
+        <div className="content-stretch flex items-center px-[20px] relative rounded-[100px] flex-1 min-w-0 h-[40px] group">
+          <div aria-hidden="true" className="absolute border border-[#BABABA] group-focus-within:border-[#939393] border-solid inset-0 pointer-events-none rounded-[100px]" />
+          <input
+            type={showNewPassword ? "text" : "password"}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="Password..."
+            className="flex-1 bg-transparent outline-none font-['Lato:SemiBold',sans-serif] not-italic text-[16px] text-[#1C2C42] placeholder:text-[#C9C9C9] focus:placeholder:text-transparent placeholder-lato-semibold leading-[26px]"
+          />
+          <button
+            type="button"
+            onClick={() => setShowNewPassword(!showNewPassword)}
+            className="absolute right-[20px] top-0 bottom-0 my-auto h-[15.5px] w-[21.5px] cursor-pointer flex items-center justify-center"
+            aria-label={showNewPassword ? "Hide password" : "Show password"}
+          >
+            <svg className="block w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21.5 15.5">
+              <g>
+                <path clipRule="evenodd" d={loginSvgPaths.p11ad9280} fill={showNewPassword ? "#1C2C42" : "#C9C9C9"} fillRule="evenodd" />
+                <path clipRule="evenodd" d={loginSvgPaths.pb9ed400} fill={showNewPassword ? "#1C2C42" : "#C9C9C9"} fillRule="evenodd" />
+              </g>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="content-stretch flex gap-[16px] items-center relative shrink-0 w-full">
+        <div className="w-[85px] shrink-0">
+          <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#1C2C42] text-[17px] whitespace-nowrap">Confirm</p>
+        </div>
+        <div className="content-stretch flex items-center px-[20px] relative rounded-[100px] flex-1 min-w-0 h-[40px] group">
+          <div aria-hidden="true" className="absolute border border-[#BABABA] group-focus-within:border-[#939393] border-solid inset-0 pointer-events-none rounded-[100px]" />
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Password..."
+            className="flex-1 bg-transparent outline-none font-['Lato:SemiBold',sans-serif] not-italic text-[16px] text-[#1C2C42] placeholder:text-[#C9C9C9] focus:placeholder:text-transparent placeholder-lato-semibold leading-[26px]"
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-[20px] top-0 bottom-0 my-auto h-[15.5px] w-[21.5px] cursor-pointer flex items-center justify-center"
+            aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+          >
+            <svg className="block w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21.5 15.5">
+              <g>
+                <path clipRule="evenodd" d={loginSvgPaths.p11ad9280} fill={showConfirmPassword ? "#1C2C42" : "#C9C9C9"} fillRule="evenodd" />
+                <path clipRule="evenodd" d={loginSvgPaths.pb9ed400} fill={showConfirmPassword ? "#1C2C42" : "#C9C9C9"} fillRule="evenodd" />
+              </g>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="bg-[#4784f8] h-[40px] relative rounded-[100px] shrink-0 w-full cursor-pointer">
+        <div className="flex flex-row items-center justify-center size-full">
+          <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+              <p className="leading-[normal]">Reset</p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 
