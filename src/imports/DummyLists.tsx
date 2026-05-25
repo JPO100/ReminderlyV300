@@ -145,16 +145,19 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
               </div>
             </div>
           </div>
-          {/* Include done list items */}
           <button
             onClick={() => setIncludeDone(!includeDone)}
-            className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
+            className="flex h-[30px] items-center justify-between w-full"
+            style={{ cursor: 'pointer' }}
           >
-            <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeDone ? '#1C2C42' : '#C9C9C9' }}>Include done list items</p>
-            </div>
+            <p
+              className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
+              style={{ color: includeDone ? '#1C2C42' : '#C9C9C9' }}
+            >
+              Include done list items
+            </p>
             <div
-              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeDone ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+              className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeDone ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
             >
               <div className="relative shrink-0 size-[22.5px]">
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
@@ -165,13 +168,17 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
           </button>
           <button
             onClick={() => setIncludeSmartReminderLists(!includeSmartReminderLists)}
-            className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
+            className="flex h-[30px] items-center justify-between w-full"
+            style={{ cursor: 'pointer' }}
           >
-            <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSmartReminderLists ? '#1C2C42' : '#C9C9C9' }}>Include smart reminder lists</p>
-            </div>
+            <p
+              className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
+              style={{ color: includeSmartReminderLists ? '#1C2C42' : '#C9C9C9' }}
+            >
+              Include smart reminder lists
+            </p>
             <div
-              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSmartReminderLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+              className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSmartReminderLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
             >
               <div className="relative shrink-0 size-[22.5px]">
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
@@ -182,13 +189,17 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
           </button>
           <button
             onClick={() => setIncludeSavedLists(!includeSavedLists)}
-            className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
+            className="flex h-[30px] items-center justify-between w-full"
+            style={{ cursor: 'pointer' }}
           >
-            <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: includeSavedLists ? '#1C2C42' : '#C9C9C9' }}>Include List templates</p>
-            </div>
+            <p
+              className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
+              style={{ color: includeSavedLists ? '#1C2C42' : '#C9C9C9' }}
+            >
+              Include List templates
+            </p>
             <div
-              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSavedLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+              className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSavedLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
             >
               <div className="relative shrink-0 size-[22.5px]">
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
