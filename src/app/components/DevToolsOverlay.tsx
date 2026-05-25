@@ -990,7 +990,7 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
                     setPendingNlcState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#1C2C42' }}
+                  style={{ backgroundColor: '#4784F8' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -1116,7 +1116,7 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
                     setPendingOnboardingState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#1C2C42' }}
+                  style={{ backgroundColor: '#4784F8' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
@@ -1606,7 +1606,7 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
                     setPendingListsState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
-                  style={{ backgroundColor: '#1C2C42' }}
+                  style={{ backgroundColor: '#4784F8' }}
                 >
                   <div className="flex items-center justify-center size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
