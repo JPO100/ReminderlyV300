@@ -152,6 +152,9 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
     <PageShell title="Dev tools password" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Settings" />
       <ToggleRow label="Password required" isOn={passwordRequired} onToggle={() => onPasswordRequiredChange(!passwordRequired)} />
+      <div className="flex h-[10px] items-center w-full">
+        <p className="font-['Lato:SemiBold',sans-serif] text-[14px] text-[#939393] leading-[normal]">Current password: {DEV_TOOLS_PASSWORD}</p>
+      </div>
       <KeyLine />
       <SectionSubtitle text="Password reset" />
       <div className="content-stretch flex gap-[16px] items-center relative shrink-0 w-full">
@@ -773,7 +776,7 @@ function LoginScreen({ onUnlock, passwordRequired }: { onUnlock: () => void; pas
                   onKeyDown={handleKeyDown}
                   onPointerDown={handlePasswordPointerDown}
                   placeholder="Password..."
-                  className="flex-1 bg-transparent outline-none font-['Lato:Bold',sans-serif] not-italic text-[20px] text-[#1C2C42] placeholder:text-[#C9C9C9] focus:placeholder:text-transparent placeholder-lato-semibold text-center leading-[60px] h-full"
+                  className="flex-1 bg-transparent outline-none font-['Lato:Bold',sans-serif] not-italic text-[20px] text-[#1C2C42] placeholder:text-[#C9C9C9] focus:placeholder:text-transparent placeholder-lato-semibold text-center leading-normal h-full"
                 />
                 {/* Eye icon - toggles password visibility */}
                 <button
