@@ -158,7 +158,7 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
         <div className="w-[85px] shrink-0">
           <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#1C2C42] text-[17px] whitespace-nowrap">Password</p>
         </div>
-        <div className="content-stretch flex items-center px-[20px] relative rounded-[100px] flex-1 min-w-0 h-[40px] group">
+        <div className="content-stretch flex items-center px-[20px] relative rounded-[100px] flex-1 min-w-0 h-[50px] group">
           <div aria-hidden="true" className="absolute border border-[#BABABA] group-focus-within:border-[#939393] border-solid inset-0 pointer-events-none rounded-[100px]" />
           <input
             type={showNewPassword ? "text" : "password"}
@@ -186,7 +186,7 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
         <div className="w-[85px] shrink-0">
           <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[#1C2C42] text-[17px] whitespace-nowrap">Confirm</p>
         </div>
-        <div className="content-stretch flex items-center px-[20px] relative rounded-[100px] flex-1 min-w-0 h-[40px] group">
+        <div className="content-stretch flex items-center px-[20px] relative rounded-[100px] flex-1 min-w-0 h-[50px] group">
           <div aria-hidden="true" className="absolute border border-[#BABABA] group-focus-within:border-[#939393] border-solid inset-0 pointer-events-none rounded-[100px]" />
           <input
             type={showConfirmPassword ? "text" : "password"}
@@ -210,7 +210,7 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
           </button>
         </div>
       </div>
-      <div className="bg-[#4784f8] h-[40px] relative rounded-[100px] shrink-0 w-full cursor-pointer">
+      <div className="bg-[#4784f8] h-[50px] relative rounded-[100px] shrink-0 w-full cursor-pointer">
         <div className="flex flex-row items-center justify-center size-full">
           <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
             <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
