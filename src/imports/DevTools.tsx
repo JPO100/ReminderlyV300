@@ -43,7 +43,7 @@ function NavRow({ label, onClick, plain }: { label: string; onClick: () => void;
       className={`${plain ? 'h-[60px]' : 'h-[50px] bg-[#f5f5f5] rounded-[100px]'} relative shrink-0 w-full cursor-pointer`}
     >
       <div className="flex flex-row items-center size-full">
-        <div className={`content-stretch flex items-center ${plain ? 'pr-[30px]' : 'px-[30px]'} py-[15px] relative size-full`}>
+        <div className={`content-stretch flex items-center ${plain ? 'pr-[15px]' : 'px-[30px]'} py-[15px] relative size-full`}>
           <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
             <div className={`flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 ${plain ? 'text-[#1C2C42] text-[17px]' : 'text-[#939393] text-[17px]'} whitespace-nowrap`}>
               <p className="leading-[normal] truncate">{label}</p>

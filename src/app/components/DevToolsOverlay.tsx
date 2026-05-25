@@ -105,7 +105,7 @@ function MenuRow({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="flex h-[30px] items-center justify-between w-full cursor-pointer"
+      className="flex h-[30px] items-center justify-between w-full cursor-pointer pr-[15px]"
     >
       <p className="font-['Lato:Bold',sans-serif] leading-[normal] text-[17px] text-[#1C2C42] whitespace-nowrap">
         {label}
