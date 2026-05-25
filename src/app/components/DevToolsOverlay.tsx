@@ -1566,7 +1566,6 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
                 </div>
               </div>
             </button>
-            <div />
           </div>
         </div>
       </div>
