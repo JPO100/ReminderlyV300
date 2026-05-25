@@ -1200,10 +1200,163 @@ function NotificationsAreaPage({ onBack, onClose, reminderAlerts, onReminderAler
   );
 }
 
-function TestingPage({ onBack, onClose, onNavigateAutomatedTests }: { onBack: () => void; onClose: () => void; onNavigateAutomatedTests: () => void }) {
+function TestingPage({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
+  const [isRunning, setIsRunning] = useState(false);
+  const [report, setReport] = useState<RunReport | null>(null);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleRunChecks = async () => {
+    if (isRunning) return;
+    setIsRunning(true);
+    setReport(null);
+    setCopyStatus('idle');
+    try {
+      const result = await runChecks(() => {
+        const scheduleChecks = getScheduleChecks().map(c => ({ ...c, name: `[Schedule and reminder logic] ${c.name}` }));
+        const reminderChecks = getReminderChecks().map(c => ({ ...c, name: `[Persistence and hydration] ${c.name}` }));
+        const nlcParserChecks = getNlcParserChecks().map(c => ({ ...c, name: `[Natural language parsing] ${c.name}` }));
+        const nlcInteractionChecks = getNlcInteractionChecks().map(c => ({ ...c, name: `[Natural language interaction] ${c.name}` }));
+        const doneDeletedChecks = getDoneDeletedChecks().map(c => ({ ...c, name: `[Done, deleted, and completion] ${c.name}` }));
+        const completionChecks = getCompletionChecks().map(c => ({ ...c, name: `[Done, deleted, and completion] ${c.name}` }));
+        const listChecks = getListChecks().map(c => ({ ...c, name: `[Lists and smart reminders] ${c.name}` }));
+        const devToolsChecks = getDevToolsChecks().map(c => ({ ...c, name: `[Dev tools and feature flags] ${c.name}` }));
+        return [...scheduleChecks, ...reminderChecks, ...nlcParserChecks, ...nlcInteractionChecks, ...doneDeletedChecks, ...completionChecks, ...listChecks, ...devToolsChecks];
+      });
+      setReport(result);
+    } catch (error) {
+      console.error('Failed to run checks:', error);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const handleCopyResults = () => {
+    if (!report || !textAreaRef.current) return;
+    try {
+      textAreaRef.current.select();
+      document.execCommand('copy');
+      setCopyStatus('copied');
+      setTimeout(() => setCopyStatus('idle'), 2000);
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+    }
+  };
+
+  const handleReset = () => {
+    setReport(null);
+    setCopyStatus('idle');
+  };
+
   return (
     <PageShell title="Testing" onBack={onBack} onClose={onClose}>
-      <MenuRow label="Self tests" onClick={onNavigateAutomatedTests} />
+      <div className="flex flex-col gap-[12px] shrink-0">
+        <div className="flex gap-[12px]">
+          <button
+            onClick={handleRunChecks}
+            disabled={isRunning}
+            className="bg-[#4784f8] text-white font-['Lato',sans-serif] font-bold text-[14px] px-[20px] py-[10px] rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isRunning ? 'Running...' : 'Run self-checks'}
+          </button>
+          <button
+            onClick={handleCopyResults}
+            disabled={!report}
+            className="bg-[#4784f8] text-white font-['Lato',sans-serif] font-bold text-[14px] px-[20px] py-[10px] rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {copyStatus === 'copied' ? 'Copied!' : 'Copy results'}
+          </button>
+          <button
+            onClick={handleReset}
+            disabled={!report}
+            className="bg-[#6b7280] text-white font-['Lato',sans-serif] font-bold text-[14px] px-[20px] py-[10px] rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+      {report && (
+        <div className="flex flex-col gap-[8px] flex-1 min-h-0">
+          <div className="font-['Lato',sans-serif] text-[14px] text-[#1C2C42] shrink-0">
+            <span className="font-bold">Run invocation id: {report.runId}</span>
+            {' | '}
+            <span className="font-bold">Passed: {report.passCount}</span>
+            {' | '}
+            <span className="font-bold">Failed: {report.failCount}</span>
+            {' | '}
+            <span className="font-bold">Duration: {report.durationMs}ms</span>
+          </div>
+          <div className="flex flex-col gap-[4px] flex-1 overflow-y-auto min-h-0">
+            {(() => {
+              const grouped = groupResultsBySection(report.results);
+              if (grouped.hasAnySections) {
+                return grouped.sections.map((section) => (
+                  <div key={section.sectionName || 'unsectioned'} className="flex flex-col gap-[4px]">
+                    {section.sectionName !== '' && (
+                      <div className="font-['Lato',sans-serif] text-[14px] text-[#1C2C42] font-bold mt-[8px] mb-[4px]">
+                        {section.sectionName}
+                      </div>
+                    )}
+                    {section.results.map((result) => (
+                      <div
+                        key={result.id}
+                        className={`flex flex-col gap-[4px] p-[8px] rounded-[4px] ${
+                          result.passed ? 'bg-[#e8f5e9]' : 'bg-[#ffebee]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-[8px]">
+                          <span className="font-['Lato',sans-serif] text-[16px]">
+                            {result.passed ? '✓' : '✗'}
+                          </span>
+                          <span className="font-['Lato',sans-serif] text-[14px] text-[#1C2C42]">
+                            {result.name.replace(/^\[.+?\] /, '')}
+                          </span>
+                        </div>
+                        {result.error && (
+                          <div className="font-['Lato',sans-serif] text-[12px] text-[#c62828] ml-[24px]">
+                            {result.error}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ));
+              } else {
+                return report.results.map((result) => (
+                  <div
+                    key={result.id}
+                    className={`flex flex-col gap-[4px] p-[8px] rounded-[4px] ${
+                      result.passed ? 'bg-[#e8f5e9]' : 'bg-[#ffebee]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-[8px]">
+                      <span className="font-['Lato',sans-serif] text-[16px]">
+                        {result.passed ? '✓' : '✗'}
+                      </span>
+                      <span className="font-['Lato',sans-serif] text-[14px] text-[#1C2C42]">
+                        {result.name}
+                      </span>
+                    </div>
+                    {result.error && (
+                      <div className="font-['Lato',sans-serif] text-[12px] text-[#c62828] ml-[24px]">
+                        {result.error}
+                      </div>
+                    )}
+                  </div>
+                ));
+              }
+            })()}
+          </div>
+          <textarea
+            ref={textAreaRef}
+            value={formatReportAsText(report)}
+            readOnly
+            className="absolute opacity-0 pointer-events-none"
+            style={{ top: -9999, left: -9999 }}
+            aria-hidden="true"
+          />
+        </div>
+      )}
     </PageShell>
   );
 }
@@ -1580,7 +1733,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'testing') {
     content = (
-      <TestingPage onBack={() => setPage('home')} onClose={onClose} onNavigateAutomatedTests={() => setPage('tests')} />
+      <TestingPage onBack={() => setPage('home')} onClose={onClose} />
     );
   } else if (page === 'reminders') {
     content = (
