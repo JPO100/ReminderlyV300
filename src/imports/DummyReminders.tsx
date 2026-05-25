@@ -164,7 +164,7 @@ export default function DummyReminders({ onBack, onClose, addReminders, hideOver
   };
 
   return (
-    <div className="bg-white content-stretch flex flex-col gap-[30px] items-start pb-[30px] pt-[26px] px-[20px] relative rounded-tl-[20px] rounded-tr-[20px] size-full" data-name="dummy reminders">
+    <div className="bg-white content-stretch flex flex-col gap-[30px] items-start pb-[30px] pt-[30px] px-[20px] relative rounded-tl-[20px] rounded-tr-[20px] size-full" data-name="dummy reminders">
       <Header onBack={onBack} onClose={onClose} />
       <div className="content-stretch flex flex-[1_0_0] flex-col gap-[32px] items-center min-h-px min-w-px relative w-full">
         <div className="content-stretch flex flex-col gap-[10px] items-start relative w-full" data-name="Scrollable List Area" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
