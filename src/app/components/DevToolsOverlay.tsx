@@ -962,8 +962,8 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
         <ToggleRow label="Contact recognition" isOn={false} onToggle={() => {}} disabled />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Auto-parsing" isOn={false} onToggle={() => {}} disabled />
-        <ToggleRow label="Click-parsing" isOn={true} onToggle={() => {}} />
+        <ToggleRow label="Auto-parsing" isOn={nlcMode === 'auto'} onToggle={() => onNlcModeChange('auto')} />
+        <ToggleRow label="Click-parsing" isOn={nlcMode === 'click'} onToggle={() => onNlcModeChange('click')} />
       </PageShell>
       {pendingNlcState !== null && (
         <>
