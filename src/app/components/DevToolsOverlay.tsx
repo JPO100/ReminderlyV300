@@ -1028,7 +1028,7 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
   );
 }
 
-function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboardingTutorialEnabledChange, showTutorialOnFirstLaunch, onShowTutorialOnFirstLaunchChange }: { onBack: () => void; onClose: () => void; isOnboardingTutorialEnabled: boolean; onOnboardingTutorialEnabledChange: (next: boolean) => void; showTutorialOnFirstLaunch: boolean; onShowTutorialOnFirstLaunchChange: (value: boolean) => void }) {
+function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboardingTutorialEnabledChange, showTutorialOnFirstLaunch, onShowTutorialOnFirstLaunchChange, showTutorialOnEveryStart, onShowTutorialOnEveryStartChange }: { onBack: () => void; onClose: () => void; isOnboardingTutorialEnabled: boolean; onOnboardingTutorialEnabledChange: (next: boolean) => void; showTutorialOnFirstLaunch: boolean; onShowTutorialOnFirstLaunchChange: (value: boolean) => void; showTutorialOnEveryStart: boolean; onShowTutorialOnEveryStartChange: (value: boolean) => void }) {
   const [pendingOnboardingState, setPendingOnboardingState] = useState<boolean | null>(null);
 
   return (
@@ -1037,8 +1037,8 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
         <ToggleRow label="Enable onboarding" isOn={isOnboardingTutorialEnabled} onToggle={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)} />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Show tutorial on first launch" isOn={showTutorialOnFirstLaunch} onToggle={() => onShowTutorialOnFirstLaunchChange(!showTutorialOnFirstLaunch)} />
-        <ToggleRow label="Show tutorial on every app start" isOn={false} onToggle={() => {}} disabled />
+        <ToggleRow label="Show tutorial on first launch" isOn={showTutorialOnFirstLaunch} onToggle={() => { const next = !showTutorialOnFirstLaunch; onShowTutorialOnFirstLaunchChange(next); if (next) onShowTutorialOnEveryStartChange(false); }} />
+        <ToggleRow label="Show tutorial on every app start" isOn={showTutorialOnEveryStart} onToggle={() => { const next = !showTutorialOnEveryStart; onShowTutorialOnEveryStartChange(next); if (next) onShowTutorialOnFirstLaunchChange(false); }} />
       </PageShell>
       {pendingOnboardingState !== null && (
         <>
@@ -1676,7 +1676,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'onboarding') {
     content = (
-      <OnboardingPage onBack={() => setPage('home')} onClose={onClose} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={onOnboardingTutorialEnabledChange} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={onShowTutorialOnFirstLaunchChange} />
+      <OnboardingPage onBack={() => setPage('home')} onClose={onClose} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={onOnboardingTutorialEnabledChange} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={onShowTutorialOnFirstLaunchChange} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={onShowTutorialOnEveryStartChange} />
     );
   } else if (page === 'onboarding-tutorial') {
     content = (
