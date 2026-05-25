@@ -105,42 +105,44 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
       <Header onBack={onBack} onClose={onClose} />
       <div className="content-stretch flex flex-[1_0_0] flex-col gap-[32px] items-center min-h-px min-w-px relative w-full" style={!listsEnabled ? { opacity: 0.5, pointerEvents: 'none' } : undefined}>
         <div className="content-stretch flex flex-col gap-[30px] items-start relative w-full" data-name="Scrollable List Area" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
-          {/* Number of lists */}
-          <div className="h-[51px] relative shrink-0 w-full">
-            <div className="flex flex-row items-center size-full">
-              <div className="content-stretch flex items-center justify-between px-px py-[13px] relative size-full">
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                  <p className="leading-[normal]">Number of lists</p>
-                </div>
-                <div className="bg-white content-stretch flex h-[36px] items-center justify-center p-[13px] relative rounded-[4px] shrink-0 w-[60px]" data-name="text-box">
-                  <div aria-hidden="true" className="absolute border border-[#eaeaea] border-solid inset-0 pointer-events-none rounded-[4px]" />
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={numberOfLists}
-                    onChange={(e) => setNumberOfLists(e.target.value)}
-                    className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#1C2C42] text-[17px] p-0 m-0"
-                  />
+          <div className="content-stretch flex flex-col gap-[10px] items-start relative w-full">
+            {/* Number of lists */}
+            <div className="h-[51px] relative shrink-0 w-full">
+              <div className="flex flex-row items-center size-full">
+                <div className="content-stretch flex items-center justify-between px-px py-[13px] relative size-full">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
+                    <p className="leading-[normal]">Number of lists</p>
+                  </div>
+                  <div className="bg-white content-stretch flex h-[36px] items-center justify-center p-[13px] relative rounded-[4px] shrink-0 w-[60px]" data-name="text-box">
+                    <div aria-hidden="true" className="absolute border border-[#eaeaea] border-solid inset-0 pointer-events-none rounded-[4px]" />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={numberOfLists}
+                      onChange={(e) => setNumberOfLists(e.target.value)}
+                      className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#1C2C42] text-[17px] p-0 m-0"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          {/* Max number of list items */}
-          <div className="h-[51px] relative shrink-0 w-full">
-            <div className="flex flex-row items-center size-full">
-              <div className="content-stretch flex items-center justify-between px-px py-[13px] relative size-full">
-                <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                  <p className="leading-[normal]">Max number of list items</p>
-                </div>
-                <div className="bg-white content-stretch flex h-[36px] items-center justify-center p-[13px] relative rounded-[4px] shrink-0 w-[60px]" data-name="text-box">
-                  <div aria-hidden="true" className="absolute border border-[#eaeaea] border-solid inset-0 pointer-events-none rounded-[4px]" />
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={maxListItems}
-                    onChange={(e) => setMaxListItems(e.target.value)}
-                    className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#1C2C42] text-[17px] p-0 m-0"
-                  />
+            {/* Max number of list items */}
+            <div className="h-[51px] relative shrink-0 w-full">
+              <div className="flex flex-row items-center size-full">
+                <div className="content-stretch flex items-center justify-between px-px py-[13px] relative size-full">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
+                    <p className="leading-[normal]">Max number of list items</p>
+                  </div>
+                  <div className="bg-white content-stretch flex h-[36px] items-center justify-center p-[13px] relative rounded-[4px] shrink-0 w-[60px]" data-name="text-box">
+                    <div aria-hidden="true" className="absolute border border-[#eaeaea] border-solid inset-0 pointer-events-none rounded-[4px]" />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={maxListItems}
+                      onChange={(e) => setMaxListItems(e.target.value)}
+                      className="bg-transparent border-none outline-none w-full text-center font-['Lato:SemiBold',sans-serif] leading-[26px] not-italic text-[#1C2C42] text-[17px] p-0 m-0"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -228,7 +230,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
           </button>
           <button
             onClick={handleGenerate}
-            className={`${showDone ? 'bg-[#3060C0]' : 'bg-[#4784F8]'} relative rounded-[100px] flex-1 cursor-pointer`}
+            className={`${showDone ? 'bg-[#2DA44E]' : 'bg-[#34C759]'} relative rounded-[100px] flex-1 cursor-pointer`}
             data-name="generate-btn"
             style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
           >
