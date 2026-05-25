@@ -481,66 +481,11 @@ function NlcPage({ onBack, onClose, nlcMode, onNlcModeChange, recognition, onRec
 function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVariantChange, isListsEnabled }: { onBack: () => void; onClose: () => void; filtersMenuVariant: FiltersMenuVariant; onFiltersMenuVariantChange: (variant: FiltersMenuVariant) => void; isListsEnabled: boolean }) {
   const displayVariant = isListsEnabled ? 'standard' : filtersMenuVariant;
   return (
-    <div className="flex flex-col h-full relative w-full" data-name="filters-menu-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Filters menu" onBack={onBack} onClose={onClose} />
-
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full" style={isListsEnabled ? { opacity: 0.5, pointerEvents: 'none' } : undefined}>
-            <button
-              onClick={() => onFiltersMenuVariantChange('grouped')}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="relative w-[24px] h-[22px] shrink-0">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 22">
-                    <g>
-                      <path clipRule="evenodd" d={svgPathsGear.peea5400} fill={displayVariant === 'grouped' ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                      <path clipRule="evenodd" d={svgPathsGear.p3dec100} fill={displayVariant === 'grouped' ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                    </g>
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: displayVariant === 'grouped' ? '#1C2C42' : '#C9C9C9' }}>Grouped filters</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${displayVariant === 'grouped' ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => onFiltersMenuVariantChange('standard')}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="relative w-[24px] h-[22px] shrink-0">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24.2227 22">
-                    <g>
-                      <path clipRule="evenodd" d={svgPathsHex.p13390100} fill={displayVariant === 'standard' ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                      <path clipRule="evenodd" d={svgPathsHex.p2e5bc040} fill={displayVariant === 'standard' ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                    </g>
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: displayVariant === 'standard' ? '#1C2C42' : '#C9C9C9' }}>Standard filters</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${displayVariant === 'standard' ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <PageShell title="Filters menu" onBack={onBack} onClose={onClose}>
+      <SectionSubtitle text="Settings" />
+      <ToggleRow label="Standard filters" isOn={displayVariant === 'standard'} onToggle={() => onFiltersMenuVariantChange('standard')} disabled={isListsEnabled} />
+      <ToggleRow label="Grouped filters" isOn={displayVariant === 'grouped'} onToggle={() => onFiltersMenuVariantChange('grouped')} disabled={isListsEnabled} />
+    </PageShell>
   );
 }
 
