@@ -1028,69 +1028,18 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
   );
 }
 
-function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboardingTutorialEnabledChange, onNavigateOnboardingTutorial }: { onBack: () => void; onClose: () => void; isOnboardingTutorialEnabled: boolean; onOnboardingTutorialEnabledChange: (next: boolean) => void; onNavigateOnboardingTutorial: () => void }) {
+function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboardingTutorialEnabledChange, showTutorialOnFirstLaunch, onShowTutorialOnFirstLaunchChange }: { onBack: () => void; onClose: () => void; isOnboardingTutorialEnabled: boolean; onOnboardingTutorialEnabledChange: (next: boolean) => void; showTutorialOnFirstLaunch: boolean; onShowTutorialOnFirstLaunchChange: (value: boolean) => void }) {
   const [pendingOnboardingState, setPendingOnboardingState] = useState<boolean | null>(null);
 
   return (
-    <div className="flex flex-col h-full relative w-full" data-name="onboarding-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Onboarding" onBack={onBack} onClose={onClose} />
-
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            <button
-              onClick={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <p
-                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
-                  style={{ color: isOnboardingTutorialEnabled ? '#1C2C42' : '#C9C9C9' }}
-                >
-                  Enable onboarding tutorial
-                </p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${isOnboardingTutorialEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
-            <div />
-            <button
-              onClick={onNavigateOnboardingTutorial}
-              className="h-[60px] relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="flex flex-row items-center size-full">
-                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
-                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                      <p className="leading-[normal] truncate">Onboarding tutorial settings</p>
-                    </div>
-                    <div className="flex items-center justify-center relative shrink-0">
-                      <div className="-scale-y-100 flex-none rotate-180">
-                        <div className="h-[13px] relative w-[7px]">
-                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
-                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </button>
-            <div />
-          </div>
-        </div>
-      </div>
+    <>
+      <PageShell title="Onboarding" onBack={onBack} onClose={onClose}>
+        <ToggleRow label="Enable onboarding" isOn={isOnboardingTutorialEnabled} onToggle={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)} />
+        <KeyLine />
+        <SectionSubtitle text="Settings" />
+        <ToggleRow label="Show tutorial on first launch" isOn={showTutorialOnFirstLaunch} onToggle={() => onShowTutorialOnFirstLaunchChange(!showTutorialOnFirstLaunch)} />
+        <ToggleRow label="Show tutorial on every app start" isOn={false} onToggle={() => {}} disabled />
+      </PageShell>
       {pendingOnboardingState !== null && (
         <>
           <div
@@ -1150,7 +1099,7 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }
 
@@ -1727,7 +1676,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'onboarding') {
     content = (
-      <OnboardingPage onBack={() => setPage('home')} onClose={onClose} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={onOnboardingTutorialEnabledChange} onNavigateOnboardingTutorial={() => setPage('onboarding-tutorial')} />
+      <OnboardingPage onBack={() => setPage('home')} onClose={onClose} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={onOnboardingTutorialEnabledChange} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={onShowTutorialOnFirstLaunchChange} />
     );
   } else if (page === 'onboarding-tutorial') {
     content = (
