@@ -12,7 +12,7 @@ function Header({ onBack, onClose }: { onBack: () => void; onClose: () => void }
         <button onClick={onBack} className="cursor-pointer shrink-0" aria-label="Back">
           <div className="h-[17px] relative shrink-0 w-[9px]" data-name="Union">
             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 9 17">
-              <path d={svgPaths.p347e8980} fill="var(--fill-0, #4784F8)" id="Union" />
+              <path d={svgPaths.p347e8980} fill="var(--fill-0, #1C2C42)" id="Union" />
             </svg>
           </div>
         </button>
@@ -29,7 +29,7 @@ function Header({ onBack, onClose }: { onBack: () => void; onClose: () => void }
         <div className="flex-none rotate-45">
           <div className="relative size-[18px]" data-name="Union">
             <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 18">
-              <path d={svgPaths.p1cbc7100} fill="var(--fill-0, #4784F8)" id="Union" />
+              <path d={svgPaths.p1cbc7100} fill="var(--fill-0, #1C2C42)" id="Union" />
             </svg>
           </div>
         </div>
@@ -50,8 +50,8 @@ function ReminderRow({ label, color, defaultCount, value, onChange, textColor, i
                   <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 25 25">
                     {isDone ? (
                       <g>
-                        <rect fill="#4784F8" height="23" rx="11.5" width="23" x="1" y="1" />
-                        <rect height="23" rx="11.5" stroke="#4784F8" strokeWidth="2" width="23" x="1" y="1" />
+                        <rect fill="#1C2C42" height="23" rx="11.5" width="23" x="1" y="1" />
+                        <rect height="23" rx="11.5" stroke="#1C2C42" strokeWidth="2" width="23" x="1" y="1" />
                         <path d={doneSvgPaths.p1bc11a00} fill="white" />
                       </g>
                     ) : (
