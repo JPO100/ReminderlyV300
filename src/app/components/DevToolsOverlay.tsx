@@ -483,8 +483,10 @@ function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVar
   return (
     <PageShell title="Filters menu" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Settings" />
-      <ToggleRow label="Standard filters" isOn={displayVariant === 'standard'} onToggle={() => onFiltersMenuVariantChange('standard')} disabled={isListsEnabled} />
-      <ToggleRow label="Grouped filters" isOn={displayVariant === 'grouped'} onToggle={() => onFiltersMenuVariantChange('grouped')} disabled={isListsEnabled} />
+      <div className="flex flex-col gap-[30px] w-full" style={isListsEnabled ? { opacity: 0.5, pointerEvents: 'none' } : undefined}>
+        <ToggleRow label="Standard filters" isOn={displayVariant === 'standard'} onToggle={() => onFiltersMenuVariantChange('standard')} />
+        <ToggleRow label="Grouped filters" isOn={displayVariant === 'grouped'} onToggle={() => onFiltersMenuVariantChange('grouped')} />
+      </div>
     </PageShell>
   );
 }
