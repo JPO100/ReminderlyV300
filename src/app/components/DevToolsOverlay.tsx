@@ -1553,15 +1553,9 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
                   <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
                     <p className="leading-[normal] truncate">Dummy lists</p>
                   </div>
-                  <div className="flex items-center justify-center relative shrink-0">
-                    <div className="-scale-y-100 flex-none rotate-180">
-                      <div className="h-[13px] relative w-[7px]">
-                        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
-                          <path d={svgPathsDummy.p1b692f00} fill="var(--fill-0, #939393)" id="Union" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
+                  <svg width="7" height="13" viewBox="0 0 7 13" fill="none" className="shrink-0">
+                    <path d="M1.92753 0.349745C1.50716 -0.116582 0.82549 -0.116582 0.405113 0.349745C-0.0151913 0.816064 -0.0152062 1.57198 0.405113 2.03828L4.38238 6.45L0.315234 10.9617C-0.10508 11.428 -0.105076 12.1839 0.315234 12.6503C0.735611 13.1166 1.41728 13.1166 1.83766 12.6503L6.4969 7.48173C6.5635 7.43513 6.62678 7.37992 6.68481 7.31555C7.10508 6.84926 7.10505 6.09333 6.68481 5.62701L1.92753 0.349745Z" fill="#939393" />
+                  </svg>
                 </div>
               </div>
             </div>
