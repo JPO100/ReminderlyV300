@@ -210,7 +210,7 @@ export default function DummyReminders({ onBack, onClose, addReminders, hideOver
               </div>
             </div>
           </button>
-          <button onClick={handleGenerate} className={`${showDone ? 'bg-[#2DA44E]' : 'bg-[#34C759]'} relative rounded-[100px] flex-1 cursor-pointer`} data-name="generate-btn" style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}>
+          <button onClick={handleGenerate} className={`${showDone ? 'bg-[#6AB016]' : 'bg-[#7EC91C]'} relative rounded-[100px] flex-1 cursor-pointer`} data-name="generate-btn" style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}>
             <div className="flex flex-row items-center justify-center size-full">
               <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
                 <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">

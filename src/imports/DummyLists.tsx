@@ -230,7 +230,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
           </button>
           <button
             onClick={handleGenerate}
-            className={`${showDone ? 'bg-[#2DA44E]' : 'bg-[#34C759]'} relative rounded-[100px] flex-1 cursor-pointer`}
+            className={`${showDone ? 'bg-[#6AB016]' : 'bg-[#7EC91C]'} relative rounded-[100px] flex-1 cursor-pointer`}
             data-name="generate-btn"
             style={{ height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
           >
