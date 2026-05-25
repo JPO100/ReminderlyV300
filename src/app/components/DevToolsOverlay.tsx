@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import type { ReactNode } from "react";
 import { runChecks, formatReportAsText, groupResultsBySection } from "../dev/check-system";
 import type { RunReport } from "../dev/check-system";
 import { getScheduleChecks } from "../dev/schedule-checks";
@@ -66,6 +67,69 @@ function BackHeader({ title, onBack, onClose }: { title: string; onBack: () => v
       </button>
     </div>
   );
+}
+
+function PageShell({ title, onBack, onClose, children }: { title: string; onBack: () => void; onClose: () => void; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-[30px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0" style={{ overflowY: 'auto' }}>
+      <BackHeader title={title} onBack={onBack} onClose={onClose} />
+      {children}
+    </div>
+  );
+}
+
+function ToggleRow({ label, isOn, onToggle, disabled }: { label: string; isOn: boolean; onToggle: () => void; disabled?: boolean }) {
+  return (
+    <button
+      onClick={disabled ? undefined : onToggle}
+      className="flex h-[30px] items-center justify-between w-full"
+      style={{ cursor: disabled ? 'default' : 'pointer' }}
+    >
+      <p
+        className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
+        style={{ color: disabled ? '#C9C9C9' : (isOn ? '#1C2C42' : '#C9C9C9') }}
+      >
+        {label}
+      </p>
+      <div
+        className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${disabled ? 'bg-[#C9C9C9] justify-start' : (isOn ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start')}`}
+      >
+        <div className="relative shrink-0 size-[22.5px]">
+          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
+            <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
+          </svg>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function MenuRow({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex h-[30px] items-center justify-between w-full cursor-pointer"
+    >
+      <p className="font-['Lato:Bold',sans-serif] leading-[normal] text-[17px] text-[#1C2C42] whitespace-nowrap">
+        {label}
+      </p>
+      <svg width="7" height="13" viewBox="0 0 7 13" fill="none" className="shrink-0">
+        <path d="M1.92753 0.349745C1.50716 -0.116582 0.82549 -0.116582 0.405113 0.349745C-0.0151913 0.816064 -0.0152062 1.57198 0.405113 2.03828L4.38238 6.45L0.315234 10.9617C-0.10508 11.428 -0.105076 12.1839 0.315234 12.6503C0.735611 13.1166 1.41728 13.1166 1.83766 12.6503L6.4969 7.48173C6.5635 7.43513 6.62678 7.37992 6.68481 7.31555C7.10508 6.84926 7.10505 6.09333 6.68481 5.62701L1.92753 0.349745Z" fill="#939393" />
+      </svg>
+    </button>
+  );
+}
+
+function SectionSubtitle({ text }: { text: string }) {
+  return (
+    <div className="flex h-[10px] items-center w-full">
+      <p className="font-['Lato:SemiBold',sans-serif] text-[14px] text-[#939393] leading-[normal]">{text}</p>
+    </div>
+  );
+}
+
+function KeyLine() {
+  return <div className="w-full h-px bg-[#E4E4E4]" />;
 }
 
 function SelfChecks({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
@@ -1415,153 +1479,19 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
 
   return (
     <div className="flex flex-col h-full relative w-full" data-name="lists-area-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0" style={{ overflowY: 'auto' }}>
-        <div className="flex flex-col gap-[30px] w-full shrink-0">
-          <BackHeader title="Lists" onBack={onBack} onClose={onClose} />
-
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            <button
-              onClick={() => setPendingListsState(!isListsEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <p
-                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
-                  style={{ color: isListsEnabled ? '#1C2C42' : '#C9C9C9' }}
-                >
-                  Enable lists
-                </p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${isListsEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <div className="w-full h-px bg-[#E4E4E4]" />
-
-          <div className="flex flex-col gap-[20px] w-full">
-            <p className="font-['Lato:SemiBold',sans-serif] text-[14px] text-[#939393] leading-[normal]">Features</p>
-
-            <button
-              onClick={() => onSmartRemindersEnabledChange(!smartRemindersEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <p
-                className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
-                style={{ color: smartRemindersEnabled ? '#1C2C42' : '#C9C9C9' }}
-              >
-                Smart reminders
-              </p>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${smartRemindersEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => onSavedListsEnabledChange(!savedListsEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <p
-                className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
-                style={{ color: savedListsEnabled ? '#1C2C42' : '#C9C9C9' }}
-              >
-                List templates
-              </p>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${savedListsEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => onPinnedListsEnabledChange(!pinnedListsEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <p
-                className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
-                style={{ color: pinnedListsEnabled ? '#1C2C42' : '#C9C9C9' }}
-              >
-                Pinned lists
-              </p>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${pinnedListsEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <div className="w-full h-px bg-[#E4E4E4]" />
-
-          <div className="flex flex-col gap-[20px] w-full">
-            <p className="font-['Lato:SemiBold',sans-serif] text-[14px] text-[#939393] leading-[normal]">Settings</p>
-
-            <button
-              onClick={() => { if (savedListsEnabled) onUseDefaultTemplatesInCleanStateChange(!useDefaultTemplatesInCleanState); }}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full"
-              style={{ cursor: savedListsEnabled ? 'pointer' : 'default', opacity: savedListsEnabled ? 1 : 1 }}
-            >
-              <p
-                className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
-                style={{ color: !savedListsEnabled ? '#C9C9C9' : (useDefaultTemplatesInCleanState ? '#1C2C42' : '#C9C9C9') }}
-              >
-                Use default template set in clean state
-              </p>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${!savedListsEnabled ? 'bg-[#C9C9C9] justify-start' : (useDefaultTemplatesInCleanState ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start')}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          <div className="w-full h-px bg-[#E4E4E4]" />
-
-          <button
-            onClick={onNavigateDummyLists}
-            className="h-[60px] relative shrink-0 w-full cursor-pointer"
-          >
-            <div className="flex flex-row items-center size-full">
-              <div className="content-stretch flex items-center py-[15px] relative size-full">
-                <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                    <p className="leading-[normal] truncate">Dummy lists</p>
-                  </div>
-                  <svg width="7" height="13" viewBox="0 0 7 13" fill="none" className="shrink-0">
-                    <path d="M1.92753 0.349745C1.50716 -0.116582 0.82549 -0.116582 0.405113 0.349745C-0.0151913 0.816064 -0.0152062 1.57198 0.405113 2.03828L4.38238 6.45L0.315234 10.9617C-0.10508 11.428 -0.105076 12.1839 0.315234 12.6503C0.735611 13.1166 1.41728 13.1166 1.83766 12.6503L6.4969 7.48173C6.5635 7.43513 6.62678 7.37992 6.68481 7.31555C7.10508 6.84926 7.10505 6.09333 6.68481 5.62701L1.92753 0.349745Z" fill="#939393" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </button>
-        </div>
-      </div>
+      <PageShell title="Lists" onBack={onBack} onClose={onClose}>
+        <ToggleRow label="Enable lists" isOn={isListsEnabled} onToggle={() => setPendingListsState(!isListsEnabled)} />
+        <KeyLine />
+        <SectionSubtitle text="Features" />
+        <ToggleRow label="Smart reminders" isOn={smartRemindersEnabled} onToggle={() => onSmartRemindersEnabledChange(!smartRemindersEnabled)} />
+        <ToggleRow label="List templates" isOn={savedListsEnabled} onToggle={() => onSavedListsEnabledChange(!savedListsEnabled)} />
+        <ToggleRow label="Pinned lists" isOn={pinnedListsEnabled} onToggle={() => onPinnedListsEnabledChange(!pinnedListsEnabled)} />
+        <KeyLine />
+        <SectionSubtitle text="Settings" />
+        <ToggleRow label="Use default template set in clean state" isOn={useDefaultTemplatesInCleanState} onToggle={() => onUseDefaultTemplatesInCleanStateChange(!useDefaultTemplatesInCleanState)} disabled={!savedListsEnabled} />
+        <KeyLine />
+        <MenuRow label="Dummy lists" onClick={onNavigateDummyLists} />
+      </PageShell>
       {pendingListsState !== null && (
         <>
           <div
