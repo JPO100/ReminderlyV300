@@ -1541,32 +1541,31 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
             </button>
           </div>
 
-          <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
-            <div />
-            <button
-              onClick={onNavigateDummyLists}
-              className="h-[60px] relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="flex flex-row items-center size-full">
-                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
-                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                      <p className="leading-[normal] truncate">Dummy lists</p>
-                    </div>
-                    <div className="flex items-center justify-center relative shrink-0">
-                      <div className="-scale-y-100 flex-none rotate-180">
-                        <div className="h-[13px] relative w-[7px]">
-                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
-                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
-                          </svg>
-                        </div>
+          <div className="w-full h-px bg-[#E4E4E4]" />
+
+          <button
+            onClick={onNavigateDummyLists}
+            className="h-[60px] relative shrink-0 w-full cursor-pointer"
+          >
+            <div className="flex flex-row items-center size-full">
+              <div className="content-stretch flex items-center py-[15px] relative size-full">
+                <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
+                  <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
+                    <p className="leading-[normal] truncate">Dummy lists</p>
+                  </div>
+                  <div className="flex items-center justify-center relative shrink-0">
+                    <div className="-scale-y-100 flex-none rotate-180">
+                      <div className="h-[13px] relative w-[7px]">
+                        <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
+                          <path d={svgPathsDummy.p1b692f00} fill="var(--fill-0, #939393)" id="Union" />
+                        </svg>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </button>
-          </div>
+            </div>
+          </button>
         </div>
       </div>
       {pendingListsState !== null && (
