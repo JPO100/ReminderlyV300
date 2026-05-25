@@ -1,6 +1,4 @@
 import svgPaths from "./svg-7kpmedzeqd";
-import { useState, useEffect, useRef } from "react";
-
 function ToggleBtn({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) {
   return (
     <div className="h-[30px] relative shrink-0 w-[56px]" data-name="toggle-btn" onClick={(e) => { e.stopPropagation(); onToggle(); }} style={{ cursor: 'pointer' }}>
@@ -59,59 +57,6 @@ function NavRow({ label, onClick, plain }: { label: string; onClick: () => void;
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </button>
-  );
-}
-
-function ClearButton({ onClick }: { onClick: () => void }) {
-  const [confirmState, setConfirmState] = useState<'idle' | 'confirming' | 'cleared'>('idle');
-  const buttonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (confirmState !== 'confirming') return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
-        setConfirmState('idle');
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [confirmState]);
-
-  const handleClick = () => {
-    if (confirmState === 'idle') {
-      setConfirmState('confirming');
-    } else if (confirmState === 'confirming') {
-      onClick();
-      setConfirmState('cleared');
-      setTimeout(() => setConfirmState('idle'), 2000);
-    }
-  };
-
-  const label =
-    confirmState === 'idle' ? 'Clear reminders list' :
-    confirmState === 'confirming' ? 'Are you sure?' :
-    'Cleared!';
-
-  const bgColor =
-    confirmState === 'cleared' ? '#16a34a' :
-    confirmState === 'confirming' ? '#cc0000' : 'red';
-
-  return (
-    <button
-      ref={buttonRef}
-      onClick={handleClick}
-      className="h-[50px] relative rounded-[100px] shrink-0 w-full cursor-pointer"
-      style={{ backgroundColor: bgColor, height: 'clamp(40px, calc(20vh - 73.6px), 60px)' }}
-      data-name="clear-btn"
-    >
-      <div className="flex flex-row items-center justify-center size-full">
-        <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
-          <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] text-white whitespace-nowrap">
-            <p className="leading-[normal] truncate">{label}</p>
           </div>
         </div>
       </div>

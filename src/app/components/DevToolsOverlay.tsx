@@ -15,7 +15,6 @@ import type { GeneratedDummyListsPayload, GeneratedList } from "../utils/dummy-l
 import DevToolsHome from "../../imports/DevTools";
 import DummyRemindersPage from "../../imports/DummyReminders";
 import DummyListsPage from "../../imports/DummyLists";
-import nlcTogglePaths from "../../imports/svg-cg3s3ktbqw";
 import type { Reminder } from "../reminder-utils";
 import svgPathsDummy from "../../imports/svg-enpj30u9ti";
 import type { NlcMode } from "../utils/nlc-interaction";
@@ -23,15 +22,13 @@ import type { NlcRecognitionConfig } from "../utils/nlc-parser";
 import type { FiltersMenuVariant } from "../reminder-utils";
 import svgPathsGear from "../../imports/svg-rl6qtmr1a6";
 import svgPathsHex from "../../imports/svg-8hjr6ht2yw";
-import firstLaunchIconPaths from "../../imports/svg-cybycm9ooj";
-import everyStartIconPaths from "../../imports/svg-j7fklgsdp0";
 import loginSvgPaths from "../../imports/svg-xgk7qm25s1";
 import passwordPageSvgPaths from "../../imports/svg-y29dfn20l5";
 import passwordResetSvgPaths from "../../imports/svg-p8ebad7jx7";
 
 const DEV_TOOLS_PASSWORD = '123';
 
-type DevToolsPage = 'home' | 'tests' | 'test-data' | 'dummy-reminders' | 'dummy-lists' | 'nlc' | 'filters-menu' | 'onboarding-tutorial' | 'dev-tools-password' | 'reminder-settings' | 'list-settings' | 'paywall' | 'notifications' | 'system' | 'natural-language' | 'onboarding' | 'notifications-area' | 'testing' | 'reminders' | 'lists';
+type DevToolsPage = 'home' | 'dummy-reminders' | 'dummy-lists' | 'filters-menu' | 'dev-tools-password' | 'system' | 'natural-language' | 'onboarding' | 'notifications-area' | 'testing' | 'reminders' | 'lists';
 
 function BackHeader({ title, onBack, onClose }: { title: string; onBack: () => void; onClose: () => void }) {
   return (
@@ -132,352 +129,6 @@ function KeyLine() {
   return <div className="w-full h-px bg-[#E4E4E4]" />;
 }
 
-function SelfChecks({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
-  const [isRunning, setIsRunning] = useState(false);
-  const [report, setReport] = useState<RunReport | null>(null);
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied'>('idle');
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleRunChecks = async () => {
-    if (isRunning) return;
-    
-    setIsRunning(true);
-    setReport(null);
-    setCopyStatus('idle');
-    try {
-      const result = await runChecks(() => {
-        const scheduleChecks = getScheduleChecks().map(c => ({ ...c, name: `[Schedule and reminder logic] ${c.name}` }));
-        const reminderChecks = getReminderChecks().map(c => ({ ...c, name: `[Persistence and hydration] ${c.name}` }));
-        const nlcParserChecks = getNlcParserChecks().map(c => ({ ...c, name: `[Natural language parsing] ${c.name}` }));
-        const nlcInteractionChecks = getNlcInteractionChecks().map(c => ({ ...c, name: `[Natural language interaction] ${c.name}` }));
-        const doneDeletedChecks = getDoneDeletedChecks().map(c => ({ ...c, name: `[Done, deleted, and completion] ${c.name}` }));
-        const completionChecks = getCompletionChecks().map(c => ({ ...c, name: `[Done, deleted, and completion] ${c.name}` }));
-        const listChecks = getListChecks().map(c => ({ ...c, name: `[Lists and smart reminders] ${c.name}` }));
-        const devToolsChecks = getDevToolsChecks().map(c => ({ ...c, name: `[Dev tools and feature flags] ${c.name}` }));
-        return [...scheduleChecks, ...reminderChecks, ...nlcParserChecks, ...nlcInteractionChecks, ...doneDeletedChecks, ...completionChecks, ...listChecks, ...devToolsChecks];
-      });
-      setReport(result);
-    } catch (error) {
-      console.error('Failed to run checks:', error);
-    } finally {
-      setIsRunning(false);
-    }
-  };
-
-  const handleCopyResults = () => {
-    if (!report || !textAreaRef.current) return;
-    
-    try {
-      textAreaRef.current.select();
-      document.execCommand('copy');
-      setCopyStatus('copied');
-      setTimeout(() => setCopyStatus('idle'), 2000);
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
-    }
-  };
-
-  const handleReset = () => {
-    setReport(null);
-    setCopyStatus('idle');
-  };
-
-  return (
-    <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-      <BackHeader title="Automated tests" onBack={onBack} onClose={onClose} />
-
-      <div className="flex flex-col gap-[12px] shrink-0">
-        <div className="flex gap-[12px]">
-          <button
-            onClick={handleRunChecks}
-            disabled={isRunning}
-            className="bg-[#4784f8] text-white font-['Lato',sans-serif] font-bold text-[14px] px-[20px] py-[10px] rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isRunning ? 'Running...' : 'Run self-checks'}
-          </button>
-          
-          <button
-            onClick={handleCopyResults}
-            disabled={!report}
-            className="bg-[#4784f8] text-white font-['Lato',sans-serif] font-bold text-[14px] px-[20px] py-[10px] rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {copyStatus === 'copied' ? 'Copied!' : 'Copy results'}
-          </button>
-
-          <button
-            onClick={handleReset}
-            disabled={!report}
-            className="bg-[#6b7280] text-white font-['Lato',sans-serif] font-bold text-[14px] px-[20px] py-[10px] rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Reset
-          </button>
-        </div>
-      </div>
-
-      {report && (
-        <div className="flex flex-col gap-[8px] flex-1 min-h-0">
-          <div className="font-['Lato',sans-serif] text-[14px] text-[#1C2C42] shrink-0">
-            <span className="font-bold">Run invocation id: {report.runId}</span>
-            {' | '}
-            <span className="font-bold">Passed: {report.passCount}</span>
-            {' | '}
-            <span className="font-bold">Failed: {report.failCount}</span>
-            {' | '}
-            <span className="font-bold">Duration: {report.durationMs}ms</span>
-          </div>
-          
-          <div className="flex flex-col gap-[4px] flex-1 overflow-y-auto min-h-0">
-            {(() => {
-              const grouped = groupResultsBySection(report.results);
-              if (grouped.hasAnySections) {
-                return grouped.sections.map((section) => (
-                  <div key={section.sectionName || 'unsectioned'} className="flex flex-col gap-[4px]">
-                    {section.sectionName !== '' && (
-                      <div className="font-['Lato',sans-serif] text-[14px] text-[#1C2C42] font-bold mt-[8px] mb-[4px]">
-                        {section.sectionName}
-                      </div>
-                    )}
-                    {section.results.map((result) => (
-                      <div
-                        key={result.id}
-                        className={`flex flex-col gap-[4px] p-[8px] rounded-[4px] ${
-                          result.passed ? 'bg-[#e8f5e9]' : 'bg-[#ffebee]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-[8px]">
-                          <span className="font-['Lato',sans-serif] text-[16px]">
-                            {result.passed ? '✓' : '✗'}
-                          </span>
-                          <span className="font-['Lato',sans-serif] text-[14px] text-[#1C2C42]">
-                            {result.name.replace(/^\[.+?\] /, '')}
-                          </span>
-                        </div>
-                        {result.error && (
-                          <div className="font-['Lato',sans-serif] text-[12px] text-[#c62828] ml-[24px]">
-                            {result.error}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ));
-              } else {
-                return report.results.map((result) => (
-                  <div
-                    key={result.id}
-                    className={`flex flex-col gap-[4px] p-[8px] rounded-[4px] ${
-                      result.passed ? 'bg-[#e8f5e9]' : 'bg-[#ffebee]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-[8px]">
-                      <span className="font-['Lato',sans-serif] text-[16px]">
-                        {result.passed ? '✓' : '✗'}
-                      </span>
-                      <span className="font-['Lato',sans-serif] text-[14px] text-[#1C2C42]">
-                        {result.name}
-                      </span>
-                    </div>
-                    {result.error && (
-                      <div className="font-['Lato',sans-serif] text-[12px] text-[#c62828] ml-[24px]">
-                        {result.error}
-                      </div>
-                    )}
-                  </div>
-                ));
-              }
-            })()}
-          </div>
-
-          {/* Hidden textarea for copy fallback */}
-          <textarea
-            ref={textAreaRef}
-            value={formatReportAsText(report)}
-            readOnly
-            className="absolute opacity-0 pointer-events-none"
-            style={{ top: -9999, left: -9999 }}
-            aria-hidden="true"
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function TestDataPage({ onBack, onClose, onNavigateReminders, onNavigateLists }: { onBack: () => void; onClose: () => void; onNavigateReminders: () => void; onNavigateLists: () => void }) {
-  return (
-    <div className="flex flex-col h-full relative w-full" data-name="test-data-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Test data" onBack={onBack} onClose={onClose} />
-          <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
-            <div />
-            <button
-              onClick={onNavigateReminders}
-              className="h-[60px] relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="flex flex-row items-center size-full">
-                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
-                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                      <p className="leading-[normal] truncate">Dummy reminders</p>
-                    </div>
-                    <div className="flex items-center justify-center relative shrink-0">
-                      <div className="-scale-y-100 flex-none rotate-180">
-                        <div className="h-[13px] relative w-[7px]">
-                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
-                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={onNavigateLists}
-              className="h-[60px] relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="flex flex-row items-center size-full">
-                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
-                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                      <p className="leading-[normal] truncate">Dummy lists</p>
-                    </div>
-                    <div className="flex items-center justify-center relative shrink-0">
-                      <div className="-scale-y-100 flex-none rotate-180">
-                        <div className="h-[13px] relative w-[7px]">
-                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
-                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </button>
-            <div />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function NlcToggleRow({ label, isOn, onClick, disabled = false }: { label: string; isOn: boolean; onClick: () => void; disabled?: boolean }) {
-  const activeColor = disabled ? '#C9C9C9' : (isOn ? '#1C2C42' : '#C9C9C9');
-  const trackColor = disabled ? '#E4E4E4' : (isOn ? '#4784f8' : '#C9C9C9');
-  return (
-    <button
-      onClick={disabled ? undefined : onClick}
-      className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full"
-      style={{ cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.45 : 1 }}
-    >
-      <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: activeColor }}>{label}</p>
-      <div
-        className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors`}
-        style={{ backgroundColor: trackColor, justifyContent: isOn && !disabled ? 'flex-end' : 'flex-start' }}
-      >
-        <div className="relative shrink-0 size-[22.5px]">
-          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-            <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-          </svg>
-        </div>
-      </div>
-    </button>
-  );
-}
-
-function NlcPage({ onBack, onClose, nlcMode, onNlcModeChange, recognition, onRecognitionChange }: { onBack: () => void; onClose: () => void; nlcMode: NlcMode; onNlcModeChange: (mode: NlcMode) => void; recognition: NlcRecognitionConfig; onRecognitionChange: (config: NlcRecognitionConfig) => void }) {
-  return (
-    <div className="flex flex-col h-full relative w-full" data-name="nlc-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Natural Language Capture" onBack={onBack} onClose={onClose} />
-
-          {/* NLC Mode toggles */}
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            {/* Auto-parsing toggle */}
-            <button
-              onClick={() => onNlcModeChange('auto')}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="h-[21.5px] relative shrink-0 w-[24px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 21.5002">
-                    <g>
-                      <path clipRule="evenodd" d={nlcTogglePaths.pa3f6300} fill={nlcMode === 'auto' ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                      <path clipRule="evenodd" d={nlcTogglePaths.p299691f0} fill={nlcMode === 'auto' ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                      <path clipRule="evenodd" d={nlcTogglePaths.p16049180} fill={nlcMode === 'auto' ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                    </g>
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: nlcMode === 'auto' ? '#1C2C42' : '#C9C9C9' }}>Auto-parsing</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${nlcMode === 'auto' ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-
-            {/* Click-parsing toggle */}
-            <button
-              onClick={() => onNlcModeChange('click')}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="relative shrink-0 size-[24px]" data-name="click-icon">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24.0003">
-                    <g>
-                      <path clipRule="evenodd" d={nlcTogglePaths.p11e6a80} fill={nlcMode === 'click' ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                      <path d={nlcTogglePaths.p30203000} fill={nlcMode === 'click' ? '#1C2C42' : '#C9C9C9'} />
-                      <path d={nlcTogglePaths.p2738c500} fill={nlcMode === 'click' ? '#1C2C42' : '#C9C9C9'} />
-                      <path d={nlcTogglePaths.p1012d780} fill={nlcMode === 'click' ? '#1C2C42' : '#C9C9C9'} />
-                      <path d={nlcTogglePaths.p6124c70} fill={nlcMode === 'click' ? '#1C2C42' : '#C9C9C9'} />
-                      <path d={nlcTogglePaths.p32aaa280} fill={nlcMode === 'click' ? '#1C2C42' : '#C9C9C9'} />
-                      <path d={nlcTogglePaths.p35ba42f2} fill={nlcMode === 'click' ? '#1C2C42' : '#C9C9C9'} />
-                      <path d={nlcTogglePaths.pa3ccb80} fill={nlcMode === 'click' ? '#1C2C42' : '#C9C9C9'} />
-                    </g>
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: nlcMode === 'click' ? '#1C2C42' : '#C9C9C9' }}>Click-parsing</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${nlcMode === 'click' ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          {/* Separator */}
-          <div className="w-full h-[1px] bg-[#D9D9D9]" />
-
-          {/* Recognition toggles */}
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            <NlcToggleRow label="Date recognition" isOn={recognition.date} onClick={() => onRecognitionChange({ ...recognition, date: !recognition.date })} />
-            <NlcToggleRow label="Time recognition" isOn={recognition.time} onClick={() => onRecognitionChange({ ...recognition, time: !recognition.time })} />
-            <NlcToggleRow label="Repeats recognition" isOn={recognition.repeats} onClick={() => onRecognitionChange({ ...recognition, repeats: !recognition.repeats })} />
-            <NlcToggleRow label="Phone number recognition" isOn={false} onClick={() => {}} disabled />
-            <NlcToggleRow label="Contact recognition" isOn={false} onClick={() => {}} disabled />
-          </div>
-
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVariantChange, isListsEnabled }: { onBack: () => void; onClose: () => void; filtersMenuVariant: FiltersMenuVariant; onFiltersMenuVariantChange: (variant: FiltersMenuVariant) => void; isListsEnabled: boolean }) {
   const displayVariant = isListsEnabled ? 'standard' : filtersMenuVariant;
   return (
@@ -488,79 +139,6 @@ function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVar
         <ToggleRow label="Grouped filters" isOn={displayVariant === 'grouped'} onToggle={() => onFiltersMenuVariantChange('grouped')} />
       </div>
     </PageShell>
-  );
-}
-
-function OnboardingTutorialPage({ onBack, onClose, showTutorialOnFirstLaunch, onShowTutorialOnFirstLaunchChange, showTutorialOnEveryStart, onShowTutorialOnEveryStartChange }: { onBack: () => void; onClose: () => void; showTutorialOnFirstLaunch: boolean; onShowTutorialOnFirstLaunchChange: (value: boolean) => void; showTutorialOnEveryStart: boolean; onShowTutorialOnEveryStartChange: (value: boolean) => void }) {
-  return (
-    <div className="flex flex-col h-full relative w-full" data-name="onboarding-tutorial-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Onboarding tutorial" onBack={onBack} onClose={onClose} />
-
-          {/* Show tutorial on first launch toggle */}
-          <button
-            onClick={() => { const next = !showTutorialOnFirstLaunch; onShowTutorialOnFirstLaunchChange(next); if (next) onShowTutorialOnEveryStartChange(false); }}
-            className="content-stretch flex h-[40px] items-center justify-between gap-[20px] relative shrink-0 w-full cursor-pointer"
-          >
-            <div className="content-stretch flex gap-[16px] items-center relative min-w-0 flex-1">
-              <div className="h-[21.75px] relative shrink-0 w-[21.75px]">
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 21.7502 21.75">
-                  <g>
-                    <path d={firstLaunchIconPaths.p6ee0680} fill={showTutorialOnFirstLaunch ? '#1C2C42' : '#C9C9C9'} />
-                    <path d={firstLaunchIconPaths.p1bcb00} fill={showTutorialOnFirstLaunch ? '#1C2C42' : '#C9C9C9'} />
-                    <path d={firstLaunchIconPaths.p3f2c8a80} fill={showTutorialOnFirstLaunch ? '#1C2C42' : '#C9C9C9'} />
-                    <path clipRule="evenodd" d={firstLaunchIconPaths.p12360180} fill={showTutorialOnFirstLaunch ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                    <path d={firstLaunchIconPaths.p1ec41300} fill={showTutorialOnFirstLaunch ? '#1C2C42' : '#C9C9C9'} />
-                  </g>
-                </svg>
-              </div>
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] truncate" style={{ color: showTutorialOnFirstLaunch ? '#1C2C42' : '#C9C9C9' }}>Show tutorial on first launch</p>
-            </div>
-            <div
-              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${showTutorialOnFirstLaunch ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-            >
-              <div className="relative shrink-0 size-[22.5px]">
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                  <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                </svg>
-              </div>
-            </div>
-          </button>
-
-          {/* Show tutorial on every app start toggle */}
-          <button
-            onClick={() => { const next = !showTutorialOnEveryStart; onShowTutorialOnEveryStartChange(next); if (next) onShowTutorialOnFirstLaunchChange(false); }}
-            className="content-stretch flex h-[40px] items-center justify-between gap-[20px] relative shrink-0 w-full cursor-pointer"
-          >
-            <div className="content-stretch flex gap-[16px] items-center relative min-w-0 flex-1">
-              <div className="h-[21.75px] relative shrink-0 w-[26.605px]">
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 26.6054 21.7499">
-                  <g>
-                    <path d={everyStartIconPaths.p399d1980} fill={showTutorialOnEveryStart ? '#1C2C42' : '#C9C9C9'} />
-                    <path d={everyStartIconPaths.p1a246800} fill={showTutorialOnEveryStart ? '#1C2C42' : '#C9C9C9'} />
-                    <path d={everyStartIconPaths.pd0d1180} fill={showTutorialOnEveryStart ? '#1C2C42' : '#C9C9C9'} />
-                    <path d={everyStartIconPaths.p222e6c80} fill={showTutorialOnEveryStart ? '#1C2C42' : '#C9C9C9'} />
-                    <path clipRule="evenodd" d={everyStartIconPaths.p3c26b000} fill={showTutorialOnEveryStart ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                    <path d={everyStartIconPaths.p32b75700} fill={showTutorialOnEveryStart ? '#1C2C42' : '#C9C9C9'} />
-                  </g>
-                </svg>
-              </div>
-              <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] truncate" style={{ color: showTutorialOnEveryStart ? '#1C2C42' : '#C9C9C9' }}>Show tutorial on every app start</p>
-            </div>
-            <div
-              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${showTutorialOnEveryStart ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-            >
-              <div className="relative shrink-0 size-[22.5px]">
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                  <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                </svg>
-              </div>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -645,80 +223,6 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
   );
 }
 
-function ReminderSettingsPage({ onBack, onClose, useOneMinuteIncrements, onUseOneMinuteIncrementsChange }: { onBack: () => void; onClose: () => void; useOneMinuteIncrements: boolean; onUseOneMinuteIncrementsChange: (value: boolean) => void }) {
-  return (
-    <div className="flex flex-col h-full relative w-full" data-name="reminder-settings-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Reminder settings" onBack={onBack} onClose={onClose} />
-
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            <button
-              onClick={() => onUseOneMinuteIncrementsChange(!useOneMinuteIncrements)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <p
-                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
-                  style={{ color: useOneMinuteIncrements ? '#1C2C42' : '#C9C9C9' }}
-                >
-                  Display 1 minute time increments
-                </p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${useOneMinuteIncrements ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ListSettingsPage({ onBack, onClose, useDefaultTemplatesInCleanState, onUseDefaultTemplatesInCleanStateChange }: { onBack: () => void; onClose: () => void; useDefaultTemplatesInCleanState: boolean; onUseDefaultTemplatesInCleanStateChange: (value: boolean) => void }) {
-  return (
-    <div className="flex flex-col h-full relative w-full" data-name="list-settings-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="List settings" onBack={onBack} onClose={onClose} />
-
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            <button
-              onClick={() => onUseDefaultTemplatesInCleanStateChange(!useDefaultTemplatesInCleanState)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <p
-                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
-                  style={{ color: useDefaultTemplatesInCleanState ? '#1C2C42' : '#C9C9C9' }}
-                >
-                  Use default templates in clean state
-                </p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${useDefaultTemplatesInCleanState ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnabledChange, settingsMenuEnabled, onSettingsMenuEnabledChange, onNavigateFiltersMenu, onNavigateDevToolsPassword }: { onBack: () => void; onClose: () => void; siriShortcutsEnabled: boolean; onSiriShortcutsEnabledChange: (value: boolean) => void; settingsMenuEnabled: boolean; onSettingsMenuEnabledChange: (value: boolean) => void; onNavigateFiltersMenu: () => void; onNavigateDevToolsPassword: () => void }) {
   return (
     <PageShell title="System" onBack={onBack} onClose={onClose}>
@@ -744,6 +248,7 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
         <SectionSubtitle text="Features" />
         <ToggleRow label="Date recognition" isOn={recognition.date} onToggle={() => onRecognitionChange({ ...recognition, date: !recognition.date })} />
         <ToggleRow label="Time recognition" isOn={recognition.time} onToggle={() => onRecognitionChange({ ...recognition, time: !recognition.time })} />
+        <ToggleRow label="Repeats recognition" isOn={recognition.repeats} onToggle={() => onRecognitionChange({ ...recognition, repeats: !recognition.repeats })} />
         <ToggleRow label="Phone number recognition" isOn={false} onToggle={() => {}} disabled />
         <ToggleRow label="Contact recognition" isOn={false} onToggle={() => {}} disabled />
         <KeyLine />
@@ -886,88 +391,6 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
         </>
       )}
     </>
-  );
-}
-
-function NotificationsSettingsPage({ onBack, onClose, reminderAlerts, onReminderAlertsChange, appBadge, onAppBadgeChange, includeTodayInBadge, onIncludeTodayInBadgeChange }: { onBack: () => void; onClose: () => void; reminderAlerts: boolean; onReminderAlertsChange: (value: boolean) => void; appBadge: boolean; onAppBadgeChange: (value: boolean) => void; includeTodayInBadge: boolean; onIncludeTodayInBadgeChange: (value: boolean) => void }) {
-  return (
-    <div className="flex flex-col h-full relative w-full" data-name="notifications-settings-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Notifications" onBack={onBack} onClose={onClose} />
-
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            <button
-              onClick={() => onReminderAlertsChange(!reminderAlerts)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <p
-                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
-                  style={{ color: reminderAlerts ? '#1C2C42' : '#C9C9C9' }}
-                >
-                  Reminder alerts
-                </p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${reminderAlerts ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => onAppBadgeChange(!appBadge)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <p
-                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
-                  style={{ color: appBadge ? '#1C2C42' : '#C9C9C9' }}
-                >
-                  App badge
-                </p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${appBadge ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={appBadge ? () => onIncludeTodayInBadgeChange(!includeTodayInBadge) : undefined}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full"
-              style={{ cursor: appBadge ? 'pointer' : 'default', opacity: appBadge ? 1 : 0.45 }}
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <p
-                  className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic relative shrink-0 text-[17px] whitespace-nowrap"
-                  style={{ color: appBadge && includeTodayInBadge ? '#1C2C42' : '#C9C9C9' }}
-                >
-                  Include today in badge count
-                </p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${appBadge && includeTodayInBadge ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -1248,97 +671,6 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
   );
 }
 
-function ListsPage({ onBack, onClose, smartRemindersEnabled, onSmartRemindersEnabledChange, savedListsEnabled, onSavedListsEnabledChange, pinnedListsEnabled, onPinnedListsEnabledChange }: { onBack: () => void; onClose: () => void; smartRemindersEnabled: boolean; onSmartRemindersEnabledChange: (value: boolean) => void; savedListsEnabled: boolean; onSavedListsEnabledChange: (value: boolean) => void; pinnedListsEnabled: boolean; onPinnedListsEnabledChange: (value: boolean) => void }) {
-  return (
-    <div className="flex flex-col h-full relative w-full" data-name="lists-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Lists" onBack={onBack} onClose={onClose} />
-          <div className="content-stretch flex flex-col gap-[20px] items-start relative w-full">
-            <button
-              onClick={() => onSmartRemindersEnabledChange(!smartRemindersEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="h-[21.5px] relative shrink-0 w-[24px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 21.5002">
-                    <g>
-                      <path clipRule="evenodd" d={nlcTogglePaths.pa3f6300} fill={smartRemindersEnabled ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                      <path clipRule="evenodd" d={nlcTogglePaths.p299691f0} fill={smartRemindersEnabled ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                      <path clipRule="evenodd" d={nlcTogglePaths.p16049180} fill={smartRemindersEnabled ? '#1C2C42' : '#C9C9C9'} fillRule="evenodd" />
-                    </g>
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: smartRemindersEnabled ? '#1C2C42' : '#C9C9C9' }}>Smart reminders</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${smartRemindersEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => onSavedListsEnabledChange(!savedListsEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="h-[20px] relative shrink-0 w-[20px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 20 20">
-                    <path d="M14.4152 18.1609C14.854 18.1609 15.2098 18.5167 15.2098 18.9555C15.2098 19.3943 14.854 19.75 14.4152 19.75H11.6911C11.2523 19.75 10.8966 19.3943 10.8966 18.9555C10.8966 18.5167 11.2523 18.1609 11.6911 18.1609H14.4152Z" fill={savedListsEnabled ? '#1C2C42' : '#C9C9C9'} />
-                    <path d="M6.99479 16.3608C7.42491 16.2746 7.84305 16.5532 7.92944 16.9833C8.01327 17.4004 8.14468 17.6113 8.34179 17.7734C8.55972 17.9527 8.88081 18.0883 9.48837 18.168C9.92328 18.2251 10.2297 18.6234 10.173 19.0583C10.1159 19.4934 9.71684 19.8 9.28176 19.7429C8.53098 19.6445 7.87526 19.4462 7.33265 18.9998C6.78118 18.5461 6.50747 17.9685 6.37229 17.2954C6.28606 16.8653 6.56467 16.4472 6.99479 16.3608Z" fill={savedListsEnabled ? '#1C2C42' : '#C9C9C9'} />
-                    <path d="M18.1769 16.9833C18.2633 16.5532 18.6814 16.2746 19.1115 16.3608C19.5417 16.4472 19.8203 16.8653 19.734 17.2954C19.5989 17.9685 19.3251 18.5461 18.7737 18.9998C18.2311 19.4462 17.5753 19.6445 16.8246 19.7429C16.3895 19.8 15.9904 19.4934 15.9334 19.0583C15.8766 18.6234 16.183 18.2251 16.618 18.168C17.2255 18.0883 17.5466 17.9527 17.7645 17.7734C17.9616 17.6113 18.0931 17.4004 18.1769 16.9833Z" fill={savedListsEnabled ? '#1C2C42' : '#C9C9C9'} />
-                    <path d="M7.60489 1.44977e-06C9.07801 1.55801e-06 10.2527 -0.00166324 11.1821 0.108187C12.129 0.220112 12.9241 0.457041 13.5914 1.0047C13.8156 1.18865 14.0211 1.3942 14.2051 1.61835C14.724 2.2507 14.964 2.99778 15.083 3.88048C15.1995 4.74551 15.2087 5.82103 15.2098 7.14998C15.2098 7.38362 15.1078 7.59341 14.9473 7.73879C14.926 7.75812 14.9041 7.77682 14.8808 7.79377C14.7912 7.85875 14.6881 7.90641 14.5757 7.92944C14.5242 7.94003 14.4708 7.94534 14.4161 7.9454L14.4152 7.94452L11.6911 7.9454C11.2523 7.9454 10.8966 7.58968 10.8966 7.15086C10.8966 6.71205 11.2523 6.35632 11.6911 6.35632H13.6171C13.6101 5.40556 13.587 4.67936 13.5081 4.0933C13.4108 3.37144 13.2394 2.94651 12.9769 2.6266C12.859 2.48291 12.7269 2.35079 12.5832 2.23287C12.246 1.9562 11.7924 1.78081 10.9959 1.68663C10.1815 1.59036 9.11694 1.58908 7.60489 1.58908C6.09283 1.58908 5.0283 1.59036 4.2139 1.68663C3.4174 1.78081 2.96381 1.9562 2.6266 2.23287C2.48291 2.35079 2.35079 2.48291 2.23287 2.6266C1.9562 2.96381 1.78081 3.4174 1.68663 4.2139C1.59036 5.0283 1.58908 6.09283 1.58908 7.60489C1.58908 9.11694 1.59036 10.1815 1.68663 10.9959C1.78081 11.7924 1.9562 12.246 2.23287 12.5832C2.35079 12.7269 2.48291 12.859 2.6266 12.9769C2.94651 13.2394 3.37144 13.4108 4.0933 13.5081C4.67936 13.587 5.40556 13.6092 6.35632 13.6163V11.6911C6.35632 11.2523 6.71205 10.8966 7.15086 10.8966C7.58968 10.8966 7.9454 11.2523 7.9454 11.6911V14.4152C7.9454 14.5523 7.91075 14.6813 7.84963 14.7939C7.81927 14.8498 7.78115 14.9005 7.73879 14.9473C7.7146 14.974 7.68922 14.9994 7.66164 15.0227C7.65471 15.0285 7.64748 15.0339 7.64036 15.0395C7.50532 15.1455 7.33587 15.2098 7.15086 15.2098L7.14998 15.2089C5.82102 15.2078 4.74552 15.1995 3.88048 15.083C2.99778 14.964 2.2507 14.724 1.61835 14.2051C1.3942 14.0211 1.18865 13.8156 1.0047 13.5914C0.457041 12.9241 0.220112 12.129 0.108187 11.1821C-0.00166323 10.2527 1.34081e-06 9.07801 1.44956e-06 7.60489C1.55651e-06 6.13177 -0.00166326 4.95702 0.108187 4.02768C0.220112 3.0808 0.457041 2.28568 1.0047 1.61835C1.18865 1.3942 1.3942 1.18865 1.61835 1.0047C2.28568 0.457041 3.0808 0.220112 4.02768 0.108187C4.95703 -0.00166331 6.13177 1.34101e-06 7.60489 1.44977e-06Z" fill={savedListsEnabled ? '#1C2C42' : '#C9C9C9'} />
-                    <path d="M18.9555 10.8966C19.3943 10.8966 19.75 11.2523 19.75 11.6911V14.4152C19.75 14.854 19.3943 15.2098 18.9555 15.2098C18.5167 15.2098 18.1609 14.854 18.1609 14.4152V11.6911C18.1609 11.2523 18.5167 10.8966 18.9555 10.8966Z" fill={savedListsEnabled ? '#1C2C42' : '#C9C9C9'} />
-                    <path d="M9.28176 6.36342C9.71684 6.30636 10.1159 6.61291 10.173 7.048C10.2297 7.48289 9.92328 7.88125 9.48837 7.93831C8.88081 8.01798 8.55973 8.15367 8.34179 8.33292C8.14468 8.49507 8.01327 8.7059 7.92944 9.12303C7.84305 9.55315 7.42491 9.83176 6.99479 9.74553C6.56467 9.65914 6.28606 9.241 6.37229 8.81089C6.50747 8.13783 6.78118 7.56022 7.33265 7.10653C7.87526 6.66015 8.53099 6.46187 9.28176 6.36342Z" fill={savedListsEnabled ? '#1C2C42' : '#C9C9C9'} />
-                    <path d="M16.8246 6.36342C17.5753 6.46187 18.2311 6.66015 18.7737 7.10653C19.3251 7.56022 19.5989 8.13783 19.734 8.81089C19.8203 9.241 19.5417 9.65914 19.1115 9.74553C18.6814 9.83176 18.2633 9.55315 18.1769 9.12303C18.0931 8.7059 17.9616 8.49507 17.7645 8.33292C17.5466 8.15367 17.2255 8.01798 16.618 7.93831C16.183 7.88125 15.8766 7.48289 15.9334 7.048C15.9904 6.61291 16.3895 6.30636 16.8246 6.36342Z" fill={savedListsEnabled ? '#1C2C42' : '#C9C9C9'} />
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: savedListsEnabled ? '#1C2C42' : '#C9C9C9' }}>List templates</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${savedListsEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => onPinnedListsEnabledChange(!pinnedListsEnabled)}
-              className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
-                <div className="h-[20px] relative shrink-0 w-[20px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="xMidYMid meet" viewBox="0 0 22 22">
-                    <path d="M1 21L6.55436 15.4446" stroke={pinnedListsEnabled ? '#1C2C42' : '#C9C9C9'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M12.3967 18.6345C8.23842 17.6902 4.30958 13.7606 3.36544 9.6015C3.21598 8.94311 3.14125 8.61392 3.35775 8.07983C3.57424 7.54575 3.83871 7.38049 4.36764 7.04998C5.56332 6.30284 6.85803 6.06532 8.20168 6.18419C10.0871 6.35098 11.0298 6.43438 11.5 6.18932C11.9703 5.94425 12.2899 5.37122 12.929 4.22515L13.7386 2.77334C14.272 1.81696 14.5386 1.33877 15.1659 1.11335C15.7932 0.887927 16.1708 1.02444 16.9258 1.29745C18.6915 1.93593 20.0608 3.30556 20.6992 5.07157C20.9722 5.82676 21.1087 6.20435 20.8833 6.83178C20.6579 7.4592 20.1798 7.72593 19.2236 8.25939L17.7386 9.08783C16.5949 9.72587 16.0231 10.0449 15.7782 10.5198C15.5332 10.9948 15.6222 11.9171 15.8001 13.7618C15.9309 15.1184 15.7054 16.4219 14.9484 17.6326C14.6177 18.1617 14.4523 18.4262 13.9184 18.6425C13.3846 18.8588 13.0553 18.7841 12.3967 18.6345Z" stroke={pinnedListsEnabled ? '#1C2C42' : '#C9C9C9'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: pinnedListsEnabled ? '#1C2C42' : '#C9C9C9' }}>Pinned lists</p>
-              </div>
-              <div
-                className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${pinnedListsEnabled ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
-              >
-                <div className="relative shrink-0 size-[22.5px]">
-                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
-                    <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
-                  </svg>
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function LoginScreen({ onUnlock, passwordRequired }: { onUnlock: () => void; passwordRequired: boolean }) {
   const [password, setPassword] = useState('');
   const [showError, setShowError] = useState(false);
@@ -1525,15 +857,6 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     content = (
       <RemindersPage onBack={() => setPage('home')} onClose={onClose} useOneMinuteIncrements={useOneMinuteIncrements} onUseOneMinuteIncrementsChange={onUseOneMinuteIncrementsChange} onNavigateDummyReminders={() => setPage('dummy-reminders')} />
     );
-  } else if (page === 'test-data') {
-    content = (
-      <TestDataPage
-        onBack={() => setPage('testing')}
-        onClose={onClose}
-        onNavigateReminders={() => setPage('reminders')}
-        onNavigateLists={() => setPage('lists')}
-      />
-    );
   } else if (page === 'dummy-reminders') {
     content = (
       <DummyRemindersPage onBack={() => setPage('reminders')} onClose={onClose} addReminders={addReminders} hideOverdue={hideOverdue} onHideOverdueChange={onHideOverdueChange} onClearReminders={onClearReminders} />
@@ -1550,10 +873,6 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     content = (
       <NaturalLanguagePage onBack={() => setPage('home')} onClose={onClose} nlcEnabled={nlcEnabled} onNlcEnabledChange={onNlcEnabledChange} nlcMode={nlcMode} onNlcModeChange={onNlcModeChange} recognition={nlcRecognition} onRecognitionChange={onNlcRecognitionChange} />
     );
-  } else if (page === 'nlc') {
-    content = (
-      <NlcPage onBack={() => setPage('natural-language')} onClose={onClose} nlcMode={nlcMode} onNlcModeChange={onNlcModeChange} recognition={nlcRecognition} onRecognitionChange={onNlcRecognitionChange} />
-    );
   } else if (page === 'filters-menu') {
     content = (
       <FiltersMenuPage onBack={() => setPage('system')} onClose={onClose} filtersMenuVariant={filtersMenuVariant} onFiltersMenuVariantChange={onFiltersMenuVariantChange} isListsEnabled={isListsEnabled} />
@@ -1561,10 +880,6 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
   } else if (page === 'onboarding') {
     content = (
       <OnboardingPage onBack={() => setPage('home')} onClose={onClose} isOnboardingTutorialEnabled={isOnboardingTutorialEnabled} onOnboardingTutorialEnabledChange={onOnboardingTutorialEnabledChange} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={onShowTutorialOnFirstLaunchChange} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={onShowTutorialOnEveryStartChange} />
-    );
-  } else if (page === 'onboarding-tutorial') {
-    content = (
-      <OnboardingTutorialPage onBack={() => setPage('onboarding')} onClose={onClose} showTutorialOnFirstLaunch={showTutorialOnFirstLaunch} onShowTutorialOnFirstLaunchChange={onShowTutorialOnFirstLaunchChange} showTutorialOnEveryStart={showTutorialOnEveryStart} onShowTutorialOnEveryStartChange={onShowTutorialOnEveryStartChange} />
     );
   } else if (page === 'system') {
     content = (
@@ -1574,31 +889,9 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     content = (
       <DevToolsPasswordPage onBack={() => setPage('system')} onClose={onClose} passwordRequired={isDevToolsPasswordRequired} onPasswordRequiredChange={onDevToolsPasswordRequiredChange} />
     );
-  } else if (page === 'reminder-settings') {
-    content = (
-      <ReminderSettingsPage onBack={() => setPage('reminders')} onClose={onClose} useOneMinuteIncrements={useOneMinuteIncrements} onUseOneMinuteIncrementsChange={onUseOneMinuteIncrementsChange} />
-    );
-  } else if (page === 'list-settings') {
-    content = (
-      <ListSettingsPage onBack={() => setPage('lists')} onClose={onClose} useDefaultTemplatesInCleanState={useDefaultTemplatesInCleanState} onUseDefaultTemplatesInCleanStateChange={onUseDefaultTemplatesInCleanStateChange} />
-    );
-  } else if (page === 'paywall') {
-    content = (
-      <ListsPage onBack={() => setPage('lists')} onClose={onClose} smartRemindersEnabled={smartRemindersEnabled} onSmartRemindersEnabledChange={onSmartRemindersEnabledChange} savedListsEnabled={savedListsEnabled} onSavedListsEnabledChange={onSavedListsEnabledChange} pinnedListsEnabled={pinnedListsEnabled} onPinnedListsEnabledChange={onPinnedListsEnabledChange} />
-    );
   } else if (page === 'notifications-area') {
     content = (
       <NotificationsAreaPage onBack={() => setPage('home')} onClose={onClose} reminderAlerts={notifReminderAlerts} onReminderAlertsChange={onNotifReminderAlertsChange} appBadge={notifAppBadge} onAppBadgeChange={onNotifAppBadgeChange} includeTodayInBadge={notifIncludeTodayInBadge} onIncludeTodayInBadgeChange={onNotifIncludeTodayInBadgeChange} />
-    );
-  } else if (page === 'notifications') {
-    content = (
-      <NotificationsSettingsPage onBack={() => setPage('notifications-area')} onClose={onClose} reminderAlerts={notifReminderAlerts} onReminderAlertsChange={onNotifReminderAlertsChange} appBadge={notifAppBadge} onAppBadgeChange={onNotifAppBadgeChange} includeTodayInBadge={notifIncludeTodayInBadge} onIncludeTodayInBadgeChange={onNotifIncludeTodayInBadgeChange} />
-    );
-  } else {
-    content = (
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <SelfChecks onBack={() => setPage('testing')} onClose={onClose} />
-      </div>
     );
   }
 
