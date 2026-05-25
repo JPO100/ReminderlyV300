@@ -1236,43 +1236,18 @@ function NotificationsSettingsPage({ onBack, onClose, reminderAlerts, onReminder
   );
 }
 
-function NotificationsAreaPage({ onBack, onClose, onNavigateNotificationSettings }: { onBack: () => void; onClose: () => void; onNavigateNotificationSettings: () => void }) {
+function NotificationsAreaPage({ onBack, onClose, reminderAlerts, onReminderAlertsChange, appBadge, onAppBadgeChange, includeTodayInBadge, onIncludeTodayInBadgeChange }: { onBack: () => void; onClose: () => void; reminderAlerts: boolean; onReminderAlertsChange: (value: boolean) => void; appBadge: boolean; onAppBadgeChange: (value: boolean) => void; includeTodayInBadge: boolean; onIncludeTodayInBadgeChange: (value: boolean) => void }) {
   return (
-    <div className="flex flex-col h-full relative w-full" data-name="notifications-area-page">
-      <div className="flex flex-col gap-[32px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0">
-        <div className="flex flex-col gap-[30px] w-full flex-1 min-h-0">
-          <BackHeader title="Notifications" onBack={onBack} onClose={onClose} />
-
-          <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
-            <div />
-            <button
-              onClick={onNavigateNotificationSettings}
-              className="h-[60px] relative shrink-0 w-full cursor-pointer"
-            >
-              <div className="flex flex-row items-center size-full">
-                <div className="content-stretch flex items-center pr-[30px] py-[15px] relative size-full">
-                  <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
-                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[#1C2C42] text-[17px] whitespace-nowrap">
-                      <p className="leading-[normal] truncate">Notification settings</p>
-                    </div>
-                    <div className="flex items-center justify-center relative shrink-0">
-                      <div className="-scale-y-100 flex-none rotate-180">
-                        <div className="h-[13px] relative w-[7px]">
-                          <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
-                            <path d={svgPathsDummy.p1b692f00} fill="#939393" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </button>
-            <div />
-          </div>
-        </div>
-      </div>
-    </div>
+    <PageShell title="Notifications" onBack={onBack} onClose={onClose}>
+      <ToggleRow label="Enable notifications" isOn={true} onToggle={() => {}} />
+      <KeyLine />
+      <SectionSubtitle text="Features" />
+      <ToggleRow label="Reminder system notifications" isOn={reminderAlerts} onToggle={() => onReminderAlertsChange(!reminderAlerts)} />
+      <ToggleRow label="Reminder app badge notifications" isOn={appBadge} onToggle={() => onAppBadgeChange(!appBadge)} />
+      <KeyLine />
+      <SectionSubtitle text="Settings" />
+      <ToggleRow label="Include today in app badge count" isOn={appBadge && includeTodayInBadge} onToggle={() => onIncludeTodayInBadgeChange(!includeTodayInBadge)} disabled={!appBadge} />
+    </PageShell>
   );
 }
 
@@ -1780,7 +1755,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'notifications-area') {
     content = (
-      <NotificationsAreaPage onBack={() => setPage('home')} onClose={onClose} onNavigateNotificationSettings={() => setPage('notifications')} />
+      <NotificationsAreaPage onBack={() => setPage('home')} onClose={onClose} reminderAlerts={notifReminderAlerts} onReminderAlertsChange={onNotifReminderAlertsChange} appBadge={notifAppBadge} onAppBadgeChange={onNotifAppBadgeChange} includeTodayInBadge={notifIncludeTodayInBadge} onIncludeTodayInBadgeChange={onNotifIncludeTodayInBadgeChange} />
     );
   } else if (page === 'notifications') {
     content = (
