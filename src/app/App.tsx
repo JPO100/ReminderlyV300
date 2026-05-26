@@ -3459,7 +3459,7 @@ export default function App() {
 
           {/* Filter buttons — hidden when Lists mode is active (rendered inside container instead) */}
           {!isListsEnabled && (
-          <div className="filters-menu flex items-center justify-between relative shrink-0 w-full">
+          <div className="filters-menu flex items-center justify-between relative shrink-0 w-full" style={{ marginTop: 2 }}>
             {viewMode === "done-deleted" ? (<div
               className="flex items-center justify-between w-full"
             >
