@@ -403,10 +403,12 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
 
 function NotificationsAreaPage({ onBack, onClose, reminderAlerts, onReminderAlertsChange, appBadge, onAppBadgeChange, includeTodayInBadge, onIncludeTodayInBadgeChange }: { onBack: () => void; onClose: () => void; reminderAlerts: boolean; onReminderAlertsChange: (value: boolean) => void; appBadge: boolean; onAppBadgeChange: (value: boolean) => void; includeTodayInBadge: boolean; onIncludeTodayInBadgeChange: (value: boolean) => void }) {
   const [enableNotifications, setEnableNotifications] = useState(true);
+  const [pendingNotificationsState, setPendingNotificationsState] = useState<boolean | null>(null);
 
   return (
+    <>
     <PageShell title="Notifications" onBack={onBack} onClose={onClose}>
-      <ToggleRow label="Enable notifications" isOn={enableNotifications} onToggle={() => setEnableNotifications(prev => !prev)} />
+      <ToggleRow label="Enable notifications" isOn={enableNotifications} onToggle={() => setPendingNotificationsState(!enableNotifications)} />
       <KeyLine />
       <SectionSubtitle text="Features" />
       <ToggleRow label="Reminder system notifications" isOn={reminderAlerts} onToggle={() => onReminderAlertsChange(!reminderAlerts)} disabled={!enableNotifications} />
@@ -415,6 +417,66 @@ function NotificationsAreaPage({ onBack, onClose, reminderAlerts, onReminderAler
       <SectionSubtitle text="Settings" />
       <ToggleRow label="Include today in app badge count" isOn={appBadge && includeTodayInBadge} onToggle={() => onIncludeTodayInBadgeChange(!includeTodayInBadge)} disabled={!enableNotifications || !appBadge} />
     </PageShell>
+      {pendingNotificationsState !== null && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-[60]"
+            onClick={() => setPendingNotificationsState(null)}
+          />
+          <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+            <div
+              className="bg-white relative flex flex-col gap-[35px] items-center py-[40px] px-[34px] rounded-[32px] pointer-events-auto"
+              style={{ width: 322 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">
+                  {pendingNotificationsState
+                    ? 'Turn on notifications?'
+                    : 'Turn off notifications?'}
+                </p>
+              </div>
+              <div className="flex flex-col font-['Lato:SemiBold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#939393] text-[17px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">
+                  {pendingNotificationsState
+                    ? 'The Notifications feature will be enabled, turning on access to system notifications, app badge, and badge count settings.'
+                    : 'The Notifications feature will be disabled, turning off access to system notifications, app badge, and badge count settings.'}
+                </p>
+              </div>
+              <div className="flex gap-[16px] w-full justify-between">
+                <button
+                  onClick={() => setPendingNotificationsState(null)}
+                  className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
+                  style={{ backgroundColor: '#BABABA' }}
+                >
+                  <div className="flex items-center justify-center size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Cancel</p>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    setEnableNotifications(pendingNotificationsState);
+                    setPendingNotificationsState(null);
+                  }}
+                  className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
+                  style={{ backgroundColor: '#4784F8' }}
+                >
+                  <div className="flex items-center justify-center size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">
+                        {pendingNotificationsState ? 'Yes, turn on' : 'Yes, turn off'}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
@@ -582,11 +644,13 @@ function TestingPage({ onBack, onClose }: { onBack: () => void; onClose: () => v
 function RemindersPage({ onBack, onClose, useOneMinuteIncrements, onUseOneMinuteIncrementsChange, onNavigateDummyReminders }: { onBack: () => void; onClose: () => void; useOneMinuteIncrements: boolean; onUseOneMinuteIncrementsChange: (value: boolean) => void; onNavigateDummyReminders: () => void }) {
   const [repeatToggle, setRepeatToggle] = useState(true);
   const [enableReminders, setEnableReminders] = useState(true);
+  const [pendingRemindersState, setPendingRemindersState] = useState<boolean | null>(null);
 
   return (
+    <>
     <div className="flex flex-col h-full relative w-full" data-name="reminders-page">
       <PageShell title="Reminders" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable reminders" isOn={enableReminders} onToggle={() => setEnableReminders(prev => !prev)} />
+        <ToggleRow label="Enable reminders" isOn={enableReminders} onToggle={() => setPendingRemindersState(!enableReminders)} />
         <KeyLine />
         <SectionSubtitle text="Features" />
         <ToggleRow label="Repeat reminders" isOn={repeatToggle} onToggle={() => setRepeatToggle(prev => !prev)} disabled={!enableReminders} />
@@ -597,6 +661,66 @@ function RemindersPage({ onBack, onClose, useOneMinuteIncrements, onUseOneMinute
         <MenuRow label="Dummy reminders" onClick={onNavigateDummyReminders} disabled={!enableReminders} />
       </PageShell>
     </div>
+      {pendingRemindersState !== null && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-[60]"
+            onClick={() => setPendingRemindersState(null)}
+          />
+          <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+            <div
+              className="bg-white relative flex flex-col gap-[35px] items-center py-[40px] px-[34px] rounded-[32px] pointer-events-auto"
+              style={{ width: 322 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">
+                  {pendingRemindersState
+                    ? 'Turn on reminders?'
+                    : 'Turn off reminders?'}
+                </p>
+              </div>
+              <div className="flex flex-col font-['Lato:SemiBold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#939393] text-[17px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">
+                  {pendingRemindersState
+                    ? 'The Reminders feature will be enabled, turning on access to repeat reminders, time increments, and dummy reminders.'
+                    : 'The Reminders feature will be disabled, turning off access to repeat reminders, time increments, and dummy reminders.'}
+                </p>
+              </div>
+              <div className="flex gap-[16px] w-full justify-between">
+                <button
+                  onClick={() => setPendingRemindersState(null)}
+                  className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
+                  style={{ backgroundColor: '#BABABA' }}
+                >
+                  <div className="flex items-center justify-center size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Cancel</p>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    setEnableReminders(pendingRemindersState);
+                    setPendingRemindersState(null);
+                  }}
+                  className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
+                  style={{ backgroundColor: '#4784F8' }}
+                >
+                  <div className="flex items-center justify-center size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">
+                        {pendingRemindersState ? 'Yes, turn on' : 'Yes, turn off'}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
