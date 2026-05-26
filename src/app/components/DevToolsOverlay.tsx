@@ -249,7 +249,6 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
 
   return (
     <>
-    <div className="flex flex-col h-full relative w-full min-h-0" data-name="natural-language-page">
       <PageShell title="Natural Language" onBack={onBack} onClose={onClose}>
         <ToggleRow label="Enable Natural Language Capture" isOn={nlcEnabled} onToggle={() => setPendingNlcState(!nlcEnabled)} />
         <KeyLine />
@@ -264,7 +263,6 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
         <ToggleRow label="Auto-parsing" isOn={nlcMode === 'auto'} onToggle={() => onNlcModeChange('auto')} disabled={!nlcEnabled} />
         <ToggleRow label="Click-parsing" isOn={nlcMode === 'click'} onToggle={() => onNlcModeChange('click')} disabled={!nlcEnabled} />
       </PageShell>
-    </div>
       {pendingNlcState !== null && (
         <>
           <div
@@ -1046,7 +1044,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 relative w-full max-w-[768px]" data-name="dev-tools-content">
+    <div className="flex flex-col h-full relative w-full max-w-[768px]" data-name="dev-tools-content">
       {content}
     </div>
   );
