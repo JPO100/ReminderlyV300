@@ -249,6 +249,7 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
 
   return (
     <>
+    <div className="flex flex-col h-full relative w-full min-h-0" data-name="natural-language-page">
       <PageShell title="Natural Language" onBack={onBack} onClose={onClose}>
         <ToggleRow label="Enable Natural Language Capture" isOn={nlcEnabled} onToggle={() => setPendingNlcState(!nlcEnabled)} />
         <KeyLine />
@@ -263,6 +264,7 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
         <ToggleRow label="Auto-parsing" isOn={nlcMode === 'auto'} onToggle={() => onNlcModeChange('auto')} disabled={!nlcEnabled} />
         <ToggleRow label="Click-parsing" isOn={nlcMode === 'click'} onToggle={() => onNlcModeChange('click')} disabled={!nlcEnabled} />
       </PageShell>
+    </div>
       {pendingNlcState !== null && (
         <>
           <div
@@ -331,6 +333,7 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
 
   return (
     <>
+    <div className="flex flex-col h-full relative w-full" data-name="onboarding-page">
       <PageShell title="Onboarding" onBack={onBack} onClose={onClose}>
         <ToggleRow label="Enable onboarding" isOn={isOnboardingTutorialEnabled} onToggle={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)} />
         <KeyLine />
@@ -338,6 +341,7 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
         <ToggleRow label="Show tutorial on first launch" isOn={showTutorialOnFirstLaunch} onToggle={() => { const next = !showTutorialOnFirstLaunch; onShowTutorialOnFirstLaunchChange(next); if (next) onShowTutorialOnEveryStartChange(false); }} disabled={!isOnboardingTutorialEnabled} />
         <ToggleRow label="Show tutorial on every app start" isOn={showTutorialOnEveryStart} onToggle={() => { const next = !showTutorialOnEveryStart; onShowTutorialOnEveryStartChange(next); if (next) onShowTutorialOnFirstLaunchChange(false); }} disabled={!isOnboardingTutorialEnabled} />
       </PageShell>
+    </div>
       {pendingOnboardingState !== null && (
         <>
           <div
