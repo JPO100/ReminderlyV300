@@ -68,7 +68,7 @@ function BackHeader({ title, onBack, onClose }: { title: string; onBack: () => v
 
 function PageShell({ title, onBack, onClose, children }: { title: string; onBack: () => void; onClose: () => void; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-[30px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0" style={{ overflowY: 'auto' }}>
+    <div className="flex flex-col gap-[45px] items-start pt-[30px] px-[20px] pb-[32px] relative w-full flex-1 min-h-0" style={{ overflowY: 'auto' }}>
       <BackHeader title={title} onBack={onBack} onClose={onClose} />
       {children}
     </div>
