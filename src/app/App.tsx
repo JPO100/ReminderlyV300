@@ -95,7 +95,15 @@ const CATEGORY_COLOURS: Record<string, string> = {
   other: "#FDB146",
 };
 
-function getReminderFilterPillStyle(filter: ReminderCategory, activeFilter: ReminderCategory | "all") {
+function getReminderFilterPillStyle(filter: ReminderCategory, activeFilter: ReminderCategory | "all", listsOff?: boolean) {
+  if (listsOff) {
+    const isActive = activeFilter === filter;
+    if (isActive) {
+      return { color: '#4784F8' };
+    }
+    return { boxShadow: 'inset 0 0 0 1px #ffffff', color: '#ffffff' };
+  }
+
   const pillColor = CATEGORY_COLOURS[filter] || "#939393";
   const isActive = activeFilter === filter;
   const isDefault = activeFilter === "all";
@@ -3537,7 +3545,7 @@ export default function App() {
                       } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                         filter === "other" ? "hidden min-[390px]:flex" : ""
                       }`}
-                      style={getReminderFilterPillStyle(filter, activeFilter)}
+                      style={getReminderFilterPillStyle(filter, activeFilter, !isListsEnabled)}
                     >
                       <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                         {getCategoryLabel(filter)}
@@ -3566,7 +3574,7 @@ export default function App() {
                   } content-stretch flex items-center justify-center px-[16px] h-[40px] relative rounded-[100px] shrink-0 cursor-pointer ${
                     filter === "sometime" ? "hidden min-[390px]:flex" : ""
                   }`}
-                  style={getReminderFilterPillStyle(filter, activeFilter)}
+                  style={getReminderFilterPillStyle(filter, activeFilter, !isListsEnabled)}
                 >
                   <div className="font-['Lato',sans-serif] font-bold text-[14px] whitespace-nowrap">
                     {getCategoryLabel(filter)}
