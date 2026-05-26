@@ -68,9 +68,9 @@ function NavRow({ label, onClick, plain }: { label: string; onClick: () => void;
 function NavRowWithToggle({ label, isOn, onToggle, onClick }: { label: string; isOn: boolean; onToggle: () => void; onClick: () => void }) {
   return (
     <button
-      onClick={isOn ? onClick : undefined}
+      onClick={onClick}
       className="h-[60px] relative shrink-0 w-full"
-      style={{ cursor: isOn ? 'pointer' : 'default' }}
+      style={{ cursor: 'pointer' }}
     >
       <div className="flex flex-row items-center size-full">
         <div className="content-stretch flex items-center pr-[15px] py-[15px] relative size-full gap-[16px]">
