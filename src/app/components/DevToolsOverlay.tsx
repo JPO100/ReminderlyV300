@@ -32,7 +32,7 @@ type DevToolsPage = 'home' | 'dummy-reminders' | 'dummy-lists' | 'filters-menu' 
 
 function BackHeader({ title, onBack, onClose }: { title: string; onBack: () => void; onClose: () => void }) {
   return (
-    <div className="content-stretch flex items-center justify-between relative shrink-0 w-full" data-name="header">
+    <div className="content-stretch flex items-center justify-between relative shrink-0 w-full mb-[15px]" data-name="header">
       <div className="content-stretch flex gap-[20px] items-center relative shrink-0">
         <button
           onClick={onBack}
