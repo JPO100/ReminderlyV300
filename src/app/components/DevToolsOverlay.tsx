@@ -1046,7 +1046,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
   }
 
   return (
-    <div className="flex flex-col h-full relative w-full max-w-[768px]" data-name="dev-tools-content">
+    <div className="flex flex-col h-full min-h-0 relative w-full max-w-[768px]" data-name="dev-tools-content">
       {content}
     </div>
   );
