@@ -917,6 +917,7 @@ export default function App() {
 
 
   const [isDevToolsOpen, setIsDevToolsOpen] = useState(false);
+  const devToolsTopRef = useRef<number | null>(null);
   const [isDevToolsUnlocked, setIsDevToolsUnlocked] = useState(false);
   const [isDevToolsPasswordRequired, setIsDevToolsPasswordRequired] = useState<boolean>(() => {
     try {
@@ -3310,6 +3311,13 @@ export default function App() {
 
   const now = new Date();
 
+  if (isDevToolsOpen && devToolsTopRef.current === null) {
+    devToolsTopRef.current = getBottomSheetTopPosition();
+  }
+  if (!isDevToolsOpen) {
+    devToolsTopRef.current = null;
+  }
+
   return (
     <div className="content-stretch flex flex-col items-center h-screen w-full overflow-hidden" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }} onPointerDownCapture={(e) => {
         if ((clearListStep === 1 || clearListStep === 2) && clearAllButtonRef.current && !clearAllButtonRef.current.contains(e.target as Node)) {
@@ -5376,7 +5384,7 @@ export default function App() {
             {/* Overlay sliding from bottom */}
             <motion.div
               initial={{ y: "100%" }}
-              animate={{ y: 0, top: getBottomSheetTopPosition() }}
+              animate={{ y: 0, top: devToolsTopRef.current ?? getBottomSheetTopPosition() }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.25, ease: "easeInOut" }}
               className="fixed left-0 right-0 z-50 mx-auto w-full"
