@@ -1,3 +1,4 @@
+import { useState } from "react";
 import svgPaths from "./svg-7kpmedzeqd";
 function ToggleBtn({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) {
   return (
@@ -64,6 +65,69 @@ function NavRow({ label, onClick, plain }: { label: string; onClick: () => void;
   );
 }
 
+function NavRowWithToggle({ label, isOn, onToggle, onClick }: { label: string; isOn: boolean; onToggle: () => void; onClick: () => void }) {
+  return (
+    <button
+      onClick={isOn ? onClick : undefined}
+      className="h-[60px] relative shrink-0 w-full"
+      style={{ cursor: isOn ? 'pointer' : 'default' }}
+    >
+      <div className="flex flex-row items-center size-full">
+        <div className="content-stretch flex items-center pr-[15px] py-[15px] relative size-full gap-[16px]">
+          <ToggleBtn isOn={isOn} onToggle={onToggle} />
+          <div className="content-stretch flex flex-[1_0_0] items-center justify-between min-h-px min-w-px relative">
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: isOn ? '#1C2C42' : '#D9D9D9' }}>
+              <p className="leading-[normal] truncate">{label}</p>
+            </div>
+            <div className="flex items-center justify-center relative shrink-0">
+              <div className="-scale-y-100 flex-none rotate-180">
+                <div className="h-[13px] relative w-[7px]" data-name="Union">
+                  <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 7 13">
+                    <path d={svgPaths.p1b692f00} fill={isOn ? '#939393' : '#D9D9D9'} />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+const homeOverlayCopy: Record<string, { onTitle: string; onSubtitle: string; offTitle: string; offSubtitle: string }> = {
+  reminders: {
+    onTitle: 'Turn on reminders?',
+    onSubtitle: 'The Reminders feature will be enabled, turning on access to repeat reminders, time increments, and dummy reminders.',
+    offTitle: 'Turn off reminders?',
+    offSubtitle: 'The Reminders feature will be disabled, turning off access to repeat reminders, time increments, and dummy reminders.',
+  },
+  lists: {
+    onTitle: 'Turn on Lists?',
+    onSubtitle: 'The Lists feature will be enabled, allowing full access to all features.',
+    offTitle: 'Turn off Lists?',
+    offSubtitle: 'The Lists feature will be disabled, restricting access to certain features.',
+  },
+  nlc: {
+    onTitle: 'Turn on NLC?',
+    onSubtitle: 'Dates and times will be recognised automatically as you type. Existing reminders remain unchanged until edited.',
+    offTitle: 'Turn off NLC?',
+    offSubtitle: 'Reminders will be saved exactly as typed. Dates and times will only be set manually.',
+  },
+  notifications: {
+    onTitle: 'Turn on notifications?',
+    onSubtitle: 'The Notifications feature will be enabled, turning on access to system notifications, app badge, and badge count settings.',
+    offTitle: 'Turn off notifications?',
+    offSubtitle: 'The Notifications feature will be disabled, turning off access to system notifications, app badge, and badge count settings.',
+  },
+  onboarding: {
+    onTitle: 'Turn on onboarding tutorial?',
+    onSubtitle: 'The onboarding tutorial will be accessible from Settings and shown to new users on first launch.',
+    offTitle: 'Turn off onboarding tutorial?',
+    offSubtitle: 'The onboarding tutorial will be hidden from Settings and will not be shown to new users.',
+  },
+};
+
 export default function DevTools({
   onClose,
   onNavigateReminders,
@@ -73,6 +137,16 @@ export default function DevTools({
   onNavigateOnboarding,
   onNavigateTesting,
   onNavigateSystem,
+  enableReminders,
+  onEnableRemindersChange,
+  enableLists,
+  onEnableListsChange,
+  enableNlc,
+  onEnableNlcChange,
+  enableNotifications,
+  onEnableNotificationsChange,
+  enableOnboarding,
+  onEnableOnboardingChange,
 }: {
   onClose: () => void;
   onNavigateReminders: () => void;
@@ -82,18 +156,46 @@ export default function DevTools({
   onNavigateOnboarding: () => void;
   onNavigateTesting: () => void;
   onNavigateSystem: () => void;
+  enableReminders: boolean;
+  onEnableRemindersChange: (value: boolean) => void;
+  enableLists: boolean;
+  onEnableListsChange: (value: boolean) => void;
+  enableNlc: boolean;
+  onEnableNlcChange: (value: boolean) => void;
+  enableNotifications: boolean;
+  onEnableNotificationsChange: (value: boolean) => void;
+  enableOnboarding: boolean;
+  onEnableOnboardingChange: (value: boolean) => void;
 }) {
+  const [pendingToggle, setPendingToggle] = useState<{ feature: string; target: boolean } | null>(null);
+
+  const handleConfirm = () => {
+    if (!pendingToggle) return;
+    const handlers: Record<string, (value: boolean) => void> = {
+      reminders: onEnableRemindersChange,
+      lists: onEnableListsChange,
+      nlc: onEnableNlcChange,
+      notifications: onEnableNotificationsChange,
+      onboarding: onEnableOnboardingChange,
+    };
+    handlers[pendingToggle.feature](pendingToggle.target);
+    setPendingToggle(null);
+  };
+
+  const copy = pendingToggle ? homeOverlayCopy[pendingToggle.feature] : null;
+
   return (
+    <>
     <div className="bg-white content-stretch flex flex-col gap-[30px] items-start pb-[30px] pt-[30px] px-[20px] relative rounded-tl-[20px] rounded-tr-[20px] size-full" data-name="dev-tools">
       <Header onClose={onClose} />
       <div className="content-stretch flex flex-[1_0_0] flex-col gap-[32px] items-center min-h-px min-w-px relative w-full">
         <div className="content-stretch flex flex-col items-start relative w-full" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-full divide-y divide-[#E4E4E4]">
-            <NavRow label="Reminders" onClick={onNavigateReminders} plain />
-            <NavRow label="Lists" onClick={onNavigateLists} plain />
-            <NavRow label="Natural Language" onClick={onNavigateNlc} plain />
-            <NavRow label="Notifications" onClick={onNavigateNotifications} plain />
-            <NavRow label="Onboarding" onClick={onNavigateOnboarding} plain />
+            <NavRowWithToggle label="Reminders" isOn={enableReminders} onToggle={() => setPendingToggle({ feature: 'reminders', target: !enableReminders })} onClick={onNavigateReminders} />
+            <NavRowWithToggle label="Lists" isOn={enableLists} onToggle={() => setPendingToggle({ feature: 'lists', target: !enableLists })} onClick={onNavigateLists} />
+            <NavRowWithToggle label="Natural Language Capture" isOn={enableNlc} onToggle={() => setPendingToggle({ feature: 'nlc', target: !enableNlc })} onClick={onNavigateNlc} />
+            <NavRowWithToggle label="Notifications" isOn={enableNotifications} onToggle={() => setPendingToggle({ feature: 'notifications', target: !enableNotifications })} onClick={onNavigateNotifications} />
+            <NavRowWithToggle label="Onboarding" isOn={enableOnboarding} onToggle={() => setPendingToggle({ feature: 'onboarding', target: !enableOnboarding })} onClick={onNavigateOnboarding} />
             <NavRow label="Testing" onClick={onNavigateTesting} plain />
             <NavRow label="System" onClick={onNavigateSystem} plain />
             <div />
@@ -101,5 +203,58 @@ export default function DevTools({
         </div>
       </div>
     </div>
+      {pendingToggle && copy && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-[60]"
+            onClick={() => setPendingToggle(null)}
+          />
+          <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+            <div
+              className="bg-white relative flex flex-col gap-[35px] items-center py-[40px] px-[34px] rounded-[32px] pointer-events-auto"
+              style={{ width: 322 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">
+                  {pendingToggle.target ? copy.onTitle : copy.offTitle}
+                </p>
+              </div>
+              <div className="flex flex-col font-['Lato:SemiBold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#939393] text-[17px] text-center">
+                <p className="leading-[normal] whitespace-pre-wrap">
+                  {pendingToggle.target ? copy.onSubtitle : copy.offSubtitle}
+                </p>
+              </div>
+              <div className="flex gap-[16px] w-full justify-between">
+                <button
+                  onClick={() => setPendingToggle(null)}
+                  className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
+                  style={{ backgroundColor: '#BABABA' }}
+                >
+                  <div className="flex items-center justify-center size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Cancel</p>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
+                  style={{ backgroundColor: '#4784F8' }}
+                >
+                  <div className="flex items-center justify-center size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">
+                        {pendingToggle.target ? 'Yes, turn on' : 'Yes, turn off'}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 }

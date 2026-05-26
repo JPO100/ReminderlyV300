@@ -401,8 +401,7 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
   );
 }
 
-function NotificationsAreaPage({ onBack, onClose, reminderAlerts, onReminderAlertsChange, appBadge, onAppBadgeChange, includeTodayInBadge, onIncludeTodayInBadgeChange }: { onBack: () => void; onClose: () => void; reminderAlerts: boolean; onReminderAlertsChange: (value: boolean) => void; appBadge: boolean; onAppBadgeChange: (value: boolean) => void; includeTodayInBadge: boolean; onIncludeTodayInBadgeChange: (value: boolean) => void }) {
-  const [enableNotifications, setEnableNotifications] = useState(true);
+function NotificationsAreaPage({ onBack, onClose, enableNotifications, onEnableNotificationsChange, reminderAlerts, onReminderAlertsChange, appBadge, onAppBadgeChange, includeTodayInBadge, onIncludeTodayInBadgeChange }: { onBack: () => void; onClose: () => void; enableNotifications: boolean; onEnableNotificationsChange: (value: boolean) => void; reminderAlerts: boolean; onReminderAlertsChange: (value: boolean) => void; appBadge: boolean; onAppBadgeChange: (value: boolean) => void; includeTodayInBadge: boolean; onIncludeTodayInBadgeChange: (value: boolean) => void }) {
   const [pendingNotificationsState, setPendingNotificationsState] = useState<boolean | null>(null);
 
   return (
@@ -457,7 +456,7 @@ function NotificationsAreaPage({ onBack, onClose, reminderAlerts, onReminderAler
                 </button>
                 <button
                   onClick={() => {
-                    setEnableNotifications(pendingNotificationsState);
+                    onEnableNotificationsChange(pendingNotificationsState);
                     setPendingNotificationsState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
@@ -641,9 +640,8 @@ function TestingPage({ onBack, onClose }: { onBack: () => void; onClose: () => v
   );
 }
 
-function RemindersPage({ onBack, onClose, useOneMinuteIncrements, onUseOneMinuteIncrementsChange, onNavigateDummyReminders }: { onBack: () => void; onClose: () => void; useOneMinuteIncrements: boolean; onUseOneMinuteIncrementsChange: (value: boolean) => void; onNavigateDummyReminders: () => void }) {
+function RemindersPage({ onBack, onClose, enableReminders, onEnableRemindersChange, useOneMinuteIncrements, onUseOneMinuteIncrementsChange, onNavigateDummyReminders }: { onBack: () => void; onClose: () => void; enableReminders: boolean; onEnableRemindersChange: (value: boolean) => void; useOneMinuteIncrements: boolean; onUseOneMinuteIncrementsChange: (value: boolean) => void; onNavigateDummyReminders: () => void }) {
   const [repeatToggle, setRepeatToggle] = useState(true);
-  const [enableReminders, setEnableReminders] = useState(true);
   const [pendingRemindersState, setPendingRemindersState] = useState<boolean | null>(null);
 
   return (
@@ -701,7 +699,7 @@ function RemindersPage({ onBack, onClose, useOneMinuteIncrements, onUseOneMinute
                 </button>
                 <button
                   onClick={() => {
-                    setEnableReminders(pendingRemindersState);
+                    onEnableRemindersChange(pendingRemindersState);
                     setPendingRemindersState(null);
                   }}
                   className="h-[50px] rounded-[100px] cursor-pointer px-[16px]"
@@ -964,6 +962,8 @@ function LoginScreen({ onUnlock, passwordRequired }: { onUnlock: () => void; pas
 
 function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders, nlcMode, onNlcModeChange, nlcEnabled, onNlcEnabledChange, nlcRecognition, onNlcRecognitionChange, filtersMenuVariant, onFiltersMenuVariantChange, hideOverdue, onHideOverdueChange, isOnboardingTutorialEnabled, onOnboardingTutorialEnabledChange, isListsEnabled, onListsEnabledChange, showTutorialOnFirstLaunch, onShowTutorialOnFirstLaunchChange, showTutorialOnEveryStart, onShowTutorialOnEveryStartChange, isDevToolsUnlocked, onDevToolsUnlock, isDevToolsPasswordRequired, onDevToolsPasswordRequiredChange, useOneMinuteIncrements, onUseOneMinuteIncrementsChange, smartRemindersEnabled, onSmartRemindersEnabledChange, savedListsEnabled, onSavedListsEnabledChange, pinnedListsEnabled, onPinnedListsEnabledChange, settingsMenuEnabled, onSettingsMenuEnabledChange, notifReminderAlerts, onNotifReminderAlertsChange, notifAppBadge, onNotifAppBadgeChange, notifIncludeTodayInBadge, onNotifIncludeTodayInBadgeChange, siriShortcutsEnabled, onSiriShortcutsEnabledChange, useDefaultTemplatesInCleanState, onUseDefaultTemplatesInCleanStateChange, onClearLists, onGenerateLists }: { onClose: () => void; onClearReminders: () => void; addReminder: (reminder: Reminder) => void; addReminders: (reminders: Reminder[]) => void; nlcMode: NlcMode; onNlcModeChange: (mode: NlcMode) => void; nlcEnabled: boolean; onNlcEnabledChange: (enabled: boolean) => void; nlcRecognition: NlcRecognitionConfig; onNlcRecognitionChange: (config: NlcRecognitionConfig) => void; filtersMenuVariant: FiltersMenuVariant; onFiltersMenuVariantChange: (variant: FiltersMenuVariant) => void; hideOverdue: boolean; onHideOverdueChange: (value: boolean) => void; isOnboardingTutorialEnabled: boolean; onOnboardingTutorialEnabledChange: (next: boolean) => void; isListsEnabled: boolean; onListsEnabledChange: (enabled: boolean) => void; showTutorialOnFirstLaunch: boolean; onShowTutorialOnFirstLaunchChange: (value: boolean) => void; showTutorialOnEveryStart: boolean; onShowTutorialOnEveryStartChange: (value: boolean) => void; isDevToolsUnlocked: boolean; onDevToolsUnlock: () => void; isDevToolsPasswordRequired: boolean; onDevToolsPasswordRequiredChange: (value: boolean) => void; useOneMinuteIncrements: boolean; onUseOneMinuteIncrementsChange: (value: boolean) => void; smartRemindersEnabled: boolean; onSmartRemindersEnabledChange: (value: boolean) => void; savedListsEnabled: boolean; onSavedListsEnabledChange: (value: boolean) => void; pinnedListsEnabled: boolean; onPinnedListsEnabledChange: (value: boolean) => void; settingsMenuEnabled: boolean; onSettingsMenuEnabledChange: (value: boolean) => void; notifReminderAlerts: boolean; onNotifReminderAlertsChange: (value: boolean) => void; notifAppBadge: boolean; onNotifAppBadgeChange: (value: boolean) => void; notifIncludeTodayInBadge: boolean; onNotifIncludeTodayInBadgeChange: (value: boolean) => void; siriShortcutsEnabled: boolean; onSiriShortcutsEnabledChange: (value: boolean) => void; useDefaultTemplatesInCleanState: boolean; onUseDefaultTemplatesInCleanStateChange: (value: boolean) => void; onClearLists: (useDefaultTemplatesInCleanState: boolean) => void; onGenerateLists: (payload: GeneratedDummyListsPayload) => void }) {
   const [page, setPage] = useState<DevToolsPage>('home');
+  const [enableReminders, setEnableReminders] = useState(true);
+  const [enableNotifications, setEnableNotifications] = useState(true);
 
   let content;
   if (!isDevToolsUnlocked) {
@@ -983,6 +983,16 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
         onNavigateOnboarding={() => setPage('onboarding')}
         onNavigateTesting={() => setPage('testing')}
         onNavigateSystem={() => setPage('system')}
+        enableReminders={enableReminders}
+        onEnableRemindersChange={setEnableReminders}
+        enableLists={isListsEnabled}
+        onEnableListsChange={onListsEnabledChange}
+        enableNlc={nlcEnabled}
+        onEnableNlcChange={onNlcEnabledChange}
+        enableNotifications={enableNotifications}
+        onEnableNotificationsChange={setEnableNotifications}
+        enableOnboarding={isOnboardingTutorialEnabled}
+        onEnableOnboardingChange={onOnboardingTutorialEnabledChange}
       />
     );
   } else if (page === 'testing') {
@@ -991,7 +1001,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'reminders') {
     content = (
-      <RemindersPage onBack={() => setPage('home')} onClose={onClose} useOneMinuteIncrements={useOneMinuteIncrements} onUseOneMinuteIncrementsChange={onUseOneMinuteIncrementsChange} onNavigateDummyReminders={() => setPage('dummy-reminders')} />
+      <RemindersPage onBack={() => setPage('home')} onClose={onClose} enableReminders={enableReminders} onEnableRemindersChange={setEnableReminders} useOneMinuteIncrements={useOneMinuteIncrements} onUseOneMinuteIncrementsChange={onUseOneMinuteIncrementsChange} onNavigateDummyReminders={() => setPage('dummy-reminders')} />
     );
   } else if (page === 'dummy-reminders') {
     content = (
@@ -1027,7 +1037,7 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'notifications-area') {
     content = (
-      <NotificationsAreaPage onBack={() => setPage('home')} onClose={onClose} reminderAlerts={notifReminderAlerts} onReminderAlertsChange={onNotifReminderAlertsChange} appBadge={notifAppBadge} onAppBadgeChange={onNotifAppBadgeChange} includeTodayInBadge={notifIncludeTodayInBadge} onIncludeTodayInBadgeChange={onNotifIncludeTodayInBadgeChange} />
+      <NotificationsAreaPage onBack={() => setPage('home')} onClose={onClose} enableNotifications={enableNotifications} onEnableNotificationsChange={setEnableNotifications} reminderAlerts={notifReminderAlerts} onReminderAlertsChange={onNotifReminderAlertsChange} appBadge={notifAppBadge} onAppBadgeChange={onNotifAppBadgeChange} includeTodayInBadge={notifIncludeTodayInBadge} onIncludeTodayInBadgeChange={onNotifIncludeTodayInBadgeChange} />
     );
   }
 
