@@ -128,7 +128,7 @@ function SectionSubtitle({ text }: { text: string }) {
 }
 
 function KeyLine() {
-  return <div className="w-full h-px bg-[#E4E4E4]" />;
+  return <div className="w-full h-px bg-[#E4E4E4] shrink-0" />;
 }
 
 function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVariantChange, isListsEnabled }: { onBack: () => void; onClose: () => void; filtersMenuVariant: FiltersMenuVariant; onFiltersMenuVariantChange: (variant: FiltersMenuVariant) => void; isListsEnabled: boolean }) {
