@@ -604,6 +604,7 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
   const [pendingListsState, setPendingListsState] = useState<boolean | null>(null);
 
   return (
+    <>
     <div className="flex flex-col h-full relative w-full" data-name="lists-area-page">
       <PageShell title="Lists" onBack={onBack} onClose={onClose}>
         <ToggleRow label="Enable lists" isOn={isListsEnabled} onToggle={() => setPendingListsState(!isListsEnabled)} />
@@ -618,6 +619,7 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
         <KeyLine />
         <MenuRow label="Dummy lists" onClick={onNavigateDummyLists} disabled={!isListsEnabled} />
       </PageShell>
+    </div>
       {pendingListsState !== null && (
         <>
           <div
@@ -677,7 +679,7 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }
 
