@@ -15,17 +15,21 @@ type ScheduledNotificationPayload = {
 };
 
 export async function registerNotificationActionTypes() {
-    await LocalNotifications.registerActionTypes({
-        types: [
-            {
-                id: "reminder-actions",
-                actions: [
-                    { id: "mark-done", title: "Mark as done" },
-                    { id: "move-tomorrow", title: "Move to tomorrow" },
-                ],
-            },
-        ],
-    });
+    try {
+        await LocalNotifications.registerActionTypes({
+            types: [
+                {
+                    id: "reminder-actions",
+                    actions: [
+                        { id: "mark-done", title: "Mark as done" },
+                        { id: "move-tomorrow", title: "Move to tomorrow" },
+                    ],
+                },
+            ],
+        });
+    } catch {
+        // Not available on web
+    }
 }
 
 function toNotificationAtIso(value: unknown): string | null {
@@ -43,6 +47,7 @@ function getNotificationSignature(notification: {
     body?: string;
     schedule?: { at?: unknown };
     extra?: { reminderId?: unknown };
+    actionTypeId?: string;
 }): string {
     return JSON.stringify({
         id: notification.id ?? null,
@@ -50,6 +55,7 @@ function getNotificationSignature(notification: {
         body: notification.body ?? "",
         at: toNotificationAtIso(notification.schedule?.at) ?? null,
         reminderId: typeof notification.extra?.reminderId === "string" ? notification.extra.reminderId : null,
+        actionTypeId: notification.actionTypeId ?? "",
     });
 }
 
