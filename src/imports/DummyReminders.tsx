@@ -176,7 +176,7 @@ export default function DummyReminders({ onBack, onClose, addReminders, hideOver
           >
             <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
               <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: hideOverdue ? '#1C2C42' : '#C9C9C9' }}>Hide overdue reminders</p>
-              <InfoIconWithOverlay color={hideOverdue ? '#939393' : '#D9D9D9'} header="Hide overdue reminders" title="Hides overdue reminders from the active list." />
+              <InfoIconWithOverlay color={hideOverdue ? '#939393' : '#D9D9D9'} header="Hide overdue reminders" title="When enabled, reminders in the 'Overdue' category are hidden from the generated dummy set. Use this to test the active list layout without overdue reminders appearing. Does not affect other reminder categories." />
             </div>
             <div
               className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${hideOverdue ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}

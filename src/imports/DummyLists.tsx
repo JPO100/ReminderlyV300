@@ -160,7 +160,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
               >
                 Include done list items
               </p>
-              <InfoIconWithOverlay color={includeDone ? '#939393' : '#D9D9D9'} header="Include done list items" title="Includes completed list items when generating dummy lists." />
+              <InfoIconWithOverlay color={includeDone ? '#939393' : '#D9D9D9'} header="Include done list items" title="When enabled, generated dummy lists will include items marked as done alongside active items. Use this to test how completed items appear within lists and how they affect smart reminder progress counts." />
             </div>
             <div
               className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeDone ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
@@ -184,7 +184,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
               >
                 Include smart reminder lists
               </p>
-              <InfoIconWithOverlay color={includeSmartReminderLists ? '#939393' : '#D9D9D9'} header="Include smart reminder lists" title="Includes smart reminder lists when generating dummy lists." />
+              <InfoIconWithOverlay color={includeSmartReminderLists ? '#939393' : '#D9D9D9'} header="Include smart reminder lists" title="When enabled, generated dummy lists will include lists that are linked to a smart reminder. This lets you test the smart reminder progress display and list-to-reminder navigation. Requires Smart reminders to be enabled in the Lists page." />
             </div>
             <div
               className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSmartReminderLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
@@ -208,7 +208,7 @@ export default function DummyLists({ onBack, onClose, onClearLists, onGenerateLi
               >
                 Include List templates
               </p>
-              <InfoIconWithOverlay color={includeSavedLists ? '#939393' : '#D9D9D9'} header="Include List templates" title="Includes list templates when generating dummy lists." />
+              <InfoIconWithOverlay color={includeSavedLists ? '#939393' : '#D9D9D9'} header="Include List templates" title="When enabled, generated dummy lists will include saved list templates. Use this to test template display and selection in the list creation flow. Requires List templates to be enabled in the Lists page." />
             </div>
             <div
               className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${includeSavedLists ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}

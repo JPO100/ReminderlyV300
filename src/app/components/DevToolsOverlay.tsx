@@ -190,8 +190,8 @@ function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVar
     <PageShell title="Filters menu" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Settings" />
       <div className="flex flex-col gap-[30px] w-full" style={isListsEnabled ? { opacity: 0.5, pointerEvents: 'none' } : undefined}>
-        <ToggleRow label="Standard filters" isOn={displayVariant === 'standard'} onToggle={() => onFiltersMenuVariantChange('standard')} infoTitle="Uses the standard filter layout in the filters menu." />
-        <ToggleRow label="Grouped filters" isOn={displayVariant === 'grouped'} onToggle={() => onFiltersMenuVariantChange('grouped')} infoTitle="Uses the grouped filter layout in the filters menu." />
+        <ToggleRow label="Standard filters" isOn={displayVariant === 'standard'} onToggle={() => onFiltersMenuVariantChange('standard')} infoTitle="Switches the filters menu to a flat list of individual filter options. Only one filter layout can be active at a time — enabling this automatically disables Grouped filters. Disabled when Lists is enabled, as Lists forces the standard layout." />
+        <ToggleRow label="Grouped filters" isOn={displayVariant === 'grouped'} onToggle={() => onFiltersMenuVariantChange('grouped')} infoTitle="Switches the filters menu to a grouped layout that organises filters into collapsible categories. Only one filter layout can be active at a time — enabling this automatically disables Standard filters. Disabled when Lists is enabled." />
       </div>
     </PageShell>
   );
@@ -206,7 +206,7 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
   return (
     <PageShell title="Dev tools password" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Settings" />
-      <ToggleRow label="Password required" isOn={passwordRequired} onToggle={() => onPasswordRequiredChange(!passwordRequired)} infoTitle="Requires a password to access dev tools." />
+      <ToggleRow label="Password required" isOn={passwordRequired} onToggle={() => onPasswordRequiredChange(!passwordRequired)} infoTitle="When enabled, the Dev Tools login screen requires the correct password before granting access. When disabled, the Log-in button unlocks Dev Tools without any password. The current password is shown below this toggle when enabled." />
       {passwordRequired && (
         <div className="flex h-[10px] items-center w-full">
           <p className="font-['Lato:SemiBold',sans-serif] text-[14px] text-[#939393] leading-[normal]">Current password: {DEV_TOOLS_PASSWORD}</p>
@@ -287,12 +287,12 @@ function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnab
   return (
     <PageShell title="System" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Features" />
-      <ToggleRow label="Siri shortcuts" isOn={siriShortcutsEnabled} onToggle={() => onSiriShortcutsEnabledChange(!siriShortcutsEnabled)} infoTitle="Enables Siri shortcut integration for quick actions." />
-      <ToggleRow label="Settings menu" isOn={settingsMenuEnabled} onToggle={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)} infoTitle="Shows the settings menu in the main app." />
+      <ToggleRow label="Siri shortcuts" isOn={siriShortcutsEnabled} onToggle={() => onSiriShortcutsEnabledChange(!siriShortcutsEnabled)} infoTitle="Controls whether Siri shortcut integration is available in the app. When enabled, users can trigger reminder actions via Siri voice commands and the Shortcuts app. This is an app-wide feature toggle independent of other Dev Tools settings." />
+      <ToggleRow label="Settings menu" isOn={settingsMenuEnabled} onToggle={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)} infoTitle="Controls whether the Settings gear icon is visible and accessible from the main app interface. When disabled, users cannot open the Settings overlay. This does not affect Dev Tools access, which is triggered separately." />
       <KeyLine />
       <SectionSubtitle text="Settings" />
-      <MenuRow label="Filters menu" onClick={onNavigateFiltersMenu} infoTitle="Configure the filters menu display variant." />
-      <MenuRow label="Dev tools password" onClick={onNavigateDevToolsPassword} infoTitle="Manage dev tools access password settings." />
+      <MenuRow label="Filters menu" onClick={onNavigateFiltersMenu} infoTitle="Opens the Filters Menu settings page where you can switch between Standard and Grouped filter layouts. The chosen layout affects how filters appear in the main app's filter menu. Layout choice is overridden when Lists is enabled." />
+      <MenuRow label="Dev tools password" onClick={onNavigateDevToolsPassword} infoTitle="Opens the Dev Tools Password page where you can enable or disable the login password requirement, view the current password, and reset the password. Changes here affect the Dev Tools login screen shown on every open." />
     </PageShell>
   );
 }
@@ -304,18 +304,18 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
     <>
     <div className="flex flex-col h-full relative w-full" data-name="natural-language-page">
       <PageShell title="Natural Language" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable Natural Language Capture" isOn={nlcEnabled} onToggle={() => setPendingNlcState(!nlcEnabled)} infoTitle="Enables automatic recognition of dates and times as you type." />
+        <ToggleRow label="Enable Natural Language Capture" isOn={nlcEnabled} onToggle={() => setPendingNlcState(!nlcEnabled)} infoTitle="Master toggle for the NLC system. When enabled, the app can automatically detect dates, times, and repeat patterns as the user types a reminder. Disabling this turns off all NLC sub-features below and reverts to manual-only scheduling." />
         <KeyLine />
         <SectionSubtitle text="Features" />
-        <ToggleRow label="Date recognition" isOn={recognition.date} onToggle={() => onRecognitionChange({ ...recognition, date: !recognition.date })} disabled={!nlcEnabled} infoTitle="Automatically detects and parses date references in reminder text." />
-        <ToggleRow label="Time recognition" isOn={recognition.time} onToggle={() => onRecognitionChange({ ...recognition, time: !recognition.time })} disabled={!nlcEnabled} infoTitle="Automatically detects and parses time references in reminder text." />
-        <ToggleRow label="Repeats recognition" isOn={recognition.repeats} onToggle={() => onRecognitionChange({ ...recognition, repeats: !recognition.repeats })} disabled={!nlcEnabled} infoTitle="Automatically detects repeat patterns in reminder text." />
-        <ToggleRow label="Phone number recognition" isOn={false} onToggle={() => {}} disabled infoTitle="Detects phone numbers in reminder text. Coming soon." />
-        <ToggleRow label="Contact recognition" isOn={false} onToggle={() => {}} disabled infoTitle="Detects contact names in reminder text. Coming soon." />
+        <ToggleRow label="Date recognition" isOn={recognition.date} onToggle={() => onRecognitionChange({ ...recognition, date: !recognition.date })} disabled={!nlcEnabled} infoTitle="Allows NLC to detect and parse date references like 'tomorrow', 'next Friday', or 'March 5th' from reminder text. Parsed dates are applied to the reminder's schedule automatically. Requires Enable Natural Language Capture to be on." />
+        <ToggleRow label="Time recognition" isOn={recognition.time} onToggle={() => onRecognitionChange({ ...recognition, time: !recognition.time })} disabled={!nlcEnabled} infoTitle="Allows NLC to detect and parse time references like 'at 3pm' or 'in the morning' from reminder text. Parsed times are applied to the reminder's schedule automatically. Requires Enable Natural Language Capture to be on." />
+        <ToggleRow label="Repeats recognition" isOn={recognition.repeats} onToggle={() => onRecognitionChange({ ...recognition, repeats: !recognition.repeats })} disabled={!nlcEnabled} infoTitle="Allows NLC to detect and parse repeat patterns like 'every Monday' or 'daily' from reminder text. Parsed patterns are applied as repeat rules on the reminder. Requires Enable Natural Language Capture to be on." />
+        <ToggleRow label="Phone number recognition" isOn={false} onToggle={() => {}} disabled infoTitle="Planned feature: will allow NLC to detect phone numbers in reminder text and offer quick-dial actions. Not yet implemented — this toggle is reserved for a future release. Currently locked in the disabled state." />
+        <ToggleRow label="Contact recognition" isOn={false} onToggle={() => {}} disabled infoTitle="Planned feature: will allow NLC to detect contact names in reminder text and link them to address book entries. Not yet implemented — this toggle is reserved for a future release. Currently locked in the disabled state." />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Auto-parsing" isOn={nlcMode === 'auto'} onToggle={() => onNlcModeChange('auto')} disabled={!nlcEnabled} infoTitle="Parses natural language automatically as you type." />
-        <ToggleRow label="Click-parsing" isOn={nlcMode === 'click'} onToggle={() => onNlcModeChange('click')} disabled={!nlcEnabled} infoTitle="Parses natural language only when explicitly triggered." />
+        <ToggleRow label="Auto-parsing" isOn={nlcMode === 'auto'} onToggle={() => onNlcModeChange('auto')} disabled={!nlcEnabled} infoTitle="NLC parses the reminder text in real time as the user types. Dates, times, and repeats are detected and applied immediately without user action. Only one parsing mode can be active. Requires Enable Natural Language Capture to be on." />
+        <ToggleRow label="Click-parsing" isOn={nlcMode === 'click'} onToggle={() => onNlcModeChange('click')} disabled={!nlcEnabled} infoTitle="NLC only parses the reminder text when the user explicitly triggers it by tapping the parse button. Gives the user full control over when detection runs. Only one parsing mode can be active. Requires Enable Natural Language Capture to be on." />
       </PageShell>
     </div>
       {pendingNlcState !== null && (
@@ -388,11 +388,11 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
     <>
     <div className="flex flex-col h-full relative w-full" data-name="onboarding-page">
       <PageShell title="Onboarding" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable onboarding" isOn={isOnboardingTutorialEnabled} onToggle={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)} infoTitle="Enables the onboarding tutorial feature." />
+        <ToggleRow label="Enable onboarding" isOn={isOnboardingTutorialEnabled} onToggle={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)} infoTitle="Master toggle for the onboarding tutorial system. When enabled, the tutorial is accessible from the Settings menu and can be shown to users on first launch or every app start. Disabling this hides the tutorial from Settings and prevents all automatic display." />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Show tutorial on first launch" isOn={showTutorialOnFirstLaunch} onToggle={() => { const next = !showTutorialOnFirstLaunch; onShowTutorialOnFirstLaunchChange(next); if (next) onShowTutorialOnEveryStartChange(false); }} disabled={!isOnboardingTutorialEnabled} infoTitle="Shows the tutorial on the user's first app launch." />
-        <ToggleRow label="Show tutorial on every app start" isOn={showTutorialOnEveryStart} onToggle={() => { const next = !showTutorialOnEveryStart; onShowTutorialOnEveryStartChange(next); if (next) onShowTutorialOnFirstLaunchChange(false); }} disabled={!isOnboardingTutorialEnabled} infoTitle="Shows the tutorial every time the app starts." />
+        <ToggleRow label="Show tutorial on first launch" isOn={showTutorialOnFirstLaunch} onToggle={() => { const next = !showTutorialOnFirstLaunch; onShowTutorialOnFirstLaunchChange(next); if (next) onShowTutorialOnEveryStartChange(false); }} disabled={!isOnboardingTutorialEnabled} infoTitle="Shows the onboarding tutorial automatically the first time a user opens the app. Enabling this disables 'Show tutorial on every app start' — only one launch trigger can be active. Requires Enable onboarding to be on." />
+        <ToggleRow label="Show tutorial on every app start" isOn={showTutorialOnEveryStart} onToggle={() => { const next = !showTutorialOnEveryStart; onShowTutorialOnEveryStartChange(next); if (next) onShowTutorialOnFirstLaunchChange(false); }} disabled={!isOnboardingTutorialEnabled} infoTitle="Shows the onboarding tutorial every time the app is opened, regardless of whether the user has seen it before. Enabling this disables 'Show tutorial on first launch' — only one launch trigger can be active. Requires Enable onboarding to be on." />
       </PageShell>
     </div>
       {pendingOnboardingState !== null && (
@@ -464,14 +464,14 @@ function NotificationsAreaPage({ onBack, onClose, enableNotifications, onEnableN
   return (
     <>
     <PageShell title="Notifications" onBack={onBack} onClose={onClose}>
-      <ToggleRow label="Enable notifications" isOn={enableNotifications} onToggle={() => setPendingNotificationsState(!enableNotifications)} infoTitle="Enables the notifications system." />
+      <ToggleRow label="Enable notifications" isOn={enableNotifications} onToggle={() => setPendingNotificationsState(!enableNotifications)} infoTitle="Master toggle for the notifications system. When enabled, the app can send system notifications and display an app badge count. Disabling this turns off all notification sub-features below including system alerts, app badge, and badge count settings." />
       <KeyLine />
       <SectionSubtitle text="Features" />
-      <ToggleRow label="Reminder system notifications" isOn={reminderAlerts} onToggle={() => onReminderAlertsChange(!reminderAlerts)} disabled={!enableNotifications} infoTitle="Sends system notifications for reminder alerts." />
-      <ToggleRow label="Reminder app badge notifications" isOn={appBadge} onToggle={() => onAppBadgeChange(!appBadge)} disabled={!enableNotifications} infoTitle="Shows a badge count on the app icon." />
+      <ToggleRow label="Reminder system notifications" isOn={reminderAlerts} onToggle={() => onReminderAlertsChange(!reminderAlerts)} disabled={!enableNotifications} infoTitle="Controls whether the app sends native iOS system notifications when a reminder is due. Notifications appear as banners, alerts, and in the notification centre. Requires Enable notifications to be on." />
+      <ToggleRow label="Reminder app badge notifications" isOn={appBadge} onToggle={() => onAppBadgeChange(!appBadge)} disabled={!enableNotifications} infoTitle="Controls whether the app displays a numeric badge on the app icon showing how many reminders need attention. The badge count reflects overdue reminders by default. Requires Enable notifications to be on." />
       <KeyLine />
       <SectionSubtitle text="Settings" />
-      <ToggleRow label="Include today in app badge count" isOn={appBadge && includeTodayInBadge} onToggle={() => onIncludeTodayInBadgeChange(!includeTodayInBadge)} disabled={!enableNotifications || !appBadge} infoTitle="Includes today's reminders in the app badge count." />
+      <ToggleRow label="Include today in app badge count" isOn={appBadge && includeTodayInBadge} onToggle={() => onIncludeTodayInBadgeChange(!includeTodayInBadge)} disabled={!enableNotifications || !appBadge} infoTitle="When enabled, reminders due today are included in the app icon badge count alongside overdue reminders. When disabled, only overdue reminders contribute to the badge number. Requires both Enable notifications and App badge to be on." />
     </PageShell>
       {pendingNotificationsState !== null && (
         <>
@@ -705,15 +705,15 @@ function RemindersPage({ onBack, onClose, enableReminders, onEnableRemindersChan
     <>
     <div className="flex flex-col h-full relative w-full" data-name="reminders-page">
       <PageShell title="Reminders" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable reminders" isOn={enableReminders} onToggle={() => setPendingRemindersState(!enableReminders)} infoTitle="Enables the core reminders feature." />
+        <ToggleRow label="Enable reminders" isOn={enableReminders} onToggle={() => setPendingRemindersState(!enableReminders)} infoTitle="Master toggle for the reminders feature. Controls access to repeat reminders, time increment settings, and the dummy reminders page. Disabling this restricts all reminder sub-features and settings on this page." />
         <KeyLine />
         <SectionSubtitle text="Features" />
-        <ToggleRow label="Repeat reminders" isOn={repeatToggle} onToggle={() => setRepeatToggle(prev => !prev)} disabled={!enableReminders} infoTitle="Allows reminders to repeat on a schedule." />
+        <ToggleRow label="Repeat reminders" isOn={repeatToggle} onToggle={() => setRepeatToggle(prev => !prev)} disabled={!enableReminders} infoTitle="Controls whether reminders can have repeat rules (e.g. daily, weekly, monthly). When disabled, the repeat option is hidden from the reminder creation and edit flows. Requires Enable reminders to be on." />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Display 1 minute time increments" isOn={useOneMinuteIncrements} onToggle={() => onUseOneMinuteIncrementsChange(!useOneMinuteIncrements)} disabled={!enableReminders} infoTitle="Shows one-minute intervals in the time picker." />
+        <ToggleRow label="Display 1 minute time increments" isOn={useOneMinuteIncrements} onToggle={() => onUseOneMinuteIncrementsChange(!useOneMinuteIncrements)} disabled={!enableReminders} infoTitle="Changes the time picker to show one-minute intervals instead of the default five-minute intervals. Affects the time picker in both the new reminder and edit reminder flows. Requires Enable reminders to be on." />
         <KeyLine />
-        <MenuRow label="Dummy reminders" onClick={onNavigateDummyReminders} disabled={!enableReminders} infoTitle="Generate and manage test reminders for development." />
+        <MenuRow label="Dummy reminders" onClick={onNavigateDummyReminders} disabled={!enableReminders} infoTitle="Opens the Dummy Reminders page where you can generate test reminders across all time categories (overdue, today, this week, later, sometime, done), configure repeat flags, and clear all reminders. Requires Enable reminders to be on." />
       </PageShell>
     </div>
       {pendingRemindersState !== null && (
@@ -786,17 +786,17 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
     <>
     <div className="flex flex-col h-full relative w-full" data-name="lists-area-page">
       <PageShell title="Lists" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable lists" isOn={isListsEnabled} onToggle={() => setPendingListsState(!isListsEnabled)} infoTitle="Enables the lists feature." />
+        <ToggleRow label="Enable lists" isOn={isListsEnabled} onToggle={() => setPendingListsState(!isListsEnabled)} infoTitle="Master toggle for the lists feature. Controls access to smart reminders, list templates, pinned lists, and the dummy lists page. Disabling this restricts all list sub-features. Also forces the filters menu to use the Standard layout." />
         <KeyLine />
         <SectionSubtitle text="Features" />
-        <ToggleRow label="Smart reminders" isOn={smartRemindersEnabled} onToggle={() => onSmartRemindersEnabledChange(!smartRemindersEnabled)} disabled={!isListsEnabled} infoTitle="Allows reminders to be linked to lists." />
-        <ToggleRow label="List templates" isOn={savedListsEnabled} onToggle={() => onSavedListsEnabledChange(!savedListsEnabled)} disabled={!isListsEnabled} infoTitle="Enables saved list templates." />
-        <ToggleRow label="Pinned lists" isOn={pinnedListsEnabled} onToggle={() => onPinnedListsEnabledChange(!pinnedListsEnabled)} disabled={!isListsEnabled} infoTitle="Allows lists to be pinned for quick access." />
+        <ToggleRow label="Smart reminders" isOn={smartRemindersEnabled} onToggle={() => onSmartRemindersEnabledChange(!smartRemindersEnabled)} disabled={!isListsEnabled} infoTitle="Allows reminders to be linked to a list, turning them into smart reminders that track list item progress. Smart reminders display a completion count (e.g. '3 of 5 items'). Requires Enable lists to be on." />
+        <ToggleRow label="List templates" isOn={savedListsEnabled} onToggle={() => onSavedListsEnabledChange(!savedListsEnabled)} disabled={!isListsEnabled} infoTitle="Enables saved list templates that users can create and reuse. Templates appear in the list creation flow and can be pre-populated with default items. Also unlocks the 'Use default template set' setting below. Requires Enable lists to be on." />
+        <ToggleRow label="Pinned lists" isOn={pinnedListsEnabled} onToggle={() => onPinnedListsEnabledChange(!pinnedListsEnabled)} disabled={!isListsEnabled} infoTitle="Allows users to pin frequently used lists for quick access. Pinned lists appear in a dedicated section above other lists in the lists view. Requires Enable lists to be on." />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Use default template set in clean state" isOn={useDefaultTemplatesInCleanState} onToggle={() => onUseDefaultTemplatesInCleanStateChange(!useDefaultTemplatesInCleanState)} disabled={!isListsEnabled || !savedListsEnabled} infoTitle="Uses the default template set when all lists are cleared." />
+        <ToggleRow label="Use default template set in clean state" isOn={useDefaultTemplatesInCleanState} onToggle={() => onUseDefaultTemplatesInCleanStateChange(!useDefaultTemplatesInCleanState)} disabled={!isListsEnabled || !savedListsEnabled} infoTitle="When all lists are cleared, the app automatically restores the default set of list templates instead of showing an empty state. Only applies when list templates are enabled. Requires both Enable lists and List templates to be on." />
         <KeyLine />
-        <MenuRow label="Dummy lists" onClick={onNavigateDummyLists} disabled={!isListsEnabled} infoTitle="Generate and manage test lists for development." />
+        <MenuRow label="Dummy lists" onClick={onNavigateDummyLists} disabled={!isListsEnabled} infoTitle="Opens the Dummy Lists page where you can generate test lists with configurable item counts, choose to include done items, smart reminder lists, and saved list templates, then clear or regenerate. Requires Enable lists to be on." />
       </PageShell>
     </div>
       {pendingListsState !== null && (
