@@ -170,24 +170,22 @@ export default function DummyReminders({ onBack, onClose, addReminders, hideOver
       <div className="content-stretch flex flex-[1_0_0] flex-col gap-[32px] items-center min-h-px min-w-px relative w-full">
         <div className="content-stretch flex flex-col gap-[10px] items-start relative w-full" data-name="Scrollable List Area" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
           {/* Hide overdue toggle */}
-          <button
-            onClick={() => onHideOverdueChange(!hideOverdue)}
-            className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full cursor-pointer"
-          >
+          <div className="content-stretch flex h-[40px] items-center justify-between relative shrink-0 w-full">
             <div className="content-stretch flex gap-[16px] items-center relative shrink-0">
               <p className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px]" style={{ color: hideOverdue ? '#1C2C42' : '#C9C9C9' }}>Hide overdue reminders</p>
               <InfoIconWithOverlay color={hideOverdue ? '#939393' : '#D9D9D9'} header="Hide overdue reminders" title="When enabled, reminders in the 'Overdue' category are hidden from the generated dummy set. Use this to test the active list layout without overdue reminders appearing. Does not affect other reminder categories." />
             </div>
-            <div
-              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors ${hideOverdue ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
+            <button
+              onClick={() => onHideOverdueChange(!hideOverdue)}
+              className={`content-stretch flex h-[30px] items-center p-[3.75px] relative rounded-[37.5px] shrink-0 w-[56px] transition-colors cursor-pointer ${hideOverdue ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start'}`}
             >
               <div className="relative shrink-0 size-[22.5px]">
                 <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
                   <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
                 </svg>
               </div>
-            </div>
-          </button>
+            </button>
+          </div>
           <ReminderRow label="'Overdue' reminders" color="#FF0000" defaultCount="01" value={counts.overdue} onChange={updateCount('overdue')} textColor="#FF0000" repeatActive={repeats.overdue} onToggleRepeat={toggleRepeat('overdue')} />
           <ReminderRow label="'Today' reminders" color="#00AFEE" defaultCount="03" value={counts.today} onChange={updateCount('today')} repeatActive={repeats.today} onToggleRepeat={toggleRepeat('today')} />
           <ReminderRow label="'This week' reminders" color="#DF4DFC" defaultCount="02" value={counts.thisWeek} onChange={updateCount('thisWeek')} repeatActive={repeats.thisWeek} onToggleRepeat={toggleRepeat('thisWeek')} />

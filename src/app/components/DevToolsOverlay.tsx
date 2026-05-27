@@ -124,11 +124,7 @@ export function InfoIconWithOverlay({ color, header, title }: { color?: string; 
 
 function ToggleRow({ label, isOn, onToggle, disabled, infoHeader, infoTitle }: { label: string; isOn: boolean; onToggle: () => void; disabled?: boolean; infoHeader?: string; infoTitle?: string }) {
   return (
-    <button
-      onClick={() => { if (!disabled) onToggle(); }}
-      className="flex h-[30px] items-center justify-between w-full"
-      style={{ cursor: disabled ? 'default' : 'pointer' }}
-    >
+    <div className="flex h-[30px] items-center justify-between w-full">
       <div className="flex items-center gap-[16px]">
         <p
           className="font-['Lato:Bold',sans-serif] leading-[23px] not-italic text-[17px] whitespace-nowrap"
@@ -138,16 +134,18 @@ function ToggleRow({ label, isOn, onToggle, disabled, infoHeader, infoTitle }: {
         </p>
         <InfoIconWithOverlay color={disabled || !isOn ? '#D9D9D9' : undefined} header={infoHeader || label} title={infoTitle || ''} />
       </div>
-      <div
+      <button
+        onClick={() => { if (!disabled) onToggle(); }}
         className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${disabled ? 'bg-[#D9D9D9] justify-start' : (isOn ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start')}`}
+        style={{ cursor: disabled ? 'default' : 'pointer' }}
       >
         <div className="relative shrink-0 size-[22.5px]">
           <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 22.5 22.5">
             <circle cx="11.25" cy="11.25" fill="white" r="11.25" />
           </svg>
         </div>
-      </div>
-    </button>
+      </button>
+    </div>
   );
 }
 
