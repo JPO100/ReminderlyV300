@@ -125,7 +125,7 @@ export function InfoIconWithOverlay({ color, header, title }: { color?: string; 
 function ToggleRow({ label, isOn, onToggle, disabled, infoHeader, infoTitle }: { label: string; isOn: boolean; onToggle: () => void; disabled?: boolean; infoHeader?: string; infoTitle?: string }) {
   return (
     <button
-      onClick={disabled ? undefined : onToggle}
+      onClick={() => { if (!disabled) onToggle(); }}
       className="flex h-[30px] items-center justify-between w-full"
       style={{ cursor: disabled ? 'default' : 'pointer' }}
     >
@@ -154,7 +154,7 @@ function ToggleRow({ label, isOn, onToggle, disabled, infoHeader, infoTitle }: {
 function MenuRow({ label, onClick, disabled, infoHeader, infoTitle }: { label: string; onClick: () => void; disabled?: boolean; infoHeader?: string; infoTitle?: string }) {
   return (
     <button
-      onClick={disabled ? undefined : onClick}
+      onClick={() => { if (!disabled) onClick(); }}
       className="flex h-[30px] items-center justify-between w-full pr-[15px]"
       style={{ cursor: disabled ? 'default' : 'pointer' }}
     >
