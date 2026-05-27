@@ -85,7 +85,44 @@ function InfoIcon({ color = '#939393' }: { color?: string }) {
   );
 }
 
-function ToggleRow({ label, isOn, onToggle, disabled }: { label: string; isOn: boolean; onToggle: () => void; disabled?: boolean }) {
+export function DevToolsInfoOverlay({ visible, onClose, header, title }: { visible: boolean; onClose: () => void; header: string; title: string }) {
+  if (!visible) return null;
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/50 z-[60]" onClick={onClose} />
+      <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+        <div
+          className="bg-white relative flex flex-col gap-[40px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] pointer-events-auto outline-none"
+          style={{ width: 340 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p className="font-['Lato:Bold',sans-serif] text-[20px] text-[#1C2C42] leading-[normal] text-center whitespace-pre-wrap" style={{ fontWeight: 700 }}>{header}</p>
+          <p className="font-['Lato:Bold',sans-serif] text-[17px] text-[#BABABA] text-center whitespace-pre-wrap" style={{ fontWeight: 700, lineHeight: '24px' }}>{title}</p>
+          <button
+            onClick={onClose}
+            className="bg-[#4784f8] h-[50px] w-full rounded-[100px] cursor-pointer flex items-center justify-center shrink-0"
+          >
+            <p className="font-['Lato:Bold',sans-serif] text-[17px] text-white leading-[normal]" style={{ fontWeight: 700 }}>Close</p>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export function InfoIconWithOverlay({ color, header, title }: { color?: string; header: string; title: string }) {
+  const [showInfo, setShowInfo] = useState(false);
+  return (
+    <>
+      <span onClick={(e) => { e.stopPropagation(); setShowInfo(true); }} className="shrink-0 cursor-pointer">
+        <InfoIcon color={color} />
+      </span>
+      <DevToolsInfoOverlay visible={showInfo} onClose={() => setShowInfo(false)} header={header} title={title} />
+    </>
+  );
+}
+
+function ToggleRow({ label, isOn, onToggle, disabled, infoHeader, infoTitle }: { label: string; isOn: boolean; onToggle: () => void; disabled?: boolean; infoHeader?: string; infoTitle?: string }) {
   return (
     <button
       onClick={disabled ? undefined : onToggle}
@@ -99,7 +136,7 @@ function ToggleRow({ label, isOn, onToggle, disabled }: { label: string; isOn: b
         >
           {label}
         </p>
-        <InfoIcon color={disabled || !isOn ? '#D9D9D9' : undefined} />
+        <InfoIconWithOverlay color={disabled || !isOn ? '#D9D9D9' : undefined} header={infoHeader || label} title={infoTitle || ''} />
       </div>
       <div
         className={`flex h-[30px] items-center p-[3.75px] rounded-[37.5px] shrink-0 w-[56px] transition-colors ${disabled ? 'bg-[#D9D9D9] justify-start' : (isOn ? 'bg-[#4784f8] justify-end' : 'bg-[#C9C9C9] justify-start')}`}
@@ -114,7 +151,7 @@ function ToggleRow({ label, isOn, onToggle, disabled }: { label: string; isOn: b
   );
 }
 
-function MenuRow({ label, onClick, disabled }: { label: string; onClick: () => void; disabled?: boolean }) {
+function MenuRow({ label, onClick, disabled, infoHeader, infoTitle }: { label: string; onClick: () => void; disabled?: boolean; infoHeader?: string; infoTitle?: string }) {
   return (
     <button
       onClick={disabled ? undefined : onClick}
@@ -126,7 +163,7 @@ function MenuRow({ label, onClick, disabled }: { label: string; onClick: () => v
            style={{ color: disabled ? '#D9D9D9' : '#1C2C42' }}>
           {label}
         </p>
-        <InfoIcon color={disabled ? '#D9D9D9' : undefined} />
+        <InfoIconWithOverlay color={disabled ? '#D9D9D9' : undefined} header={infoHeader || label} title={infoTitle || ''} />
       </div>
       <svg width="7" height="13" viewBox="0 0 7 13" fill="none" className="shrink-0">
         <path d="M1.92753 0.349745C1.50716 -0.116582 0.82549 -0.116582 0.405113 0.349745C-0.0151913 0.816064 -0.0152062 1.57198 0.405113 2.03828L4.38238 6.45L0.315234 10.9617C-0.10508 11.428 -0.105076 12.1839 0.315234 12.6503C0.735611 13.1166 1.41728 13.1166 1.83766 12.6503L6.4969 7.48173C6.5635 7.43513 6.62678 7.37992 6.68481 7.31555C7.10508 6.84926 7.10505 6.09333 6.68481 5.62701L1.92753 0.349745Z" fill={disabled ? '#D9D9D9' : '#939393'} />
@@ -153,8 +190,8 @@ function FiltersMenuPage({ onBack, onClose, filtersMenuVariant, onFiltersMenuVar
     <PageShell title="Filters menu" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Settings" />
       <div className="flex flex-col gap-[30px] w-full" style={isListsEnabled ? { opacity: 0.5, pointerEvents: 'none' } : undefined}>
-        <ToggleRow label="Standard filters" isOn={displayVariant === 'standard'} onToggle={() => onFiltersMenuVariantChange('standard')} />
-        <ToggleRow label="Grouped filters" isOn={displayVariant === 'grouped'} onToggle={() => onFiltersMenuVariantChange('grouped')} />
+        <ToggleRow label="Standard filters" isOn={displayVariant === 'standard'} onToggle={() => onFiltersMenuVariantChange('standard')} infoTitle="Uses the standard filter layout in the filters menu." />
+        <ToggleRow label="Grouped filters" isOn={displayVariant === 'grouped'} onToggle={() => onFiltersMenuVariantChange('grouped')} infoTitle="Uses the grouped filter layout in the filters menu." />
       </div>
     </PageShell>
   );
@@ -169,7 +206,7 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
   return (
     <PageShell title="Dev tools password" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Settings" />
-      <ToggleRow label="Password required" isOn={passwordRequired} onToggle={() => onPasswordRequiredChange(!passwordRequired)} />
+      <ToggleRow label="Password required" isOn={passwordRequired} onToggle={() => onPasswordRequiredChange(!passwordRequired)} infoTitle="Requires a password to access dev tools." />
       {passwordRequired && (
         <div className="flex h-[10px] items-center w-full">
           <p className="font-['Lato:SemiBold',sans-serif] text-[14px] text-[#939393] leading-[normal]">Current password: {DEV_TOOLS_PASSWORD}</p>
@@ -250,12 +287,12 @@ function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnab
   return (
     <PageShell title="System" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Features" />
-      <ToggleRow label="Siri shortcuts" isOn={siriShortcutsEnabled} onToggle={() => onSiriShortcutsEnabledChange(!siriShortcutsEnabled)} />
-      <ToggleRow label="Settings menu" isOn={settingsMenuEnabled} onToggle={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)} />
+      <ToggleRow label="Siri shortcuts" isOn={siriShortcutsEnabled} onToggle={() => onSiriShortcutsEnabledChange(!siriShortcutsEnabled)} infoTitle="Enables Siri shortcut integration for quick actions." />
+      <ToggleRow label="Settings menu" isOn={settingsMenuEnabled} onToggle={() => onSettingsMenuEnabledChange(!settingsMenuEnabled)} infoTitle="Shows the settings menu in the main app." />
       <KeyLine />
       <SectionSubtitle text="Settings" />
-      <MenuRow label="Filters menu" onClick={onNavigateFiltersMenu} />
-      <MenuRow label="Dev tools password" onClick={onNavigateDevToolsPassword} />
+      <MenuRow label="Filters menu" onClick={onNavigateFiltersMenu} infoTitle="Configure the filters menu display variant." />
+      <MenuRow label="Dev tools password" onClick={onNavigateDevToolsPassword} infoTitle="Manage dev tools access password settings." />
     </PageShell>
   );
 }
@@ -267,18 +304,18 @@ function NaturalLanguagePage({ onBack, onClose, nlcEnabled, onNlcEnabledChange, 
     <>
     <div className="flex flex-col h-full relative w-full" data-name="natural-language-page">
       <PageShell title="Natural Language" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable Natural Language Capture" isOn={nlcEnabled} onToggle={() => setPendingNlcState(!nlcEnabled)} />
+        <ToggleRow label="Enable Natural Language Capture" isOn={nlcEnabled} onToggle={() => setPendingNlcState(!nlcEnabled)} infoTitle="Enables automatic recognition of dates and times as you type." />
         <KeyLine />
         <SectionSubtitle text="Features" />
-        <ToggleRow label="Date recognition" isOn={recognition.date} onToggle={() => onRecognitionChange({ ...recognition, date: !recognition.date })} disabled={!nlcEnabled} />
-        <ToggleRow label="Time recognition" isOn={recognition.time} onToggle={() => onRecognitionChange({ ...recognition, time: !recognition.time })} disabled={!nlcEnabled} />
-        <ToggleRow label="Repeats recognition" isOn={recognition.repeats} onToggle={() => onRecognitionChange({ ...recognition, repeats: !recognition.repeats })} disabled={!nlcEnabled} />
-        <ToggleRow label="Phone number recognition" isOn={false} onToggle={() => {}} disabled />
-        <ToggleRow label="Contact recognition" isOn={false} onToggle={() => {}} disabled />
+        <ToggleRow label="Date recognition" isOn={recognition.date} onToggle={() => onRecognitionChange({ ...recognition, date: !recognition.date })} disabled={!nlcEnabled} infoTitle="Automatically detects and parses date references in reminder text." />
+        <ToggleRow label="Time recognition" isOn={recognition.time} onToggle={() => onRecognitionChange({ ...recognition, time: !recognition.time })} disabled={!nlcEnabled} infoTitle="Automatically detects and parses time references in reminder text." />
+        <ToggleRow label="Repeats recognition" isOn={recognition.repeats} onToggle={() => onRecognitionChange({ ...recognition, repeats: !recognition.repeats })} disabled={!nlcEnabled} infoTitle="Automatically detects repeat patterns in reminder text." />
+        <ToggleRow label="Phone number recognition" isOn={false} onToggle={() => {}} disabled infoTitle="Detects phone numbers in reminder text. Coming soon." />
+        <ToggleRow label="Contact recognition" isOn={false} onToggle={() => {}} disabled infoTitle="Detects contact names in reminder text. Coming soon." />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Auto-parsing" isOn={nlcMode === 'auto'} onToggle={() => onNlcModeChange('auto')} disabled={!nlcEnabled} />
-        <ToggleRow label="Click-parsing" isOn={nlcMode === 'click'} onToggle={() => onNlcModeChange('click')} disabled={!nlcEnabled} />
+        <ToggleRow label="Auto-parsing" isOn={nlcMode === 'auto'} onToggle={() => onNlcModeChange('auto')} disabled={!nlcEnabled} infoTitle="Parses natural language automatically as you type." />
+        <ToggleRow label="Click-parsing" isOn={nlcMode === 'click'} onToggle={() => onNlcModeChange('click')} disabled={!nlcEnabled} infoTitle="Parses natural language only when explicitly triggered." />
       </PageShell>
     </div>
       {pendingNlcState !== null && (
@@ -351,11 +388,11 @@ function OnboardingPage({ onBack, onClose, isOnboardingTutorialEnabled, onOnboar
     <>
     <div className="flex flex-col h-full relative w-full" data-name="onboarding-page">
       <PageShell title="Onboarding" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable onboarding" isOn={isOnboardingTutorialEnabled} onToggle={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)} />
+        <ToggleRow label="Enable onboarding" isOn={isOnboardingTutorialEnabled} onToggle={() => setPendingOnboardingState(!isOnboardingTutorialEnabled)} infoTitle="Enables the onboarding tutorial feature." />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Show tutorial on first launch" isOn={showTutorialOnFirstLaunch} onToggle={() => { const next = !showTutorialOnFirstLaunch; onShowTutorialOnFirstLaunchChange(next); if (next) onShowTutorialOnEveryStartChange(false); }} disabled={!isOnboardingTutorialEnabled} />
-        <ToggleRow label="Show tutorial on every app start" isOn={showTutorialOnEveryStart} onToggle={() => { const next = !showTutorialOnEveryStart; onShowTutorialOnEveryStartChange(next); if (next) onShowTutorialOnFirstLaunchChange(false); }} disabled={!isOnboardingTutorialEnabled} />
+        <ToggleRow label="Show tutorial on first launch" isOn={showTutorialOnFirstLaunch} onToggle={() => { const next = !showTutorialOnFirstLaunch; onShowTutorialOnFirstLaunchChange(next); if (next) onShowTutorialOnEveryStartChange(false); }} disabled={!isOnboardingTutorialEnabled} infoTitle="Shows the tutorial on the user's first app launch." />
+        <ToggleRow label="Show tutorial on every app start" isOn={showTutorialOnEveryStart} onToggle={() => { const next = !showTutorialOnEveryStart; onShowTutorialOnEveryStartChange(next); if (next) onShowTutorialOnFirstLaunchChange(false); }} disabled={!isOnboardingTutorialEnabled} infoTitle="Shows the tutorial every time the app starts." />
       </PageShell>
     </div>
       {pendingOnboardingState !== null && (
@@ -427,14 +464,14 @@ function NotificationsAreaPage({ onBack, onClose, enableNotifications, onEnableN
   return (
     <>
     <PageShell title="Notifications" onBack={onBack} onClose={onClose}>
-      <ToggleRow label="Enable notifications" isOn={enableNotifications} onToggle={() => setPendingNotificationsState(!enableNotifications)} />
+      <ToggleRow label="Enable notifications" isOn={enableNotifications} onToggle={() => setPendingNotificationsState(!enableNotifications)} infoTitle="Enables the notifications system." />
       <KeyLine />
       <SectionSubtitle text="Features" />
-      <ToggleRow label="Reminder system notifications" isOn={reminderAlerts} onToggle={() => onReminderAlertsChange(!reminderAlerts)} disabled={!enableNotifications} />
-      <ToggleRow label="Reminder app badge notifications" isOn={appBadge} onToggle={() => onAppBadgeChange(!appBadge)} disabled={!enableNotifications} />
+      <ToggleRow label="Reminder system notifications" isOn={reminderAlerts} onToggle={() => onReminderAlertsChange(!reminderAlerts)} disabled={!enableNotifications} infoTitle="Sends system notifications for reminder alerts." />
+      <ToggleRow label="Reminder app badge notifications" isOn={appBadge} onToggle={() => onAppBadgeChange(!appBadge)} disabled={!enableNotifications} infoTitle="Shows a badge count on the app icon." />
       <KeyLine />
       <SectionSubtitle text="Settings" />
-      <ToggleRow label="Include today in app badge count" isOn={appBadge && includeTodayInBadge} onToggle={() => onIncludeTodayInBadgeChange(!includeTodayInBadge)} disabled={!enableNotifications || !appBadge} />
+      <ToggleRow label="Include today in app badge count" isOn={appBadge && includeTodayInBadge} onToggle={() => onIncludeTodayInBadgeChange(!includeTodayInBadge)} disabled={!enableNotifications || !appBadge} infoTitle="Includes today's reminders in the app badge count." />
     </PageShell>
       {pendingNotificationsState !== null && (
         <>
@@ -668,15 +705,15 @@ function RemindersPage({ onBack, onClose, enableReminders, onEnableRemindersChan
     <>
     <div className="flex flex-col h-full relative w-full" data-name="reminders-page">
       <PageShell title="Reminders" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable reminders" isOn={enableReminders} onToggle={() => setPendingRemindersState(!enableReminders)} />
+        <ToggleRow label="Enable reminders" isOn={enableReminders} onToggle={() => setPendingRemindersState(!enableReminders)} infoTitle="Enables the core reminders feature." />
         <KeyLine />
         <SectionSubtitle text="Features" />
-        <ToggleRow label="Repeat reminders" isOn={repeatToggle} onToggle={() => setRepeatToggle(prev => !prev)} disabled={!enableReminders} />
+        <ToggleRow label="Repeat reminders" isOn={repeatToggle} onToggle={() => setRepeatToggle(prev => !prev)} disabled={!enableReminders} infoTitle="Allows reminders to repeat on a schedule." />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Display 1 minute time increments" isOn={useOneMinuteIncrements} onToggle={() => onUseOneMinuteIncrementsChange(!useOneMinuteIncrements)} disabled={!enableReminders} />
+        <ToggleRow label="Display 1 minute time increments" isOn={useOneMinuteIncrements} onToggle={() => onUseOneMinuteIncrementsChange(!useOneMinuteIncrements)} disabled={!enableReminders} infoTitle="Shows one-minute intervals in the time picker." />
         <KeyLine />
-        <MenuRow label="Dummy reminders" onClick={onNavigateDummyReminders} disabled={!enableReminders} />
+        <MenuRow label="Dummy reminders" onClick={onNavigateDummyReminders} disabled={!enableReminders} infoTitle="Generate and manage test reminders for development." />
       </PageShell>
     </div>
       {pendingRemindersState !== null && (
@@ -749,17 +786,17 @@ function ListsAreaPage({ onBack, onClose, isListsEnabled, onListsEnabledChange, 
     <>
     <div className="flex flex-col h-full relative w-full" data-name="lists-area-page">
       <PageShell title="Lists" onBack={onBack} onClose={onClose}>
-        <ToggleRow label="Enable lists" isOn={isListsEnabled} onToggle={() => setPendingListsState(!isListsEnabled)} />
+        <ToggleRow label="Enable lists" isOn={isListsEnabled} onToggle={() => setPendingListsState(!isListsEnabled)} infoTitle="Enables the lists feature." />
         <KeyLine />
         <SectionSubtitle text="Features" />
-        <ToggleRow label="Smart reminders" isOn={smartRemindersEnabled} onToggle={() => onSmartRemindersEnabledChange(!smartRemindersEnabled)} disabled={!isListsEnabled} />
-        <ToggleRow label="List templates" isOn={savedListsEnabled} onToggle={() => onSavedListsEnabledChange(!savedListsEnabled)} disabled={!isListsEnabled} />
-        <ToggleRow label="Pinned lists" isOn={pinnedListsEnabled} onToggle={() => onPinnedListsEnabledChange(!pinnedListsEnabled)} disabled={!isListsEnabled} />
+        <ToggleRow label="Smart reminders" isOn={smartRemindersEnabled} onToggle={() => onSmartRemindersEnabledChange(!smartRemindersEnabled)} disabled={!isListsEnabled} infoTitle="Allows reminders to be linked to lists." />
+        <ToggleRow label="List templates" isOn={savedListsEnabled} onToggle={() => onSavedListsEnabledChange(!savedListsEnabled)} disabled={!isListsEnabled} infoTitle="Enables saved list templates." />
+        <ToggleRow label="Pinned lists" isOn={pinnedListsEnabled} onToggle={() => onPinnedListsEnabledChange(!pinnedListsEnabled)} disabled={!isListsEnabled} infoTitle="Allows lists to be pinned for quick access." />
         <KeyLine />
         <SectionSubtitle text="Settings" />
-        <ToggleRow label="Use default template set in clean state" isOn={useDefaultTemplatesInCleanState} onToggle={() => onUseDefaultTemplatesInCleanStateChange(!useDefaultTemplatesInCleanState)} disabled={!isListsEnabled || !savedListsEnabled} />
+        <ToggleRow label="Use default template set in clean state" isOn={useDefaultTemplatesInCleanState} onToggle={() => onUseDefaultTemplatesInCleanStateChange(!useDefaultTemplatesInCleanState)} disabled={!isListsEnabled || !savedListsEnabled} infoTitle="Uses the default template set when all lists are cleared." />
         <KeyLine />
-        <MenuRow label="Dummy lists" onClick={onNavigateDummyLists} disabled={!isListsEnabled} />
+        <MenuRow label="Dummy lists" onClick={onNavigateDummyLists} disabled={!isListsEnabled} infoTitle="Generate and manage test lists for development." />
       </PageShell>
     </div>
       {pendingListsState !== null && (
