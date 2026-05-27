@@ -2,6 +2,7 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import type { Reminder } from "./reminder-utils";
 
 export const PENDING_NOTIFICATION_REMINDER_ID_KEY = "reminderly.pendingNotificationReminderId";
+export const PENDING_NOTIFICATION_ACTION_KEY = "reminderly.pendingNotificationAction";
 export const NOTIFICATION_TAP_EVENT = "reminderly:notification-tap";
 
 type ScheduledNotificationPayload = {
@@ -10,7 +11,22 @@ type ScheduledNotificationPayload = {
     body: string;
     schedule: { at: Date };
     extra: { reminderId: string };
+    actionTypeId: string;
 };
+
+export async function registerNotificationActionTypes() {
+    await LocalNotifications.registerActionTypes({
+        types: [
+            {
+                id: "reminder-actions",
+                actions: [
+                    { id: "mark-done", title: "Mark as done" },
+                    { id: "move-tomorrow", title: "Move to tomorrow" },
+                ],
+            },
+        ],
+    });
+}
 
 function toNotificationAtIso(value: unknown): string | null {
     if (value instanceof Date) return value.toISOString();
@@ -67,6 +83,7 @@ export function buildScheduledNotifications(reminders: Reminder[]): ScheduledNot
                 body: reminder.displayText,
                 schedule: { at },
                 extra: { reminderId: reminder.id },
+                actionTypeId: "reminder-actions",
             };
         });
 }

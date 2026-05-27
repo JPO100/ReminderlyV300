@@ -1673,19 +1673,6 @@ export default function App() {
     }
   }, [activeMainTab]);
 
-  useNotificationTapHandler({
-    reminders,
-    setActiveMainTab,
-    setIsTutorialOpen,
-    setIsOverlayOpen,
-    setIsListsOverlayOpen,
-    setIsRepeatsOverlayOpen,
-    setIsSettingsOpen,
-    setViewMode,
-    setActiveFilter,
-    setInfoReminder,
-  });
-
   const getTutorialSeenStorageKey = (variant: TutorialVariant) => (
     variant === 'lists' ? 'reminderly-tutorial-lists-shown' : 'reminderly-tutorial-reminders-shown'
   );
@@ -3106,6 +3093,21 @@ export default function App() {
       );
     }
   }, [reminders]);
+
+  useNotificationTapHandler({
+    reminders,
+    setActiveMainTab,
+    setIsTutorialOpen,
+    setIsOverlayOpen,
+    setIsListsOverlayOpen,
+    setIsRepeatsOverlayOpen,
+    setIsSettingsOpen,
+    setViewMode,
+    setActiveFilter,
+    setInfoReminder,
+    onMarkAsDone: handleCompleteClick,
+    onMoveToTomorrow: handleMoveReminderToTomorrow,
+  });
 
   useEffect(() => {
     handleCompleteClickRef.current = handleCompleteClick;
