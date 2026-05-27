@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
 import { runChecks, formatReportAsText, groupResultsBySection } from "../dev/check-system";
 import type { RunReport } from "../dev/check-system";
@@ -87,7 +88,7 @@ function InfoIcon({ color = '#939393' }: { color?: string }) {
 
 export function DevToolsInfoOverlay({ visible, onClose, header, title }: { visible: boolean; onClose: () => void; header: string; title: string }) {
   if (!visible) return null;
-  return (
+  return createPortal(
     <>
       <div className="fixed inset-0 bg-black/50 z-[60]" onClick={onClose} />
       <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
@@ -106,7 +107,8 @@ export function DevToolsInfoOverlay({ visible, onClose, header, title }: { visib
           </button>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
 
