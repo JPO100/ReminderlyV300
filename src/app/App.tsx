@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { registerPlugin } from "@capacitor/core";
+
 import { Badge } from "@capawesome/capacitor-badge";
 import { motion, AnimatePresence, useDragControls } from "motion/react";
 import svgPaths from "../imports/svg-tzdfx9foxi";
@@ -223,7 +223,7 @@ const APP_TEXT_DARK_BLUE = "#1C2C42";
 const DEFAULT_TEMPLATES_IN_CLEAN_STATE_STORAGE_KEY = 'reminderly-dev-default-templates-in-clean-state';
 const DONE_LIST_COLOUR = "#404040";
 type TutorialVariant = 'reminders' | 'lists';
-const CapacitorApp = registerPlugin("App");
+
 
 // Deleted grey constant for deleted styling
 const DELETED_GREY = "#939393";
@@ -1479,14 +1479,14 @@ export default function App() {
   }, [clearCreateTemplateFeedbackTimers]);
 
   useEffect(() => {
-    const listener = CapacitorApp.addListener('appStateChange', (state: { isActive: boolean }) => {
-      if (state.isActive) {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
         setTimeRefreshTick((tick) => tick + 1);
       }
-    });
-
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => {
-      void listener.then((handle) => handle.remove());
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
