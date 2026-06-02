@@ -68,12 +68,22 @@ function getNotificationSignature(notification: {
 const MAX_SCHEDULED_NOTIFICATIONS = 64;
 const MIDNIGHT_BADGE_NOTIFICATION_ID = 2147483647;
 
+function hasActiveDateOnlyReminder(reminders: Reminder[]): boolean {
+    return reminders.some((r) =>
+        r.completedAt == null &&
+        r.deletedAt == null &&
+        r.schedule.kind === "scheduled" &&
+        !r.schedule.time
+    );
+}
+
 function buildMidnightBadgeNotification(
     reminders: Reminder[],
     notifAppBadge: boolean,
     notifIncludeTodayInBadge: boolean,
 ): ScheduledNotificationPayload | null {
     if (!notifAppBadge) return null;
+    if (!hasActiveDateOnlyReminder(reminders)) return null;
 
     const now = new Date();
     const midnight = new Date(now);
