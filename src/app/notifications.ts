@@ -14,6 +14,7 @@ type ScheduledNotificationPayload = {
     extra: { reminderId: string; badgeDeltaOnAction: number };
     actionTypeId: string;
     badge: number;
+    silent?: boolean;
 };
 
 export async function registerNotificationActionTypes() {
@@ -65,12 +66,42 @@ function getNotificationSignature(notification: {
 }
 
 const MAX_SCHEDULED_NOTIFICATIONS = 64;
+const MIDNIGHT_BADGE_NOTIFICATION_ID = 2147483647;
+
+function buildMidnightBadgeNotification(
+    reminders: Reminder[],
+    notifAppBadge: boolean,
+    notifIncludeTodayInBadge: boolean,
+): ScheduledNotificationPayload | null {
+    if (!notifAppBadge) return null;
+
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setDate(midnight.getDate() + 1);
+    midnight.setHours(0, 0, 0, 0);
+
+    const badge = computeBadgeCount(reminders, notifIncludeTodayInBadge, new Date(midnight.getTime() + 1));
+
+    return {
+        id: MIDNIGHT_BADGE_NOTIFICATION_ID,
+        title: "",
+        body: "",
+        schedule: { at: midnight },
+        extra: { reminderId: "", badgeDeltaOnAction: 0 },
+        actionTypeId: "",
+        silent: true,
+        badge,
+    };
+}
 
 export function buildScheduledNotifications(
     reminders: Reminder[],
     notifAppBadge: boolean,
     notifIncludeTodayInBadge: boolean,
 ): ScheduledNotificationPayload[] {
+    const midnightNotification = buildMidnightBadgeNotification(reminders, notifAppBadge, notifIncludeTodayInBadge);
+    const reservedSlots = midnightNotification ? 1 : 0;
+
     const notifications = reminders
         .filter((reminder) => {
             if (reminder.completedAt != null) return false;
@@ -112,7 +143,13 @@ export function buildScheduledNotifications(
         });
 
     notifications.sort((a, b) => a.schedule.at.getTime() - b.schedule.at.getTime());
-    return notifications.slice(0, MAX_SCHEDULED_NOTIFICATIONS);
+    const result = notifications.slice(0, MAX_SCHEDULED_NOTIFICATIONS - reservedSlots);
+
+    if (midnightNotification) {
+        result.push(midnightNotification);
+    }
+
+    return result;
 }
 
 export async function syncReminderNotifications(
