@@ -15,7 +15,7 @@ import type { RepeatRule } from "./types/reminder";
 import type { NlcMode } from "./utils/nlc-interaction";
 import type { NlcRecognitionConfig } from "./utils/nlc-parser";
 import { renderReminderText, getDisplayTitle } from "./utils/render-text";
-import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow, formatReminderNextOccurrenceLabel, formatRepeatRuleText, computeBadgeCount, getNextBadgeBoundary } from "./reminder-utils";
+import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow, formatReminderNextOccurrenceLabel, formatRepeatRuleText, computeBadgeCount, getNextTimeRefreshBoundary } from "./reminder-utils";
 import { parseTokens, MONTH_NAME_TO_NUMBER } from "./utils/nlc-parser";
 import { computeAutoApplyResult, computeTokenClickResult } from "./utils/nlc-interaction";
 import { normaliseReminderText } from "./utils/normalise-text";
@@ -1511,12 +1511,21 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const ms = getNextBadgeBoundary(reminders, new Date());
+    const now = new Date();
+    const ms = getNextTimeRefreshBoundary(reminders, now);
     if (ms == null) return;
-    const timer = window.setTimeout(() => {
-      setTimeRefreshTick((tick) => tick + 1);
-    }, ms + 100);
-    return () => { clearTimeout(timer); };
+    const boundaryTs = now.getTime() + ms;
+    let timerId: number;
+    const check = () => {
+      if (Date.now() >= boundaryTs + 100) {
+        setTimeRefreshTick((tick) => tick + 1);
+      } else {
+        const remaining = boundaryTs + 100 - Date.now();
+        timerId = window.setTimeout(check, Math.min(remaining, 30_000));
+      }
+    };
+    timerId = window.setTimeout(check, Math.min(ms + 100, 30_000));
+    return () => { clearTimeout(timerId); };
   }, [reminders, timeRefreshTick]);
 
   useEffect(() => {

@@ -137,7 +137,7 @@ export function computeBadgeCount(
   return count;
 }
 
-export function getNextBadgeBoundary(reminders: Reminder[], now: Date): number | null {
+export function getNextTimeRefreshBoundary(reminders: Reminder[], now: Date): number | null {
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
   const tomorrowStart = new Date(todayStart);
