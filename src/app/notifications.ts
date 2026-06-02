@@ -1,6 +1,6 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import type { Reminder } from "./reminder-utils";
-import { computeBadgeCount, categoriseReminder } from "./reminder-utils";
+import { computeBadgeCount } from "./reminder-utils";
 
 export const PENDING_NOTIFICATION_REMINDER_ID_KEY = "reminderly.pendingNotificationReminderId";
 export const PENDING_NOTIFICATION_ACTION_KEY = "reminderly.pendingNotificationAction";
@@ -98,10 +98,7 @@ export function buildScheduledNotifications(
                 ? computeBadgeCount(reminders, notifIncludeTodayInBadge, new Date(at.getTime() + 1))
                 : 0;
 
-            const badgeDeltaOnAction =
-                notifAppBadge && notifIncludeTodayInBadge && categoriseReminder(reminder, new Date()) === "today"
-                    ? 1
-                    : 0;
+            const badgeDeltaOnAction = badge > 0 ? 1 : 0;
 
             return {
                 id: notificationId,
