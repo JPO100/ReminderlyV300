@@ -1,5 +1,6 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import type { Reminder } from "./reminder-utils";
+import { computeBadgeCount } from "./reminder-utils";
 
 export const PENDING_NOTIFICATION_REMINDER_ID_KEY = "reminderly.pendingNotificationReminderId";
 export const PENDING_NOTIFICATION_ACTION_KEY = "reminderly.pendingNotificationAction";
@@ -12,6 +13,7 @@ type ScheduledNotificationPayload = {
     schedule: { at: Date };
     extra: { reminderId: string };
     actionTypeId: string;
+    badge: number;
 };
 
 export async function registerNotificationActionTypes() {
@@ -48,6 +50,7 @@ function getNotificationSignature(notification: {
     schedule?: { at?: unknown };
     extra?: { reminderId?: unknown };
     actionTypeId?: string;
+    badge?: number;
 }): string {
     return JSON.stringify({
         id: notification.id ?? null,
@@ -56,11 +59,18 @@ function getNotificationSignature(notification: {
         at: toNotificationAtIso(notification.schedule?.at) ?? null,
         reminderId: typeof notification.extra?.reminderId === "string" ? notification.extra.reminderId : null,
         actionTypeId: notification.actionTypeId ?? "",
+        badge: notification.badge ?? 0,
     });
 }
 
-export function buildScheduledNotifications(reminders: Reminder[]): ScheduledNotificationPayload[] {
-    return reminders
+const MAX_SCHEDULED_NOTIFICATIONS = 64;
+
+export function buildScheduledNotifications(
+    reminders: Reminder[],
+    notifAppBadge: boolean,
+    notifIncludeTodayInBadge: boolean,
+): ScheduledNotificationPayload[] {
+    const notifications = reminders
         .filter((reminder) => {
             if (reminder.completedAt != null) return false;
             if (reminder.deletedAt != null) return false;
@@ -83,6 +93,10 @@ export function buildScheduledNotifications(reminders: Reminder[]): ScheduledNot
                 1
             );
 
+            const badge = notifAppBadge
+                ? computeBadgeCount(reminders, notifIncludeTodayInBadge, new Date(at.getTime() + 1))
+                : 0;
+
             return {
                 id: notificationId,
                 title: "Reminderly",
@@ -90,15 +104,23 @@ export function buildScheduledNotifications(reminders: Reminder[]): ScheduledNot
                 schedule: { at },
                 extra: { reminderId: reminder.id },
                 actionTypeId: "reminder-actions",
+                badge,
             };
         });
+
+    notifications.sort((a, b) => a.schedule.at.getTime() - b.schedule.at.getTime());
+    return notifications.slice(0, MAX_SCHEDULED_NOTIFICATIONS);
 }
 
-export async function syncReminderNotifications(reminders: Reminder[]) {
+export async function syncReminderNotifications(
+    reminders: Reminder[],
+    notifAppBadge: boolean,
+    notifIncludeTodayInBadge: boolean,
+) {
     const permission = await LocalNotifications.requestPermissions();
     if (permission.display !== "granted") return;
 
-    const notifications = buildScheduledNotifications(reminders);
+    const notifications = buildScheduledNotifications(reminders, notifAppBadge, notifIncludeTodayInBadge);
     const pending = await LocalNotifications.getPending();
 
     const pendingSignatures = pending.notifications

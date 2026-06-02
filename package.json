@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "guard:repo": "node scripts/guard-no-ui-suite.mjs"
+    "guard:repo": "node scripts/guard-no-ui-suite.mjs",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.0",
@@ -75,6 +76,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
+    "patch-package": "^8.0.1",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
   },

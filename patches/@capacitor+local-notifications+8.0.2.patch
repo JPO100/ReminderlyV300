@@ -1,0 +1,15 @@
+diff --git a/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsPlugin.swift b/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsPlugin.swift
+index 463be9a..f2ce02a 100644
+--- a/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsPlugin.swift
++++ b/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsPlugin.swift
+@@ -247,6 +247,10 @@ public class LocalNotificationsPlugin: CAPPlugin, CAPBridgedPlugin {
+             "cap_schedule": schedule
+         ]
+
++        if let badgeValue = notification["badge"] as? Int {
++            content.badge = NSNumber(value: badgeValue)
++        }
++
+         if let actionTypeId = notification["actionTypeId"] as? String {
+             content.categoryIdentifier = actionTypeId
+         }

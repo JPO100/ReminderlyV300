@@ -1343,8 +1343,8 @@ export default function App() {
   }, [reminders]);
 
   useEffect(() => {
-    void syncReminderNotifications(reminders);
-  }, [reminders]);
+    void syncReminderNotifications(reminders, notifAppBadge, notifIncludeTodayInBadge);
+  }, [reminders, notifAppBadge, notifIncludeTodayInBadge]);
 
   // Persist showDateAndTimeSubtitles to localStorage
   useEffect(() => {
