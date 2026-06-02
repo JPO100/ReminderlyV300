@@ -1,3 +1,111 @@
+diff --git a/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsHandler.swift b/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsHandler.swift
+index e0bf257..7e6076f 100644
+--- a/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsHandler.swift
++++ b/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsHandler.swift
+@@ -26,6 +26,10 @@ public class LocalNotificationsHandler: NSObject, NotificationHandlerProtocol {
+     public func willPresent(notification: UNNotification) -> UNNotificationPresentationOptions {
+         let notificationData = makeNotificationRequestJSObject(notification.request)
+ 
++        if let badgeValue = notification.request.content.badge?.intValue {
++            UserDefaults.standard.set(badgeValue, forKey: Self.nativeBadgeCountKey)
++        }
++
+         self.plugin?.notifyListeners("localNotificationReceived", data: notificationData)
+ 
+         if let options = notificationRequestLookup[notification.request.identifier] {
+@@ -42,15 +46,14 @@ public class LocalNotificationsHandler: NSObject, NotificationHandlerProtocol {
+         ]
+     }
+ 
++    private static let nativeBadgeCountKey = "reminderly.nativeBadgeCount"
++
+     public func didReceive(response: UNNotificationResponse) {
+         var data = JSObject()
+ 
+-        // Get the info for the original notification request
+         let originalNotificationRequest = response.notification.request
+-
+         let actionId = response.actionIdentifier
+ 
+-        // We turn the two default actions (open/dismiss) into generic strings
+         if actionId == UNNotificationDefaultActionIdentifier {
+             data["actionId"] = "tap"
+         } else if actionId == UNNotificationDismissActionIdentifier {
+@@ -59,16 +62,73 @@ public class LocalNotificationsHandler: NSObject, NotificationHandlerProtocol {
+             data["actionId"] = actionId
+         }
+ 
+-        // If the type of action was for an input type, get the value
+         if let inputType = response as? UNTextInputNotificationResponse {
+             data["inputValue"] = inputType.userText
+         }
+ 
+         data["notification"] = makeNotificationRequestJSObject(originalNotificationRequest)
+ 
++        if actionId == "mark-done" || actionId == "move-tomorrow" {
++            let extra = originalNotificationRequest.content.userInfo["cap_extra"] as? [String: Any] ?? [:]
++            let delta = extra["badgeDeltaOnAction"] as? Int ?? 0
++            if delta > 0 {
++                correctBadgeAfterAction(delta: delta)
++            }
++        }
++
+         self.plugin?.notifyListeners("localNotificationActionPerformed", data: data, retainUntilConsumed: true)
+     }
+ 
++    private func correctBadgeAfterAction(delta: Int) {
++        let current = UIApplication.shared.applicationIconBadgeNumber
++        let corrected = max(current - delta, 0)
++
++        UserDefaults.standard.set(corrected, forKey: Self.nativeBadgeCountKey)
++        UIApplication.shared.applicationIconBadgeNumber = corrected
++
++        reschedulePendingBadges(delta: delta)
++    }
++
++    private func reschedulePendingBadges(delta: Int) {
++        var backgroundTaskId: UIBackgroundTaskIdentifier = .invalid
++        backgroundTaskId = UIApplication.shared.beginBackgroundTask {
++            UIApplication.shared.endBackgroundTask(backgroundTaskId)
++            backgroundTaskId = .invalid
++        }
++
++        let center = UNUserNotificationCenter.current()
++        center.getPendingNotificationRequests { requests in
++            let group = DispatchGroup()
++
++            for request in requests {
++                guard let trigger = request.trigger else { continue }
++
++                let oldBadge = request.content.badge?.intValue ?? 0
++                guard oldBadge > 0 else { continue }
++
++                let newContent = request.content.mutableCopy() as! UNMutableNotificationContent
++                newContent.badge = NSNumber(value: max(oldBadge - delta, 0))
++
++                let newRequest = UNNotificationRequest(
++                    identifier: request.identifier,
++                    content: newContent,
++                    trigger: trigger
++                )
++
++                group.enter()
++                center.add(newRequest) { _ in
++                    group.leave()
++                }
++            }
++
++            group.notify(queue: .main) {
++                if backgroundTaskId != .invalid {
++                    UIApplication.shared.endBackgroundTask(backgroundTaskId)
++                }
++            }
++        }
++    }
++
+     /**
+      * Turn a UNNotificationRequest into a JSObject to return back to the client.
+      */
 diff --git a/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsPlugin.swift b/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsPlugin.swift
 index 463be9a..f2ce02a 100644
 --- a/node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/LocalNotificationsPlugin.swift
@@ -5,7 +113,7 @@ index 463be9a..f2ce02a 100644
 @@ -247,6 +247,10 @@ public class LocalNotificationsPlugin: CAPPlugin, CAPBridgedPlugin {
              "cap_schedule": schedule
          ]
-
+ 
 +        if let badgeValue = notification["badge"] as? Int {
 +            content.badge = NSNumber(value: badgeValue)
 +        }

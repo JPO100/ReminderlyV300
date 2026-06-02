@@ -1,6 +1,6 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import type { Reminder } from "./reminder-utils";
-import { computeBadgeCount } from "./reminder-utils";
+import { computeBadgeCount, categoriseReminder } from "./reminder-utils";
 
 export const PENDING_NOTIFICATION_REMINDER_ID_KEY = "reminderly.pendingNotificationReminderId";
 export const PENDING_NOTIFICATION_ACTION_KEY = "reminderly.pendingNotificationAction";
@@ -11,7 +11,7 @@ type ScheduledNotificationPayload = {
     title: string;
     body: string;
     schedule: { at: Date };
-    extra: { reminderId: string };
+    extra: { reminderId: string; badgeDeltaOnAction: number };
     actionTypeId: string;
     badge: number;
 };
@@ -48,7 +48,7 @@ function getNotificationSignature(notification: {
     title?: string;
     body?: string;
     schedule?: { at?: unknown };
-    extra?: { reminderId?: unknown };
+    extra?: { reminderId?: unknown; badgeDeltaOnAction?: unknown };
     actionTypeId?: string;
     badge?: number;
 }): string {
@@ -58,6 +58,7 @@ function getNotificationSignature(notification: {
         body: notification.body ?? "",
         at: toNotificationAtIso(notification.schedule?.at) ?? null,
         reminderId: typeof notification.extra?.reminderId === "string" ? notification.extra.reminderId : null,
+        badgeDeltaOnAction: typeof notification.extra?.badgeDeltaOnAction === "number" ? notification.extra.badgeDeltaOnAction : 0,
         actionTypeId: notification.actionTypeId ?? "",
         badge: notification.badge ?? 0,
     });
@@ -97,12 +98,17 @@ export function buildScheduledNotifications(
                 ? computeBadgeCount(reminders, notifIncludeTodayInBadge, new Date(at.getTime() + 1))
                 : 0;
 
+            const badgeDeltaOnAction =
+                notifAppBadge && notifIncludeTodayInBadge && categoriseReminder(reminder, new Date()) === "today"
+                    ? 1
+                    : 0;
+
             return {
                 id: notificationId,
                 title: "Reminderly",
                 body: reminder.displayText,
                 schedule: { at },
-                extra: { reminderId: reminder.id },
+                extra: { reminderId: reminder.id, badgeDeltaOnAction },
                 actionTypeId: "reminder-actions",
                 badge,
             };
