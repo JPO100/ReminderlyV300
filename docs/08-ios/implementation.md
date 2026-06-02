@@ -106,6 +106,30 @@ The current iOS shell participates in local notification support through Capacit
 
 `src/app/notifications.ts` derives local notifications from the current reminder set and syncs them through the Capacitor local notifications API.
 
+## patch-package: Local Notifications Badge Support
+
+The `@capacitor/local-notifications` plugin does not natively pass the `badge` field from the JS notification payload to `UNMutableNotificationContent.badge`. A patch applied via `patch-package` adds this support.
+
+Patch file: `patches/@capacitor+local-notifications+8.0.2.patch`
+
+The patch modifies two files in `node_modules/@capacitor/local-notifications/ios/Sources/LocalNotificationsPlugin/`:
+
+### LocalNotificationsPlugin.swift
+
+In `makeNotificationContent`: reads `badge` from the notification JSObject and sets `content.badge = NSNumber(value: badgeValue)`. This enables iOS to update the app icon badge when a local notification fires, including when the app is backgrounded or force-closed.
+
+### LocalNotificationsHandler.swift
+
+Adds badge correction and tracking:
+
+- `willPresent`: stores the notification's badge value to `UserDefaults` under `reminderly.nativeBadgeCount` when a notification is delivered in the foreground
+- `didReceive`: when a `mark-done` or `move-tomorrow` action is taken, reads `badgeDeltaOnAction` from the notification's `cap_extra` userInfo. If delta > 0, reads the current badge from `UIApplication.shared.applicationIconBadgeNumber`, decrements by delta (clamped to 0), writes to `UserDefaults`, sets the app icon badge, and reschedules all pending notifications with corrected badge values
+- `reschedulePendingBadges`: uses `beginBackgroundTask` as a safety net, iterates pending notification requests, decrements each badge by delta, and re-adds with the same identifier and trigger
+
+### Maintenance
+
+The `postinstall` script in `package.json` runs `patch-package` so the patch is applied automatically on `npm install`. If upgrading `@capacitor/local-notifications`, the patch must be regenerated or verified against the new version.
+
 ## Relationship Between Native and Web Layers
 
 The current relationship is:
@@ -113,5 +137,6 @@ The current relationship is:
 - native iOS provides the app container, scene lifecycle, launch screen, orientation rules, and plugin bridge
 - the web app provides the full product UI and business logic
 - notification scheduling and tap handling are implemented in the web app, but delivered through the native Capacitor plugin bridge
+- native badge correction on notification actions is handled in the patched `LocalNotificationsHandler.swift`
 
-There is no duplicated native Swift feature implementation for reminders, lists, filters, overlays, or settings.
+There is no duplicated native Swift feature implementation for reminders, lists, filters, overlays, or settings. The native badge correction operates on badge counts only — reminder state changes (mark-done, move-tomorrow, repeat spawning) are handled by the JS layer when the app opens.
