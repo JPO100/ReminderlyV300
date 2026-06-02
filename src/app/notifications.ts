@@ -94,6 +94,39 @@ export function buildScheduledNotifications(reminders: Reminder[]): ScheduledNot
         });
 }
 
+// TEMPORARY SPIKE — Stage 2 badge tests. Remove after testing.
+export async function scheduleBadgeSpike() {
+    const permission = await LocalNotifications.requestPermissions();
+    if (permission.display !== "granted") return;
+
+    const now = Date.now();
+
+    // Spike A: visible notification with badge=5, fires in 2 minutes
+    const spikeA = {
+        id: 999901,
+        title: "Spike A",
+        body: "Badge should be 5",
+        schedule: { at: new Date(now + 2 * 60 * 1000) },
+        extra: { reminderId: "spike-a" },
+        actionTypeId: "reminder-actions",
+        badge: 5,
+    };
+
+    // Spike B: silent badge-only notification with badge=7, fires in 3 minutes
+    const spikeB = {
+        id: 999902,
+        title: "",
+        body: "",
+        schedule: { at: new Date(now + 3 * 60 * 1000) },
+        extra: { reminderId: "spike-b" },
+        badge: 7,
+    };
+
+    await LocalNotifications.schedule({ notifications: [spikeA, spikeB] as any });
+    console.log("[SPIKE] Spike A scheduled for", new Date(now + 2 * 60 * 1000).toLocaleTimeString());
+    console.log("[SPIKE] Spike B scheduled for", new Date(now + 3 * 60 * 1000).toLocaleTimeString());
+}
+
 export async function syncReminderNotifications(reminders: Reminder[]) {
     const permission = await LocalNotifications.requestPermissions();
     if (permission.display !== "granted") return;
@@ -101,7 +134,10 @@ export async function syncReminderNotifications(reminders: Reminder[]) {
     const notifications = buildScheduledNotifications(reminders);
     const pending = await LocalNotifications.getPending();
 
+    // TEMPORARY SPIKE — exclude spike IDs from signature comparison
+    const SPIKE_IDS_SIG = new Set([999901, 999902]);
     const pendingSignatures = pending.notifications
+        .filter((notification) => !SPIKE_IDS_SIG.has(notification.id))
         .map((notification) => getNotificationSignature(notification))
         .sort();
     const desiredSignatures = notifications
@@ -115,9 +151,12 @@ export async function syncReminderNotifications(reminders: Reminder[]) {
         return;
     }
 
-    if (pending.notifications.length > 0) {
+    // TEMPORARY SPIKE — preserve spike notification IDs during cancel
+    const SPIKE_IDS = new Set([999901, 999902]);
+    const toCancel = pending.notifications.filter((notification) => !SPIKE_IDS.has(notification.id));
+    if (toCancel.length > 0) {
         await LocalNotifications.cancel({
-            notifications: pending.notifications.map((notification) => ({
+            notifications: toCancel.map((notification) => ({
                 id: notification.id,
             })),
         });

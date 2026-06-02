@@ -23,7 +23,7 @@ import { repeatConfigToRule } from "./utils/repeat-conversion";
 import type { Reminder, ReminderCategory, ReminderSchedule, RepeatConfig, ViewMode, FiltersMenuVariant } from "./reminder-utils";
 import { formatTime12h } from "./utils/normalise-text";
 import { scheduleEquality } from "./utils/schedule";
-import { PENDING_NOTIFICATION_REMINDER_ID_KEY, syncReminderNotifications } from "./notifications";
+import { PENDING_NOTIFICATION_REMINDER_ID_KEY, syncReminderNotifications, scheduleBadgeSpike } from "./notifications";
 import { useNotificationTapHandler } from "./useNotificationTapHandler";
 import laterBtnPaths from "../imports/svg-0tntgsesap";
 import listInfoOverlayPaths from "../imports/svg-oxn8g14l6y";
@@ -1508,6 +1508,11 @@ export default function App() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       void appListener.then((handle) => handle.remove());
     };
+  }, []);
+
+  // TEMPORARY SPIKE — Stage 2 badge tests. Remove after testing.
+  useEffect(() => {
+    void scheduleBadgeSpike();
   }, []);
 
   useEffect(() => {
