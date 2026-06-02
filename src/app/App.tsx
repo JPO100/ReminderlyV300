@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
 import { Badge } from "@capawesome/capacitor-badge";
+import { App as CapacitorApp } from "@capacitor/app";
 import { motion, AnimatePresence, useDragControls } from "motion/react";
 import svgPaths from "../imports/svg-tzdfx9foxi";
 import doneTickPaths from "../imports/svg-c9judk5sbu";
@@ -14,7 +15,7 @@ import type { RepeatRule } from "./types/reminder";
 import type { NlcMode } from "./utils/nlc-interaction";
 import type { NlcRecognitionConfig } from "./utils/nlc-parser";
 import { renderReminderText, getDisplayTitle } from "./utils/render-text";
-import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow, formatReminderNextOccurrenceLabel, formatRepeatRuleText } from "./reminder-utils";
+import { STORAGE_KEY, loadReminders, isOverdue, categoriseReminder, sortReminders, formatRepeatLabel, formatScheduledDateForRow, formatReminderNextOccurrenceLabel, formatRepeatRuleText, computeBadgeCount, getNextBadgeBoundary } from "./reminder-utils";
 import { parseTokens, MONTH_NAME_TO_NUMBER } from "./utils/nlc-parser";
 import { computeAutoApplyResult, computeTokenClickResult } from "./utils/nlc-interaction";
 import { normaliseReminderText } from "./utils/normalise-text";
@@ -1479,17 +1480,44 @@ export default function App() {
   }, [clearCreateTemplateFeedbackTimers]);
 
   useEffect(() => {
+    let lastRefreshTs = 0;
+    const DEDUP_MS = 500;
+
+    const triggerRefresh = () => {
+      const now = Date.now();
+      if (now - lastRefreshTs < DEDUP_MS) return;
+      lastRefreshTs = now;
+      setTimeRefreshTick((tick) => tick + 1);
+    };
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        setTimeRefreshTick((tick) => tick + 1);
+        triggerRefresh();
       }
     };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const appListener = CapacitorApp.addListener('appStateChange', (state) => {
+      if (state.isActive) {
+        triggerRefresh();
+      }
+    });
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      void appListener.then((handle) => handle.remove());
     };
   }, []);
 
+  useEffect(() => {
+    const ms = getNextBadgeBoundary(reminders, new Date());
+    if (ms == null) return;
+    const timer = window.setTimeout(() => {
+      setTimeRefreshTick((tick) => tick + 1);
+    }, ms + 100);
+    return () => { clearTimeout(timer); };
+  }, [reminders, timeRefreshTick]);
 
   useEffect(() => {
     if (!isListsEnabled) {
@@ -1535,16 +1563,7 @@ export default function App() {
       void Badge.clear();
       return;
     }
-    const now = new Date();
-    let count = 0;
-    for (const r of reminders) {
-      if (r.completedAt || r.deletedAt || r.schedule.kind !== 'scheduled') continue;
-      if (isOverdue(r, now)) {
-        count++;
-      } else if (notifIncludeTodayInBadge && categoriseReminder(r, now) === 'today') {
-        count++;
-      }
-    }
+    const count = computeBadgeCount(reminders, notifIncludeTodayInBadge, new Date());
     void Badge.set({ count });
   }, [reminders, notifAppBadge, notifIncludeTodayInBadge, timeRefreshTick]);
 

@@ -120,6 +120,55 @@ export function loadReminders(): Reminder[] {
   }
 }
 
+export function computeBadgeCount(
+  reminders: Reminder[],
+  includeTodayInBadge: boolean,
+  now: Date
+): number {
+  let count = 0;
+  for (const r of reminders) {
+    if (r.completedAt || r.deletedAt || r.schedule.kind !== 'scheduled') continue;
+    if (isOverdue(r, now)) {
+      count++;
+    } else if (includeTodayInBadge && categoriseReminder(r, now) === 'today') {
+      count++;
+    }
+  }
+  return count;
+}
+
+export function getNextBadgeBoundary(reminders: Reminder[], now: Date): number | null {
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+  const msToMidnight = tomorrowStart.getTime() - now.getTime();
+
+  let earliest = msToMidnight;
+
+  for (const r of reminders) {
+    if (r.completedAt || r.deletedAt) continue;
+    if (r.schedule.kind !== 'scheduled' || !r.schedule.time) continue;
+
+    const [y, m, d] = r.schedule.date.split('-').map(Number);
+    const reminderDate = new Date(y, m - 1, d);
+    reminderDate.setHours(0, 0, 0, 0);
+
+    if (reminderDate.getTime() !== todayStart.getTime()) continue;
+
+    const [hh, mm] = r.schedule.time.split(':').map(Number);
+    const scheduledMoment = new Date(y, m - 1, d, hh, mm, 0, 0);
+    const msUntil = scheduledMoment.getTime() - now.getTime();
+
+    if (msUntil > 0 && msUntil < earliest) {
+      earliest = msUntil;
+    }
+  }
+
+  if (earliest <= 0) return null;
+  return earliest;
+}
+
 // Pure helper: is a scheduled reminder overdue relative to `now`?
 // Only applies to kind === "scheduled". Sometime is never overdue.
 // Date-only: overdue when date < today (today is not overdue).
