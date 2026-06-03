@@ -441,9 +441,17 @@ const DEFAULT_LIST_NAMES = [
   "The essentials...",
 ];
 
+let _onPersistenceError: (() => void) | null = null;
+let _onPersistenceSuccess: (() => void) | null = null;
+
 function persistStringIfChanged(key: string, value: string) {
-  if (localStorage.getItem(key) === value) return;
-  localStorage.setItem(key, value);
+  try {
+    if (localStorage.getItem(key) === value) return;
+    localStorage.setItem(key, value);
+    _onPersistenceSuccess?.();
+  } catch {
+    _onPersistenceError?.();
+  }
 }
 
 /** Pick a random default name, avoiding titles already used by existing lists */
@@ -574,6 +582,7 @@ function DelayedEmptyState({ message }: { message: string }) {
 
 export default function App() {
   const [reminders, setReminders] = useState<Reminder[]>(() => loadReminders());
+  const [persistenceError, setPersistenceError] = useState(false);
   const [timeRefreshTick, setTimeRefreshTick] = useState(0);
   const [activeFilter, setActiveFilter] = useState<ReminderCategory | "all">("all");
   const [activeListFilter, setActiveListFilter] = useState<"all" | "complete" | "almost" | "started" | "todo" | "grouped-todo">("all");
@@ -2067,6 +2076,12 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    _onPersistenceError = () => setPersistenceError(true);
+    _onPersistenceSuccess = () => setPersistenceError(false);
+    return () => { _onPersistenceError = null; _onPersistenceSuccess = null; };
+  }, []);
+
   // Calculate overlay top position based on viewport height
   const getOverlayTopPosition = () => {
     const THRESHOLD = 570;
@@ -3366,6 +3381,11 @@ export default function App() {
           }
         }
       }}>
+      {persistenceError && (
+        <div style={{ backgroundColor: '#b45309', color: '#fff', textAlign: 'center', padding: '6px 12px', fontSize: '13px', fontWeight: 500, flexShrink: 0, width: '100%' }}>
+          Storage unavailable - changes may not be saved
+        </div>
+      )}
       {/* Header */}
       <div className="app-header relative shrink-0 w-full p-[20px]">
         <div className="content-stretch flex flex-col gap-[17px] items-start relative w-full max-w-[768px] mx-auto" style={{ backgroundColor: viewMode === "done-deleted" ? (isListsEnabled ? "#4784f8" : DONE_BLUE) : (isListsEnabled && activeMainTab === 'lists') ? DONE_BLUE : "#4784f8" }}>
