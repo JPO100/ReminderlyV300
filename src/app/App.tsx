@@ -4521,6 +4521,22 @@ export default function App() {
                                               return `${formatListProgress(completedCount, linkedList.items.length)} ${itemLabel}. ${formatSmartReminderDueBy(item.schedule.date, item.schedule.time)}`;
                                             }
                                           }
+                                          if (overdue && item.schedule.kind === 'scheduled' && item.schedule.date) {
+                                            const [oy, om, od] = item.schedule.date.split('-').map(Number);
+                                            const overdueDate = new Date(oy, om - 1, od);
+                                            overdueDate.setHours(0, 0, 0, 0);
+                                            const todayStart = new Date(now);
+                                            todayStart.setHours(0, 0, 0, 0);
+                                            const daysOverdue = Math.round((todayStart.getTime() - overdueDate.getTime()) / 86400000);
+                                            if (daysOverdue >= 1) {
+                                              const overdueLabel = `${daysOverdue} ${daysOverdue === 1 ? 'day' : 'days'} overdue`;
+                                              if (item.repeatRule) {
+                                                const repeatText = formatRepeatRuleText(item.repeatRule, item.schedule.date);
+                                                if (repeatText) return `${overdueLabel}. ${repeatText}`;
+                                              }
+                                              return overdueLabel;
+                                            }
+                                          }
                                           if (item.repeatRule) {
                                             if (item.schedule.kind === 'scheduled' && item.schedule.date) {
                                               const nextOccurrenceLabel = formatReminderNextOccurrenceLabel(item.schedule.date, item.schedule.time, now);
@@ -4652,6 +4668,22 @@ export default function App() {
                                           const completedCount = linkedList.items.filter((listItem) => listItem.completed).length;
                                           const itemLabel = linkedList.items.length === 1 ? 'item' : 'items';
                                           return `${formatListProgress(completedCount, linkedList.items.length)} ${itemLabel}. ${formatSmartReminderDueBy(reminder.schedule.date, reminder.schedule.time)}`;
+                                        }
+                                      }
+                                      if (overdue && reminder.schedule.kind === 'scheduled' && reminder.schedule.date) {
+                                        const [oy, om, od] = reminder.schedule.date.split('-').map(Number);
+                                        const overdueDate = new Date(oy, om - 1, od);
+                                        overdueDate.setHours(0, 0, 0, 0);
+                                        const todayStart = new Date(now);
+                                        todayStart.setHours(0, 0, 0, 0);
+                                        const daysOverdue = Math.round((todayStart.getTime() - overdueDate.getTime()) / 86400000);
+                                        if (daysOverdue >= 1) {
+                                          const overdueLabel = `${daysOverdue} ${daysOverdue === 1 ? 'day' : 'days'} overdue`;
+                                          if (reminder.repeatRule) {
+                                            const repeatText = formatRepeatRuleText(reminder.repeatRule, reminder.schedule.date);
+                                            if (repeatText) return `${overdueLabel}. ${repeatText}`;
+                                          }
+                                          return overdueLabel;
                                         }
                                       }
                                       if (reminder.repeatRule) {
