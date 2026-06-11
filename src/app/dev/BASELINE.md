@@ -1,8 +1,6 @@
 # Self-Check Baseline Report
 
-Last updated: 2026-03-12
-
-> **Stale**: this baseline reflects 280 checks from 2026-03-12. The current suite total is 425 checks across 8 suites. Re-run self-checks and replace the output below to bring this baseline current.
+Last updated: 2026-06-03
 
 ## Clean Run (Expected)
 
@@ -11,7 +9,7 @@ Reminderly Self-Checks Report
 Run invocation id: [varies]
 Ran at: [varies]
 Duration: [varies]ms
-Passed: 280 | Failed: 0
+Passed: 340 | Failed: 0
 
 Schedule and reminder logic
 
@@ -52,6 +50,9 @@ Schedule and reminder logic
 ✓ Derived: hasTime is false when time is null
 ✓ Derived: isRecurring is true when repeatRule is non-null
 ✓ Derived: isRecurring is false when repeatRule is null
+
+Persistence and hydration
+
 ✓ Persistence: loadReminders returns [] for invalid JSON
 ✓ Persistence: loadReminders returns [] for JSON object
 ✓ Persistence: loadReminders returns [] for JSON string
@@ -94,22 +95,20 @@ Schedule and reminder logic
 ✓ Overdue: tomorrow is NOT overdue
 ✓ Overdue: sometime schedule is never overdue
 ✓ Overdue: today (date only, no time) is NOT overdue
+✓ Overdue sorting: overdue items pinned to top within this-week list
 ✓ Overdue sorting: overdue items appear above ALL non-overdue items regardless of category
 ✓ Hydration: legacy localStorage with removed schedule kind loads as "sometime"
 ✓ Hydration: legacy localStorage with "text" migrates to originalText + displayText
-
-Persistence and hydration
-
 ✓ Normalise: "Call mum tomorrow night at 7:30pm" → "Call mum on Friday at 7:30pm"
 ✓ Normalise: "Pay rent next Monday" → "Pay rent on Monday" (within 6 days uses weekday)
 ✓ Normalise: "Dinner tonight" → "Dinner on Thursday at 7pm"
 ✓ Normalise: "Buy milk" with no date returns unchanged
 ✓ Normalise: scheduled date-only does not inject "at" time
 ✓ Normalise: recurring "Call mum every wednesday at 7pm" does not inject "on Wednesday"
-✓ Normalise: "Call mum Feb 28 at 7pm" strips month-name date phrase
-✓ Normalise: "Call mum February 28th" strips month-name date phrase
-✓ Normalise: "Car MOT March 7th 2027 at 12pm" strips phrase and injects year
-✓ Normalise: "Car MOT March 7th at 12pm" same year omits year
+✓ Normalise: "Call mum Feb 28 at 7pm" → "Call mum at 7pm"
+✓ Normalise: "Call mum February 28th" → "Call mum"
+✓ Normalise: "Car MOT March 7th 2027 at 12pm" → "Car MOT at 12pm"
+✓ Normalise: "Car MOT March 7th at 12pm" → "Car MOT at 12pm"
 ✓ Normalise: "Call mum March 1 in the morning" → "Call mum at 7am"
 ✓ Normalise: "Call mum March 1 in morning" → "Call mum at 7am"
 ✓ Normalise: "Call mum on speaker March 1 in the morning" keeps "on speaker"
@@ -140,6 +139,19 @@ Natural language parsing
 ✓ NLC parser: recognises "next Friday" as single date token
 ✓ NLC parser: recognises two weekdays as separate date tokens
 ✓ NLC parser: weekday matching is case-insensitive
+✓ NLC parser: recognises "February 28" as date token
+✓ NLC parser: recognises "February 28th" as date token
+✓ NLC parser: recognises "Feb 28" as date token
+✓ NLC parser: recognises "Feb 28th" as date token
+✓ NLC parser: recognises "28 Feb" as date token
+✓ NLC parser: recognises "28th Feb" as date token
+✓ NLC parser: recognises "28 February" as date token
+✓ NLC parser: recognises "28th February" as date token
+✓ NLC parser hardening: rejects month+year (Feb 2027)
+✓ NLC parser hardening: rejects 2-digit year (23 Feb 27)
+✓ NLC parser hardening: rejects comma format (Feb 23, 2027)
+✓ NLC parser hardening: rejects year-first (2027 Feb 23)
+✓ NLC parser hardening: rejects invalid date with year (31 February 2027)
 ✓ NLC parser: recognises "7pm" as time token
 ✓ NLC parser: recognises "7:30pm" as time token
 ✓ NLC parser: recognises "7 pm" as time token
@@ -174,21 +186,17 @@ Natural language parsing
 ✓ NLC parser: repeat token suppresses date tokens
 ✓ NLC parser: "every morning at 6am" produces repeats + time tokens
 ✓ NLC parser: token start/end match exact substring position
-✓ NLC parser hardening: rejects month+year (Feb 2027)
-✓ NLC parser hardening: rejects 2-digit year (23 Feb 27)
-✓ NLC parser hardening: rejects comma format (Feb 23, 2027)
-✓ NLC parser hardening: rejects year-first (2027 Feb 23)
-✓ NLC parser hardening: rejects invalid date with year (31 February 2027)
-✓ NLC parser: recognises "February 28" as date token
-✓ NLC parser: recognises "February 28th" as date token
-✓ NLC parser: recognises "Feb 28" as date token
-✓ NLC parser: recognises "Feb 28th" as date token
-✓ NLC parser: recognises "28 Feb" as date token
-✓ NLC parser: recognises "28th Feb" as date token
-✓ NLC parser: recognises "28 February" as date token
-✓ NLC parser: recognises "28th February" as date token
-✓ NLC parser: recognises "28 February" as date token
-✓ NLC parser: recognises "28th February" as date token
+✓ NLC parser: date recognition OFF produces no date tokens
+✓ NLC parser: time recognition OFF produces no time tokens
+✓ NLC parser: repeats recognition OFF produces no repeats tokens
+✓ NLC parser: repeats OFF allows "every Wednesday" weekday as date token
+✓ NLC parser: repeats OFF allows "every morning" morning as time token
+✓ NLC parser: date OFF + time ON returns only time tokens
+✓ NLC parser: all recognition OFF returns empty array
+✓ NLC parser: default recognition config enables all categories
+
+Natural language interaction
+
 ✓ NLC interaction A: recognition-only does not apply toggles or schedule
 ✓ NLC interaction B: clicking time token sets time only, not date
 ✓ NLC interaction C: clicking date token sets date only
@@ -201,12 +209,6 @@ Natural language parsing
 ✓ NLC interaction I: "every 3 days" anchor is today
 ✓ NLC interaction J: two identical time tokens after edit cause invalidation, not relocation
 ✓ NLC interaction K: no token clicks means schedule is "sometime"
-✓ NLC interaction AL: "23 Feb 2027" resolves to 2027-02-23
-✓ NLC interaction AM: "Feb 23 2027" resolves to 2027-02-23
-✓ NLC interaction AN: "23 Feb 2025" resolves to 2025-02-23 (past year allowed)
-✓ NLC interaction AO: "29 Feb 2028" resolves correctly (leap year valid)
-✓ NLC interaction AP: "29 Feb 2027" does not tokenise (invalid date)
-✓ NLC interaction AQ: NLC feature flag off disables all NLC tokens
 ✓ NLC auto parsing: applies time when exactly one time token exists and time toggle is off
 ✓ NLC auto parsing: does not apply date when two date tokens exist
 ✓ NLC auto parsing: applies repeats+date when exactly one repeats token exists
@@ -233,15 +235,28 @@ Natural language parsing
 ✓ NLC interaction AI: "Feb 26" resolves to next year when date is past
 ✓ NLC interaction AJ: "28 Feb" resolves to 2026-02-28
 ✓ NLC interaction AK: "26 Feb" resolves to next year when date is past
+✓ NLC interaction AL: "23 Feb 2027" resolves to 2027-02-23
+✓ NLC interaction AM: "Feb 23 2027" resolves to 2027-02-23
+✓ NLC interaction AN: "23 Feb 2025" resolves to 2025-02-23 (past year allowed)
+✓ NLC interaction AO: "29 Feb 2028" resolves correctly (leap year valid)
+✓ NLC interaction AP: "29 Feb 2027" does not tokenise (invalid date)
+✓ NLC interaction AQ: nlcEnabled=false produces empty token list without calling parseTokens
+✓ NLC interaction AR: date recognition OFF prevents date auto-apply
+✓ NLC interaction AR: time recognition OFF prevents time auto-apply
+✓ NLC interaction AR: repeats recognition OFF prevents implied date/time from repeats
+✓ NLC interaction AR: mixed recognition config filters correctly through pipeline
+
+Done, deleted, and completion
+
 ✓ ViewMode: list -> done-deleted on tick click
 ✓ ViewMode: done-deleted -> list on tick click
 ✓ ViewMode: Today filter -> done-deleted on tick click (resets filter)
 ✓ Navigation: tick click area (0-22%) does not overlap text area (25%-100%)
-✓ Subfilter derivation: Done/Deleted/All computed from completedAt + deletedAt
-✓ Subfilter visibility: Pending restore items visible only in "Deleted" subfilter
-✓ Clear all scope: "Clear all" in Done subfilter clears only done items
-✓ Sort precedence: Mixed done+deleted list sorts by status then deletedAt/completedAt
-✓ Persistence: deletedAt field survives save/load cycle
+✓ Done/deleted: sub-filter classifies done-only, deleted-only, and both items correctly
+✓ Done/deleted: pendingUncomplete/pendingUndelete items visible in correct sub-filters
+✓ Done/deleted: clear-all includes pending restore ids, excludes pendingDelete ids
+✓ Derivation: sort key uses pendingUndeleteSortKey ?? deletedAt ?? completedAt ?? pendingUncompleteCompletedAt
+✓ Persistence: deletedAt survives save/load cycle
 ✓ Derivation: active list excludes reminders with completedAt != null
 ✓ Derivation: done/deleted list includes reminders with completedAt != null
 ✓ Derivation: done list sorted by completedAt descending
@@ -256,6 +271,109 @@ Natural language parsing
 ✓ Uncomplete: no-op when completedAt is already null
 ✓ Uncomplete: only clears completedAt, preserves all other fields
 ✓ Repeat: second click during in-flight window cancels completion and prevents spawn
+
+Lists and smart reminders
+
+✓ List date storage: round-trips YYYY-MM-DD values
+✓ List date storage: invalid stored values return null
+✓ List due date formatting: current-year dates omit year
+✓ List due date formatting: cross-year dates include short year
+✓ List smart reminders: 0% progress uses Complete copy
+✓ List smart reminders: 1%-74% progress uses Finish copy
+✓ List smart reminders: 75%+ progress uses Nearly done copy
+✓ List smart reminders: no due date means no linked reminder
+✓ List smart reminders: linked reminder uses scheduled noon and list metadata
+✓ List categories: todo, started, almost, complete derive from completion ratio
+✓ List ordering: insertion mode preserves authored order
+✓ List ordering: alphabetical mode sorts by item text
+✓ List ordering: alphabetical pinned item stays at its current visual index temporarily
+✓ List ordering: missing pinned item falls back to alphabetical list
+✓ List settings: closing overlay delays sort apply by 150ms when draft changed
+✓ List settings: closing overlay does not schedule sort apply when draft matches current
+✓ List settings: Uncheck all closes overlay and applies item reset after 150ms
+✓ List smart reminder overlays: toggling on from no-date state opens picker
+✓ List smart reminder overlays: back from no-date picker restores no date and turns toggle off
+✓ List smart reminder overlays: back from existing-date picker preserves saved date and toggle
+✓ List smart reminder overlays: Set date stores pending display date and collapses picker
+✓ List smart reminder overlays: saved due-date update clears pending display buffer
+✓ List smart reminder sync: active linked reminders are removed when feature is disabled
+✓ List smart reminder sync: done or deleted linked reminders are preserved when feature is disabled
+✓ List smart reminder sync: linked reminder text and schedule update when list changes
+✓ List smart reminder sync: missing linked reminder is created for eligible list
+
+Dev tools and feature flags
+
+✓ Dev tools password: default is true when no value persisted
+✓ Dev tools password: true persists to localStorage
+✓ Dev tools password: false persists to localStorage
+✓ Dev tools password: hydrates true correctly from localStorage
+✓ Dev tools password: hydrates false correctly from localStorage
+✓ Paywall toggle: default is true when no value persisted
+✓ Paywall toggle: true persists to localStorage
+✓ Paywall toggle: false persists to localStorage
+✓ Paywall toggle: hydrates true correctly from localStorage
+✓ Paywall toggle: hydrates false correctly from localStorage
+✓ Onboarding tutorial enabled: default is true when no value persisted
+✓ Onboarding tutorial enabled: true persists to localStorage
+✓ Onboarding tutorial enabled: false persists to localStorage
+✓ Onboarding tutorial enabled: hydrates true correctly from localStorage
+✓ Onboarding tutorial enabled: hydrates false correctly from localStorage
+✓ Tutorial first-launch: default is true when no value persisted
+✓ Tutorial first-launch: true persists to localStorage
+✓ Tutorial first-launch: false persists to localStorage
+✓ Tutorial first-launch: hydrates true correctly from localStorage
+✓ Tutorial first-launch: hydrates false correctly from localStorage
+✓ Tutorial every-start: default is false when no value persisted
+✓ Tutorial every-start: true persists to localStorage
+✓ Tutorial every-start: false persists to localStorage
+✓ Tutorial every-start: hydrates true correctly from localStorage
+✓ Tutorial every-start: hydrates false correctly from localStorage
+✓ Tutorial reminders sentinel: absent by default (no value persisted)
+✓ Tutorial reminders sentinel: can be written to localStorage
+✓ Tutorial lists sentinel: absent by default (no value persisted)
+✓ Tutorial lists sentinel: can be written to localStorage
+✓ Filters menu: default is "grouped" when no value persisted
+✓ Filters menu: "standard" persists to localStorage
+✓ Filters menu: "grouped" persists to localStorage
+✓ Filters menu: hydrates "standard" correctly from localStorage
+✓ Filters menu: hydrates "grouped" correctly from localStorage
+✓ Show date/time subtitles: default is true when no value persisted
+✓ Show date/time subtitles: true persists to localStorage
+✓ Show date/time subtitles: false persists to localStorage
+✓ Show date/time subtitles: hydrates true correctly from localStorage
+✓ Show date/time subtitles: hydrates false correctly from localStorage
+✓ Show date/time subtitles: grouped-to-standard reset logic (false resets to true)
+✓ Show date/time subtitles: no reset when variant is grouped
+✓ Show date/time subtitles: no reset when already true
+✓ Hide overdue: default is false on initial load
+✓ Hide overdue: state can change to true
+✓ Hide overdue: state can change to false
+✓ Hide overdue: reinitialisation resets to default false
+
+Notification and badge
+
+✓ Badge count: counts overdue reminders
+✓ Badge count: includes today reminders when includeTodayInBadge is true
+✓ Badge count: excludes today reminders when includeTodayInBadge is false
+✓ Badge count: excludes completed reminders
+✓ Badge count: excludes deleted reminders
+✓ Badge count: excludes sometime reminders
+✓ Badge count: returns 0 when no reminders match
+✓ Notification payload: sets badge to computed count at fire time
+✓ Notification payload: sets badge to 0 when notifAppBadge is false
+✓ Badge delta: sets badgeDeltaOnAction to 1 when badge > 0
+✓ Badge delta: sets badgeDeltaOnAction to 0 when badge is 0
+✓ Scheduling limits: limits to 64 notifications when no midnight needed
+✓ Scheduling limits: 63 reminder notifications plus midnight when date-only exists
+✓ Midnight notification: included when active date-only reminder exists
+✓ Midnight notification: excluded when all reminders have times
+✓ Midnight notification: excluded when badge is disabled
+✓ Midnight notification: has empty title and body
+✓ Midnight notification: excludes completed date-only reminders
+✓ Midnight notification: excludes deleted date-only reminders
+✓ Scheduling limits: all 64 slots for reminders when no midnight needed
+✓ Refresh boundary: returns ms to midnight when no timed reminders today
+✓ Refresh boundary: returns ms to next timed reminder when sooner than midnight
 ```
 
 ## Check Count Breakdown
@@ -266,7 +384,6 @@ Natural language parsing
   - RepeatRule equality: 8
   - Delta detection: 14
   - Derived properties: 4
-  - Integrity (runner duplicate-id guard): 1 synthetic
 - **Reminder checks** (reminder-checks.ts): 77
   - Persistence (defensive load): 12
   - Persistence (round trip): 3
@@ -276,42 +393,39 @@ Natural language parsing
   - Overdue detection: 6
   - Overdue sorting: 2
   - Legacy hydration migration: 2
-  - Text normalisation (normaliseReminderText): 14
-  - Text normalisation — recurring guard: 1
+  - Text normalisation (normaliseReminderText): 15
   - Restore from done — bucket colour: 2
   - Render text (renderReminderText): 7
   - Date indicator label: 2
   - getDisplayTitle: 5
-- **NLC parser checks** (nlc-parser-checks.ts): 53
+- **NLC parser checks** (nlc-parser-checks.ts): 61
   - Date token recognition: 6
-  - Time token recognition: 6
-  - Repeats token recognition: 6
-  - Cross-category: 2
-  - Edge cases (empty/plain text): 2
-  - Time-of-day tokens: 10
-  - "every" pattern tokens: 6
-  - Token range accuracy: 1
-  - Repeat-date suppression: 1
   - Month-name date recognition: 8
   - Month-name date hardening (negative): 5
-- **NLC interaction checks** (nlc-interaction-checks.ts): 44
+  - Time token recognition: 6
+  - Repeats token recognition: 6
+  - Cross-category and edge cases: 3
+  - Time-of-day tokens: 10
+  - "every" pattern tokens: 8
+  - Token range accuracy: 1
+  - Recognition config: 8
+- **NLC interaction checks** (nlc-interaction-checks.ts): 48
   - Token click behaviour (A-K): 12
-  - Auto-apply behaviour (L-P): 5
+  - Auto-apply behaviour: 5
   - Time-of-day interaction (Q-T): 4
   - Compound patterns (U-Z): 6
   - Advanced patterns (AA-AE): 5
   - Repeats anchor auto-apply (AF-AG): 2
-  - Month-name date resolution (AH-AI): 2
-  - Day-first month-name date resolution (AJ-AK): 2
+  - Month-name date resolution (AH-AK): 4
   - Explicit year resolution (AL-AP): 5
   - Feature flag control (AQ): 1
+  - Recognition config (AR): 4
 - **Done/deleted checks** (done-deleted-checks.ts): 9
   - ViewMode toggling: 3
   - Navigation (click areas): 1
-  - Subfilter derivation: 1
-  - Pending restore visibility: 1
-  - Clear all scope: 1
-  - Sort precedence (mixed done+deleted): 1
+  - Sub-filter classification: 2
+  - Clear-all scope: 1
+  - Sort key precedence: 1
   - Persistence (deletedAt): 1
 - **Completion checks** (completion-checks.ts): 14
   - Derivation (active/done lists): 4
@@ -320,17 +434,34 @@ Natural language parsing
   - Persistence: 1
   - Uncomplete: 3
   - Repeat double-click cancellation: 1
+- **List checks** (list-checks.ts): 26
+  - Date storage round-trip: 2
+  - Due date formatting: 2
+  - Smart reminder text (progress-based): 3
+  - Smart reminder creation: 2
+  - List category derivation: 1
+  - List ordering (insertion/alphabetical/pinned): 4
+  - List settings (sort apply, uncheck all): 3
+  - Smart reminder overlay flows: 5
+  - Smart reminder sync: 4
 - **Dev tools and feature flags checks** (dev-tools-checks.ts): 46
-  - Dev tools password: 5 (default, persist true/false, hydrate true/false)
-  - Paywall toggle: 5 (default, persist true/false, hydrate true/false)
-  - Onboarding tutorial enabled: 5 (default, persist true/false, hydrate true/false)
-  - Tutorial first-launch: 5 (default, persist true/false, hydrate true/false)
-  - Tutorial every-start: 5 (default, persist true/false, hydrate true/false)
-  - Tutorial sentinel: 4 (default absent, written, check absent, check present)
-  - Filters menu: 5 (default, persist standard/grouped, hydrate standard/grouped)
-  - Show date/time subtitles: 8 (default, persist true/false, hydrate true/false, grouped-to-standard reset, no reset when grouped, no reset when already true)
-  - Hide overdue: 4 (default false, state change true, state change false, reinit resets)
-- **Total**: 280 checks
+  - Dev tools password: 5
+  - Paywall toggle: 5
+  - Onboarding tutorial enabled: 5
+  - Tutorial first-launch: 5
+  - Tutorial every-start: 5
+  - Tutorial sentinels (reminders + lists): 4
+  - Filters menu: 5
+  - Show date/time subtitles: 8
+  - Hide overdue: 4
+- **Notification checks** (notification-checks.ts): 22
+  - Badge count: 7
+  - Notification payload: 2
+  - Badge delta: 2
+  - Scheduling limits: 3
+  - Midnight notification: 6
+  - Refresh boundary: 2
+- **Total**: 340 checks across 9 suites
 
 ## Runner Integrity Check
 

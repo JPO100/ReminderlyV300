@@ -55,6 +55,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
