@@ -23,6 +23,7 @@ import { repeatConfigToRule } from "./utils/repeat-conversion";
 import type { Reminder, ReminderCategory, ReminderSchedule, RepeatConfig, ViewMode, FiltersMenuVariant } from "./reminder-utils";
 import { formatTime12h } from "./utils/normalise-text";
 import { scheduleEquality } from "./utils/schedule";
+import { hapticsSuccess, hapticsWarning, hapticsLight, hapticsSelection } from "./utils/haptics";
 import { PENDING_NOTIFICATION_REMINDER_ID_KEY, syncReminderNotifications } from "./notifications";
 import { useNotificationTapHandler } from "./useNotificationTapHandler";
 import laterBtnPaths from "../imports/svg-0tntgsesap";
@@ -1818,6 +1819,9 @@ export default function App() {
   };
 
   const addReminder = useCallback((reminder: Reminder) => {
+    // Haptic feedback on new reminder
+    hapticsSuccess();
+
     // Cancel any pending insert timer (last-one-wins)
     if (newReminderInsertTimerRef.current !== null) {
       clearTimeout(newReminderInsertTimerRef.current);
@@ -2476,6 +2480,8 @@ export default function App() {
     if (completeListTimersRef.current.has(listId)) return;
     if (deleteListTimersRef.current.has(listId)) return;
 
+    hapticsSuccess();
+
     setPendingDoneListIds((prev) => {
       const next = new Set(prev);
       next.add(listId);
@@ -2516,6 +2522,8 @@ export default function App() {
 
     const target = createdLists.find((list) => list.id === listId);
     if (!target || target.status !== 'done') return;
+
+    hapticsLight();
 
     pendingUndoneListStatusChangedAtRef.current.set(listId, target.statusChangedAt ?? Date.now());
     setCreatedLists((prev) =>
@@ -2712,6 +2720,9 @@ export default function App() {
       setTimeout(() => setEmptyRerenderTick((c) => c + 1), EMPTY_STATE_DELAY + 350);
     }
 
+    // Haptic feedback on complete
+    hapticsSuccess();
+
     // Immediate visual commit
     setPendingDoneIds((prev) => {
       const next = new Set(prev);
@@ -2860,6 +2871,9 @@ export default function App() {
       // Capture prior deletedAt for stable sort during pending window
       pendingUndeleteSortKeyRef.current.set(reminderId, target.deletedAt);
 
+      // Haptic feedback on undelete
+      hapticsLight();
+
       // Immediately clear deletedAt (causes instant reinsertion to active list if completedAt is null)
       setReminders((prev) =>
         prev.map((r) => r.id === reminderId ? { ...r, deletedAt: null } : r)
@@ -2956,6 +2970,9 @@ export default function App() {
         }
       }
     }
+
+    // Haptic feedback on uncomplete
+    hapticsLight();
 
     // 2. Store original completedAt for stable sort, then clear it for instant reinsertion.
     //    For repeating reminders with a computed next schedule, also remove the duplicate
@@ -3056,6 +3073,9 @@ export default function App() {
     // Cancel all pending timers and clear all pending state for this id
     cancelAllTimersForId(reminderId);
     clearPendingStateForId(reminderId);
+
+    // Haptic feedback on delete
+    hapticsWarning();
 
     // Immediate visual commit: add to pendingDeleteIds
     setPendingDeleteIds((prev) => {
@@ -3210,6 +3230,7 @@ export default function App() {
     }
 
     // clearListStep === 1: execute clear
+    hapticsWarning();
     setClearListStep(2);
     setDoneDeletedFilter('all');
 
@@ -5063,7 +5084,7 @@ export default function App() {
                           }}
                           className="w-full"
                         >
-                          <EditableListItem name={item.text} completed={isSavedListCreateOverlay ? false : item.completed} isHighlighted={isItemHighlighted} accentColor={isSavedListCreateOverlay ? '#4784F8' : currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={isSavedListCreateOverlay ? undefined : () => { setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { const wasCompleted = next[idx].completed; next[idx] = { ...next[idx], completed: !wasCompleted, completedAt: wasCompleted ? null : Date.now() }; } return next; }); }} onDelete={() => { setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={true} leadingIcon={isSavedListCreateOverlay ? <SavedListOverlayCheckCircle /> : undefined} onCommit={(val: string) => {
+                          <EditableListItem name={item.text} completed={isSavedListCreateOverlay ? false : item.completed} isHighlighted={isItemHighlighted} accentColor={isSavedListCreateOverlay ? '#4784F8' : currentListAccentColor} isDeleteRevealed={revealedDeleteListItemId === item.id} onDeleteRevealChange={(revealed) => setRevealedDeleteListItemId(revealed ? item.id : null)} onToggle={isSavedListCreateOverlay ? undefined : () => { hapticsLight(); setRevealedDeleteListItemId(null); setListItems(prev => { const next = [...prev]; const idx = next.findIndex(i => i.id === item.id); if (idx !== -1) { const wasCompleted = next[idx].completed; next[idx] = { ...next[idx], completed: !wasCompleted, completedAt: wasCompleted ? null : Date.now() }; } return next; }); }} onDelete={() => { hapticsWarning(); setRevealedDeleteListItemId(null); setListItems(prev => prev.filter((listItem) => listItem.id !== item.id)); }} editable={true} leadingIcon={isSavedListCreateOverlay ? <SavedListOverlayCheckCircle /> : undefined} onCommit={(val: string) => {
                             const currentIndex = overlayDisplayListItems.findIndex((displayItem) => displayItem.id === item.id);
                             setRevealedDeleteListItemId(null);
                             const nextItems = listItems.map((listItem) => (
