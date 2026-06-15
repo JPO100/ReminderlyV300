@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { hapticsSelection } from "../../utils/haptics";
+import { hapticTap } from "../../utils/haptics";
 
 const DONE_TICK_PATH = "M16.2615 8.39052C16.7715 7.86975 17.599 7.8699 18.1091 8.39052C18.6187 8.91126 18.6187 9.75551 18.1091 10.2763L11.3376 17.1903C11.0808 17.4525 10.7437 17.5819 10.407 17.58C10.0711 17.5887 9.73154 17.4668 9.46948 17.2108L6.40308 14.2157C5.882 13.7063 5.86382 12.8619 6.36206 12.33C6.86047 11.7985 7.6864 11.7808 8.20776 12.2899L10.3718 14.4042L16.2615 8.39052Z";
 
@@ -244,7 +244,7 @@ export default function EditableListItem({
                         return;
                     }
                     const shouldReveal = dragOffsetX <= -SWIPE_REVEAL_THRESHOLD;
-                    if (shouldReveal) hapticsSelection();
+                    if (shouldReveal) hapticTap();
                     onDeleteRevealChange?.(shouldReveal);
                     resetSwipeTracking();
                 }}
