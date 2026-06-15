@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
+import { getHapticsConfig, setHapticsConfig } from "../utils/haptics";
+import type { HapticAction, HapticsConfig } from "../utils/haptics";
 import { runChecks, formatReportAsText, groupResultsBySection } from "../dev/check-system";
 import type { RunReport } from "../dev/check-system";
 import { getScheduleChecks } from "../dev/schedule-checks";
@@ -30,7 +32,7 @@ import passwordResetSvgPaths from "../../imports/svg-p8ebad7jx7";
 
 const DEV_TOOLS_PASSWORD = '123';
 
-type DevToolsPage = 'home' | 'dummy-reminders' | 'dummy-lists' | 'filters-menu' | 'dev-tools-password' | 'system' | 'natural-language' | 'onboarding' | 'notifications-area' | 'testing' | 'reminders' | 'lists';
+type DevToolsPage = 'home' | 'dummy-reminders' | 'dummy-lists' | 'filters-menu' | 'dev-tools-password' | 'haptics' | 'system' | 'natural-language' | 'onboarding' | 'notifications-area' | 'testing' | 'reminders' | 'lists';
 
 function BackHeader({ title, onBack, onClose }: { title: string; onBack: () => void; onClose: () => void }) {
   return (
@@ -284,7 +286,42 @@ function DevToolsPasswordPage({ onBack, onClose, passwordRequired, onPasswordReq
   );
 }
 
-function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnabledChange, settingsMenuEnabled, onSettingsMenuEnabledChange, onNavigateFiltersMenu, onNavigateDevToolsPassword }: { onBack: () => void; onClose: () => void; siriShortcutsEnabled: boolean; onSiriShortcutsEnabledChange: (value: boolean) => void; settingsMenuEnabled: boolean; onSettingsMenuEnabledChange: (value: boolean) => void; onNavigateFiltersMenu: () => void; onNavigateDevToolsPassword: () => void }) {
+const HAPTIC_ACTION_LABELS: { action: HapticAction; label: string; info: string }[] = [
+  { action: 'markDone', label: 'Mark reminder done', info: 'Fires haptic feedback when a reminder is marked as completed.' },
+  { action: 'createReminder', label: 'Create new reminder', info: 'Fires haptic feedback when a new reminder is created.' },
+  { action: 'markListComplete', label: 'Mark list complete', info: 'Fires haptic feedback when an entire list is marked as done.' },
+  { action: 'deleteReminder', label: 'Delete reminder', info: 'Fires haptic feedback when a reminder is deleted.' },
+  { action: 'deleteListItem', label: 'Delete list item', info: 'Fires haptic feedback when a list item is deleted.' },
+  { action: 'clearAllDoneDeleted', label: 'Clear all done/deleted', info: 'Fires haptic feedback when all done or deleted items are cleared.' },
+  { action: 'uncompleteReminder', label: 'Uncomplete reminder', info: 'Fires haptic feedback when a completed reminder is restored to active.' },
+  { action: 'undeleteReminder', label: 'Undelete reminder', info: 'Fires haptic feedback when a deleted reminder is restored.' },
+  { action: 'undoListCompletion', label: 'Undo list completion', info: 'Fires haptic feedback when a completed list is restored to active.' },
+  { action: 'toggleListItemCheckbox', label: 'Toggle list item checkbox', info: 'Fires haptic feedback when a list item checkbox is toggled.' },
+  { action: 'swipeRevealDelete', label: 'Swipe to reveal delete', info: 'Fires haptic feedback when swiping a list item reveals the delete button.' },
+];
+
+function HapticsPage({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
+  const [config, setConfig] = useState<HapticsConfig>(getHapticsConfig);
+
+  const update = (next: HapticsConfig) => {
+    setConfig(next);
+    setHapticsConfig(next);
+  };
+
+  return (
+    <PageShell title="Haptics" onBack={onBack} onClose={onClose}>
+      <SectionSubtitle text="Master" />
+      <ToggleRow label="All haptics" isOn={config.allHaptics} onToggle={() => update({ ...config, allHaptics: !config.allHaptics })} infoTitle="Global toggle for all haptic feedback. When off, no vibration feedback fires for any action. Individual action settings are preserved and restored when this is turned back on." />
+      <KeyLine />
+      <SectionSubtitle text="Actions" />
+      {HAPTIC_ACTION_LABELS.map(({ action, label, info }) => (
+        <ToggleRow key={action} label={label} isOn={config[action]} onToggle={() => update({ ...config, [action]: !config[action] })} disabled={!config.allHaptics} infoTitle={info} />
+      ))}
+    </PageShell>
+  );
+}
+
+function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnabledChange, settingsMenuEnabled, onSettingsMenuEnabledChange, onNavigateFiltersMenu, onNavigateDevToolsPassword, onNavigateHaptics }: { onBack: () => void; onClose: () => void; siriShortcutsEnabled: boolean; onSiriShortcutsEnabledChange: (value: boolean) => void; settingsMenuEnabled: boolean; onSettingsMenuEnabledChange: (value: boolean) => void; onNavigateFiltersMenu: () => void; onNavigateDevToolsPassword: () => void; onNavigateHaptics: () => void }) {
   return (
     <PageShell title="System" onBack={onBack} onClose={onClose}>
       <SectionSubtitle text="Features" />
@@ -294,6 +331,7 @@ function SystemPage({ onBack, onClose, siriShortcutsEnabled, onSiriShortcutsEnab
       <SectionSubtitle text="Settings" />
       <MenuRow label="Filters menu" onClick={onNavigateFiltersMenu} infoTitle="Opens the Filters Menu settings page where you can switch between Standard and Grouped filter layouts. The chosen layout affects how filters appear in the main app's filter menu. Layout choice is overridden when Lists is enabled." />
       <MenuRow label="Dev tools password" onClick={onNavigateDevToolsPassword} infoTitle="Opens the Dev Tools Password page where you can enable or disable the login password requirement, view the current password, and reset the password. Changes here affect the Dev Tools login screen shown on every open." />
+      <MenuRow label="Haptics" onClick={onNavigateHaptics} infoTitle="Opens the Haptics settings page. Haptics control vibration feedback for app actions like completing reminders, deleting items, and toggling checkboxes. Each action can be enabled or disabled individually, or all haptics can be turned off globally." />
     </PageShell>
   );
 }
@@ -1088,11 +1126,15 @@ function DevToolsContent({ onClose, onClearReminders, addReminder, addReminders,
     );
   } else if (page === 'system') {
     content = (
-      <SystemPage onBack={() => setPage('home')} onClose={onClose} siriShortcutsEnabled={siriShortcutsEnabled} onSiriShortcutsEnabledChange={onSiriShortcutsEnabledChange} settingsMenuEnabled={settingsMenuEnabled} onSettingsMenuEnabledChange={onSettingsMenuEnabledChange} onNavigateFiltersMenu={() => setPage('filters-menu')} onNavigateDevToolsPassword={() => setPage('dev-tools-password')} />
+      <SystemPage onBack={() => setPage('home')} onClose={onClose} siriShortcutsEnabled={siriShortcutsEnabled} onSiriShortcutsEnabledChange={onSiriShortcutsEnabledChange} settingsMenuEnabled={settingsMenuEnabled} onSettingsMenuEnabledChange={onSettingsMenuEnabledChange} onNavigateFiltersMenu={() => setPage('filters-menu')} onNavigateDevToolsPassword={() => setPage('dev-tools-password')} onNavigateHaptics={() => setPage('haptics')} />
     );
   } else if (page === 'dev-tools-password') {
     content = (
       <DevToolsPasswordPage onBack={() => setPage('system')} onClose={onClose} passwordRequired={isDevToolsPasswordRequired} onPasswordRequiredChange={onDevToolsPasswordRequiredChange} />
+    );
+  } else if (page === 'haptics') {
+    content = (
+      <HapticsPage onBack={() => setPage('system')} onClose={onClose} />
     );
   } else if (page === 'notifications-area') {
     content = (

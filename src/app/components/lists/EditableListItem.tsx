@@ -244,7 +244,7 @@ export default function EditableListItem({
                         return;
                     }
                     const shouldReveal = dragOffsetX <= -SWIPE_REVEAL_THRESHOLD;
-                    if (shouldReveal) hapticTap();
+                    if (shouldReveal) hapticTap('swipeRevealDelete');
                     onDeleteRevealChange?.(shouldReveal);
                     resetSwipeTracking();
                 }}
