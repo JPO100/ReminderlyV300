@@ -259,6 +259,37 @@ npx cap sync ios
 * Do not add explanations inside the command blocks
 * Keep them clean and copy-paste ready
 
+## Git push and branch publishing rules
+
+1. No automatic pushing
+
+* Claude must never run `git push` automatically.
+* Pushing to any remote branch (including main) requires explicit user instruction.
+
+2. Push is not part of the standard sign-off
+
+* The standard implementation sign-off includes commit and build/sync only.
+* `git push` must not be added to the sign-off block by default.
+
+3. When push is permitted
+
+* The user explicitly asks to push, publish, or update GitHub.
+* The user has approved the commit and asks Claude to complete the full publish flow.
+
+4. Post-commit reporting
+
+* After any local commit, Claude must report whether the branch is ahead of origin.
+* State the number of unpushed commits if ahead.
+* State whether `git push` is still required.
+
+5. Branch work rules
+
+* Branch creation must be recorded in `docs/development-history.md`.
+* Commits on feature branches must use the standard sign-off format.
+* Merges into main must be explicitly approved by the user.
+* Pushes to remote branches or main must be explicitly approved by the user.
+* After merge, `docs/development-history.md` must record the merge and final commit references.
+
 ## Development history maintenance
 
 * `docs/development-history.md` is the authoritative project history.
