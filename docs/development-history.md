@@ -13,7 +13,7 @@ The codebase originated from a Figma Make build and was extended with a Capacito
 Created: 2026-04-03
 Purpose: Primary development branch
 Status: Active
-Tip: 3c85c52
+Tip: b81c142
 
 ### badge-midnight-fix
 
@@ -232,8 +232,8 @@ Badge counts are embedded in each scheduled local notification payload rather th
 ### Native badge correction on action (2026-06-02)
 When a user acts on a notification (mark done, move to tomorrow), the native iOS handler decrements the badge and reschedules pending notification badge values. This avoids requiring the JS layer to be active.
 
-### Midnight badge notification always scheduled (2026-06-16)
-Removed the hasActiveDateOnlyReminder guard. The midnight silent badge notification is now always scheduled when badge is enabled, regardless of reminder types. This ensures badge updates at midnight even when only timed reminders exist and the app is suspended.
+### Midnight badge notification gated on active date-only reminders (2026-06-18)
+Restored the hasActiveDateOnlyReminder guard in buildMidnightBadgeNotification. The midnight silent badge notification is only scheduled when badge is enabled AND at least one active (non-completed, non-deleted) date-only reminder exists. This was reverted from the 2026-06-16 change which removed the guard, because removing it caused 5 self-check failures in the notification suite.
 
 ### Haptics unified to single light impact (2026-06-15)
 All haptic feedback actions use a single light impact tap rather than varied intensities. Per-action controls were added to dev tools for granular enable/disable.
@@ -398,3 +398,22 @@ Completed:
 - Updated iOS web assets after badge fix
 
 Outcome: Merged to main (fast-forward). Remaining limitation: badge updates for arbitrary times while app is suspended (e.g. timed reminder becoming overdue at 3pm) require additional silent notifications at each time boundary - a separate architectural change.
+
+### 2026-06-18
+
+Branch: main
+Commits: b81c142
+
+Issue: 5 self-checks failing in notification and badge suite (335/340 passing).
+Root cause: The 2026-06-16 badge-midnight-fix removed the hasActiveDateOnlyReminder guard from buildMidnightBadgeNotification, causing midnight notifications to be generated unconditionally when badge was enabled. This broke tests that expected no midnight notification when all reminders had explicit times, or when the only date-only reminders were completed/deleted.
+Resolution: Restored the hasActiveDateOnlyReminder(reminders) early-return guard in buildMidnightBadgeNotification (src/app/notifications.ts:86).
+Test results: Self-check suite restored to 340/340 passing, 0 failed.
+
+Failing checks fixed:
+- Scheduling limits: limits to 64 notifications when no midnight needed
+- Midnight notification: excluded when all reminders have times
+- Midnight notification: excludes completed date-only reminders
+- Midnight notification: excludes deleted date-only reminders
+- Scheduling limits: all 64 slots for reminders when no midnight needed
+
+Outcome: Notification self-checks green. Single line change.
