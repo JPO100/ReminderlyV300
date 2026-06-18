@@ -1,0 +1,400 @@
+# Development history
+
+## Project overview
+
+Reminderly is a mobile-first reminders application built with React, TypeScript, and Capacitor for iOS. It combines natural language input with structured scheduling, allowing users to create, organise, and track reminders with optional dates, times, and repeat rules. The app includes a lists system, smart reminders, dev tools overlay, notification system with native badge support, and haptic feedback.
+
+The codebase originated from a Figma Make build and was extended with a Capacitor iOS shell.
+
+## Branch history
+
+### main
+
+Created: 2026-04-03
+Purpose: Primary development branch
+Status: Active
+Tip: 3c85c52
+
+### badge-midnight-fix
+
+Created: 2026-06-16
+Parent: main (7765120)
+Purpose: Fix midnight badge notification scheduling - remove overly restrictive date-only guard
+
+Status: Merged
+Merged into: main (fast-forward)
+Final commit: f98d81f
+
+Summary:
+- Removed hasActiveDateOnlyReminder guard from buildMidnightBadgeNotification
+- Updated notification tests to match new behaviour
+
+### add-haptic-feedback
+
+Created: 2026-06-15
+Parent: main (1c3b696)
+Purpose: Add haptic feedback to key user actions with per-action dev tools controls
+
+Status: Merged
+Merged into: main
+Merge commit: 7765120
+Final commit: dc2079d
+
+Summary:
+- Added haptic feedback to reminder and list actions
+- Unified haptics to single light impact tap
+- Added dev tools haptics settings page with per-action toggles
+- Updated iOS build artifacts
+
+### overdue-subtitle-format
+
+Created: 2026-06-03
+Parent: main (167ce2d)
+Purpose: Show overdue duration in reminder subtitles and add App Library category
+
+Status: Merged
+Merged into: main
+Merge commit: 24aeb9b
+Final commit: f321245
+
+Summary:
+- Show overdue duration in reminder subtitle from day 1 onwards
+- Added productivity category to Info.plist for App Library grouping
+- Synced iOS public index with current build
+- Added persistence failure visibility
+- Review infrastructure updates
+
+### code-review
+
+Created: 2026-06-03
+Parent: main (167ce2d)
+Purpose: Code review infrastructure and fixes
+
+Status: Archived (subsumed by overdue-subtitle-format merge)
+Tip: c5a885a
+
+Summary:
+- Same commits as early overdue-subtitle-format work
+- Branch diverged at same point, appears to have been used as a staging area
+
+### reminder-refresh-v2
+
+Created: 2026-06-02
+Parent: main (1972dc2)
+Purpose: Reminder time refresh and badge notification system
+
+Status: Archived (work landed directly on main)
+Tip: 1972dc2
+
+Summary:
+- Branch pointer sits at same commit as main at time of creation
+- All badge/notification work was committed directly to main
+
+### devtools-2.0
+
+Created: 2026-05-29
+Parent: main (01c874d)
+Purpose: Dev tools 2.0 overhaul
+
+Status: Archived (work landed directly on main)
+Tip: 01c874d
+
+### colour-palette-2
+
+Created: unknown
+Parent: main
+Purpose: Colour palette exploration
+
+Status: Archived (no unique commits)
+Tip: ee1bc8c
+
+### ios-integration-phase-1
+
+Created: 2026-04-04
+Parent: main (3989b32)
+Purpose: iOS integration work
+
+Status: Archived (work landed directly on main)
+Tip: 3989b32
+
+### long-list-sheet-bounce
+
+Created: 2026-04-28
+Parent: main (097e822)
+Purpose: Long list sheet bounce behaviour
+
+Status: Archived (no unique commits)
+Tip: 097e822
+
+### saved-lists
+
+Created: 2026-04-28
+Parent: main (1d72997)
+Purpose: Saved lists feature
+
+Status: Archived (work landed directly on main)
+Tip: 1d72997
+
+### smart-reminders
+
+Created: 2026-04-08
+Parent: main (4759143)
+Purpose: Smart reminders feature
+
+Status: Archived (work landed directly on main)
+Tip: 4759143
+
+### smart-reminders-ui-2
+
+Created: unknown
+Parent: main
+Purpose: Smart reminders UI iteration
+
+Status: Archived (no unique commits)
+Tip: 96d4cbe
+
+### tutorial-v2
+
+Created: unknown
+Parent: main
+Purpose: Tutorial system v2
+
+Status: Archived (no unique commits)
+Tip: e86c3d3
+
+### ui-exploration-3-dots
+
+Created: 2026-04-05
+Parent: main (49686e6)
+Purpose: 3-dot menu UI exploration
+
+Status: Archived (work landed directly on main)
+Tip: 49686e6
+
+## Merge history
+
+### 2026-06-16
+
+Source: badge-midnight-fix
+Destination: main
+Result: fast-forward to f98d81f
+
+Changes:
+- Removed date-only guard from midnight badge notification scheduling
+- Updated notification tests to reflect new behaviour
+- Follow-up commit 3c85c52 updated iOS web assets
+
+### 2026-06-15
+
+Source: add-haptic-feedback
+Destination: main
+Merge commit: 7765120
+
+Changes:
+- Added haptic feedback to key user actions (create, complete, delete, undelete, uncomplete, clear done/deleted)
+- Unified all haptics to single light impact tap
+- Added dev tools haptics settings page with per-action toggles
+- Updated iOS build artifacts after cap sync
+
+### 2026-06-11
+
+Source: overdue-subtitle-format
+Destination: main
+Merge commit: 24aeb9b
+
+Changes:
+- Added overdue day count to reminder subtitles
+- Added productivity category to Info.plist
+- Added persistence failure visibility banner
+- Synced iOS public index
+- Review infrastructure updates
+
+## Release history
+
+### Baseline build - 2026-04-03
+
+Commit: c30b1e8
+Milestone: Initial Figma Make build with Capacitor iOS shell established as project baseline.
+
+### Stable rollback points - 2026-04-04
+
+Commits: 2fce61a, 4d44338, e12212a
+Milestone: Three stable rollback points created before and after notification work and code cleanup.
+
+## Significant decisions
+
+### Capacitor as iOS bridge (2026-04-03)
+The project uses Capacitor to bridge a web-based React/TypeScript application to native iOS. This allows the core UI and logic to remain in web technologies while accessing native capabilities (notifications, badge, haptics) through Capacitor plugins.
+
+### Per-notification badge values (2026-06-02)
+Badge counts are embedded in each scheduled local notification payload rather than using background app refresh or push notifications. Each notification carries the pre-computed badge count for its fire time. A silent midnight notification handles day-boundary badge transitions.
+
+### Native badge correction on action (2026-06-02)
+When a user acts on a notification (mark done, move to tomorrow), the native iOS handler decrements the badge and reschedules pending notification badge values. This avoids requiring the JS layer to be active.
+
+### Midnight badge notification always scheduled (2026-06-16)
+Removed the hasActiveDateOnlyReminder guard. The midnight silent badge notification is now always scheduled when badge is enabled, regardless of reminder types. This ensures badge updates at midnight even when only timed reminders exist and the app is suspended.
+
+### Haptics unified to single light impact (2026-06-15)
+All haptic feedback actions use a single light impact tap rather than varied intensities. Per-action controls were added to dev tools for granular enable/disable.
+
+### Standard centred overlay pattern (2026-05-25 onwards)
+Dev tools pages use a consistent PageShell with flat layout and shared components (ToggleRow, MenuRow, BackHeader).
+
+### Hierarchical dev tools enable/disable (2026-05-26)
+Dev tools pages have root-level enable toggles with hierarchical disabled states. Disabled pages use #D9D9D9 styling.
+
+### Lists and reminders structurally separate (2026-04-04 onwards)
+Lists and reminders are separate data structures. Smart reminders provide the bridge between them by linking a reminder to a list for progress tracking.
+
+## Development log
+
+### 2026-04-03
+
+Branch: main
+Commits: c30b1e8
+
+Completed:
+- Baseline ReminderlyV300 Figma Make build with Capacitor iOS shell
+
+Outcome: Project initialised.
+
+### 2026-04-04
+
+Branch: main
+Commits: 2fce61a, 4d44338, e12212a, b8d9799 through 3989b32
+
+Completed:
+- Created stable rollback points
+- Refined reminder overlay and done view UI
+- Refined list interactions, 3-dot menus, list overlays
+- Polished smart list entry UI
+
+Outcome: Core UI foundation established.
+
+### 2026-04-05 to 2026-04-13
+
+Branch: main
+Commits: 49686e6 through a773e66
+
+Completed:
+- Built smart reminders list overlay flow
+- Implemented smart reminder list sync
+- Refined smart reminder overlay date actions
+- Added list self-check coverage
+- Built saved lists workflow and overlay interactions
+- Refined template overlays, dev tools list template controls
+- Refined reminder actions and text input behaviour
+
+Outcome: Lists, smart reminders, and saved lists features built out.
+
+### 2026-04-23 to 2026-05-03
+
+Branch: main
+Commits: 98cb381 through f674cac
+
+Completed:
+- Updated lists button copy
+- Refined smart reminder subtitles and handoff flow
+- Layout refinements: title truncation, descender clipping, panel spacing
+- Reordered list filters to todo/started/done
+
+Outcome: Layout polish and list filter refinements.
+
+### 2026-05-25 to 2026-05-27
+
+Branch: main
+Commits: c698d55 through 19f0f20
+
+Completed:
+- Dev tools 2.0 overhaul: refactored all sub-pages to PageShell pattern
+- Added shared ToggleRow, MenuRow, BackHeader components
+- Added hierarchical enable/disable across all dev tools pages
+- Added info icons with detailed cross-dependency descriptions
+- Fixed sub-page scrolling issues
+- Added Move to tomorrow notification long-press action
+- Fixed notification sync signature
+- Fixed resume refresh with visibilitychange event
+
+Outcome: Dev tools fully restructured. Notification long-press actions added.
+
+### 2026-05-29
+
+Branch: main
+Commits: 01c874d
+
+Completed:
+- Fixed resume refresh by replacing missing @capacitor/app listener with visibilitychange event
+
+Outcome: App resume now correctly triggers time refresh.
+
+### 2026-06-02
+
+Branch: main
+Commits: 417ef98 through 167ce2d
+
+Completed:
+- Stage 1 reminder time refresh with capped 30s re-arm timer
+- Notification badge payload support
+- Native badge correction on notification action (iOS Swift handler)
+- Silent midnight badge notification for day-boundary transitions
+- Midnight badge guard behind active date-only reminder check
+- Notification badge tests
+- Notification badge self-checks in dev tools
+- Removed test artifacts
+
+Outcome: Full notification badge system implemented with native iOS support.
+
+### 2026-06-03
+
+Branch: overdue-subtitle-format
+Commits: 9458484 through c5a885a
+
+Completed:
+- Review infrastructure updates
+- Added persistence failure visibility
+- Synced iOS public index
+- Added productivity category to Info.plist
+
+Outcome: Infrastructure improvements.
+
+### 2026-06-11
+
+Branch: overdue-subtitle-format
+Commits: f321245
+Merge: 24aeb9b
+
+Completed:
+- Show overdue duration in reminder subtitle from day 1 onwards
+- Merged overdue-subtitle-format into main
+
+Outcome: Merged to main.
+
+### 2026-06-15
+
+Branch: add-haptic-feedback
+Commits: fae4339 through dc2079d
+Merge: 7765120
+
+Completed:
+- Added haptic feedback to key user actions
+- Unified all haptic feedback to single light impact tap
+- Added dev tools haptics settings page with per-action toggles
+- Updated iOS build artifacts
+- Merged add-haptic-feedback into main
+
+Outcome: Merged to main.
+
+### 2026-06-16
+
+Branch: badge-midnight-fix
+Commits: f98d81f, 3c85c52
+
+Completed:
+- Investigated badge not updating at midnight when app suspended
+- Identified hasActiveDateOnlyReminder guard as overly restrictive
+- Removed guard so midnight badge notification always schedules when badge enabled
+- Updated notification tests
+- Updated iOS web assets after badge fix
+
+Outcome: Merged to main (fast-forward). Remaining limitation: badge updates for arbitrary times while app is suspended (e.g. timed reminder becoming overdue at 3pm) require additional silent notifications at each time boundary - a separate architectural change.
