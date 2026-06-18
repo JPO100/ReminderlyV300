@@ -259,30 +259,68 @@ npx cap sync ios
 * Do not add explanations inside the command blocks
 * Keep them clean and copy-paste ready
 
-## Git push and branch publishing rules
+## Git governance rules
 
-1. No automatic pushing
+Claude must never execute any of the following git commands automatically. Each requires explicit user instruction before execution.
+
+1. No automatic git add
+
+* Claude must never run `git add` automatically.
+* The sign-off block outputs `git add` commands as text for the user to copy and run.
+* Claude must not stage files without explicit user instruction.
+
+2. No automatic commit
+
+* Claude must never run `git commit` automatically.
+* The sign-off block outputs `git commit` commands as text for the user to copy and run.
+* Claude must not create commits without explicit user instruction.
+
+3. No automatic push
 
 * Claude must never run `git push` automatically.
 * Pushing to any remote branch (including main) requires explicit user instruction.
 
-2. Push is not part of the standard sign-off
+4. No automatic merge
+
+* Claude must never run `git merge` automatically.
+* Merges into any branch (including main) require explicit user instruction.
+
+5. No automatic rebase
+
+* Claude must never run `git rebase` automatically.
+* Rebasing any branch requires explicit user instruction.
+
+6. No automatic reset
+
+* Claude must never run `git reset` automatically.
+* Resetting HEAD, staging, or working tree requires explicit user instruction.
+
+7. No automatic branch creation
+
+* Claude must never run `git checkout -b` or `git branch` to create branches automatically.
+* Branch creation requires explicit user instruction.
+* All branch creation must be recorded in `docs/development-history.md`.
+
+8. Push is not part of the standard sign-off
 
 * The standard implementation sign-off includes commit and build/sync only.
 * `git push` must not be added to the sign-off block by default.
 
-3. When push is permitted
+9. When git commands are permitted
 
-* The user explicitly asks to push, publish, or update GitHub.
-* The user has approved the commit and asks Claude to complete the full publish flow.
+* The user explicitly instructs Claude to run the specific git command.
+* Implicit approval of one command does not grant approval for others.
+* Each command type requires its own explicit instruction.
 
-4. Post-commit reporting
+10. Post-implementation git status reporting
 
-* After any local commit, Claude must report whether the branch is ahead of origin.
-* State the number of unpushed commits if ahead.
+* Every implementation sign-off must include a `git status` summary.
+* Report: files modified, files untracked, files staged.
+* State whether a commit is recommended (yes/no) with a one-line reason.
+* State whether the branch is ahead of origin and by how many commits.
 * State whether `git push` is still required.
 
-5. Branch work rules
+11. Branch work rules
 
 * Branch creation must be recorded in `docs/development-history.md`.
 * Commits on feature branches must use the standard sign-off format.

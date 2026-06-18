@@ -429,3 +429,18 @@ Completed:
 - Added git push and branch publishing rules to Claude.md (a6ee791)
 
 Outcome: Development workflow governance formalised in Claude.md. All changes pushed to origin/main.
+
+### 2026-06-18 (git governance update)
+
+Branch: main
+Commits: pending
+
+Completed:
+- Expanded "Git push and branch publishing rules" in Claude.md to comprehensive "Git governance rules"
+- Added: no automatic git add, no automatic commit, no automatic rebase, no automatic reset, no automatic branch creation
+- Added: mandatory git status reporting in every implementation sign-off
+- Added: mandatory commit recommendation (yes/no with reason) in every sign-off
+- Aligned Reminderly git governance model with Noterly project standards
+
+Outcome: Pending commit.
+
