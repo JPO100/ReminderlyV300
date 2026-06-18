@@ -13,7 +13,7 @@ The codebase originated from a Figma Make build and was extended with a Capacito
 Created: 2026-04-03
 Purpose: Primary development branch
 Status: Active
-Tip: b81c142
+Tip: a6ee791
 
 ### badge-midnight-fix
 
@@ -417,3 +417,15 @@ Failing checks fixed:
 - Scheduling limits: all 64 slots for reminders when no midnight needed
 
 Outcome: Notification self-checks green. Single line change.
+
+### 2026-06-18 (governance)
+
+Branch: main
+Commits: f67662d, 112b0af, a6ee791
+
+Completed:
+- Recorded midnight notification fix in docs/development-history.md (f67662d)
+- Committed development history maintenance rules to Claude.md with explicit bug fix trigger (112b0af)
+- Added git push and branch publishing rules to Claude.md (a6ee791)
+
+Outcome: Development workflow governance formalised in Claude.md. All changes pushed to origin/main.
