@@ -83,6 +83,7 @@ function buildMidnightBadgeNotification(
     notifIncludeTodayInBadge: boolean,
 ): ScheduledNotificationPayload | null {
     if (!notifAppBadge) return null;
+    if (!hasActiveDateOnlyReminder(reminders)) return null;
 
     const now = new Date();
     const midnight = new Date(now);
