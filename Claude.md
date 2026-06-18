@@ -258,3 +258,11 @@ npx cap sync ios
 
 * Do not add explanations inside the command blocks
 * Keep them clean and copy-paste ready
+
+## Development history maintenance
+
+* `docs/development-history.md` is the authoritative project history.
+* It must be updated after every meaningful change.
+* Branch creation, merges, releases, architectural decisions, bug fixes, and significant implementation work must be recorded.
+* Documentation updates are considered part of the task and are not complete until both code and history have been updated.
+* Claude should proactively maintain this document without being asked.
