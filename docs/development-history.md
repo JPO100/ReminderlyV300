@@ -444,3 +444,23 @@ Completed:
 
 Outcome: Pending commit.
 
+### 2026-06-19 (commit and build sign-off alignment)
+
+Branch: main
+Commits: pending
+
+Completed:
+- Separated "Required sign-off format" and "Build sign-off requirements" into distinct "Commit sign-off requirements" and "Build sign-off requirements" sections
+- Added mandatory commit reporting fields: commit hash, files committed, test status, current branch, git status
+- Added mandatory raw output requirements: git status (pre-commit), git log -1 --oneline (post-commit)
+- Resolved short ref conflict: commit reference is now the actual post-commit hash from git log -1 --oneline, not a human-readable label
+- Added test status field with three valid values (not run - not requested, not run - documentation only, run - with result)
+- Preserved existing test prohibition: tests remain forbidden unless explicitly requested
+- Preserved existing push, branch, merge, rebase, and reset approval rules unchanged
+- Preserved existing anti-stall execution rules unchanged
+- Updated git governance rule 10 to require raw git status output instead of narrative summary
+- Aligned Reminderly commit/build workflow with Noterly standard
+
+Outcome: Pending commit.
+
+

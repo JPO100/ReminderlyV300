@@ -78,9 +78,13 @@ Read only the specific file and function needed for the change. Do not repo-wide
 - Concise, literal, implementation-focused
 - No optional extras or suggestions unless asked
 
-## Required sign-off format
+## Commit sign-off requirements
 
-All implementation sign-off output must follow this template exactly:
+Every implementation must end with a commit sign-off. This is mandatory and separate from the build sign-off.
+
+1. Commit command block
+
+Output the exact command block below with relevant files and message filled in:
 
 ```bash
 cd "/Users/john/Personal/Reminderly/Reminderly app build v2/FINAL builds/ReminderlyV300"
@@ -88,19 +92,54 @@ git add <relevant files>
 git commit -m "<commit message>"
 ```
 
-Current short ref: <short-ref>
+2. Mandatory reporting
 
-```bash
-npm run build
-npx cap sync ios
-```
+After the commit command block, include all of the following fields:
 
-Rules:
+* Files committed: explicit list of every file in the `git add` command
+* Test status: one of:
+  * `Not run - not requested`
+  * `Not run - documentation only`
+  * `Run - <exact command and result>`
+* Current branch: the branch name
+* Commit hash: `pending - verify with git log -1 --oneline after commit`
 
-- This placeholder layout and ordering is the canonical project sign-off template.
-- `Current short ref:` must remain on its own line between the two terminal blocks.
-- When a real sign-off is produced, `<short-ref>` must be replaced with the real current `HEAD` short hash.
-- The visual structure should not drift from this template.
+Tests must not be run unless the user explicitly requests them. This does not change the requirement to report test status.
+
+3. Mandatory raw output
+
+Include the raw output of `git status` in the sign-off. This is a read-only command and does not require user approval.
+
+After the user confirms the commit was executed, report the raw output of `git log -1 --oneline`. The short hash from this output is the authoritative commit reference.
+
+4. Commit hash rules
+
+* The commit reference is the actual post-commit short hash from `git log -1 --oneline`.
+* Do not use human-readable labels (e.g. `refresh-on-resume`, `fix-reminder-status-stale`) as commit references.
+* Before the commit is executed, report `pending - verify with git log -1 --oneline after commit`.
+* After the commit is executed, report the actual hash.
+
+5. Commit scope rules
+
+* Only include files that were actually changed.
+* Do not include generated files (e.g. dist, ios build output) unless explicitly required.
+* Do not use `git add .`.
+
+6. Commit message rules
+
+* Must be concise and specific.
+* Must describe exactly what changed.
+* No generic messages like "fix stuff" or "update code".
+
+7. No omission
+
+* This sign-off must be present on every implementation.
+* Do not omit even for small changes.
+
+8. No additional commentary inside command block
+
+* Do not add explanations inside the command blocks.
+* Keep them clean and copy-paste ready.
 
 ## Anti-stall execution rules
 
@@ -192,72 +231,40 @@ The following are not valid reasons to stop:
 
 ## Build sign-off requirements
 
-Every implementation must end with a standardised build and commit sign-off. This is mandatory.
+Every implementation must end with a build sign-off. This is mandatory and separate from the commit sign-off.
 
-1. Always include command block
+1. Build command block
 
-At the end of every completed implementation, output the exact command block below, with relevant files and message filled in:
-
-```bash
-cd "/Users/john/Personal/Reminderly/Reminderly app build v2/FINAL builds/ReminderlyV300"
-
-git add <relevant files>
-git commit -m "<commit message>"
-```
-
-Followed by:
+After the commit sign-off, output the build commands:
 
 ```bash
-Current short ref: <short-ref>
-
 npm run build
 npx cap sync ios
 ```
 
-2. Commit scope rules
+2. Build requirement
 
-* Only include files that were actually changed
-* Do not include generated files (e.g. dist, ios build output) unless explicitly required
-* Do not use `git add .`
+* Always include both `npm run build` and `npx cap sync ios`.
+* Do not skip build steps.
+* Do not replace with alternatives.
 
-3. Commit message rules
+3. No omission
 
-* Must be concise and specific
-* Must describe exactly what changed
-* No generic messages like “fix stuff” or “update code”
+* This sign-off must be present on every implementation.
+* Do not omit even for small changes.
 
-4. Short ref requirement
-
-* Always include a short reference label after the commit block
-* Format: a short, human-readable identifier for the change
-* Example: `refresh-on-resume` or `fix-reminder-status-stale`
-
-5. Build requirement
-
-* Always include:
-
-  * `npm run build`
-  * `npx cap sync ios`
-* Do not skip build steps
-* Do not replace with alternatives
-
-6. No omission
-
-* This sign-off must be present on every implementation
-* Do not omit even for small changes
-
-7. Failure handling
+4. Failure handling
 
 * If build fails:
 
   * still include the command block
   * explicitly state the failure after it
-* Do not skip sign-off due to errors
+* Do not skip sign-off due to errors.
 
-8. No additional commentary inside block
+5. No additional commentary inside block
 
-* Do not add explanations inside the command blocks
-* Keep them clean and copy-paste ready
+* Do not add explanations inside the command blocks.
+* Keep them clean and copy-paste ready.
 
 ## Git governance rules
 
@@ -314,11 +321,11 @@ Claude must never execute any of the following git commands automatically. Each 
 
 10. Post-implementation git status reporting
 
-* Every implementation sign-off must include a `git status` summary.
-* Report: files modified, files untracked, files staged.
-* State whether a commit is recommended (yes/no) with a one-line reason.
+* Every implementation sign-off must include the raw output of `git status`.
+* Additionally report: whether a commit is recommended (yes/no) with a one-line reason.
 * State whether the branch is ahead of origin and by how many commits.
 * State whether `git push` is still required.
+* After the user confirms a commit was executed, include the raw output of `git log -1 --oneline`.
 
 11. Branch work rules
 
