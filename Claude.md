@@ -54,8 +54,8 @@ Safe actions without asking:
 Must stop and flag risk first:
 
 - tests
-- builds
-- npm or vitest commands
+- builds (except mandatory build sign-off, which is exempt)
+- npm or vitest commands (except mandatory build sign-off, which is exempt)
 - UI-driven verification
 - broad searches
 - long-running or uncertain commands
@@ -231,40 +231,112 @@ The following are not valid reasons to stop:
 
 ## Build sign-off requirements
 
-Every implementation must end with a build sign-off. This is mandatory and separate from the commit sign-off.
+Every implementation change must include a build sign-off. This is mandatory and separate from the commit sign-off.
 
-1. Build command block
+1. When build sign-off is required
 
-After the commit sign-off, output the build commands:
+For any change affecting:
+
+* Source code
+* UI
+* CSS
+* Components
+* Assets
+* Configuration
+* Capacitor behaviour
+* iOS behaviour
+* Application functionality
+
+Claude must run and report:
 
 ```bash
 npm run build
 npx cap sync ios
 ```
 
-2. Build requirement
+2. Documentation-only exception
 
-* Always include both `npm run build` and `npx cap sync ios`.
-* Do not skip build steps.
+For documentation-only changes, the build sign-off must explicitly state:
+
+`Build/sync not run - documentation-only change.`
+
+3. Mandatory reporting
+
+The build sign-off must include:
+
+* `npm run build` result (success or failure with output)
+* `npx cap sync ios` result (success or failure with output)
+* Whether generated iOS assets changed
+* `git status` after sync
+
+4. Execution rules
+
+* Claude must execute both commands, not just output them as text.
+* Both commands must be run in sequence (`npm run build` first, then `npx cap sync ios`).
+* Do not skip either command.
 * Do not replace with alternatives.
+* The mandatory build sign-off is exempt from stall-risk classification in the stall prevention rules.
 
-3. No omission
+5. Failure handling
+
+* If build fails:
+
+  * report the exact error output
+  * do not skip the sign-off
+  * do not proceed to cap sync if build failed
+* If cap sync fails:
+
+  * report the exact error output
+  * do not skip the sign-off
+
+6. No omission
 
 * This sign-off must be present on every implementation.
 * Do not omit even for small changes.
 
-4. Failure handling
+## Terminal commands for local testing
 
-* If build fails:
+Every implementation change must end with a copy/paste-ready terminal command block so the user can immediately build, sync, and run the app on simulator or device.
 
-  * still include the command block
-  * explicitly state the failure after it
-* Do not skip sign-off due to errors.
+1. Required format
 
-5. No additional commentary inside block
+After the build sign-off and commit sign-off, include the following section:
 
-* Do not add explanations inside the command blocks.
-* Keep them clean and copy-paste ready.
+Terminal commands for local testing:
+
+```bash
+cd "/Users/john/Personal/Reminderly/Reminderly app build v2/FINAL builds/ReminderlyV300"
+git checkout <current-branch>
+git log -1 --oneline
+npm run build
+npx cap sync ios
+open ios/App/App.xcworkspace
+```
+
+In Xcode:
+- Product → Clean Build Folder
+- Product → Run
+
+2. Substitution rules
+
+* `<current-branch>` must be replaced with the actual branch name, not a placeholder.
+* The repository path must be the actual path, not a placeholder.
+
+3. When required
+
+* After every change affecting source code, UI, CSS, components, assets, configuration, Capacitor behaviour, iOS behaviour, or application functionality.
+* Must be provided even if Claude has already run build/sync.
+
+4. Documentation-only exception
+
+For documentation-only changes, this section may be omitted only if the sign-off explicitly states:
+
+`Terminal commands for local testing not provided - documentation-only change.`
+
+5. No omission or weakening
+
+* This requirement must not be removed, weakened, or treated as optional.
+* Anti-stall rules must not override this requirement.
 
 ## Git governance rules
 

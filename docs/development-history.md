@@ -463,4 +463,38 @@ Completed:
 
 Outcome: Pending commit.
 
+### 2026-06-19 (mandatory build sign-off correction)
+
+Branch: main
+Commits: pending
+
+Completed:
+- Updated build sign-off requirements to require Claude to execute npm run build and npx cap sync ios, not just output commands as text
+- Added mandatory build reporting: build result, sync result, whether iOS assets changed, git status after sync
+- Added documentation-only exception: explicitly state "Build/sync not run - documentation-only change."
+- Added execution rules: both commands must be run in sequence, build first then sync
+- Updated failure handling: report exact error output, do not proceed to sync if build failed
+- Added stall prevention exemption: mandatory build sign-off is exempt from stall-risk classification
+- Updated stall prevention rules to note the exemption for mandatory build sign-off
+- Existing commit sign-off, testing rules, and git governance rules unchanged
+
+Outcome: Pending commit.
+
+### 2026-06-19 (terminal commands for local testing requirement)
+
+Branch: main
+Commits: pending
+
+Completed:
+- Added new "Terminal commands for local testing" section to claude.md after build sign-off requirements
+- Requires copy/paste-ready terminal command block after every implementation change: cd, git checkout, git log, npm run build, npx cap sync ios, open xcworkspace
+- Includes Xcode instructions: Product → Clean Build Folder, Product → Run
+- Must use actual repository path and actual branch name, not placeholders
+- Must be provided even if Claude has already run build/sync
+- Documentation-only exception requires explicit statement: "Terminal commands for local testing not provided - documentation-only change."
+- Cannot be removed, weakened, or overridden by anti-stall rules
+- Existing build sign-off, commit sign-off, testing rules, and git governance rules unchanged
+
+Outcome: Pending commit.
+
 
