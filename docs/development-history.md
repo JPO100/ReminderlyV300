@@ -15,6 +15,23 @@ Purpose: Primary development branch
 Status: Active
 Tip: a6ee791
 
+### reminder-attachments
+
+Created: 2026-08-25
+Parent: main
+Purpose: Reminder attachments feature - attach files and photos to reminders
+
+Status: Active
+
+Summary:
+- Step 7A: Choose a File via @capawesome/capacitor-file-picker with metadata-first validation, 25 MB limit, pending attachment lifecycle, generic file tile, delete confirmation
+- Step 7B: Choose a Photo via Camera.getPhoto() with CameraSource.Photos opening standard iOS PHPickerViewController with album navigation, JPEG output, same pending attachment lifecycle
+- Step 7C: Take a Photo via Camera.getPhoto() with CameraSource.Camera opening native iOS camera, same JPEG/pending attachment flow as Choose a Photo
+- Added NSPhotoLibraryAddUsageDescription to Info.plist (required by Camera plugin getPhoto() method)
+- Architectural decision: uses deprecated Camera.getPhoto() API because the newer chooseFromGallery() delegates to IONCameraLib which presents a custom SwiftUI picker without album navigation
+- Physical-device camera UAT for Take a Photo remains outstanding
+- 12 Self Checks cover attachment validation and persistence logic; native picker/camera behaviour verified through manual UAT only
+
 ### badge-midnight-fix
 
 Created: 2026-06-16
@@ -237,6 +254,9 @@ Restored the hasActiveDateOnlyReminder guard in buildMidnightBadgeNotification. 
 
 ### Haptics unified to single light impact (2026-06-15)
 All haptic feedback actions use a single light impact tap rather than varied intensities. Per-action controls were added to dev tools for granular enable/disable.
+
+### Camera plugin deprecated getPhoto() API for photo selection (2026-08-27)
+Choose a Photo and Take a Photo use the deprecated Camera.getPhoto() API rather than the newer chooseFromGallery()/takePhoto() methods. The newer methods delegate to IONCameraLib which presents a custom SwiftUI photo grid without album navigation. The deprecated getPhoto() uses PHPickerViewController (for photos) and UIImagePickerController (for camera), providing the standard iOS experience. Trade-off: all images are returned as JPEG regardless of original format. Acceptable for reminder attachments. Plugin version: @capacitor/camera@8.2.3.
 
 ### Standard centred overlay pattern (2026-05-25 onwards)
 Dev tools pages use a consistent PageShell with flat layout and shared components (ToggleRow, MenuRow, BackHeader).

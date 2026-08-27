@@ -19,6 +19,7 @@ import type { Reminder, ReminderAttachment } from "../app/reminder-utils";
 import type { ReminderSchedule } from "../app/reminder-utils";
 import { validateAttachment, resolveMimeType, saveAttachment } from "../app/utils/attachment-storage";
 import { FilePicker } from "@capawesome/capacitor-file-picker";
+import { Camera, CameraSource, CameraResultType } from "@capacitor/camera";
 import { Capacitor } from "@capacitor/core";
 import type { RepeatRule } from "../app/types/reminder";
 import { repeatConfigToRule } from "../app/utils/repeat-conversion";
@@ -1162,6 +1163,118 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     }
   };
 
+  const handleChoosePhoto = async () => {
+    setShowAttachmentOverlay(false);
+
+    try {
+      // Open standard iOS Photos picker with album navigation
+      const photo = await Camera.getPhoto({
+        source: CameraSource.Photos,
+        resultType: CameraResultType.Uri,
+        quality: 100,
+        presentationStyle: 'fullscreen',
+      });
+
+      // Plugin returns a temp JPEG file — read it and validate size
+      const path = photo.path;
+      if (!path) {
+        setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+        return;
+      }
+
+      const response = await fetch(Capacitor.convertFileSrc(path));
+      const blob = await response.blob();
+
+      // Validate the JPEG size against 25 MB limit
+      const fileName = 'photo.jpeg';
+      const mimeType = 'image/jpeg';
+      const validation = validateAttachment(fileName, mimeType, blob.size);
+      if (!validation.valid) {
+        if (validation.reason === 'too-large') {
+          setAttachmentError({ title: 'Too big!', message: 'Choose a file under 25 MB.' });
+        } else {
+          setAttachmentError({ title: 'Not this one', message: 'Try a different file.' });
+        }
+        return;
+      }
+
+      const dataBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          resolve(dataUrl.split(',')[1]);
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+
+      setPendingAttachment({
+        fileName,
+        mimeType,
+        dataBase64,
+      });
+    } catch (err: unknown) {
+      // Cancellation — silently ignore
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes('cancel')) return;
+      setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+    }
+  };
+
+  const handleTakePhoto = async () => {
+    setShowAttachmentOverlay(false);
+
+    try {
+      // Open native iOS camera directly
+      const photo = await Camera.getPhoto({
+        source: CameraSource.Camera,
+        resultType: CameraResultType.Uri,
+        quality: 100,
+      });
+
+      const path = photo.path;
+      if (!path) {
+        setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+        return;
+      }
+
+      const response = await fetch(Capacitor.convertFileSrc(path));
+      const blob = await response.blob();
+
+      const fileName = 'photo.jpeg';
+      const mimeType = 'image/jpeg';
+      const validation = validateAttachment(fileName, mimeType, blob.size);
+      if (!validation.valid) {
+        if (validation.reason === 'too-large') {
+          setAttachmentError({ title: 'Too big!', message: 'Choose a file under 25 MB.' });
+        } else {
+          setAttachmentError({ title: 'Not this one', message: 'Try a different file.' });
+        }
+        return;
+      }
+
+      const dataBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          resolve(dataUrl.split(',')[1]);
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+
+      setPendingAttachment({
+        fileName,
+        mimeType,
+        dataBase64,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes('cancel')) return;
+      setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+    }
+  };
+
   const handleSubmit = async () => {
     const text = reminderText.trim();
     if (!text) return;
@@ -1439,7 +1552,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
             <div className="content-stretch flex flex-col gap-[30px] items-start mt-[7px] relative shrink-0 w-full">
               <button
                 className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
-                onClick={() => setShowAttachmentOverlay(false)}
+                onClick={handleChoosePhoto}
               >
                 <div className="flex flex-row items-center justify-center size-full">
                   <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
@@ -1452,7 +1565,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
 
               <button
                 className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
-                onClick={() => setShowAttachmentOverlay(false)}
+                onClick={handleTakePhoto}
               >
                 <div className="flex flex-row items-center justify-center size-full">
                   <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
