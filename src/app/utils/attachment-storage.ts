@@ -91,20 +91,20 @@ export function resolveMimeType(fileName: string, mimeType: string): string {
 
 /**
  * Validate an attachment before saving.
- * Checks file size and MIME type (with extension fallback for generic types).
+ * Checks MIME type (with extension fallback for generic types) then file size.
  */
 export function validateAttachment(
   fileName: string,
   mimeType: string,
   size: number,
 ): AttachmentValidationResult {
-  if (size > MAX_ATTACHMENT_SIZE) {
-    return { valid: false, reason: "too-large" };
-  }
-
   const resolved = resolveMimeType(fileName, mimeType);
   if (!SUPPORTED_MIME_TYPES.has(resolved)) {
     return { valid: false, reason: "unsupported-type" };
+  }
+
+  if (size > MAX_ATTACHMENT_SIZE) {
+    return { valid: false, reason: "too-large" };
   }
 
   return { valid: true };

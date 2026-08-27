@@ -109,6 +109,15 @@ export function getAttachmentChecks(): Check[] {
     },
 
     {
+      id: 'attachment-unsupported-overrides-size',
+      name: 'Unsupported type reported before size limit',
+      run: () => {
+        const result = validateAttachment('clip.mp4', 'video/mp4', MAX_ATTACHMENT_SIZE + 1);
+        assert(result.valid === false && result.reason === 'unsupported-type', 'Expected unsupported-type even when file also exceeds size limit');
+      },
+    },
+
+    {
       id: 'attachment-load-without-attachment',
       name: 'Existing reminder without attachment loads normally',
       run: () => {

@@ -15,8 +15,11 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import TimePicker from "./TimePicker";
 import type { RepeatConfig } from "../app/reminder-utils";
-import type { Reminder } from "../app/reminder-utils";
+import type { Reminder, ReminderAttachment } from "../app/reminder-utils";
 import type { ReminderSchedule } from "../app/reminder-utils";
+import { validateAttachment, resolveMimeType, saveAttachment } from "../app/utils/attachment-storage";
+import { FilePicker } from "@capawesome/capacitor-file-picker";
+import { Capacitor } from "@capacitor/core";
 import type { RepeatRule } from "../app/types/reminder";
 import { repeatConfigToRule } from "../app/utils/repeat-conversion";
 import { formatShortMonthDay } from "../app/utils/date-display";
@@ -610,6 +613,9 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     return '';
   });
   const [showAttachmentOverlay, setShowAttachmentOverlay] = useState(false);
+  const [pendingAttachment, setPendingAttachment] = useState<{ fileName: string; mimeType: string; dataBase64: string } | null>(null);
+  const [attachmentError, setAttachmentError] = useState<{ title: string; message: string } | null>(null);
+  const [showDeleteAttachmentConfirm, setShowDeleteAttachmentConfirm] = useState(false);
   const prevRepeatsOverlayOpenRef = useRef(isRepeatsOverlayOpen);
   const repeatsDrawerTimerRef = useRef<number | null>(null);
   const repeatsOverlayTimerRef = useRef<number | null>(null);
@@ -1101,7 +1107,62 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     }
   };
 
-  const handleSubmit = () => {
+  const handleChooseFile = async () => {
+    setShowAttachmentOverlay(false);
+
+    try {
+      // Pick file with metadata only — do not read data yet
+      const result = await FilePicker.pickFiles({
+        limit: 1,
+        readData: false,
+      });
+
+      const picked = result.files[0];
+      if (!picked) return;
+
+      // Validate type and size before reading any file data
+      const validation = validateAttachment(picked.name, picked.mimeType, picked.size);
+      if (!validation.valid) {
+        if (validation.reason === 'too-large') {
+          setAttachmentError({ title: 'Too big!', message: 'Choose a file under 25 MB.' });
+        } else {
+          setAttachmentError({ title: 'Not this one', message: 'Try a different file.' });
+        }
+        return;
+      }
+
+      // Read file data only after validation passes
+      if (!picked.path) {
+        setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+        return;
+      }
+
+      const response = await fetch(Capacitor.convertFileSrc(picked.path));
+      const blob = await response.blob();
+      const dataBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          resolve(dataUrl.split(',')[1]);
+        };
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+
+      setPendingAttachment({
+        fileName: picked.name,
+        mimeType: resolveMimeType(picked.name, picked.mimeType),
+        dataBase64,
+      });
+    } catch (err: unknown) {
+      // Picker cancellation rejects with "pickFiles canceled."
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes('canceled')) return;
+      setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+    }
+  };
+
+  const handleSubmit = async () => {
     const text = reminderText.trim();
     if (!text) return;
     const requiresScheduledReminder = !isEditMode && !isSmartReminderMode;
@@ -1141,23 +1202,52 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       });
     } else if (isEditMode && editReminder && updateReminder) {
       // Edit mode: update existing reminder in place (id unchanged)
+      let attachment: ReminderAttachment | undefined;
+      if (pendingAttachment) {
+        try {
+          attachment = await saveAttachment(
+            editReminder.id,
+            pendingAttachment.fileName,
+            pendingAttachment.mimeType,
+            pendingAttachment.dataBase64,
+          );
+        } catch {
+          // Attachment save failed - keep existing attachment
+        }
+      }
       const updated: Reminder = {
         ...editReminder,
         originalText: text,
         displayText,
         schedule,
         repeatRule,
+        ...(attachment ? { attachment } : {}),
       };
       updateReminder(updated);
     } else {
       // Create mode: add new reminder
+      const reminderId = generateId();
+      let attachment: ReminderAttachment | undefined;
+      if (pendingAttachment) {
+        try {
+          attachment = await saveAttachment(
+            reminderId,
+            pendingAttachment.fileName,
+            pendingAttachment.mimeType,
+            pendingAttachment.dataBase64,
+          );
+        } catch {
+          // Attachment save failed - proceed without attachment
+        }
+      }
       const reminder: Reminder = {
-        id: generateId(),
+        id: reminderId,
         originalText: text,
         displayText,
         createdAt: Date.now(),
         schedule,
         repeatRule,
+        ...(attachment ? { attachment } : {}),
       };
       addReminder(reminder);
     }
@@ -1171,6 +1261,9 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     setSelectedDate(null);
     setSelectedTime(null);
     setAppliedTokens({ date: null, time: null, repeats: null });
+    setPendingAttachment(null);
+    setAttachmentError(null);
+    setShowDeleteAttachmentConfirm(false);
 
     onClose();
   };
@@ -1254,7 +1347,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
             onClick={handleTextareaClick}
             readOnly={isSmartReminderMode}
           />
-          {isReminderAttachmentsEnabled && (
+          {isReminderAttachmentsEnabled && !pendingAttachment && (
             <button
               type="button"
               className="absolute z-20 bg-transparent border-none p-0 cursor-pointer select-none"
@@ -1266,6 +1359,43 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
                 <path d="M1.79015 2.46873C3.16363 0.0901122 6.21945 -0.701928 8.60753 0.676733C10.9951 2.0557 11.8361 5.09698 10.463 7.47556L8.13585 11.5068C7.34645 12.8734 5.59455 13.324 4.2296 12.5361C2.86472 11.748 2.37928 10.0056 3.16808 8.63865L5.49523 4.6074C5.69658 4.25896 6.1427 4.13977 6.49132 4.3408C6.8397 4.5422 6.95899 4.9883 6.75792 5.33689L4.43077 9.36716C4.05195 10.0235 4.27844 10.8793 4.95909 11.2724C5.6397 11.6652 6.49302 11.4332 6.87218 10.7773L9.19933 6.74607C10.1621 5.07814 9.5812 2.9243 7.87804 1.9404C6.17428 0.956836 4.01702 1.53023 3.05382 3.19822L1.36144 6.12888C1.16007 6.4776 0.713108 6.5978 0.364367 6.39646C0.0159326 6.19501 -0.103475 5.74801 0.0977658 5.39939L1.79015 2.46873Z" fill="#1C2C42"/>
               </svg>
             </button>
+          )}
+          {isReminderAttachmentsEnabled && pendingAttachment && (
+            <div
+              className="absolute z-20"
+              style={{
+                /* Position the 45×58 tile: vertically centred in 80px container, right edge 12px from textarea right.
+                   SVG canvas is 51×63. Tile sits at x=0..45, y=5..63 within the canvas.
+                   So SVG right offset = 12 - (51-45) = 6px from container right.
+                   SVG top offset = (80-58)/2 - 5 = 6px from container top. */
+                right: 6,
+                top: 6,
+                width: 51,
+                height: 63,
+              }}
+            >
+              <svg width="51" height="63" viewBox="0 0 51 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="8" width="39" height="52" rx="4" stroke="white" strokeWidth="6"/>
+                <rect x="1.5" y="6.5" width="42" height="55" rx="5.5" stroke="#ECECEC" strokeWidth="3"/>
+                <path d="M14 32C14 28.2288 14 26.3431 15.2448 25.1716C16.4896 24 18.4931 24 22.5 24H23.2727C26.5339 24 28.1645 24 29.2969 24.7978C29.6214 25.0264 29.9094 25.2975 30.1523 25.6029C31 26.6687 31 28.2034 31 31.2727V33.8182C31 36.7814 31 38.2629 30.5311 39.4462C29.7772 41.3486 28.1829 42.8491 26.1616 43.5586C24.9044 44 23.3302 44 20.1818 44C18.3827 44 17.4832 44 16.7648 43.7478C15.6098 43.3424 14.6988 42.4849 14.268 41.3979C14 40.7217 14 39.8751 14 38.1818V32Z" stroke="#BABABA" strokeWidth="1.5" strokeLinejoin="round"/>
+                <path d="M31 34C31 35.8409 29.5076 37.3333 27.6667 37.3333C27.0009 37.3333 26.216 37.2167 25.5686 37.3901C24.9935 37.5442 24.5442 37.9935 24.3901 38.5686C24.2167 39.216 24.3333 40.0009 24.3333 40.6667C24.3333 42.5076 22.8409 44 21 44" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M18.5 29H25.5" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M18.5 33H21.5" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              {/* X remove button — 44×44 invisible tap target centred on the 20px visible circle */}
+              <button
+                type="button"
+                className="absolute bg-transparent border-none p-0 cursor-pointer select-none"
+                style={{ width: 44, height: 44, top: -12, right: -9, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={() => setShowDeleteAttachmentConfirm(true)}
+                aria-label="Remove attachment"
+              >
+                <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="20.3008" height="20.3008" rx="10.1504" fill="#BABABA"/>
+                  <path d="M12.5238 6.94045C12.7551 6.70935 13.1299 6.70926 13.3611 6.94045C13.5923 7.17164 13.5922 7.5465 13.3611 7.77776L10.988 10.1501L13.3611 12.5233C13.5923 12.7545 13.5922 13.1293 13.3611 13.3606C13.1299 13.5918 12.7551 13.5918 12.5238 13.3606L10.1507 10.9874L7.7783 13.3606C7.54706 13.5918 7.17223 13.5918 6.94099 13.3606C6.70976 13.1294 6.70978 12.7545 6.94099 12.5233L9.31337 10.1501L6.94099 7.77776C6.70993 7.5465 6.70981 7.17163 6.94099 6.94045C7.17219 6.70941 7.5471 6.70943 7.7783 6.94045L10.1507 9.31282L12.5238 6.94045Z" fill="#F7F7F7"/>
+                </svg>
+              </button>
+            </div>
           )}
         </motion.div>
       </div>
@@ -1335,12 +1465,80 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
 
               <button
                 className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
-                onClick={() => setShowAttachmentOverlay(false)}
+                onClick={handleChooseFile}
               >
                 <div className="flex flex-row items-center justify-center size-full">
                   <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
                     <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
                       <p className="leading-[normal]">Choose a file</p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+
+    {attachmentError && (
+      <>
+        <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setAttachmentError(null)} />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+          <div
+            className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] pointer-events-auto outline-none"
+            style={{ width: 340 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
+              <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>{attachmentError.title}</p>
+            </div>
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center not-italic relative shrink-0 text-[#BABABA] text-[17px] text-center">
+              <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700, lineHeight: '24px' }}>{attachmentError.message}</p>
+            </div>
+            <div className="content-stretch flex flex-col gap-[30px] items-start mt-[7px] relative shrink-0 w-full">
+              <button
+                className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
+                onClick={() => setAttachmentError(null)}
+              >
+                <div className="flex flex-row items-center justify-center size-full">
+                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">OK</p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+
+    {showDeleteAttachmentConfirm && (
+      <>
+        <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setShowDeleteAttachmentConfirm(false)} />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+          <div
+            className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] pointer-events-auto outline-none"
+            style={{ width: 340 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
+              <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>Delete attachment</p>
+            </div>
+            <div className="content-stretch flex flex-col gap-[30px] items-start mt-[7px] relative shrink-0 w-full">
+              <button
+                className="bg-[#EC0F0F] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
+                onClick={() => {
+                  setPendingAttachment(null);
+                  setShowDeleteAttachmentConfirm(false);
+                }}
+              >
+                <div className="flex flex-row items-center justify-center size-full">
+                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Delete</p>
                     </div>
                   </div>
                 </div>

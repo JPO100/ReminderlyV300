@@ -44,7 +44,7 @@ Install `@capacitor/filesystem` for native file storage.
 
 Install `@capacitor/camera` for "Take a photo" and "Choose a photo" functionality.
 
-For "Choose a file", use the standard web `<input type="file">`. In Reminderly's Capacitor 8 WKWebView, this triggers the native iOS document picker, provides file name, MIME type and size for validation, and file contents are readable for copying to native storage. No additional dependency required.
+Install `@capawesome/capacitor-file-picker` for "Choose a file" functionality. Standard web `<input type="file">` was initially selected, but device UAT showed that iOS presents an additional source-selection menu before the document picker. `@capawesome/capacitor-file-picker` opens the native Files picker directly.
 
 Add the required iOS permissions to Info.plist:
 
@@ -118,17 +118,24 @@ Follow the supplied UI specification and assets exactly.
 * An attachment failure must never affect the reminder itself.
 * Add self-check coverage for the testable validation and attachment-handling logic. Physical device interactions (camera, pickers) do not need to be artificially automated.
 
-## 8. Add the attachment thumbnail
+## 8. Add the attachment tile
 
-**Wait for the supplied UI specification before implementing thumbnail layout.**
+The attachment tile replaces the paperclip when a file is pending or saved.
 
-Once the UI specification is available:
+Tile dimensions: 45px wide x 58px high, 7px corner radius.
 
-* Once successfully attached, replace the paperclip with a larger attachment thumbnail.
-* Generate an actual preview wherever possible.
-* If a preview cannot be generated:
-  * use the supplied generic **image** icon for images;
-  * use the supplied generic **file** icon for everything else.
+Position: vertically centred in the reminder textarea, tile right edge 12px from textarea right edge.
+
+Border treatment (outside-in): 3px #ECECEC stroke, 3px white stroke, then preview content.
+
+Fallback presentations (two only):
+* **Generic File** — document pictogram, used for all non-image attachments.
+* **Generic Image** — camera pictogram, used for image attachments.
+
+Close/remove control: 20px grey circle with X, overlapping 5px above and 5px right of the tile.
+
+Behaviour:
+* Once successfully attached, replace the paperclip with the attachment tile.
 * Only one attachment can exist against a reminder.
 * There is no replace action. The existing attachment must first be deleted.
 * Add self-check coverage where practical.
