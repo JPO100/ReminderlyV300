@@ -36,6 +36,7 @@ import DeletedInfoOverlay from "../imports/deleted-info-overlay";
 import AddListItemInput from "./components/lists/AddListItemInput";
 import EditableListItem from "./components/lists/EditableListItem";
 import { CompletedCircleIcon } from "./components/icons/ReminderStateIcons";
+import { deleteAttachment } from "./utils/attachment-storage";
 import {
   dateToStorageString,
   storageStringToDate,
@@ -3388,6 +3389,13 @@ export default function App() {
         for (const id of idsToRemove) { if (next.delete(id)) changed = true; }
         return changed ? next : s;
       });
+
+      // Best-effort attachment file cleanup for reminders being permanently removed
+      for (const r of prev) {
+        if (idsToRemove.has(r.id) && r.attachment?.storagePath) {
+          deleteAttachment(r.attachment.storagePath);
+        }
+      }
 
       return prev.filter((r) => !idsToRemove.has(r.id));
     });

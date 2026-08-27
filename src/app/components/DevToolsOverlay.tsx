@@ -14,6 +14,7 @@ import { getCompletionChecks } from "../dev/completion-checks";
 import { getDevToolsChecks } from "../dev/dev-tools-checks";
 import { getListChecks } from "../dev/list-checks";
 import { getNotificationChecks } from "../dev/notification-checks";
+import { getAttachmentChecks } from "../dev/attachment-checks";
 import type { Check } from "../dev/check-system";
 import type { GeneratedDummyListsPayload, GeneratedList } from "../utils/dummy-list-generator";
 import DevToolsHome from "../../imports/DevTools";
@@ -597,7 +598,8 @@ function TestingPage({ onBack, onClose }: { onBack: () => void; onClose: () => v
         const listChecks = getListChecks().map(c => ({ ...c, name: `[Lists and smart reminders] ${c.name}` }));
         const devToolsChecks = getDevToolsChecks().map(c => ({ ...c, name: `[Dev tools and feature flags] ${c.name}` }));
         const notificationChecks = getNotificationChecks().map(c => ({ ...c, name: `[Notification and badge] ${c.name}` }));
-        return [...scheduleChecks, ...reminderChecks, ...nlcParserChecks, ...nlcInteractionChecks, ...doneDeletedChecks, ...completionChecks, ...listChecks, ...devToolsChecks, ...notificationChecks];
+        const attachmentChecks = getAttachmentChecks().map(c => ({ ...c, name: `[Reminder attachments] ${c.name}` }));
+        return [...scheduleChecks, ...reminderChecks, ...nlcParserChecks, ...nlcInteractionChecks, ...doneDeletedChecks, ...completionChecks, ...listChecks, ...devToolsChecks, ...notificationChecks, ...attachmentChecks];
       });
       setReport(result);
     } catch (error) {
