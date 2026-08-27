@@ -26,6 +26,8 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 import { FilePicker } from "@capawesome/capacitor-file-picker";
 import { Camera, CameraSource, CameraResultType } from "@capacitor/camera";
 import { Capacitor } from "@capacitor/core";
+import { Share } from "@capacitor/share";
+import { FileOpener } from "@capacitor-community/file-opener";
 import type { RepeatRule } from "../app/types/reminder";
 import { repeatConfigToRule } from "../app/utils/repeat-conversion";
 import { formatShortMonthDay } from "../app/utils/date-display";
@@ -622,6 +624,9 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
   const [pendingAttachment, setPendingAttachment] = useState<{ fileName: string; mimeType: string; dataBase64: string; previewDataUrl?: string } | null>(null);
   const [attachmentError, setAttachmentError] = useState<{ title: string; message: string } | null>(null);
   const [showDeleteAttachmentConfirm, setShowDeleteAttachmentConfirm] = useState(false);
+  const [showAttachmentViewer, setShowAttachmentViewer] = useState(false);
+  const [attachmentViewerBlobUrl, setAttachmentViewerBlobUrl] = useState<string | null>(null);
+  const [pdfImageDataUrl, setPdfImageDataUrl] = useState<string | null>(null);
   const [imagePreviewFailed, setImagePreviewFailed] = useState(false);
   useEffect(() => { setImagePreviewFailed(false); }, [pendingAttachment]);
   const attachmentDeletedRef = useRef(false);
@@ -1361,6 +1366,116 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     }
   };
 
+  const handleAttachmentTap = async () => {
+    if (!pendingAttachment) return;
+    const mime = pendingAttachment.mimeType;
+
+    if (mime.startsWith('image/')) {
+      setShowAttachmentViewer(true);
+      return;
+    }
+
+    if (mime === 'application/pdf') {
+      try {
+        const binary = atob(pendingAttachment.dataBase64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+        // Copy bytes before PDF.js may transfer the buffer
+        const bytesForBlob = bytes.slice();
+
+        const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+
+        if (pdf.numPages === 1) {
+          // Single-page PDF — render to image via PDF.js
+          const page = await pdf.getPage(1);
+          const viewport = page.getViewport({ scale: 1.5 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          const dataUrl = canvas.toDataURL('image/png');
+          setPdfImageDataUrl(dataUrl);
+        } else {
+          // Multi-page PDF — use protected copy for blob (PDF.js may neuter original buffer)
+          const blob = new Blob([bytesForBlob], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          setAttachmentViewerBlobUrl(url);
+        }
+
+        setShowAttachmentViewer(true);
+      } catch {
+        handleShareAttachment();
+      }
+      return;
+    }
+
+    // Other document types — try native preview, fall back to share sheet
+    handleOpenAttachment();
+  };
+
+  const handleOpenAttachment = async () => {
+    if (!pendingAttachment) return;
+    try {
+      const ext = pendingAttachment.fileName.includes('.')
+        ? pendingAttachment.fileName.split('.').pop()
+        : 'dat';
+      const tempPath = `reminderly-temp-preview.${ext}`;
+      await Filesystem.writeFile({
+        path: tempPath,
+        data: pendingAttachment.dataBase64,
+        directory: Directory.Cache,
+      });
+      const uriResult = await Filesystem.getUri({
+        path: tempPath,
+        directory: Directory.Cache,
+      });
+      await FileOpener.open({
+        filePath: uriResult.uri,
+        contentType: pendingAttachment.mimeType,
+        openWithDefault: true,
+      });
+    } catch {
+      // Native preview failed — fall back to share sheet
+      handleShareAttachment();
+    }
+  };
+
+  const closeAttachmentViewer = () => {
+    setShowAttachmentViewer(false);
+    if (attachmentViewerBlobUrl) {
+      URL.revokeObjectURL(attachmentViewerBlobUrl);
+      setAttachmentViewerBlobUrl(null);
+    }
+    setPdfImageDataUrl(null);
+  };
+
+  const handleShareAttachment = async () => {
+    if (!pendingAttachment) return;
+    try {
+      const ext = pendingAttachment.fileName.includes('.')
+        ? pendingAttachment.fileName.split('.').pop()
+        : 'dat';
+      const tempPath = `reminderly-temp-share.${ext}`;
+      await Filesystem.writeFile({
+        path: tempPath,
+        data: pendingAttachment.dataBase64,
+        directory: Directory.Cache,
+      });
+      const uriResult = await Filesystem.getUri({
+        path: tempPath,
+        directory: Directory.Cache,
+      });
+      await Share.share({
+        files: [uriResult.uri],
+      });
+    } catch {
+      // Share cancelled or failed — no action needed
+    }
+  };
+
   const handleSubmit = async () => {
     const text = reminderText.trim();
     if (!text) return;
@@ -1508,6 +1623,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
                   whiteSpace: 'pre-wrap',
                   overflowWrap: 'break-word',
                   wordBreak: 'break-word',
+                  ...(pendingAttachment ? { paddingRight: 73 } : {}),
                 }}
                 aria-hidden="true"
               >
@@ -1525,6 +1641,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
                   whiteSpace: 'pre-wrap',
                   overflowWrap: 'break-word',
                   wordBreak: 'break-word',
+                  ...(pendingAttachment ? { paddingRight: 73 } : {}),
                 }}
                 aria-hidden="true"
               >
@@ -1536,7 +1653,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
           <textarea
             ref={textareaRef}
             className="w-full h-full p-[12px] font-['Lato',sans-serif] text-[17px] resize-none border-none outline-none bg-transparent relative z-10 placeholder:font-medium placeholder:text-[#bababa]"
-            style={{ color: isSmartReminderMode ? '#BABABA' : (nlcEnabled ? 'transparent' : '#1C2C42'), caretColor: isSmartReminderMode ? '#BABABA' : '#1C2C42', lineHeight: 'normal' }}
+            style={{ color: isSmartReminderMode ? '#BABABA' : (nlcEnabled ? 'transparent' : '#1C2C42'), caretColor: isSmartReminderMode ? '#BABABA' : '#1C2C42', lineHeight: 'normal', ...(pendingAttachment ? { paddingRight: 73 } : {}) }}
             placeholder="Don't forget..."
             autoCapitalize="sentences"
             autoComplete="off"
@@ -1565,7 +1682,8 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
           )}
           {isReminderAttachmentsEnabled && pendingAttachment && (
             <div
-              className="absolute z-20"
+              className="absolute z-20 cursor-pointer"
+              onClick={handleAttachmentTap}
               style={{
                 /* Position the 45×58 tile: vertically centred in 80px container, right edge 12px from textarea right.
                    SVG canvas is 51×63. Tile sits at x=0..45, y=5..63 within the canvas.
@@ -1672,7 +1790,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
                 type="button"
                 className="absolute bg-transparent border-none p-0 cursor-pointer select-none"
                 style={{ width: 44, height: 44, top: -12, right: -9, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                onClick={() => setShowDeleteAttachmentConfirm(true)}
+                onClick={(e) => { e.stopPropagation(); setShowDeleteAttachmentConfirm(true); }}
                 aria-label="Remove attachment"
               >
                 <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1831,6 +1949,88 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
               </button>
             </div>
           </div>
+        </div>
+      </>
+    )}
+
+    {showAttachmentViewer && pendingAttachment && (
+      <>
+        {/* Backdrop — 85% black, tap to close */}
+        <div className="fixed inset-0 z-[70]" style={{ background: 'rgba(0,0,0,0.85)' }} onClick={closeAttachmentViewer} />
+        {/* Content area — centred, 30px side margins, 100px top/bottom from usable screen */}
+        <div
+          className="fixed z-[70] flex items-center justify-center pointer-events-none"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 100px)', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)', left: 30, right: 30 }}
+        >
+          {/* Branch 1: normal image attachment */}
+          {pendingAttachment.mimeType.startsWith('image/') ? (
+            <div className="relative pointer-events-auto">
+              <img
+                src={`data:${pendingAttachment.mimeType};base64,${pendingAttachment.dataBase64}`}
+                alt={pendingAttachment.fileName}
+                onClick={(e) => e.stopPropagation()}
+                style={{ display: 'block', maxWidth: 'calc(100vw - 60px)', maxHeight: 'calc(100vh - 200px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))', objectFit: 'contain', borderRadius: 12 }}
+              />
+              <button
+                type="button"
+                className="absolute z-[80] bg-transparent border-none p-0 cursor-pointer select-none"
+                style={{ top: 10, right: 10, width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={closeAttachmentViewer}
+                aria-label="Close viewer"
+              >
+                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="30" height="30" rx="15" fill="black"/>
+                  <path d="M18.5064 10.2562C18.8482 9.91468 19.4021 9.91453 19.7438 10.2562C20.0854 10.5978 20.0853 11.1518 19.7438 11.4935L16.2368 14.9994L19.7438 18.5064C20.0854 18.848 20.0853 19.402 19.7438 19.7437C19.4021 20.0854 18.8482 20.0854 18.5064 19.7437L14.9995 16.2367L11.4936 19.7437C11.1519 20.0854 10.598 20.0854 10.2563 19.7437C9.91456 19.402 9.91459 18.8481 10.2563 18.5064L13.7621 14.9994L10.2563 11.4935C9.91481 11.1518 9.91463 10.5978 10.2563 10.2562C10.5979 9.91476 11.152 9.91479 11.4936 10.2562L14.9995 13.762L18.5064 10.2562Z" fill="white"/>
+                </svg>
+              </button>
+            </div>
+          ) : pdfImageDataUrl ? (
+            /* Branch 2: single-page PDF rendered as image */
+            <div className="relative pointer-events-auto">
+              <img
+                src={pdfImageDataUrl}
+                alt={pendingAttachment.fileName}
+                onClick={(e) => e.stopPropagation()}
+                style={{ display: 'block', maxWidth: 'calc(100vw - 60px)', maxHeight: 'calc(100vh - 200px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))', objectFit: 'contain', borderRadius: 12 }}
+              />
+              <button
+                type="button"
+                className="absolute z-[80] bg-transparent border-none p-0 cursor-pointer select-none"
+                style={{ top: 10, right: 10, width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={closeAttachmentViewer}
+                aria-label="Close viewer"
+              >
+                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="30" height="30" rx="15" fill="black"/>
+                  <path d="M18.5064 10.2562C18.8482 9.91468 19.4021 9.91453 19.7438 10.2562C20.0854 10.5978 20.0853 11.1518 19.7438 11.4935L16.2368 14.9994L19.7438 18.5064C20.0854 18.848 20.0853 19.402 19.7438 19.7437C19.4021 20.0854 18.8482 20.0854 18.5064 19.7437L14.9995 16.2367L11.4936 19.7437C11.1519 20.0854 10.598 20.0854 10.2563 19.7437C9.91456 19.402 9.91459 18.8481 10.2563 18.5064L13.7621 14.9994L10.2563 11.4935C9.91481 11.1518 9.91463 10.5978 10.2563 10.2562C10.5979 9.91476 11.152 9.91479 11.4936 10.2562L14.9995 13.762L18.5064 10.2562Z" fill="white"/>
+                </svg>
+              </button>
+            </div>
+          ) : attachmentViewerBlobUrl ? (
+            /* Branch 3: multi-page PDF via <object> */
+            <div className="relative pointer-events-auto" style={{ width: '100%', height: '100%' }}>
+              <object
+                data={attachmentViewerBlobUrl}
+                type="application/pdf"
+                onClick={(e) => e.stopPropagation()}
+                style={{ width: '100%', height: '100%', borderRadius: 12, background: 'white' }}
+              >
+                <p style={{ color: 'white', textAlign: 'center' }}>Unable to display PDF.</p>
+              </object>
+              <button
+                type="button"
+                className="absolute z-[80] bg-transparent border-none p-0 cursor-pointer select-none"
+                style={{ top: 10, right: 10, width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                onClick={closeAttachmentViewer}
+                aria-label="Close viewer"
+              >
+                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="30" height="30" rx="15" fill="black"/>
+                  <path d="M18.5064 10.2562C18.8482 9.91468 19.4021 9.91453 19.7438 10.2562C20.0854 10.5978 20.0853 11.1518 19.7438 11.4935L16.2368 14.9994L19.7438 18.5064C20.0854 18.848 20.0853 19.402 19.7438 19.7437C19.4021 20.0854 18.8482 20.0854 18.5064 19.7437L14.9995 16.2367L11.4936 19.7437C11.1519 20.0854 10.598 20.0854 10.2563 19.7437C9.91456 19.402 9.91459 18.8481 10.2563 18.5064L13.7621 14.9994L10.2563 11.4935C9.91481 11.1518 9.91463 10.5978 10.2563 10.2562C10.5979 9.91476 11.152 9.91479 11.4936 10.2562L14.9995 13.762L18.5064 10.2562Z" fill="white"/>
+                </svg>
+              </button>
+            </div>
+          ) : null}
         </div>
       </>
     )}

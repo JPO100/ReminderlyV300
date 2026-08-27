@@ -185,5 +185,56 @@ export function getAttachmentChecks(): Check[] {
         });
       },
     },
+
+    {
+      id: 'attachment-load-explicit-null-cleared',
+      name: 'Reminder with attachment explicitly set to null loads without attachment',
+      run: () => {
+        withIsolatedKey(STORAGE_KEY, () => {
+          const reminder = {
+            id: 'test-null-att',
+            originalText: 'Cleared',
+            displayText: 'Cleared',
+            createdAt: Date.now(),
+            schedule: { kind: 'sometime' },
+            attachment: null,
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify([reminder]));
+          const loaded = loadReminders();
+          assert(loaded.length === 1, `Expected 1 reminder, got ${loaded.length}`);
+          assert(loaded[0].attachment == null, 'Expected null attachment to load as absent');
+        });
+      },
+    },
+
+    {
+      id: 'attachment-survives-soft-delete',
+      name: 'Soft-deleted reminder preserves attachment metadata',
+      run: () => {
+        withIsolatedKey(STORAGE_KEY, () => {
+          const attachment: ReminderAttachment = {
+            fileName: 'receipt.pdf',
+            mimeType: 'application/pdf',
+            storagePath: 'reminderly-attachments/test-soft.pdf',
+          };
+          const reminder = {
+            id: 'test-soft-del',
+            originalText: 'Meeting notes',
+            displayText: 'Meeting notes',
+            createdAt: Date.now(),
+            schedule: { kind: 'sometime' },
+            deletedAt: Date.now(),
+            attachment,
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify([reminder]));
+          const loaded = loadReminders();
+          assert(loaded.length === 1, `Expected 1 reminder, got ${loaded.length}`);
+          assert(loaded[0].deletedAt != null, 'Expected deletedAt to be preserved');
+          assert(loaded[0].attachment != null, 'Expected attachment to survive soft-delete');
+          assert(loaded[0].attachment!.fileName === 'receipt.pdf', 'Wrong fileName after soft-delete');
+          assert(loaded[0].attachment!.storagePath === 'reminderly-attachments/test-soft.pdf', 'Wrong storagePath after soft-delete');
+        });
+      },
+    },
   ];
 }
