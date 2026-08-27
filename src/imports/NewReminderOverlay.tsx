@@ -17,7 +17,8 @@ import TimePicker from "./TimePicker";
 import type { RepeatConfig } from "../app/reminder-utils";
 import type { Reminder, ReminderAttachment } from "../app/reminder-utils";
 import type { ReminderSchedule } from "../app/reminder-utils";
-import { validateAttachment, resolveMimeType, saveAttachment } from "../app/utils/attachment-storage";
+import { validateAttachment, resolveMimeType, saveAttachment, deleteAttachment } from "../app/utils/attachment-storage";
+import { Filesystem, Directory } from "@capacitor/filesystem";
 import * as pdfjsLib from 'pdfjs-dist';
 // @ts-ignore — Vite ?url import returns a string asset URL
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -623,6 +624,59 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
   const [showDeleteAttachmentConfirm, setShowDeleteAttachmentConfirm] = useState(false);
   const [imagePreviewFailed, setImagePreviewFailed] = useState(false);
   useEffect(() => { setImagePreviewFailed(false); }, [pendingAttachment]);
+  const attachmentDeletedRef = useRef(false);
+
+  // Load existing attachment when editing a reminder that has one
+  useEffect(() => {
+    if (!editReminder?.attachment) return;
+    const { fileName, mimeType, storagePath } = editReminder.attachment;
+    let cancelled = false;
+    (async () => {
+      try {
+        const result = await Filesystem.readFile({
+          path: storagePath,
+          directory: Directory.Data,
+        });
+        if (cancelled) return;
+        const dataBase64 = typeof result.data === 'string' ? result.data : '';
+
+        // Generate PDF preview if applicable
+        let previewDataUrl: string | undefined;
+        if (mimeType === 'application/pdf') {
+          try {
+            const binaryString = atob(dataBase64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            const pdf = await pdfjsLib.getDocument({ data: bytes.buffer }).promise;
+            const page = await pdf.getPage(1);
+            const vp = page.getViewport({ scale: 1 });
+            const scale = 90 / vp.width;
+            const scaled = page.getViewport({ scale });
+            const canvas = document.createElement('canvas');
+            canvas.width = scaled.width;
+            canvas.height = scaled.height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              await page.render({ canvasContext: ctx, viewport: scaled }).promise;
+              previewDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            }
+            pdf.destroy();
+          } catch {
+            // PDF preview generation failed — Generic File fallback
+          }
+        }
+
+        if (cancelled) return;
+        setPendingAttachment({ fileName, mimeType, dataBase64, previewDataUrl });
+      } catch {
+        // File read failed — attachment may have been deleted externally
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [editReminder]);
+
   const prevRepeatsOverlayOpenRef = useRef(isRepeatsOverlayOpen);
   const repeatsDrawerTimerRef = useRef<number | null>(null);
   const repeatsOverlayTimerRef = useRef<number | null>(null);
@@ -1347,7 +1401,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       });
     } else if (isEditMode && editReminder && updateReminder) {
       // Edit mode: update existing reminder in place (id unchanged)
-      let attachment: ReminderAttachment | undefined;
+      let attachment: ReminderAttachment | undefined | null;
       if (pendingAttachment) {
         try {
           attachment = await saveAttachment(
@@ -1359,6 +1413,10 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
         } catch {
           // Attachment save failed - keep existing attachment
         }
+      } else if (attachmentDeletedRef.current && editReminder.attachment) {
+        // User deleted the existing attachment
+        attachment = null;
+        await deleteAttachment(editReminder.attachment.storagePath);
       }
       const updated: Reminder = {
         ...editReminder,
@@ -1366,7 +1424,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
         displayText,
         schedule,
         repeatRule,
-        ...(attachment ? { attachment } : {}),
+        ...(attachment !== undefined ? { attachment } : {}),
       };
       updateReminder(updated);
     } else {
@@ -1759,6 +1817,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
                 className="bg-[#EC0F0F] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
                 onClick={() => {
                   setPendingAttachment(null);
+                  attachmentDeletedRef.current = true;
                   setShowDeleteAttachmentConfirm(false);
                 }}
               >
