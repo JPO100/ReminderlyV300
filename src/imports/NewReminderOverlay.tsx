@@ -18,6 +18,10 @@ import type { RepeatConfig } from "../app/reminder-utils";
 import type { Reminder, ReminderAttachment } from "../app/reminder-utils";
 import type { ReminderSchedule } from "../app/reminder-utils";
 import { validateAttachment, resolveMimeType, saveAttachment } from "../app/utils/attachment-storage";
+import * as pdfjsLib from 'pdfjs-dist';
+// @ts-ignore — Vite ?url import returns a string asset URL
+import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 import { FilePicker } from "@capawesome/capacitor-file-picker";
 import { Camera, CameraSource, CameraResultType } from "@capacitor/camera";
 import { Capacitor } from "@capacitor/core";
@@ -614,9 +618,11 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     return '';
   });
   const [showAttachmentOverlay, setShowAttachmentOverlay] = useState(false);
-  const [pendingAttachment, setPendingAttachment] = useState<{ fileName: string; mimeType: string; dataBase64: string } | null>(null);
+  const [pendingAttachment, setPendingAttachment] = useState<{ fileName: string; mimeType: string; dataBase64: string; previewDataUrl?: string } | null>(null);
   const [attachmentError, setAttachmentError] = useState<{ title: string; message: string } | null>(null);
   const [showDeleteAttachmentConfirm, setShowDeleteAttachmentConfirm] = useState(false);
+  const [imagePreviewFailed, setImagePreviewFailed] = useState(false);
+  useEffect(() => { setImagePreviewFailed(false); }, [pendingAttachment]);
   const prevRepeatsOverlayOpenRef = useRef(isRepeatsOverlayOpen);
   const repeatsDrawerTimerRef = useRef<number | null>(null);
   const repeatsOverlayTimerRef = useRef<number | null>(null);
@@ -1138,6 +1144,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
         return;
       }
 
+      const resolvedMime = resolveMimeType(picked.name, picked.mimeType);
       const response = await fetch(Capacitor.convertFileSrc(picked.path));
       const blob = await response.blob();
       const dataBase64 = await new Promise<string>((resolve, reject) => {
@@ -1150,10 +1157,35 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
         reader.readAsDataURL(blob);
       });
 
+      // Generate PDF first-page thumbnail for preview
+      let previewDataUrl: string | undefined;
+      if (resolvedMime === 'application/pdf') {
+        try {
+          const arrayBuffer = await blob.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const page = await pdf.getPage(1);
+          const vp = page.getViewport({ scale: 1 });
+          const scale = 90 / vp.width;
+          const scaled = page.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          canvas.width = scaled.width;
+          canvas.height = scaled.height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            await page.render({ canvasContext: ctx, viewport: scaled }).promise;
+            previewDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          }
+          pdf.destroy();
+        } catch {
+          // PDF thumbnail generation failed — fall back to Generic File
+        }
+      }
+
       setPendingAttachment({
         fileName: picked.name,
-        mimeType: resolveMimeType(picked.name, picked.mimeType),
+        mimeType: resolvedMime,
         dataBase64,
+        previewDataUrl,
       });
     } catch (err: unknown) {
       // Picker cancellation rejects with "pickFiles canceled."
@@ -1487,14 +1519,92 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
                 height: 63,
               }}
             >
-              <svg width="51" height="63" viewBox="0 0 51 63" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="8" width="39" height="52" rx="4" stroke="white" strokeWidth="6"/>
-                <rect x="1.5" y="6.5" width="42" height="55" rx="5.5" stroke="#ECECEC" strokeWidth="3"/>
-                <path d="M14 32C14 28.2288 14 26.3431 15.2448 25.1716C16.4896 24 18.4931 24 22.5 24H23.2727C26.5339 24 28.1645 24 29.2969 24.7978C29.6214 25.0264 29.9094 25.2975 30.1523 25.6029C31 26.6687 31 28.2034 31 31.2727V33.8182C31 36.7814 31 38.2629 30.5311 39.4462C29.7772 41.3486 28.1829 42.8491 26.1616 43.5586C24.9044 44 23.3302 44 20.1818 44C18.3827 44 17.4832 44 16.7648 43.7478C15.6098 43.3424 14.6988 42.4849 14.268 41.3979C14 40.7217 14 39.8751 14 38.1818V32Z" stroke="#BABABA" strokeWidth="1.5" strokeLinejoin="round"/>
-                <path d="M31 34C31 35.8409 29.5076 37.3333 27.6667 37.3333C27.0009 37.3333 26.216 37.2167 25.5686 37.3901C24.9935 37.5442 24.5442 37.9935 24.3901 38.5686C24.2167 39.216 24.3333 40.0009 24.3333 40.6667C24.3333 42.5076 22.8409 44 21 44" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M18.5 29H25.5" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M18.5 33H21.5" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              {pendingAttachment.mimeType.startsWith('image/') && !imagePreviewFailed ? (
+                /* Actual image preview */
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 5,
+                    width: 45,
+                    height: 58,
+                    borderRadius: 7,
+                    border: '3px solid #ECECEC',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: '3px solid white',
+                      borderRadius: 4,
+                      overflow: 'hidden',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    <img
+                      src={`data:${pendingAttachment.mimeType};base64,${pendingAttachment.dataBase64}`}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      onError={() => setImagePreviewFailed(true)}
+                    />
+                  </div>
+                </div>
+              ) : pendingAttachment.mimeType.startsWith('image/') ? (
+                /* Generic Image fallback — camera pictogram */
+                <svg width="51" height="63" viewBox="0 0 51 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="8" width="39" height="52" rx="4" fill="white" stroke="white" strokeWidth="6"/>
+                  <rect x="1.5" y="6.5" width="42" height="55" rx="5.5" stroke="#ECECEC" strokeWidth="3"/>
+                  <path d="M18 28.0005C16.7794 28.0041 16.1038 28.0333 15.5487 28.2663C14.7712 28.5927 14.138 29.1955 13.7681 29.9616C13.4662 30.5869 13.4168 31.388 13.318 32.9902L13.1631 35.5009C12.9174 39.4853 12.7945 41.4775 13.9637 42.7388C15.1328 44 17.1025 44 21.0419 44H24.9581C28.8975 44 30.8672 44 32.0363 42.7388C33.2055 41.4775 33.0826 39.4853 32.8369 35.5009L32.682 32.9902C32.5832 31.388 32.5338 30.5869 32.2319 29.9616C31.862 29.1955 31.2288 28.5927 30.4513 28.2663C29.8962 28.0333 29.2206 28.0041 28 28.0005" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M28 29L27.1142 26.7854C26.732 25.83 26.3994 24.7461 25.4166 24.2596C24.8924 24 24.2616 24 23 24C21.7384 24 21.1076 24 20.5834 24.2596C19.6006 24.7461 19.268 25.83 18.8858 26.7854L18 29" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M26.5 36C26.5 37.933 24.933 39.5 23 39.5C21.067 39.5 19.5 37.933 19.5 36C19.5 34.067 21.067 32.5 23 32.5C24.933 32.5 26.5 34.067 26.5 36Z" stroke="#BABABA" strokeWidth="1.5"/>
+                  <path d="M22.9998 28H23.0088" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : pendingAttachment.previewDataUrl ? (
+                /* PDF first-page thumbnail */
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 5,
+                    width: 45,
+                    height: 58,
+                    borderRadius: 7,
+                    border: '3px solid #ECECEC',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: '3px solid white',
+                      borderRadius: 4,
+                      overflow: 'hidden',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    <img
+                      src={pendingAttachment.previewDataUrl}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                /* Generic File — document pictogram (unchanged) */
+                <svg width="51" height="63" viewBox="0 0 51 63" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="8" width="39" height="52" rx="4" stroke="white" strokeWidth="6"/>
+                  <rect x="1.5" y="6.5" width="42" height="55" rx="5.5" stroke="#ECECEC" strokeWidth="3"/>
+                  <path d="M14 32C14 28.2288 14 26.3431 15.2448 25.1716C16.4896 24 18.4931 24 22.5 24H23.2727C26.5339 24 28.1645 24 29.2969 24.7978C29.6214 25.0264 29.9094 25.2975 30.1523 25.6029C31 26.6687 31 28.2034 31 31.2727V33.8182C31 36.7814 31 38.2629 30.5311 39.4462C29.7772 41.3486 28.1829 42.8491 26.1616 43.5586C24.9044 44 23.3302 44 20.1818 44C18.3827 44 17.4832 44 16.7648 43.7478C15.6098 43.3424 14.6988 42.4849 14.268 41.3979C14 40.7217 14 39.8751 14 38.1818V32Z" stroke="#BABABA" strokeWidth="1.5" strokeLinejoin="round"/>
+                  <path d="M31 34C31 35.8409 29.5076 37.3333 27.6667 37.3333C27.0009 37.3333 26.216 37.2167 25.5686 37.3901C24.9935 37.5442 24.5442 37.9935 24.3901 38.5686C24.2167 39.216 24.3333 40.0009 24.3333 40.6667C24.3333 42.5076 22.8409 44 21 44" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M18.5 29H25.5" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M18.5 33H21.5" stroke="#BABABA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
               {/* X remove button — 44×44 invisible tap target centred on the 20px visible circle */}
               <button
                 type="button"
