@@ -669,5 +669,74 @@ export function getDevToolsChecks(): Check[] {
         assert(hideOverdue === false, `Expected false after reinit, got ${hideOverdue}`);
       },
     },
+
+    // ========================================================================
+    // 10. Reminder attachments feature toggle
+    // ========================================================================
+
+    {
+      id: 'reminder-attachments-default',
+      name: 'Reminder attachments: default is false when no value persisted',
+      run: () => {
+        withIsolatedKey('reminderly-ff-reminder-attachments', () => {
+          localStorage.removeItem('reminderly-ff-reminder-attachments');
+          const stored = localStorage.getItem('reminderly-ff-reminder-attachments');
+          assert(stored === null, 'Expected no stored value');
+          // Default logic: if stored === 'true' return true, else return false
+          const defaultValue = stored === 'true' ? true : false;
+          assert(defaultValue === false, `Expected default false, got ${defaultValue}`);
+        });
+      },
+    },
+
+    {
+      id: 'reminder-attachments-persist-true',
+      name: 'Reminder attachments: true persists to localStorage',
+      run: () => {
+        withIsolatedKey('reminderly-ff-reminder-attachments', () => {
+          localStorage.setItem('reminderly-ff-reminder-attachments', 'true');
+          const stored = localStorage.getItem('reminderly-ff-reminder-attachments');
+          assert(stored === 'true', `Expected 'true', got '${stored}'`);
+        });
+      },
+    },
+
+    {
+      id: 'reminder-attachments-persist-false',
+      name: 'Reminder attachments: false persists to localStorage',
+      run: () => {
+        withIsolatedKey('reminderly-ff-reminder-attachments', () => {
+          localStorage.setItem('reminderly-ff-reminder-attachments', 'false');
+          const stored = localStorage.getItem('reminderly-ff-reminder-attachments');
+          assert(stored === 'false', `Expected 'false', got '${stored}'`);
+        });
+      },
+    },
+
+    {
+      id: 'reminder-attachments-hydrate-true',
+      name: 'Reminder attachments: hydrates true correctly from localStorage',
+      run: () => {
+        withIsolatedKey('reminderly-ff-reminder-attachments', () => {
+          localStorage.setItem('reminderly-ff-reminder-attachments', 'true');
+          const stored = localStorage.getItem('reminderly-ff-reminder-attachments');
+          const hydrated = stored === 'true' ? true : false;
+          assert(hydrated === true, `Expected true, got ${hydrated}`);
+        });
+      },
+    },
+
+    {
+      id: 'reminder-attachments-hydrate-false',
+      name: 'Reminder attachments: hydrates false correctly from localStorage',
+      run: () => {
+        withIsolatedKey('reminderly-ff-reminder-attachments', () => {
+          localStorage.setItem('reminderly-ff-reminder-attachments', 'false');
+          const stored = localStorage.getItem('reminderly-ff-reminder-attachments');
+          const hydrated = stored === 'true' ? true : false;
+          assert(hydrated === false, `Expected false, got ${hydrated}`);
+        });
+      },
+    },
   ];
 }

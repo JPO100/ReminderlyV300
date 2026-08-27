@@ -9,3 +9,8 @@ export function isListsEnabled(): boolean {
 
   return stored === "true";
 }
+
+export function isReminderAttachmentsEnabled(): boolean {
+  const stored = localStorage.getItem("reminderly-ff-reminder-attachments");
+  return stored === "true";
+}
