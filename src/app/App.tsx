@@ -4936,6 +4936,7 @@ export default function App() {
                   onCreateSmartReminder={createSmartReminderFromPanel}
                   useOneMinuteIncrements={useOneMinuteTimeIncrements}
                   autoFocusReady={isReminderOverlayFocusReady}
+                  isReminderAttachmentsEnabled={isReminderAttachmentsEnabled}
                 />
               </motion.div>
             </motion.div>

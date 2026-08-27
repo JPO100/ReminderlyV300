@@ -556,7 +556,7 @@ function ReminderOptions({
   );
 }
 
-function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, nlcRecognition, editReminder, updateReminder, smartReminderCreateList, onCreateSmartReminder, useOneMinuteIncrements = false, autoFocusReady = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; nlcRecognition?: NlcRecognitionConfig; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; smartReminderCreateList?: CreatedList | null; onCreateSmartReminder?: (payload: { listId: string; date: string; time: string }) => void; useOneMinuteIncrements?: boolean; autoFocusReady?: boolean }) {
+function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, nlcRecognition, editReminder, updateReminder, smartReminderCreateList, onCreateSmartReminder, useOneMinuteIncrements = false, autoFocusReady = false, isReminderAttachmentsEnabled = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; nlcRecognition?: NlcRecognitionConfig; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; smartReminderCreateList?: CreatedList | null; onCreateSmartReminder?: (payload: { listId: string; date: string; time: string }) => void; useOneMinuteIncrements?: boolean; autoFocusReady?: boolean; isReminderAttachmentsEnabled?: boolean }) {
   const isEditMode = !!editReminder;
   const isSmartReminderCreate = !!smartReminderCreateList;
   const isSmartReminderEdit = editReminder?.isSmartReminder === true;
@@ -1252,6 +1252,13 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
             onClick={handleTextareaClick}
             readOnly={isSmartReminderMode}
           />
+          {isReminderAttachmentsEnabled && (
+            <div className="absolute z-20 pointer-events-none" style={{ right: 16, bottom: 14 }}>
+              <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.79015 2.46873C3.16363 0.0901122 6.21945 -0.701928 8.60753 0.676733C10.9951 2.0557 11.8361 5.09698 10.463 7.47556L8.13585 11.5068C7.34645 12.8734 5.59455 13.324 4.2296 12.5361C2.86472 11.748 2.37928 10.0056 3.16808 8.63865L5.49523 4.6074C5.69658 4.25896 6.1427 4.13977 6.49132 4.3408C6.8397 4.5422 6.95899 4.9883 6.75792 5.33689L4.43077 9.36716C4.05195 10.0235 4.27844 10.8793 4.95909 11.2724C5.6397 11.6652 6.49302 11.4332 6.87218 10.7773L9.19933 6.74607C10.1621 5.07814 9.5812 2.9243 7.87804 1.9404C6.17428 0.956836 4.01702 1.53023 3.05382 3.19822L1.36144 6.12888C1.16007 6.4776 0.713108 6.5978 0.364367 6.39646C0.0159326 6.19501 -0.103475 5.74801 0.0977658 5.39939L1.79015 2.46873Z" fill="#1C2C42"/>
+              </svg>
+            </div>
+          )}
         </motion.div>
       </div>
       <div className="flex-1 min-h-0 flex flex-col px-[24px] pt-[24px] pb-[24px]">
@@ -1280,10 +1287,10 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
   );
 }
 
-export default function NewReminderOverlay({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, nlcRecognition, editReminder, updateReminder, smartReminderCreateList, onCreateSmartReminder, useOneMinuteIncrements = false, autoFocusReady = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; nlcRecognition?: NlcRecognitionConfig; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; smartReminderCreateList?: CreatedList | null; onCreateSmartReminder?: (payload: { listId: string; date: string; time: string }) => void; useOneMinuteIncrements?: boolean; autoFocusReady?: boolean }) {
+export default function NewReminderOverlay({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfigChange, isRepeatsOverlayOpen, addReminder, onClose, nlcMode, nlcEnabled, nlcRecognition, editReminder, updateReminder, smartReminderCreateList, onCreateSmartReminder, useOneMinuteIncrements = false, autoFocusReady = false, isReminderAttachmentsEnabled = false }: { onRepeatsOverlayOpen?: () => void; repeatConfig: RepeatConfig; onRepeatConfigChange: (config: RepeatConfig) => void; isRepeatsOverlayOpen: boolean; addReminder: (reminder: Reminder) => void; onClose: () => void; nlcMode: NlcMode; nlcEnabled: boolean; nlcRecognition?: NlcRecognitionConfig; editReminder?: Reminder | null; updateReminder?: (reminder: Reminder) => void; smartReminderCreateList?: CreatedList | null; onCreateSmartReminder?: (payload: { listId: string; date: string; time: string }) => void; useOneMinuteIncrements?: boolean; autoFocusReady?: boolean; isReminderAttachmentsEnabled?: boolean }) {
   return (
     <div className="bg-white content-stretch flex flex-col items-center relative rounded-tl-[15px] rounded-tr-[15px] size-full" data-name="new-reminder-overlay">
-      <NewReminderElements onRepeatsOverlayOpen={onRepeatsOverlayOpen} repeatConfig={repeatConfig} onRepeatConfigChange={onRepeatConfigChange} isRepeatsOverlayOpen={isRepeatsOverlayOpen} addReminder={addReminder} onClose={onClose} nlcMode={nlcMode} nlcEnabled={nlcEnabled} nlcRecognition={nlcRecognition} editReminder={editReminder} updateReminder={updateReminder} smartReminderCreateList={smartReminderCreateList} onCreateSmartReminder={onCreateSmartReminder} useOneMinuteIncrements={useOneMinuteIncrements} autoFocusReady={autoFocusReady} />
+      <NewReminderElements onRepeatsOverlayOpen={onRepeatsOverlayOpen} repeatConfig={repeatConfig} onRepeatConfigChange={onRepeatConfigChange} isRepeatsOverlayOpen={isRepeatsOverlayOpen} addReminder={addReminder} onClose={onClose} nlcMode={nlcMode} nlcEnabled={nlcEnabled} nlcRecognition={nlcRecognition} editReminder={editReminder} updateReminder={updateReminder} smartReminderCreateList={smartReminderCreateList} onCreateSmartReminder={onCreateSmartReminder} useOneMinuteIncrements={useOneMinuteIncrements} autoFocusReady={autoFocusReady} isReminderAttachmentsEnabled={isReminderAttachmentsEnabled} />
     </div>
   );
 }
