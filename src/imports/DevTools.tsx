@@ -65,23 +65,6 @@ function NavRow({ label, onClick, plain }: { label: string; onClick: () => void;
   );
 }
 
-function ToggleOnlyRow({ label, isOn, onToggle }: { label: string; isOn: boolean; onToggle: () => void }) {
-  return (
-    <div className="h-[60px] relative shrink-0 w-full">
-      <div className="flex flex-row items-center size-full">
-        <div className="content-stretch flex items-center pr-[15px] py-[15px] relative size-full gap-[16px]">
-          <ToggleBtn isOn={isOn} onToggle={onToggle} />
-          <div className="content-stretch flex flex-[1_0_0] items-center min-h-px min-w-px relative">
-            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative min-w-0 text-[17px] whitespace-nowrap" style={{ color: isOn ? '#1C2C42' : '#D9D9D9' }}>
-              <p className="leading-[normal] truncate">{label}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function NavRowWithToggle({ label, isOn, onToggle, onClick }: { label: string; isOn: boolean; onToggle: () => void; onClick: () => void }) {
   return (
     <button
@@ -143,12 +126,6 @@ const homeOverlayCopy: Record<string, { onTitle: string; onSubtitle: string; off
     offTitle: 'Turn off onboarding tutorial?',
     offSubtitle: 'The onboarding tutorial will be hidden from Settings and will not be shown to new users.',
   },
-  reminderAttachments: {
-    onTitle: 'Turn on reminder attachments?',
-    onSubtitle: 'Users will be able to attach a file or image to reminders. Existing attachments will become visible again.',
-    offTitle: 'Turn off reminder attachments?',
-    offSubtitle: 'Attachment UI will be hidden. Existing attachments will be kept but not visible.',
-  },
 };
 
 export default function DevTools({
@@ -170,8 +147,6 @@ export default function DevTools({
   onEnableNotificationsChange,
   enableOnboarding,
   onEnableOnboardingChange,
-  enableReminderAttachments,
-  onEnableReminderAttachmentsChange,
 }: {
   onClose: () => void;
   onNavigateReminders: () => void;
@@ -191,8 +166,6 @@ export default function DevTools({
   onEnableNotificationsChange: (value: boolean) => void;
   enableOnboarding: boolean;
   onEnableOnboardingChange: (value: boolean) => void;
-  enableReminderAttachments: boolean;
-  onEnableReminderAttachmentsChange: (value: boolean) => void;
 }) {
   const [pendingToggle, setPendingToggle] = useState<{ feature: string; target: boolean } | null>(null);
 
@@ -204,7 +177,6 @@ export default function DevTools({
       nlc: onEnableNlcChange,
       notifications: onEnableNotificationsChange,
       onboarding: onEnableOnboardingChange,
-      reminderAttachments: onEnableReminderAttachmentsChange,
     };
     handlers[pendingToggle.feature](pendingToggle.target);
     setPendingToggle(null);
@@ -224,7 +196,6 @@ export default function DevTools({
             <NavRowWithToggle label="Natural Language Capture" isOn={enableNlc} onToggle={() => setPendingToggle({ feature: 'nlc', target: !enableNlc })} onClick={onNavigateNlc} />
             <NavRowWithToggle label="Notifications" isOn={enableNotifications} onToggle={() => setPendingToggle({ feature: 'notifications', target: !enableNotifications })} onClick={onNavigateNotifications} />
             <NavRowWithToggle label="Onboarding" isOn={enableOnboarding} onToggle={() => setPendingToggle({ feature: 'onboarding', target: !enableOnboarding })} onClick={onNavigateOnboarding} />
-            <ToggleOnlyRow label="Reminder attachments" isOn={enableReminderAttachments} onToggle={() => setPendingToggle({ feature: 'reminderAttachments', target: !enableReminderAttachments })} />
             <NavRow label="Testing" onClick={onNavigateTesting} plain />
             <NavRow label="System" onClick={onNavigateSystem} plain />
             <div />

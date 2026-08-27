@@ -28,10 +28,10 @@ One attachment per reminder. No cloud storage. No attachment synchronisation.
 
 ## 3. Add the feature gate
 
-* Add **Reminder attachments** to Dev Tools > Home.
-* Position it directly below **Onboarding**.
-* Match the UI and behaviour of the existing feature toggles.
-* No `>` navigation or additional settings screen.
+* Add **Reminder attachments** to Dev Tools > Reminders > Features.
+* Position it directly below **Repeat reminders**.
+* Use the existing `ToggleRow` with info (`i`) treatment, matching the other feature toggles on the Reminders sub-page.
+* The toggle is disabled when Enable reminders is OFF.
 * Feature OFF by default.
 * Verify that OFF produces zero visible change elsewhere in Reminderly.
 * Switching OFF hides attachment functionality but does not delete existing attachments.

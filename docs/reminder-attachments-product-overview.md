@@ -137,11 +137,11 @@ Reminder Attachments will initially be feature-gated.
 
 A **Reminder attachments** toggle will be added to:
 
-**Dev Tools > Home**
+**Dev Tools > Reminders > Features**
 
-It will sit directly below **Onboarding** and use the same UI style as the existing feature toggles.
+It will sit directly below **Repeat reminders** and use the same `ToggleRow` with info (`i`) treatment as the other feature toggles on the Reminders sub-page.
 
-There is no `>` navigation or separate configuration screen.
+The toggle is disabled when Enable reminders is OFF.
 
 When the feature is OFF:
 
