@@ -44,12 +44,7 @@ Install `@capacitor/filesystem` for native file storage.
 
 Install `@capacitor/camera` for "Take a photo" and "Choose a photo" functionality.
 
-For "Choose a file", evaluate two approaches before implementing:
-
-* Standard web `<input type="file">` — no additional dependency, but may have limitations in the iOS WebView context.
-* `@capawesome/capacitor-file-picker` — dedicated native file picker, but adds a dependency.
-
-Recommend the simplest reliable approach for Reminderly/iOS. Add a plugin only if the standard web file picker has a genuine limitation that affects the user experience.
+For "Choose a file", use the standard web `<input type="file">`. In Reminderly's Capacitor 8 WKWebView, this triggers the native iOS document picker, provides file name, MIME type and size for validation, and file contents are readable for copying to native storage. No additional dependency required.
 
 Add the required iOS permissions to Info.plist:
 
@@ -116,7 +111,7 @@ Follow the supplied UI specification and assets exactly.
 
 * **Choose a photo** → open the device photo library via `@capacitor/camera`.
 * **Take a photo** → open the device camera via `@capacitor/camera`.
-* **Choose a file** → open the device file picker (approach determined in step 4).
+* **Choose a file** → open the device file picker via standard web `<input type="file">`.
 * Validate the selected attachment (file type, MIME type, size) before writing it to storage.
 * Copy successful attachments into Reminderly's native filesystem sandbox.
 * Cancelling a picker or camera simply returns the user to the reminder with no message.
