@@ -609,6 +609,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     if (editReminder) return editReminder.originalText;
     return '';
   });
+  const [showAttachmentOverlay, setShowAttachmentOverlay] = useState(false);
   const prevRepeatsOverlayOpenRef = useRef(isRepeatsOverlayOpen);
   const repeatsDrawerTimerRef = useRef<number | null>(null);
   const repeatsOverlayTimerRef = useRef<number | null>(null);
@@ -1184,6 +1185,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
   const isSubmitActive = reminderText.trim().length > 0 && (!requiresScheduledReminder || (isDateOn && selectedDate !== null && isTimeOn && selectedTime !== null));
 
   return (
+    <>
     <div className="relative shrink-0 w-full max-w-[768px] h-full flex flex-col" data-name="new-reminder-elements">
       <div className="content-stretch flex flex-col gap-[22px] items-start pt-[30px] px-[24px] relative w-full shrink-0">
         <Header isSubmitActive={isSubmitActive} onSubmit={handleSubmit} title={isSmartReminderCreate ? 'Add smart reminder' : isEditMode ? (isSmartReminderEdit ? 'Edit smart reminder' : 'Edit reminder') : 'New reminder'} />
@@ -1253,11 +1255,17 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
             readOnly={isSmartReminderMode}
           />
           {isReminderAttachmentsEnabled && (
-            <div className="absolute z-20 pointer-events-none" style={{ right: 16, bottom: 14 }}>
-              <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <button
+              type="button"
+              className="absolute z-20 bg-transparent border-none p-0 cursor-pointer select-none"
+              style={{ width: 44, height: 44, right: 0, bottom: 0 }}
+              onClick={() => setShowAttachmentOverlay(true)}
+              aria-label="Add an attachment"
+            >
+              <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute" style={{ right: 16, bottom: 14 }}>
                 <path d="M1.79015 2.46873C3.16363 0.0901122 6.21945 -0.701928 8.60753 0.676733C10.9951 2.0557 11.8361 5.09698 10.463 7.47556L8.13585 11.5068C7.34645 12.8734 5.59455 13.324 4.2296 12.5361C2.86472 11.748 2.37928 10.0056 3.16808 8.63865L5.49523 4.6074C5.69658 4.25896 6.1427 4.13977 6.49132 4.3408C6.8397 4.5422 6.95899 4.9883 6.75792 5.33689L4.43077 9.36716C4.05195 10.0235 4.27844 10.8793 4.95909 11.2724C5.6397 11.6652 6.49302 11.4332 6.87218 10.7773L9.19933 6.74607C10.1621 5.07814 9.5812 2.9243 7.87804 1.9404C6.17428 0.956836 4.01702 1.53023 3.05382 3.19822L1.36144 6.12888C1.16007 6.4776 0.713108 6.5978 0.364367 6.39646C0.0159326 6.19501 -0.103475 5.74801 0.0977658 5.39939L1.79015 2.46873Z" fill="#1C2C42"/>
               </svg>
-            </div>
+            </button>
           )}
         </motion.div>
       </div>
@@ -1284,6 +1292,66 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       />
       </div>
     </div>
+
+    {showAttachmentOverlay && (
+      <>
+        <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setShowAttachmentOverlay(false)} />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center pointer-events-none">
+          <div
+            className="bg-white relative flex flex-col gap-[25px] items-center pt-[35px] pb-[35px] px-[32px] rounded-[32px] pointer-events-auto outline-none"
+            style={{ width: 340 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#1C2C42] text-[20px] text-center">
+              <p className="leading-[normal] whitespace-pre-wrap" style={{ fontWeight: 700 }}>Add an attachment</p>
+            </div>
+
+            <div className="content-stretch flex flex-col gap-[30px] items-start mt-[7px] relative shrink-0 w-full">
+              <button
+                className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
+                onClick={() => setShowAttachmentOverlay(false)}
+              >
+                <div className="flex flex-row items-center justify-center size-full">
+                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Choose a photo</p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
+                onClick={() => setShowAttachmentOverlay(false)}
+              >
+                <div className="flex flex-row items-center justify-center size-full">
+                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Take a photo</p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                className="bg-[#4784f8] cursor-pointer h-[50px] relative rounded-[100px] shrink-0 w-full border-none"
+                onClick={() => setShowAttachmentOverlay(false)}
+              >
+                <div className="flex flex-row items-center justify-center size-full">
+                  <div className="content-stretch flex items-center justify-center px-[18px] py-[15px] relative size-full">
+                    <div className="flex flex-col font-['Lato:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[17px] text-white whitespace-nowrap">
+                      <p className="leading-[normal]">Choose a file</p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+
+    </>
   );
 }
 
