@@ -624,7 +624,6 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
   const [pendingAttachment, setPendingAttachment] = useState<{ fileName: string; mimeType: string; dataBase64: string; previewDataUrl?: string } | null>(null);
   const [attachmentError, setAttachmentError] = useState<{ title: string; message: string } | null>(null);
   const [showDeleteAttachmentConfirm, setShowDeleteAttachmentConfirm] = useState(false);
-  const [showAttachmentViewer, setShowAttachmentViewer] = useState(false);
   const [imagePreviewFailed, setImagePreviewFailed] = useState(false);
   useEffect(() => { setImagePreviewFailed(false); }, [pendingAttachment]);
   const attachmentDeletedRef = useRef(false);
@@ -1366,14 +1365,6 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
 
   const handleAttachmentTap = async () => {
     if (!pendingAttachment) return;
-    const mime = pendingAttachment.mimeType;
-
-    if (mime.startsWith('image/')) {
-      setShowAttachmentViewer(true);
-      return;
-    }
-
-    // All non-image documents (PDF, DOC, XLSX, etc.) — native iOS preview, share sheet fallback
     handleOpenAttachment();
   };
 
@@ -1402,10 +1393,6 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       // Native preview failed — fall back to share sheet
       handleShareAttachment();
     }
-  };
-
-  const closeAttachmentViewer = () => {
-    setShowAttachmentViewer(false);
   };
 
   const handleShareAttachment = async () => {
@@ -1905,42 +1892,6 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
               </button>
             </div>
           </div>
-        </div>
-      </>
-    )}
-
-    {showAttachmentViewer && pendingAttachment && (
-      <>
-        {/* Backdrop — 85% black, tap to close */}
-        <div className="fixed inset-0 z-[70]" style={{ background: 'rgba(0,0,0,0.85)' }} onClick={closeAttachmentViewer} />
-        {/* Content area — centred, 30px side margins, 100px top/bottom from usable screen */}
-        <div
-          className="fixed z-[70] flex items-center justify-center pointer-events-none"
-          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 100px)', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)', left: 30, right: 30 }}
-        >
-          {/* Image attachment viewer */}
-          {pendingAttachment.mimeType.startsWith('image/') && (
-            <div className="relative pointer-events-auto">
-              <img
-                src={`data:${pendingAttachment.mimeType};base64,${pendingAttachment.dataBase64}`}
-                alt={pendingAttachment.fileName}
-                onClick={(e) => e.stopPropagation()}
-                style={{ display: 'block', maxWidth: 'calc(100vw - 60px)', maxHeight: 'calc(100vh - 200px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))', objectFit: 'contain', borderRadius: 12 }}
-              />
-              <button
-                type="button"
-                className="absolute z-[80] bg-transparent border-none p-0 cursor-pointer select-none"
-                style={{ top: 10, right: 10, width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                onClick={closeAttachmentViewer}
-                aria-label="Close viewer"
-              >
-                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="30" height="30" rx="15" fill="black"/>
-                  <path d="M18.5064 10.2562C18.8482 9.91468 19.4021 9.91453 19.7438 10.2562C20.0854 10.5978 20.0853 11.1518 19.7438 11.4935L16.2368 14.9994L19.7438 18.5064C20.0854 18.848 20.0853 19.402 19.7438 19.7437C19.4021 20.0854 18.8482 20.0854 18.5064 19.7437L14.9995 16.2367L11.4936 19.7437C11.1519 20.0854 10.598 20.0854 10.2563 19.7437C9.91456 19.402 9.91459 18.8481 10.2563 18.5064L13.7621 14.9994L10.2563 11.4935C9.91481 11.1518 9.91463 10.5978 10.2563 10.2562C10.5979 9.91476 11.152 9.91479 11.4936 10.2562L14.9995 13.762L18.5064 10.2562Z" fill="white"/>
-                </svg>
-              </button>
-            </div>
-          )}
         </div>
       </>
     )}
