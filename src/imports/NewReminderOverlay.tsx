@@ -284,7 +284,7 @@ function InteractiveCalendar({ selectedDate, onDateSelect }: { selectedDate: Dat
 function AddTickBtn({ active, onSubmit }: { active: boolean; onSubmit?: () => void }) {
   return (
     <button
-      className={`flex items-center justify-center relative shrink-0 size-[50px] ${active ? 'cursor-pointer' : 'cursor-default'}`}
+      className={`flex items-center justify-center relative shrink-0 size-[45px] ${active ? 'cursor-pointer' : 'cursor-default'}`}
       data-name="add-tick-btn"
       disabled={!active}
       onClick={active ? onSubmit : undefined}

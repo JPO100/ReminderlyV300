@@ -118,7 +118,7 @@ function TutorialSavedListTemplateIcon() {
 
 function TemplatesTutorialButton() {
   return (
-    <div className="bg-[#4784F8] content-stretch flex items-center justify-center px-[11.487px] h-[28.718px] relative rounded-[71.795px] shrink-0">
+    <div className="bg-[#4784F8] content-stretch flex items-center justify-center px-[11.487px] h-[32.308px] relative rounded-[71.795px] shrink-0">
       <div className="content-stretch flex items-center justify-center gap-[5.744px] relative">
         <div className="font-['Lato',sans-serif] font-bold text-[10.051px] text-white whitespace-nowrap">
           Templates
@@ -194,7 +194,7 @@ function Page5DoneDeletedFilters() {
       <div className="flex items-center justify-between gap-[10px]">
         <div className="flex items-center gap-[8px]">
           <div
-            className="bg-white content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0"
+            className="bg-white content-stretch flex items-center justify-center px-[11.144px] h-[31px] relative rounded-[69.652px] shrink-0"
             style={{ boxShadow: "inset 0 0 0 1.392px #4784F8", color: "#4784F8" }}
           >
             <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
@@ -202,7 +202,7 @@ function Page5DoneDeletedFilters() {
             </div>
           </div>
           <div
-            className="content-stretch flex items-center justify-center px-[11.144px] h-[28px] relative rounded-[69.652px] shrink-0"
+            className="content-stretch flex items-center justify-center px-[11.144px] h-[31px] relative rounded-[69.652px] shrink-0"
             style={{ boxShadow: "inset 0 0 0 0.696px #898989", color: "#898989" }}
           >
             <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
@@ -210,7 +210,7 @@ function Page5DoneDeletedFilters() {
             </div>
           </div>
         </div>
-        <div className="content-stretch flex items-center justify-center h-[28px] w-[66px] relative rounded-[69.652px] shrink-0 border border-solid border-[#4784F8] text-[#4784F8]">
+        <div className="content-stretch flex items-center justify-center h-[31px] w-[66px] relative rounded-[69.652px] shrink-0 border border-solid border-[#4784F8] text-[#4784F8]">
           <div className="font-['Lato',sans-serif] font-bold text-[9.751px] whitespace-nowrap">
             Clear all
           </div>
