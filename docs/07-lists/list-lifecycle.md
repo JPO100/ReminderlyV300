@@ -134,6 +134,8 @@ Current lifecycle:
 * set due date and time on the list
 * create or edit the linked reminder through the reminders overlay
 * complete/delete/restore linked reminders through list sync flows
+* deleting the linked reminder switches the smart reminder off and discards the stored date/time
+* toggling the smart reminder back on after deletion goes through the normal creation flow (user sets a new schedule)
 
 Smart reminder state is stored on the list:
 

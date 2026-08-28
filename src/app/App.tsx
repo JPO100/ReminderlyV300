@@ -1221,6 +1221,7 @@ export default function App() {
     previousTime: string | null;
   } | null>(null);
   const smartReminderCreateDidSaveRef = useRef(false);
+  const pendingSmartReminderAnimateListIdRef = useRef<string | null>(null);
   const smartReminderSetupTimerRef = useRef<number | null>(null);
 
   // UI-only: id of reminder that just reinserted via repeat reschedule (drives fade-in)
@@ -1716,6 +1717,19 @@ export default function App() {
         if (!smartReminder) continue;
         next.push(smartReminder);
         changed = true;
+        // Trigger fade-in and insert highlight when created from the reminder panel
+        if (pendingSmartReminderAnimateListIdRef.current === list.id) {
+          pendingSmartReminderAnimateListIdRef.current = null;
+          setReinsertedId(smartReminder.id);
+          setInsertHighlightId(smartReminder.id);
+          if (insertHighlightTimerRef.current !== null) {
+            clearTimeout(insertHighlightTimerRef.current);
+          }
+          insertHighlightTimerRef.current = window.setTimeout(() => {
+            insertHighlightTimerRef.current = null;
+            setInsertHighlightId(null);
+          }, INSERT_HIGHLIGHT_MS);
+        }
       }
 
       return changed ? next : prev;
@@ -2027,23 +2041,32 @@ export default function App() {
 
   const createSmartReminderFromPanel = useCallback(({ listId, date, time }: { listId: string; date: string; time: string | null }) => {
     smartReminderCreateDidSaveRef.current = true;
-    setCreatedLists((prev) =>
-      prev.map((list) =>
-        list.id === listId
-          ? {
-              ...list,
-              smartReminders: true,
-              smartReminderDueDate: date,
-              smartReminderTime: time ?? getSmartReminderTime(list.smartReminderTime),
-            }
-          : list
-      )
-    );
-    if (editingListId === listId) {
-      setListSmartReminders(true);
-      setListSmartReminderDueDate(date);
-      setListSmartReminderTime(time ?? getSmartReminderTime(listSmartReminderTime));
+    hapticTap('createReminder');
+    pendingSmartReminderAnimateListIdRef.current = listId;
+    // Delay list state update to match normal reminder insert timing
+    if (newReminderInsertTimerRef.current !== null) {
+      clearTimeout(newReminderInsertTimerRef.current);
     }
+    newReminderInsertTimerRef.current = window.setTimeout(() => {
+      newReminderInsertTimerRef.current = null;
+      setCreatedLists((prev) =>
+        prev.map((list) =>
+          list.id === listId
+            ? {
+                ...list,
+                smartReminders: true,
+                smartReminderDueDate: date,
+                smartReminderTime: time ?? getSmartReminderTime(list.smartReminderTime),
+              }
+            : list
+        )
+      );
+      if (editingListId === listId) {
+        setListSmartReminders(true);
+        setListSmartReminderDueDate(date);
+        setListSmartReminderTime(time ?? getSmartReminderTime(listSmartReminderTime));
+      }
+    }, NEW_REMINDER_INSERT_DELAY);
     setPendingListInfoSmartReminderListId(null);
     pendingSmartReminderCreateRef.current = null;
     setSmartReminderCreateListId(null);
@@ -3127,15 +3150,20 @@ export default function App() {
         setCreatedLists((prev) =>
           prev.map((list) =>
             list.id === linkedSmartListId
-              ? { ...list, smartReminders: false }
+              ? { ...list, smartReminders: false, smartReminderDueDate: null, smartReminderTime: null }
               : list
           )
         );
+        if (editingListId === linkedSmartListId) {
+          setListSmartReminders(false);
+          setListSmartReminderDueDate(null);
+          setListSmartReminderTime(null);
+        }
       }
     }, COMPLETION_DELAY);
 
     pendingDeleteTimersRef.current.set(reminderId, timer);
-  }, [reminders]);
+  }, [reminders, editingListId]);
 
   const handleMoveReminderToTomorrow = useCallback((reminderId: string) => {
     const targetReminder = reminders.find((reminder) => reminder.id === reminderId);
@@ -4705,7 +4733,20 @@ export default function App() {
                                 }}
                               >
                                 <div className={`overflow-hidden whitespace-nowrap${isPendingAway ? ' line-through' : ''}`} style={{ color: isPendingAway ? pendingColour : textColour, textDecorationColor: isPendingAway ? pendingColour : textColour, height: '17px', maxWidth: '100%', minWidth: 0 }}>
-                                  <p style={{ display: 'block', width: '100%', minWidth: 0, fontSize: '17px', fontWeight: 700, lineHeight: '17px', transform: 'translateY(-1px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingBottom: '2px', boxSizing: 'content-box' }}>{getDisplayTitle(reminder)}</p>
+                                  {isReminderAttachmentsEnabled && reminder.attachment ? (
+                                    <div className="flex h-full items-center min-w-0" style={{ gap: '8px' }}>
+                                      <div className="flex shrink-0 items-center justify-center" style={{ width: '13px', height: '15px' }}>
+                                        <svg className="block" width="13" height="15" viewBox="0 0 13 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                          <path d="M1.96387 2.73321C3.48445 0.0995331 6.86537 -0.776742 9.50782 0.748831C12.1502 2.27444 13.0819 5.64054 11.5615 8.27422L9.02344 12.6717C8.14001 14.2013 6.17964 14.7042 4.65332 13.823C3.1273 12.9417 2.58393 10.9935 3.4668 9.46367L6.00489 5.06621C6.24645 4.64794 6.78188 4.50438 7.2002 4.7459C7.61846 4.98743 7.76193 5.5229 7.52051 5.94121L4.98145 10.3377C4.59045 11.0152 4.82282 11.9011 5.52832 12.3084C6.23373 12.7156 7.11654 12.4739 7.50782 11.7967L10.0469 7.4002C11.0753 5.61894 10.4544 3.31617 8.63282 2.26446C6.81123 1.21278 4.50693 1.82694 3.47852 3.60821L1.63282 6.80547C1.39123 7.22365 0.855779 7.36723 0.437503 7.12578C0.0192525 6.88428 -0.12417 6.34878 0.11719 5.93047L1.96387 2.73321Z" fill="currentColor"/>
+                                        </svg>
+                                      </div>
+                                      <div className="min-w-0 overflow-hidden">
+                                        <p style={{ display: 'block', width: '100%', minWidth: 0, fontSize: '17px', fontWeight: 700, lineHeight: '17px', transform: 'translateY(-1px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingBottom: '2px', boxSizing: 'content-box' }}>{getDisplayTitle(reminder)}</p>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <p style={{ display: 'block', width: '100%', minWidth: 0, fontSize: '17px', fontWeight: 700, lineHeight: '17px', transform: 'translateY(-1px)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingBottom: '2px', boxSizing: 'content-box' }}>{getDisplayTitle(reminder)}</p>
+                                  )}
                                 </div>
                                 {showSubtitles && (
                                   <div className={`flex items-center overflow-visible${isPendingAway ? ' line-through' : ''}`} style={{ textDecorationColor: isPendingAway ? pendingColour : '#BABABA' }}>
