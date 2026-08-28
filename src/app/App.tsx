@@ -36,6 +36,8 @@ import DeletedInfoOverlay from "../imports/deleted-info-overlay";
 import AddListItemInput from "./components/lists/AddListItemInput";
 import EditableListItem from "./components/lists/EditableListItem";
 import { CompletedCircleIcon } from "./components/icons/ReminderStateIcons";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { FileOpener } from "@capacitor-community/file-opener";
 import { deleteAttachment } from "./utils/attachment-storage";
 import {
   dateToStorageString,
@@ -4868,6 +4870,41 @@ export default function App() {
                       setIsOverlayOpen(true);
                     }, 200);
                   }}
+                  onViewAttachment={isReminderAttachmentsEnabled && infoReminder.attachment ? () => {
+                    const attachment = infoReminder.attachment!;
+                    setInfoReminder(null);
+                    if (overlayEditTimerRef.current !== null) {
+                      clearTimeout(overlayEditTimerRef.current);
+                    }
+                    (async () => {
+                      try {
+                        const readResult = await Filesystem.readFile({
+                          path: attachment.storagePath,
+                          directory: Directory.Data,
+                        });
+                        const ext = attachment.fileName.includes('.')
+                          ? attachment.fileName.split('.').pop()
+                          : 'dat';
+                        const tempPath = `reminderly-temp-preview.${ext}`;
+                        await Filesystem.writeFile({
+                          path: tempPath,
+                          data: readResult.data,
+                          directory: Directory.Cache,
+                        });
+                        const uriResult = await Filesystem.getUri({
+                          path: tempPath,
+                          directory: Directory.Cache,
+                        });
+                        await FileOpener.open({
+                          filePath: uriResult.uri,
+                          contentType: attachment.mimeType,
+                          openWithDefault: true,
+                        });
+                      } catch {
+                        // Silently fail if attachment cannot be opened
+                      }
+                    })();
+                  } : undefined}
                   onGoToList={() => {
                     const linkedListId = infoReminder.linkedListId;
                     if (!linkedListId) return;

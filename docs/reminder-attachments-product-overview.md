@@ -119,13 +119,13 @@ Validation uses MIME type information with sensible extension handling rather th
 
 Errors remain short, human and consistent with Reminderly's tone.
 
-| Situation          | Title             | Message                                 |
-| ------------------ | ----------------- | --------------------------------------- |
-| File too large     | **Too big!**      | Choose a file under 25 MB.              |
-| Unsupported type   | **Not this one**  | Try a different file.                   |
-| Can't read/copy    | **Oops!**         | Give it another go.                     |
-| Not enough storage | **Low on space**  | Free up some space and try again.       |
-| Permission denied  | **Access needed** | Allow access in Settings and try again. |
+| Situation                  | Title                         | Message                                                            |
+| -------------------------- | ----------------------------- | ------------------------------------------------------------------ |
+| File too large             | **This file is too big**      | Choose a file under 25 MB.                                         |
+| Unsupported file type      | **This file isn't supported** | Try a different file.                                              |
+| Can't read/copy attachment | **Oh no!**                    | We couldn't attach this file. Try again or choose a different one. |
+| Not enough device storage  | **Low on space**              | Free up some space and try again.                                  |
+| Permission denied          | **Access needed**             | Allow access in Settings and try again.                            |
 
 Cancelling a photo, camera or file selection simply returns the user to their reminder without displaying an error.
 

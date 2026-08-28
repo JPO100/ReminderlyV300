@@ -1187,16 +1187,16 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       const validation = validateAttachment(picked.name, picked.mimeType, picked.size);
       if (!validation.valid) {
         if (validation.reason === 'too-large') {
-          setAttachmentError({ title: 'Too big!', message: 'Choose a file under 25 MB.' });
+          setAttachmentError({ title: 'This file is too big', message: 'Choose a file under 25 MB.' });
         } else {
-          setAttachmentError({ title: 'Not this one', message: 'Try a different file.' });
+          setAttachmentError({ title: 'This file isn\'t supported', message: 'Try a different file.' });
         }
         return;
       }
 
       // Read file data only after validation passes
       if (!picked.path) {
-        setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+        setAttachmentError({ title: 'Oh no!', message: 'We couldn\'t attach this file. Try again or choose a different one.' });
         return;
       }
 
@@ -1247,7 +1247,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       // Picker cancellation rejects with "pickFiles canceled."
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('canceled')) return;
-      setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+      setAttachmentError({ title: 'Oh no!', message: 'We couldn\'t attach this file. Try again or choose a different one.' });
     }
   };
 
@@ -1266,7 +1266,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       // Plugin returns a temp JPEG file — read it and validate size
       const path = photo.path;
       if (!path) {
-        setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+        setAttachmentError({ title: 'Oh no!', message: 'We couldn\'t attach this file. Try again or choose a different one.' });
         return;
       }
 
@@ -1279,9 +1279,9 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       const validation = validateAttachment(fileName, mimeType, blob.size);
       if (!validation.valid) {
         if (validation.reason === 'too-large') {
-          setAttachmentError({ title: 'Too big!', message: 'Choose a file under 25 MB.' });
+          setAttachmentError({ title: 'This file is too big', message: 'Choose a file under 25 MB.' });
         } else {
-          setAttachmentError({ title: 'Not this one', message: 'Try a different file.' });
+          setAttachmentError({ title: 'This file isn\'t supported', message: 'Try a different file.' });
         }
         return;
       }
@@ -1305,7 +1305,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       // Cancellation — silently ignore
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('cancel')) return;
-      setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+      setAttachmentError({ title: 'Oh no!', message: 'We couldn\'t attach this file. Try again or choose a different one.' });
     }
   };
 
@@ -1322,7 +1322,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
 
       const path = photo.path;
       if (!path) {
-        setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+        setAttachmentError({ title: 'Oh no!', message: 'We couldn\'t attach this file. Try again or choose a different one.' });
         return;
       }
 
@@ -1334,9 +1334,9 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
       const validation = validateAttachment(fileName, mimeType, blob.size);
       if (!validation.valid) {
         if (validation.reason === 'too-large') {
-          setAttachmentError({ title: 'Too big!', message: 'Choose a file under 25 MB.' });
+          setAttachmentError({ title: 'This file is too big', message: 'Choose a file under 25 MB.' });
         } else {
-          setAttachmentError({ title: 'Not this one', message: 'Try a different file.' });
+          setAttachmentError({ title: 'This file isn\'t supported', message: 'Try a different file.' });
         }
         return;
       }
@@ -1359,7 +1359,7 @@ function NewReminderElements({ onRepeatsOverlayOpen, repeatConfig, onRepeatConfi
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('cancel')) return;
-      setAttachmentError({ title: 'Oops!', message: 'Give it another go.' });
+      setAttachmentError({ title: 'Oh no!', message: 'We couldn\'t attach this file. Try again or choose a different one.' });
     }
   };
 
