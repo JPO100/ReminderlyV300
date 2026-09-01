@@ -448,6 +448,23 @@ const DEFAULT_LIST_NAMES = [
 let _onPersistenceError: (() => void) | null = null;
 let _onPersistenceSuccess: (() => void) | null = null;
 
+// Diagnostic: detect and log when a populated list unexpectedly becomes blank.
+// Stored in localStorage as a small rolling array (max 20 entries).
+const LIST_CORRUPTION_LOG_KEY = 'reminderly-debug-list-corruption-log';
+function logListCorruptionEvent(entry: {
+  ts: number; listId: string; prevTitle: string; prevItemCount: number;
+  nextTitle: string; nextItemCount: number; editingListId: string | null;
+  overlayOpen: boolean; overlayMode: string;
+}) {
+  try {
+    const raw = localStorage.getItem(LIST_CORRUPTION_LOG_KEY);
+    const log: unknown[] = raw ? JSON.parse(raw) : [];
+    log.push(entry);
+    if (log.length > 20) log.splice(0, log.length - 20);
+    localStorage.setItem(LIST_CORRUPTION_LOG_KEY, JSON.stringify(log));
+  } catch { /* best-effort */ }
+}
+
 function persistStringIfChanged(key: string, value: string) {
   try {
     if (localStorage.getItem(key) === value) return;
@@ -638,6 +655,7 @@ export default function App() {
       return [];
     }
   });
+  const prevCreatedListsRef = useRef(createdLists);
   const [savedLists, setSavedLists] = useState<SavedListTemplate[]>(() => {
     try {
       const stored = localStorage.getItem('reminderly-saved-lists');
@@ -1621,6 +1639,22 @@ export default function App() {
   // Persist created lists to localStorage
   useEffect(() => {
     try {
+      // Diagnostic: detect populated list → blank transitions
+      const prev = prevCreatedListsRef.current;
+      for (const next of createdLists) {
+        if (next.title === '' && next.items.length === 0) {
+          const old = prev.find(l => l.id === next.id);
+          if (old && (old.title !== '' || old.items.length > 0)) {
+            logListCorruptionEvent({
+              ts: Date.now(), listId: next.id,
+              prevTitle: old.title, prevItemCount: old.items.length,
+              nextTitle: next.title, nextItemCount: next.items.length,
+              editingListId, overlayOpen: isListsOverlayOpen, overlayMode: listOverlayMode,
+            });
+          }
+        }
+      }
+      prevCreatedListsRef.current = createdLists;
       persistStringIfChanged('reminderly-created-lists', JSON.stringify(createdLists));
     } catch {
       // Fail silently
@@ -2212,29 +2246,20 @@ export default function App() {
       openListEditorTimerRef.current = null;
     }
     setListInfoOverlayListId(null);
-    setListTitle("");
-    setListItems([]);
-    setListSortMode('insertion');
-    setListSmartReminders(false);
-    setListSmartReminderDueDate(null);
-    setListSmartReminderTime(null);
+    setRevealedDeleteListItemId(null);
+    setListItemReinsertedId(null);
+    setListItemHighlightId(null);
+    setAlphabeticalPinnedListItemId(null);
+    setAlphabeticalPinnedListItemIndex(0);
+    setListTitle(list.title);
+    setListItems(list.items.map((item) => ({ id: (item as any).id || crypto.randomUUID(), ...item })));
+    setListSortMode(list.sortMode || 'insertion');
+    setListSmartReminders(list.smartReminders ?? false);
+    setListSmartReminderDueDate(list.smartReminderDueDate ?? null);
+    setListSmartReminderTime(list.smartReminderTime ?? null);
     setListOverlayMode('edit');
     setEditingListId(list.id);
     setIsListsOverlayOpen(true);
-    openListEditorTimerRef.current = window.setTimeout(() => {
-      openListEditorTimerRef.current = null;
-      setRevealedDeleteListItemId(null);
-      setListItemReinsertedId(null);
-      setListItemHighlightId(null);
-      setAlphabeticalPinnedListItemId(null);
-      setAlphabeticalPinnedListItemIndex(0);
-      setListTitle(list.title);
-      setListItems(list.items.map((item) => ({ id: (item as any).id || crypto.randomUUID(), ...item })));
-      setListSortMode(list.sortMode || 'insertion');
-      setListSmartReminders(list.smartReminders ?? false);
-      setListSmartReminderDueDate(list.smartReminderDueDate ?? null);
-      setListSmartReminderTime(list.smartReminderTime ?? null);
-    }, 0);
   };
 
   const useSavedList = (list: SavedListTemplate) => {
